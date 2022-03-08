@@ -1,0 +1,15 @@
+Alignments/STAR_Align/A10-1/Aligned.sortedByCoord.out.bam	A10-1
+Alignments/STAR_Align/A10-2/Aligned.sortedByCoord.out.bam	A10-2
+Alignments/STAR_Align/A10-3/Aligned.sortedByCoord.out.bam	A10-3
+Alignments/STAR_Align/C2-1/Aligned.sortedByCoord.out.bam	C2-1
+Alignments/STAR_Align/C2-2/Aligned.sortedByCoord.out.bam	C2-2
+Alignments/STAR_Align/C2-3/Aligned.sortedByCoord.out.bam	C2-3
+Alignments/STAR_Align/CUOME-1/Aligned.sortedByCoord.out.bam	CUOME-1
+Alignments/STAR_Align/CUOME-2/Aligned.sortedByCoord.out.bam	CUOME-2
+Alignments/STAR_Align/CUOME-3/Aligned.sortedByCoord.out.bam	CUOME-3
+Alignments/STAR_Align/DMSO-1/Aligned.sortedByCoord.out.bam	DMSO-1
+Alignments/STAR_Align/DMSO-2/Aligned.sortedByCoord.out.bam	DMSO-2
+Alignments/STAR_Align/DMSO-3/Aligned.sortedByCoord.out.bam	DMSO-3
+Alignments/STAR_Align/SM2-1/Aligned.sortedByCoord.out.bam	SM2-1
+Alignments/STAR_Align/SM2-2/Aligned.sortedByCoord.out.bam	SM2-2
+Alignments/STAR_Align/SM2-3/Aligned.sortedByCoord.out.bam	SM2-3

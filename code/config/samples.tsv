@@ -1,0 +1,16 @@
+sample	R1	R2
+A10-1	/project2/yangili1/ku_jwang168/A10-1.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/A10-1.R2_001.fastq.gz
+A10-2	/project2/yangili1/ku_jwang168/A10-2.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/A10-2.R2_001.fastq.gz
+A10-3	/project2/yangili1/ku_jwang168/A10-3.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/A10-3.R2_001.fastq.gz
+C2-1	/project2/yangili1/ku_jwang168/C2-1.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/C2-1.R2_001.fastq.gz
+C2-2	/project2/yangili1/ku_jwang168/C2-2.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/C2-2.R2_001.fastq.gz
+C2-3	/project2/yangili1/ku_jwang168/C2-3.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/C2-3.R2_001.fastq.gz
+CUOME-1	/project2/yangili1/ku_jwang168/CUOME-1.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/CUOME-1.R2_001.fastq.gz
+CUOME-2	/project2/yangili1/ku_jwang168/CUOME-2.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/CUOME-2.R2_001.fastq.gz
+CUOME-3	/project2/yangili1/ku_jwang168/CUOME-3.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/CUOME-3.R2_001.fastq.gz
+DMSO-1	/project2/yangili1/ku_jwang168/DMSO-1.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/DMSO-1.R2_001.fastq.gz
+DMSO-2	/project2/yangili1/ku_jwang168/DMSO-2.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/DMSO-2.R2_001.fastq.gz
+DMSO-3	/project2/yangili1/ku_jwang168/DMSO-3.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/DMSO-3.R2_001.fastq.gz
+SM2-1	/project2/yangili1/ku_jwang168/SM2-1.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/SM2-1.R2_001.fastq.gz
+SM2-2	/project2/yangili1/ku_jwang168/SM2-2.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/SM2-2.R2_001.fastq.gz
+SM2-3	/project2/yangili1/ku_jwang168/SM2-3.R1_001.fastq.gz	/project2/yangili1/ku_jwang168/SM2-3.R2_001.fastq.gz

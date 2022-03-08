@@ -1,0 +1,2766 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Differential Splicing</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">small molecular splicing RNA-seq</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Differential Splicing</h1>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#results">Results</a><ul>
+<li><a href="#differential-expression-analysis">Differential expression analysis</a></li>
+<li><a href="#differential-splicing-analysis">Differential splicing analysis</a></li>
+<li><a href="#using-clinvar-to-prioritize-potential-therapeutic-targets">Using ClinVar to prioritize potential therapeutic targets</a></li>
+</ul></li>
+</ul>
+</div>
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-02-17
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>20211209_JingxinRNAseq/analysis/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed19900924code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(19900924)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed19900924code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(19900924)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongNocommitsyet"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> No commits yet </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongNocommitsyet" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    ._.DS_Store
+    Ignored:    code/.DS_Store
+    Ignored:    code/._.DS_Store
+    Ignored:    code/._DOCK7.pdf
+    Ignored:    code/._DOCK7_DMSO1.pdf
+    Ignored:    code/._DOCK7_SM2_1.pdf
+    Ignored:    code/._FKTN_DMSO_1.pdf
+    Ignored:    code/._FKTN_SM2_1.pdf
+    Ignored:    code/._MAPT.pdf
+    Ignored:    code/._PKD1_DMSO_1.pdf
+    Ignored:    code/._PKD1_SM2_1.pdf
+    Ignored:    code/.snakemake/
+    Ignored:    code/5ssSeqs.tab
+    Ignored:    code/Alignments/
+    Ignored:    code/ClinVar/
+    Ignored:    code/DE_testing/
+    Ignored:    code/DE_tests.mat.counts.gz
+    Ignored:    code/DE_tests.txt.gz
+    Ignored:    code/DOCK7.pdf
+    Ignored:    code/DOCK7_DMSO1.pdf
+    Ignored:    code/DOCK7_SM2_1.pdf
+    Ignored:    code/FKTN_DMSO_1.pdf
+    Ignored:    code/FKTN_SM2_1.pdf
+    Ignored:    code/FastqFastp/
+    Ignored:    code/MAPT.pdf
+    Ignored:    code/OMIM/
+    Ignored:    code/PKD1_DMSO_1.pdf
+    Ignored:    code/PKD1_SM2_1.pdf
+    Ignored:    code/Session.vim
+    Ignored:    code/SplicingAnalysis/
+    Ignored:    code/featureCounts/
+    Ignored:    code/log
+    Ignored:    code/logs/
+    Ignored:    code/scratch/
+    Ignored:    code/scripts/.ExtractFromVcf.py.swp
+    Ignored:    code/slurm-15129743.out
+    Ignored:    code/slurm-15130459.out
+    Ignored:    code/slurm-15132009.out
+    Ignored:    code/slurm-15132188.out
+    Ignored:    code/slurm-15132283.out
+    Ignored:    code/slurm-15132284.out
+    Ignored:    code/slurm-15132285.out
+    Ignored:    code/slurm-15132286.out
+    Ignored:    code/slurm-15132287.out
+    Ignored:    code/slurm-15132288.out
+    Ignored:    code/slurm-15132289.out
+    Ignored:    code/slurm-15132290.out
+    Ignored:    code/slurm-15132291.out
+    Ignored:    code/slurm-15132292.out
+    Ignored:    code/slurm-15132293.out
+    Ignored:    code/slurm-15132294.out
+    Ignored:    code/slurm-15132295.out
+    Ignored:    code/slurm-15132296.out
+    Ignored:    code/slurm-15132297.out
+    Ignored:    code/slurm-15132298.out
+    Ignored:    code/slurm-15132299.out
+    Ignored:    code/slurm-15132300.out
+    Ignored:    code/slurm-15132301.out
+    Ignored:    code/slurm-15132302.out
+    Ignored:    code/slurm-15132303.out
+    Ignored:    code/slurm-15132304.out
+
+Untracked files:
+    Untracked:  .gitignore
+    Untracked:  20211209_JingxinRNAseq.Rproj
+    Untracked:  README.md
+    Untracked:  _workflowr.yml
+    Untracked:  analysis/
+    Untracked:  code/.editorconfig
+    Untracked:  code/.gitattributes
+    Untracked:  code/.gitignore
+    Untracked:  code/.test/
+    Untracked:  code/README.md
+    Untracked:  code/Snakefile
+    Untracked:  code/config/
+    Untracked:  code/envs/
+    Untracked:  code/rules/
+    Untracked:  code/scripts/DE_edgeR.R
+    Untracked:  code/scripts/ExtractFromVcf.py
+    Untracked:  code/scripts/GetBranchWindow.R
+    Untracked:  code/scripts/ScorePWM.py
+    Untracked:  code/scripts/common/
+    Untracked:  code/scripts/leafcutter_cluster_regtools_py3.py
+    Untracked:  code/snakemake_profiles/
+    Untracked:  data/
+    Untracked:  output/
+
+Staged changes:
+    New:        .gitmodules
+    New:        code/scripts/leafcutter
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Our collaborator, Jingxin, is interested in how small molecular drugs might effect splicing as eventually be used as treatments, like risdiplasm to treat SMA. Although antisense oligos have also been used to treat causal splicing defects in some SMA forms, small molecules may have general advatage over antisense oligos in in terms of efficient delivery to the necessary tissues. His lab has treated cells with 4 small molecules (SM2, CUOME, A10, and C2) and a DMSO control, 3 replicates for each treatment and DMSO. The goal with this experiment is to explore the splicing effects of these small molecular drugs, trying to better understand their molecular effects. Splicing was measured by RNA-seq which I have aligned with STAR and measured splicing and differential splicing with leafcutter. I also performed differential expression testing, by counting reads, fitting expression models and testing for differences with DMSO using edgeR.</p>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<div id="differential-expression-analysis" class="section level3">
+<h3>Differential expression analysis</h3>
+<p>I have processed data in a snakemake pipeline. In this Rmarkdown document I’ll plot the results of these analyses. First load necessary libraries and read in differential expression testing data…øØ</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>── Attaching packages ────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>✓ ggplot2 3.3.3     ✓ purrr   0.3.4
+✓ tibble  2.1.3     ✓ dplyr   0.8.3
+✓ tidyr   1.1.0     ✓ stringr 1.4.0
+✓ readr   1.3.1     ✓ forcats 0.4.0</code></pre>
+<pre><code>── Conflicts ───────────────────────────────────── tidyverse_conflicts() ──
+x dplyr::filter() masks stats::filter()
+x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(gplots)</code></pre>
+<pre><code>
+Attaching package: &#39;gplots&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:stats&#39;:
+
+    lowess</code></pre>
+<pre class="r"><code>library(edgeR)</code></pre>
+<pre><code>Loading required package: limma</code></pre>
+<pre class="r"><code>library(ggrepel)
+library(RColorBrewer)
+library(GGally)</code></pre>
+<pre><code>Registered S3 method overwritten by &#39;GGally&#39;:
+  method from   
+  +.gg   ggplot2</code></pre>
+<pre><code>
+Attaching package: &#39;GGally&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:dplyr&#39;:
+
+    nasa</code></pre>
+<p>Jingxin was particularly interested in the DE and differential splicing results for the genes MAPT (encoding tau protein) and SNCA (alpha synuclein). Originally I tested only genes with average expression of CountsPerMillion&gt;2, resulting in ~11000 genes to test. But MAPT and SNCA are quite lowly expressed in this cell type (fibroblasts, I think? …need to ask Jingxin). So I redid the DE testing with more permissive filters to allow testing of those genes. Here are the results…</p>
+<p>First let’s look at some basic quality control (reads mapped to genes per sample, clustering of samples by gene expression):</p>
+<pre class="r"><code>GeneCounts &lt;- read_tsv(&quot;../code/DE_testing/Counts.mat.txt.gz&quot;) %&gt;%
+  column_to_rownames(&quot;Geneid&quot;) %&gt;%
+  DGEList()</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  Geneid = col_character(),
+  `A10-1` = col_double(),
+  `A10-2` = col_double(),
+  `A10-3` = col_double(),
+  `C2-1` = col_double(),
+  `C2-2` = col_double(),
+  `C2-3` = col_double(),
+  `CUOME-1` = col_double(),
+  `CUOME-2` = col_double(),
+  `CUOME-3` = col_double(),
+  `DMSO-1` = col_double(),
+  `DMSO-2` = col_double(),
+  `DMSO-3` = col_double(),
+  `SM2-1` = col_double(),
+  `SM2-2` = col_double(),
+  `SM2-3` = col_double()
+)</code></pre>
+<pre class="r"><code>#Genic read counts per sample
+GeneCounts$samples %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Sample&quot;) %&gt;%
+  ggplot(aes(x=Sample, y=lib.size)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  ggtitle(&quot;Gene-mapping read counts per sample&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Define genes of interest
+GenesOfInterest &lt;- c(&quot;MAPT&quot;, &quot;SNCA&quot;, &quot;SMN2&quot;, &quot;HTT&quot;, &quot;GALC&quot;, &quot;FOXM1&quot;)
+
+# Raw read counts for genes of interest:
+GeneCounts$counts %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Geneid&quot;) %&gt;%
+  separate(Geneid, into=c(&quot;EnsemblID&quot;, &quot;GeneSymbol&quot;), sep = &quot;_&quot;) %&gt;%
+  filter(GeneSymbol %in% GenesOfInterest) %&gt;%
+  select(-EnsemblID) %&gt;%
+  gather(key=&quot;Sample&quot;, value=&quot;ReadCounts&quot;, -GeneSymbol) %&gt;%
+  mutate(Treatment = str_replace(Sample, &quot;(.+?)-.+?&quot;, &quot;\\1&quot;)) %&gt;%
+  ggplot(aes(x=Treatment, y=ReadCounts)) +
+  geom_jitter(width=0.1) +
+  scale_y_continuous(trans=&quot;log10&quot;) +
+  facet_wrap(~GeneSymbol, scales = &quot;free_y&quot;) +
+  theme_classic()+
+  ggtitle(&quot;Raw read counts per sample for some genes of interest&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>mean.cpm &lt;- GeneCounts %&gt;%
+    cpm(log=T) %&gt;%
+    apply(1, mean)
+
+hist(mean.cpm)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ExpressedGeneCounts &lt;- GeneCounts[mean.cpm&gt;1,]
+
+#Speaman correlation matrix heatmap for CountsPerMillion expression
+ExpressedGeneCounts %&gt;%
+  cpm(log=T) %&gt;%
+  cor(method=&quot;pearson&quot;) %&gt;%
+  heatmap.2(trace=&quot;none&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-2-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Samples sequenced to similar depths, plenty of reads per sample. High correlation as expected for RNA-seq (Pearson R &gt; 0.9) Samples cluster as expected, based on correlation of gene expression (CountsPerMillion). That is, each treatment clusters with its other replicates, and CUOME clusters closest to DMSO.</p>
+<p>And now the differential testing results:</p>
+<pre class="r"><code>DE.results &lt;- read_tsv(&quot;../code/DE_testing/Results.txt.gz&quot;) %&gt;%
+  separate(Geneid, into=c(&quot;EnsemblID&quot;, &quot;GeneSymbol&quot;), sep = &quot;_&quot;)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  treatment = col_character(),
+  Geneid = col_character(),
+  logFC = col_double(),
+  logCPM = col_double(),
+  F = col_double(),
+  PValue = col_double(),
+  FDR = col_double()
+)</code></pre>
+<pre class="r"><code>head(DE.results)</code></pre>
+<pre><code># A tibble: 6 x 8
+  treatment EnsemblID       GeneSymbol logFC logCPM     F   PValue      FDR
+  &lt;chr&gt;     &lt;chr&gt;           &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 C2        ENSG0000010240… ARMCX3     -4.16   5.72 5292. 3.15e-23 4.23e-19
+2 C2        ENSG0000013841… IDH1       -4.42   6.77 5056. 4.70e-23 4.23e-19
+3 C2        ENSG0000011586… DARS1      -3.49   5.91 4866. 6.56e-23 4.23e-19
+4 C2        ENSG0000011541… STAT1      -3.97   9.91 4356. 1.73e-22 8.37e-19
+5 C2        ENSG0000017988… PDXDC1     -3.49   5.18 3866. 4.91e-22 1.90e-18
+6 C2        ENSG0000019823… DDX42      -2.64   5.72 2774. 8.91e-21 2.87e-17</code></pre>
+<pre class="r"><code>#Total number tests
+DE.results %&gt;%
+  drop_na() %&gt;%
+  count(treatment)</code></pre>
+<pre><code># A tibble: 4 x 2
+  treatment     n
+  &lt;chr&gt;     &lt;int&gt;
+1 A10       19354
+2 C2        19354
+3 CUOME     19354
+4 SM2       19354</code></pre>
+<pre class="r"><code>DE.results %&gt;% pull(treatment) %&gt;% unique()</code></pre>
+<pre><code>[1] &quot;C2&quot;    &quot;CUOME&quot; &quot;SM2&quot;   &quot;A10&quot;  </code></pre>
+<pre class="r"><code>DE.results %&gt;%
+  select(treatment, GeneSymbol, logFC, logCPM, PValue, FDR) %&gt;%
+  filter(GeneSymbol %in% GenesOfInterest)</code></pre>
+<pre><code># A tibble: 24 x 6
+   treatment GeneSymbol   logFC  logCPM   PValue      FDR
+   &lt;chr&gt;     &lt;chr&gt;        &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+ 1 C2        GALC       -1.81    3.81   1.09e-14 1.66e-12
+ 2 C2        HTT        -0.728   6.07   1.14e- 7 1.19e- 6
+ 3 C2        FOXM1      -0.153   7.01   1.01e- 2 2.45e- 2
+ 4 C2        SMN2        0.208   4.83   1.41e- 2 3.27e- 2
+ 5 C2        MAPT       -0.517   0.0804 1.72e- 2 3.90e- 2
+ 6 C2        SNCA       -0.483  -2.27   3.72e- 1 4.88e- 1
+ 7 CUOME     GALC       -0.655   3.81   5.89e- 8 1.63e- 6
+ 8 CUOME     SMN2       -0.347   4.83   2.90e- 4 1.85e- 3
+ 9 CUOME     SNCA        1.20   -2.27   2.20e- 2 6.24e- 2
+10 CUOME     FOXM1      -0.0871  7.01   1.19e- 1 2.32e- 1
+# … with 14 more rows</code></pre>
+<pre class="r"><code>DE.results %&gt;%
+  mutate(Label = case_when(
+    GeneSymbol %in% GenesOfInterest ~ paste(GeneSymbol, format.pval(PValue
+, digits=2)),
+    TRUE ~ NA_character_)) %&gt;%
+  mutate(`FDR&lt;0.01`=FDR&lt;0.01) %&gt;%
+  ggplot(aes(x=logFC, y=-log10(PValue), color=`FDR&lt;0.01`, label=Label)) +
+  geom_point(alpha=0.2) +
+  geom_label_repel(segment.color = &#39;black&#39;, min.segment.length = 0, size=3) +
+  facet_wrap(~treatment) +
+  theme_classic() +
+  ggtitle(&quot;Differential expression volcano&quot;) +
+  labs(caption=&quot;Genes of interest labelled with nominal P&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>DE.results %&gt;%
+  mutate(Label = case_when(
+    GeneSymbol %in% GenesOfInterest ~ paste(GeneSymbol, format.pval(PValue
+, digits=2)),
+    TRUE ~ NA_character_)) %&gt;%
+  mutate(`FDR&lt;0.01`=FDR&lt;0.01) %&gt;%
+  arrange(desc(Label)) %&gt;%
+  ggplot(aes(y=logFC, x=logCPM, color=`FDR&lt;0.01`, label=Label)) +
+  geom_point(alpha=0.2) +
+  geom_label_repel(segment.color = &#39;black&#39;, min.segment.length = 0, size=3) +
+  facet_wrap(~treatment) +
+  theme_classic() +
+  ggtitle(&quot;Differential expression MA-plot&quot;) +
+  labs(caption=&quot;Genes of interest labelled with nominal P&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Number significant tests
+DE.results %&gt;%
+  select(treatment, FDR, logFC) %&gt;%
+  mutate(
+    FDR_0.10 = FDR&lt; 0.1,
+    FDR_0.05 = FDR&lt; 0.05,
+    FDR_0.01 = FDR&lt; 0.01,
+    FCGreaterThan2 = abs(logFC) &gt; 1
+    ) %&gt;%
+  gather(key=&quot;FDR&quot;, value = &quot;TestResults&quot;, FDR_0.10, FDR_0.05, FDR_0.01) %&gt;%
+  mutate(FDR=recode(FDR, FDR_0.01=&quot;FDR&lt;0.01&quot;, FDR_0.05=&quot;FDR&lt;0.05&quot;, FDR_0.10=&quot;FDR&lt;0.10&quot;)) %&gt;%
+  group_by(FDR, treatment, FCGreaterThan2) %&gt;%
+  summarise(NumDiscoveries=sum(TestResults)) %&gt;%
+  ungroup() %&gt;%
+  mutate(FCGreaterThan2=if_else(FCGreaterThan2, &quot;FoldChange &gt; 2&quot;, &quot;FoldChange &lt; 2&quot;)) %&gt;%
+  ggplot(aes(x=treatment, y=NumDiscoveries, fill=FDR)) +
+  geom_col(position=&quot;dodge&quot;) +
+  facet_wrap(~FCGreaterThan2) +
+  theme_bw() +
+  ggtitle(&quot;Number differential expression discoveries&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Note the colors on these plots are for FDR, taking into account multiple test problem. See table of Pvalues for results for these specific genes Jingxin is interested in… The C2 treatment somewhat downregulates MAPT (P=0.039, log2FC=-0.517). SM2 very strongly downregulates MAPT (P=2.2E-7, logFC=-1.97)</p>
+<p>Let’s also plot the pairwise logFC of expression:</p>
+<pre class="r"><code>Limits = 5
+
+upper_point &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_point(..., alpha=0.01) + 
+    scale_y_continuous(limits = c(-Limits, Limits)) +
+    scale_x_continuous(limits = c(-Limits, Limits)) +
+    geom_abline() +
+    geom_text_repel(aes(label=Label), color=&#39;red&#39;, segment.color = &#39;red&#39;, min.segment.length = 0, size=3, max.overlaps=20) +
+    theme_bw()
+}
+
+
+diag_limitrange &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_density(...) + 
+    coord_cartesian(xlim=c(-Limits,Limits)) +
+    theme_bw()
+}
+
+
+DE.results %&gt;%
+  mutate(Label = case_when(
+    GeneSymbol %in% GenesOfInterest ~ GeneSymbol,
+    TRUE ~ NA_character_)) %&gt;%
+  select(Label, treatment, logFC, EnsemblID) %&gt;%
+  # group_by(treatment) %&gt;%
+  # mutate(rn = row_number()) %&gt;%
+  # ungroup() %&gt;%
+  pivot_wider(id_cols = c(&quot;EnsemblID&quot;, &quot;Label&quot;), names_from = &quot;treatment&quot; , values_from = &quot;logFC&quot;) %&gt;%
+  tidyr::unnest() %&gt;%
+  arrange(Label) %&gt;%
+  mutate(color=if_else(is.na(Label), &quot;black&quot;, &quot;red&quot;)) %&gt;%
+  mutate(alpha=if_else(is.na(Label), 0.01, 1)) %&gt;%
+  ggpairs(
+    title=&quot;treatment pair expression logFC and Spearman coef&quot;,
+    columns = 3:6,
+    upper=list(continuous = wrap(&quot;cor&quot;, method = &quot;spearman&quot;, hjust=0.7)),
+    lower=list(continuous = upper_point),
+    diag=list(continuous = diag_limitrange))</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so based on differential expression, SM2 and A10 are quite similar (correlation coefficient of logFC = 0.802).</p>
+<p>Now I will move onto the splicing analyses…</p>
+</div>
+<div id="differential-splicing-analysis" class="section level3">
+<h3>Differential splicing analysis</h3>
+<div id="basic-quality-control-and-differntial-splicing-test-results" class="section level4">
+<h4>Basic quality control and differntial splicing test results</h4>
+<p>First, an overview of the data from a splicing perspective by looking at the leafcutter splice junction count table.</p>
+<pre class="r"><code>counts &lt;- read.table(&quot;../code/SplicingAnalysis/leafcutter/clustering/autosomes/leafcutter_perind_numers.counts.gz&quot;, sep = &#39; &#39;,  header=T) %&gt;%
+  rownames_to_column(&quot;intron&quot;) %&gt;%
+  gather(key=&quot;Sample&quot;, value=&quot;Count&quot;, -intron)
+
+head(counts)</code></pre>
+<pre><code>                    intron Sample Count
+1 chr1:17055:17233:clu_1_-  A10.1    92
+2 chr1:17055:17606:clu_1_-  A10.1     8
+3 chr1:17055:17915:clu_1_-  A10.1    10
+4 chr1:17368:17606:clu_1_-  A10.1    50
+5 chr1:17742:17915:clu_1_-  A10.1    68
+6 chr1:18061:18268:clu_2_-  A10.1    43</code></pre>
+<p>First, let’s check evenness of junction coverage across samples. Sum total splice junction counts.</p>
+<pre class="r"><code>counts %&gt;%
+  group_by(Sample) %&gt;%
+  summarise(TotalJunctionCounts = sum(Count)) %&gt;%
+  ggplot(aes(x=Sample, y=TotalJunctionCounts)) +
+  geom_col() +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  ggtitle(&quot;Splice junction read counts per sample&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>All samples are reasonbly well matched by this metric. Now let’s check how samples cluster looking at sperman correlation coefficient of intron excision ratios</p>
+<pre class="r"><code>PSI.table &lt;- counts %&gt;%
+  mutate(Cluster = str_replace(intron, &quot;.+:(.+)$&quot;, &quot;\\1&quot;)) %&gt;%
+  group_by(Sample, Cluster) %&gt;%
+  mutate(ClusterSum = sum(Count)) %&gt;%
+  mutate(PSI = Count/ClusterSum * 100) %&gt;%
+  ungroup()
+
+PSI.table %&gt;%
+  select(intron, Sample, PSI) %&gt;%
+  spread(key = Sample, value = PSI) %&gt;%
+  column_to_rownames(&quot;intron&quot;) %&gt;%
+  drop_na() %&gt;%
+  cor(method=&quot;spearman&quot;) %&gt;%
+  heatmap.2(trace=&quot;none&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Conditions cluster together, except for a smaple of CUOME and DMSO which is expected as I was told we expect CUOME to not have much effect on splicing, similar to DMSO control. Good. Now let’s read in the leafcutter differential splicing results.</p>
+<pre class="r"><code>cluster_sig_files &lt;- list.files(&quot;../code/SplicingAnalysis/leafcutter/differential_splicing&quot;, &quot;*_cluster_significance.txt&quot;, full.names = T)
+effect_sizes_files &lt;- list.files(&quot;../code/SplicingAnalysis/leafcutter/differential_splicing&quot;, &quot;*_effect_sizes.txt&quot;, full.names = T)
+treatments &lt;- str_replace(cluster_sig_files, &quot;.+/(.+?)_cluster_significance.txt&quot;, &quot;\\1&quot;)
+
+cluster.sig &lt;- map(cluster_sig_files, read_tsv) %&gt;%
+  set_names(cluster_sig_files) %&gt;%
+  bind_rows(.id=&quot;f&quot;) %&gt;%
+  mutate(treatment = str_replace(f, &quot;.+/(.+?)_cluster_significance.txt&quot;, &quot;\\1&quot;)) %&gt;%
+  select(-f)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  status = col_character(),
+  loglr = col_double(),
+  df = col_double(),
+  p = col_double(),
+  cluster = col_character(),
+  p.adjust = col_double()
+)
+Parsed with column specification:
+cols(
+  status = col_character(),
+  loglr = col_double(),
+  df = col_double(),
+  p = col_double(),
+  cluster = col_character(),
+  p.adjust = col_double()
+)
+Parsed with column specification:
+cols(
+  status = col_character(),
+  loglr = col_double(),
+  df = col_double(),
+  p = col_double(),
+  cluster = col_character(),
+  p.adjust = col_double()
+)
+Parsed with column specification:
+cols(
+  status = col_character(),
+  loglr = col_double(),
+  df = col_double(),
+  p = col_double(),
+  cluster = col_character(),
+  p.adjust = col_double()
+)</code></pre>
+<pre class="r"><code>effect_sizes &lt;- map(effect_sizes_files, read_tsv) %&gt;%
+  set_names(effect_sizes_files) %&gt;%
+  bind_rows(.id=&quot;f&quot;) %&gt;%
+  mutate(treatment = str_replace(f, &quot;.+/(.+?)_effect_sizes.txt&quot;, &quot;\\1&quot;)) %&gt;%
+  select(-f) %&gt;%
+  unite(&quot;psi_treatment&quot;, treatments, sep=&quot; &quot;, na.rm=T) %&gt;%
+  mutate(psi_treatment = as.numeric(psi_treatment),
+         cluster = str_replace(intron, &quot;(.+?:).+:(.+?)&quot;, &quot;\\1\\2&quot;))</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  intron = col_character(),
+  logef = col_double(),
+  A10 = col_double(),
+  DMSO = col_double(),
+  deltapsi = col_double()
+)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  intron = col_character(),
+  logef = col_double(),
+  C2 = col_double(),
+  DMSO = col_double(),
+  deltapsi = col_double()
+)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  intron = col_character(),
+  logef = col_double(),
+  CUOME = col_double(),
+  DMSO = col_double(),
+  deltapsi = col_double()
+)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  intron = col_character(),
+  logef = col_double(),
+  SM2 = col_double(),
+  DMSO = col_double(),
+  deltapsi = col_double()
+)</code></pre>
+<pre><code>Note: Using an external vector in selections is ambiguous.
+ℹ Use `all_of(treatments)` instead of `treatments` to silence this message.
+ℹ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.
+This message is displayed once per session.</code></pre>
+<pre class="r"><code>head(effect_sizes)</code></pre>
+<pre><code># A tibble: 6 x 7
+  intron           logef psi_treatment    DMSO deltapsi treatment cluster  
+  &lt;chr&gt;            &lt;dbl&gt;         &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;    
+1 chr1:17055:17…  0.354         0.337  0.379    0.0414  A10       chr1:clu…
+2 chr1:17055:17…  0.0208        0.0359 0.0289  -0.00700 A10       chr1:clu…
+3 chr1:17055:17… -0.774         0.0266 0.00966 -0.0169  A10       chr1:clu…
+4 chr1:17368:17…  0.126         0.276  0.247   -0.0293  A10       chr1:clu…
+5 chr1:17742:17…  0.274         0.324  0.336    0.0118  A10       chr1:clu…
+6 chr1:3635074:… -0.141         0.556  0.499   -0.0573  A10       chr1:clu…</code></pre>
+<p>Oops, manually inspecting the effect size signs looks like they are all reversed. Usually I think of deltapsi as treatment - control. Here it is the opposite. Let’s flip the sign. then combine the effect sizes table with the cluster significance and plot some results</p>
+<pre class="r"><code>effect_sizes &lt;- effect_sizes %&gt;%
+  mutate(deltapsi = deltapsi*-1,
+         logef = logef *-1)
+
+
+#Combine effect sizes and significance for all samples into single df
+leafcutter.ds &lt;- effect_sizes %&gt;%
+  left_join(cluster.sig, by=c(&quot;treatment&quot;, &quot;cluster&quot;))</code></pre>
+<p>Plot distribution of how many introns per cluster</p>
+<pre class="r"><code>leafcutter.ds %&gt;%
+  count(treatment, cluster) %&gt;%
+  ggplot(aes(x=n)) +
+  stat_ecdf() +
+  coord_cartesian(xlim=c(0,5)) +
+  facet_wrap(~treatment) +
+  ylab(&quot;ecdf&quot;) +
+  theme_bw() +
+  ggtitle(&quot;Distribution of number introns per leafcutter cluster&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok so the median number of introns per cluster is 3…</p>
+<p>Now, let’s plot some results of the differential splicing tests…</p>
+<pre class="r"><code># Plot histogram of P-values
+leafcutter.ds %&gt;%
+  distinct(treatment, cluster, .keep_all=T) %&gt;%
+  ggplot(aes(x=p)) +
+  geom_histogram() +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  ggtitle(&quot;differential splicing test P-value histograms&quot;)</code></pre>
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Make volcano plot of deltaPSI (max within cluster) and signifance
+leafcutter.ds %&gt;%
+  group_by(treatment, cluster) %&gt;%
+  filter(abs(deltapsi) == max(abs(deltapsi))) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=deltapsi, y=-log10(p.adjust), color=p.adjust&lt;0.01)) +
+  geom_point(alpha=0.05) +
+  xlab(&quot;max effect size within cluster\nDeltaPSI&quot;) +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  ggtitle(&quot;Differential splicing volcano&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, clearly there are many significant results, at a range of effect sizes. As expected, the CUOME sample has the least signficantly differentially spliced clusters. With so many points its hard to really see how many significant clusters there are. Let’s plot this a different way.</p>
+<pre class="r"><code>#Number of tests
+leafcutter.ds %&gt;%
+  distinct(treatment, cluster) %&gt;%
+  ggplot(aes(x=treatment)) +
+  ylab(&quot;total differential splicing tests&quot;) +
+  geom_bar() +
+  theme_bw() +
+  ggtitle(&quot;Number differential splicing tests per treatment&quot;) +
+  labs(caption = &quot;Each leafcutter cluster of introns comprises a single test&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Number of significant tests
+leafcutter.ds %&gt;%
+  select(treatment, cluster, deltapsi, p.adjust) %&gt;%
+  group_by(treatment, cluster) %&gt;%
+  filter(abs(deltapsi) == max(abs(deltapsi))) %&gt;%
+  ungroup() %&gt;%
+  mutate(
+    FDR_0.10 = p.adjust&lt; 0.1,
+    FDR_0.05 = p.adjust&lt; 0.05,
+    FDR_0.01 = p.adjust&lt; 0.01,
+    deltapsi_0.1 = abs(deltapsi) &gt; 0.1
+  ) %&gt;%
+  gather(key=&quot;FDR&quot;, value = &quot;TestResults&quot;, FDR_0.10, FDR_0.05, FDR_0.01) %&gt;%
+  mutate(FDR=recode(FDR, FDR_0.01=&quot;FDR&lt;0.01&quot;, FDR_0.05=&quot;FDR&lt;0.05&quot;, FDR_0.10=&quot;FDR&lt;0.10&quot;)) %&gt;%
+  group_by(FDR, deltapsi_0.1, treatment) %&gt;%
+  summarise(NumDiscoveries=sum(TestResults)) %&gt;%
+  ungroup() %&gt;%
+  mutate(deltapsi_0.1=if_else(deltapsi_0.1, &quot;deltaPSI &gt; 0.1&quot;, &quot;deltaPSI &lt; 0.1&quot;)) %&gt;%
+  ggplot(aes(x=treatment, y=NumDiscoveries, fill=FDR)) +
+  geom_col(position=&quot;dodge&quot;) +
+  facet_wrap(~deltapsi_0.1) +
+  theme_bw() +
+  ggtitle(&quot;Number differential splicing discoveries&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so we still get over 1000 significant clusters for the three main treatments even if we restrict to FDR&lt;0.01 and deltapsi &gt; 10%.</p>
+<p>Yang was curious about this plot and increasing the resolution of the PSI effect size groups (instead of just &lt;0.1 an &gt;0.1)… Let’s plot that. Same plot as above but faceting by different PSI ranges.</p>
+<pre class="r"><code>leafcutter.ds %&gt;%
+  select(treatment, cluster, deltapsi, p.adjust) %&gt;%
+  group_by(treatment, cluster) %&gt;%
+  filter(abs(deltapsi) == max(abs(deltapsi))) %&gt;%
+  ungroup() %&gt;%
+  mutate(
+    FDR_0.10 = p.adjust&lt; 0.1,
+    FDR_0.05 = p.adjust&lt; 0.05,
+    FDR_0.01 = p.adjust&lt; 0.01,
+    deltapsi_group = cut(abs(deltapsi), breaks=c(0,0.1, 0.2, 0.5, 1))
+  ) %&gt;%
+  gather(key=&quot;FDR&quot;, value = &quot;TestResults&quot;, FDR_0.10, FDR_0.05, FDR_0.01) %&gt;%
+  mutate(FDR=recode(FDR, FDR_0.01=&quot;FDR&lt;0.01&quot;, FDR_0.05=&quot;FDR&lt;0.05&quot;, FDR_0.10=&quot;FDR&lt;0.10&quot;)) %&gt;%
+  group_by(FDR, deltapsi_group, treatment) %&gt;%
+  summarise(NumDiscoveries=sum(TestResults)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=treatment, y=NumDiscoveries, fill=FDR)) +
+  geom_col(position=&quot;dodge&quot;) +
+  facet_wrap(~deltapsi_group) +
+  theme_bw() +
+  ggtitle(&quot;Number differential splicing discoveries&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, that is an important way to visualize the significant results I think. Notably, there are only hundreds to a thousand or so differential splicing results with delta-PSI &gt; 0.2 for A10, C2, and SM2. Virtually no changes of that size for CUOME.</p>
+<p>To ask Jingxin:</p>
+<p>How were these compunds dosed… Since these are analogs, these may have generally similar effects. If you just upped the dosage of CUOME would you get something like SM2?</p>
+</div>
+<div id="what-distinguishes-the-affected-introns" class="section level4">
+<h4>What distinguishes the affected introns?</h4>
+<p>Now let’s try to understand the molecular splicing defect better by looking if there is any meaningful assymetries in splice effect size/direction by alternative splice type (alt 3’ss, alt 5’ss, etc) among introns in significant clusters .</p>
+<p>First let’s read in the output of <a href="https://regtools.readthedocs.io/en/latest/commands/junctions-annotate/#notes">regtools annotate</a> which annotates whether the intron is novel splice donor, splice acceptor, or known… I used the ‘basic’ gencode gtf, which limits transcripts to the ‘basic’ annotated ones and not so many transcripts. I also scored 5’ss and extracted the 5’ss sequence which I want to merge in with the annotations data frame</p>
+<pre class="r"><code>SpliceTypeAnnotations &lt;- read_tsv(&quot;../code/SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.gz&quot;) %&gt;%
+  unite(Intron, chrom, start, end) %&gt;%
+  distinct(Intron, .keep_all = T) %&gt;%
+  select(Intron, strand, exons_skipped, anchor, gene_names, gene_ids, splice_site, strand) %&gt;%
+  mutate(IntronType = recode(anchor, A=&quot;Alt 5&#39;ss&quot;, D=&quot;Alt 3&#39;ss&quot;, DA=&quot;Annotated&quot;, N=&quot;New Intron&quot;, NDA=&quot;New Splice Site combination&quot;))</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  chrom = col_character(),
+  start = col_double(),
+  end = col_double(),
+  name = col_character(),
+  score = col_double(),
+  strand = col_character(),
+  splice_site = col_character(),
+  acceptors_skipped = col_double(),
+  exons_skipped = col_double(),
+  donors_skipped = col_double(),
+  anchor = col_character(),
+  known_donor = col_double(),
+  known_acceptor = col_double(),
+  known_junction = col_double(),
+  gene_names = col_character(),
+  gene_ids = col_character(),
+  transcripts = col_character()
+)</code></pre>
+<pre class="r"><code>head(SpliceTypeAnnotations)</code></pre>
+<pre><code># A tibble: 6 x 8
+  Intron strand exons_skipped anchor gene_names gene_ids splice_site
+  &lt;chr&gt;  &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;      
+1 chr1_… +                  1 DA     DDX11L1    ENSG000… GT-AG      
+2 chr1_… +                  6 N      &lt;NA&gt;       &lt;NA&gt;     GT-AG      
+3 chr1_… -                 21 N      &lt;NA&gt;       &lt;NA&gt;     GT-AG      
+4 chr1_… -                  0 N      &lt;NA&gt;       &lt;NA&gt;     GT-AG      
+5 chr1_… -                  0 N      &lt;NA&gt;       &lt;NA&gt;     GT-AG      
+6 chr1_… -                  0 N      &lt;NA&gt;       &lt;NA&gt;     GT-AG      
+# … with 1 more variable: IntronType &lt;chr&gt;</code></pre>
+<pre class="r"><code>FivePrimeSS &lt;- read_tsv(&quot;../code/SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz&quot;, col_names = c(&quot;Intron&quot;, &quot;DonorSeq&quot;, &quot;DonorScore&quot;)) %&gt;%
+  mutate(Intron = str_replace(Intron, &quot;(.+)_.+?::.+$&quot;, &quot;\\1&quot;))</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  Intron = col_character(),
+  DonorSeq = col_character(),
+  DonorScore = col_double()
+)</code></pre>
+<pre class="r"><code>SpliceTypeAnnotations &lt;- SpliceTypeAnnotations %&gt;%
+  inner_join(FivePrimeSS, by=&quot;Intron&quot;)
+
+leafcutter.ds.annotated &lt;- leafcutter.ds %&gt;%
+  mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  inner_join(SpliceTypeAnnotations, by=&quot;Intron&quot;) %&gt;%
+  mutate(UpstreamOfDonor2BaseSeq = substr(DonorSeq, 3, 4)) 
+
+leafcutter.ds.annotated %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  ggplot(aes(x=deltapsi, fill=treatment)) +
+  geom_histogram(position=&quot;dodge&quot;) +
+  xlab(&quot;Effect size\ndeltaPSI&quot;) +
+  facet_wrap(~IntronType, scales=&quot;free_y&quot;) +
+  theme_light() +
+  ggtitle(&quot;Distribution of splicing effect sizes&quot;) +
+  labs(caption=str_wrap(&quot;Alt 3&#39;ss means 5&#39;ss but not 3&#39;ss in annotation file (Gencode primary transcripts). Alt 5&#39;ss is similar. New intron means neither splice site is in annotation. New splice site combination means both splice sites are annotated but not together&quot;, 60))</code></pre>
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Same data plotted as ecdf
+leafcutter.ds.annotated %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  ggplot(aes(x=deltapsi, color=treatment)) +
+  stat_ecdf() +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~IntronType) +
+  theme_light() +
+  ggtitle(&quot;Distribution of splicing effect sizes, as ecdf&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>It seems that direction of effects for all types of splice sites are symmetric about 0. In contrast, I have made this plot before for SF3B1 mutants which assymetrically increase alt 3’ss as has been observed by many others.</p>
+<p>Maybe this plot makes sense to plot effect sizes and log-ratios of intron excision ratio changes upon treatment, rather than deltapsi. I’m concerned that alternative 3’ss for example, might in general have lower PSI, focusing on deltaPSI might mask strong molecular effects in terms of log-ratio.</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  ggplot(aes(x=logef, color=treatment)) +
+  stat_ecdf() +
+  coord_cartesian(xlim=c(-2, 2)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~IntronType) +
+  theme_light() +
+  ggtitle(&quot;Distribution of splicing effect sizes (expressed as log(FoldChange), logef, as ecdf&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Okay, actually this way of looking at the data makes more sense I think… The treatments (besides CUOME) generally increase alternative splicing and annotated basic splice sites increase in relative usage.</p>
+<p>But let’s also plot the same thing as a histogram just to get a sense of the absolute count of significant detected effects in each class…</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  ggplot(aes(x=logef, fill=treatment)) +
+  geom_histogram(breaks=seq(-2,2,0.2), position=&quot;dodge&quot;) +
+  coord_cartesian(xlim=c(-2, 2)) +
+  ylab(&quot;Count&quot;) +
+  facet_grid(rows = vars(IntronType), cols = vars(treatment), scales=&quot;free_y&quot;) +
+  theme_light() +
+  ggtitle(&quot;Histogram of splicing effect sizes&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, I can see that there are a similar number of upregulated 3’ss as there are 5’ss.</p>
+<p>Let’s go back to the cumulative distribution plots to look at effect size assymetries but for other ‘classes’ of introns based on the canonically (5’ss GT … AG 3’ss) sequence:</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  ggplot(aes(x=logef, color=treatment)) +
+  stat_ecdf() +
+  coord_cartesian(xlim=c(-2, 2)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~splice_site) +
+  theme_light() +
+  ggtitle(&quot;Ecdf of sig splicing effect sizes, by 5&#39;ss-3&#39;ss dinucleotides&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Nothing particularly notable here, though, there aren’t many non GT-AG introns to begin with so the ecdf is very jaggety.</p>
+<p>Let’s make the same plot but for different -2 to 0 positions relative to the splice donor, since risdiplasm (and these analogs) presumably can bind at this region at some splice donors which have a register change like at SMN2.</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  ggplot(aes(x=logef, color=treatment)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  coord_cartesian(xlim=c(-2, 2)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~UpstreamOfDonor2BaseSeq) +
+  theme_light() +
+  ggtitle(&quot;Effect sizes for NN|GT introns, grouped by NN&quot;) +
+  labs(caption=&quot;Only included introns in FDR&lt;0.01 significant clusters&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  ggplot(aes(x=logef, color=treatment)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  coord_cartesian(xlim=c(-2, 2)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~UpstreamOfDonor2BaseSeq) +
+  theme_light() +
+  ggtitle(&quot;Effect sizes for NN|GT introns, grouped by NN&quot;) +
+  labs(caption=&quot;All introns included&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-18-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Woah. there is a huge effect for splice sites with GA upstream of 5’ss.</p>
+<p>Let’s plot the exact same thing as a histogram, so we can get a sense of the absolute number of events in each of these groups:</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  ggplot(aes(x=logef, fill=treatment)) +
+  geom_histogram(breaks=seq(-2,2,0.2)) +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  coord_cartesian(xlim=c(-2, 2)) +
+  ylab(&quot;Number Signif Introns&quot;) +
+  facet_wrap(~UpstreamOfDonor2BaseSeq) +
+  theme_light() +
+  ggtitle(&quot;Effect sizes for NN|GT introns, grouped by NN&quot;) +
+  labs(caption=&quot;Only included introns in FDR&lt;0.01 significant clusters&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so even though GA effects are clearly strong, most significant effects, and in fact, even most signficant effects in the positive direction are not from GA|GT splice sites, since AG|GT is just more common.</p>
+<p>I wonder if this is partly due to the fact GA|GT will be in intron clusters with non GA|GT introns which will naturally have significant effects on cluster-based intron excision ratio. Let’s investigate that, to get a better sense of what proportion of significant changes can be attributed in to a primary effect (on a GA|GT intron).</p>
+<p>For this I will plot the P-value histograms of clusters containing GA|GT versus that do not.</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  group_by(cluster, treatment, p) %&gt;%
+  summarise(GA_in_cluster = ifelse(any(&quot;GA&quot; %in% UpstreamOfDonor2BaseSeq), &quot;GA|GT in cluster&quot;, &quot;GA|GT not in cluster&quot;)) %&gt;%
+  ggplot(aes(x=p)) +
+  geom_histogram() +
+  facet_grid(rows=vars(treatment), cols = vars(GA_in_cluster)) +
+  theme_light() +
+  ggtitle(&quot;P values for clusters, grouped by whether they contain GA|GT intron&quot;)</code></pre>
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, it appears that even in SM2, most of the significant changes are in intron clusters that don’t have an GA|GT intron. Also of note, nearly all clusters with a GA|GT intron have a significant change.</p>
+<p>Another way to look at this would be to look at effect size. leafcutter is quite sensitive such that even small delta-psi splicing changes may have cery low P-values. So perhaps a lot of the small P-values in the non GA|GT clusters represent relatively small effect sizes</p>
+<p>Let’s plot the histogram of effect sizes for GA|GT versus non GA|GT containing clusters… Trying to ask: “What fraction of large effect sizes singificant changes are for GA|GT containing clusters”</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  group_by(cluster, treatment, p.adjust) %&gt;%
+  mutate(GA_in_cluster = ifelse(any(&quot;GA&quot; %in% UpstreamOfDonor2BaseSeq), &quot;GA|GT in cluster&quot;, &quot;GA|GT not in cluster&quot;)) %&gt;%
+  filter(abs(logef) == max(abs(logef))) %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  ggplot(aes(x=logef, fill=GA_in_cluster)) +
+  geom_histogram(breaks=seq(-5,5,0.2)) +
+  coord_cartesian(xlim=c(-5, 5)) +
+  ylab(&quot;Number Signif Introns&quot;) +
+  xlab(&quot;max(logef) in cluster&quot;) +
+  # facet_grid(rows=vars(treatment), cols = vars(GA_in_cluster), scales = &quot;free_y&quot;) +
+  # facet_grid(cols = vars(GA_in_cluster), scales = &quot;free_y&quot;) +
+  facet_grid(rows = vars(treatment), cols = , scales = &quot;free_y&quot;) +
+  ggtitle(&quot;GA|GT introns only start explain most splicing changes at large effect sizes&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so even if you consider only the max effect in each cluster (as a way of removing redundant non-positive effect sizes of non GA|GT introns in GA|GT-containing clusters), non GA|GT clusters still make up the large majority of large effects. That is to say, I believe there are more large-effect (possibly indirect) splicing effects than direct effects on GA|GT. I suppose many of the splicing effects on non-GA|GT introns could still be direct, for example, by promoting snRNA:5’ss duplex pairing at other bulged nucleotides besides the -1A position. <a href="https://pubmed.ncbi.nlm.nih.gov/22588721/">This paper</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3566305/#!po=0.446429">this review, fig1</a> has a nice figure of other snRNA:5’ss pairings with bulged nucleotides that might be worth exploring at some point… However, the GA|GT effect is so strong that I will continue to focus on that class of introns to learn more…</p>
+<p>Note that in the above plot, I plotted the max(logef in cluster) and it is not always positive, as I expect for actual GA|GT introns. What is going on. One hypothesis is that a lot of the Alt 5’ss GA|GT introns are paired with a similarly effect alt 3’ss to create a new cassette exon which is also upregulated. Let’s look at the GA|GT-containing clusters and plot the effects, colored by type of splice site.</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  group_by(cluster, treatment, p.adjust) %&gt;%
+  mutate(GA_in_cluster = ifelse(any(&quot;GA&quot; %in% UpstreamOfDonor2BaseSeq), &quot;GA|GT in cluster&quot;, &quot;GA|GT not in cluster&quot;)) %&gt;%
+  filter(abs(logef) == max(abs(logef))) %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  filter(GA_in_cluster == &quot;GA|GT in cluster&quot;) %&gt;%
+  ggplot(aes(x=logef, fill=IntronType)) +
+  geom_histogram(breaks=seq(-5,5,0.2)) +
+  coord_cartesian(xlim=c(-5, 5)) +
+  ylab(&quot;Number Signif Introns&quot;) +
+  xlab(&quot;max(logef) in cluster&quot;) +
+  # facet_grid(rows=vars(treatment), cols = vars(GA_in_cluster), scales = &quot;free_y&quot;) +
+  # facet_grid(cols = vars(GA_in_cluster), scales = &quot;free_y&quot;) +
+  facet_wrap(~treatment,  scales = &quot;free_y&quot;) +
+  theme_light() +
+  ggtitle(&quot;Alt 5&#39;ss might be a part of cryptic exon activation&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, I see that the max effect for GA|GT introns is almost just as common to be alt 3’ss, suggesting cryptic exon activation is common mode. And that comes at the expense of downregulation of annotated introns. Maybe a simpler way to plot the same idea is to plot the distribution or median affect size all types of introns in GA|GT containing clusters:</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  group_by(cluster, treatment, p.adjust) %&gt;%
+  mutate(GA_in_cluster = ifelse(any(&quot;GA&quot; %in% UpstreamOfDonor2BaseSeq), &quot;GA|GT in cluster&quot;, &quot;GA|GT not in cluster&quot;)) %&gt;%
+  ungroup() %&gt;%
+  filter(GA_in_cluster==&quot;GA|GT in cluster&quot;) %&gt;%
+  group_by(treatment, IntronType) %&gt;%
+  summarise(MedianEffect = median(deltapsi)) %&gt;%
+  ggplot(aes(x=IntronType, fill=IntronType, y=MedianEffect)) +
+  geom_col() +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  ggtitle(&quot;Alt 5&#39;ss might be a part of cryptic exon activation&quot;) +
+  labs(caption=&quot;GA|GT intron clusters have similar median effect of alt 3&#39;ss, consistent with cryptic exon&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  group_by(cluster, treatment, p.adjust) %&gt;%
+  mutate(GA_in_cluster = ifelse(any(&quot;GA&quot; %in% UpstreamOfDonor2BaseSeq), &quot;GA|GT in cluster&quot;, &quot;GA|GT not in cluster&quot;)) %&gt;%
+  ungroup() %&gt;%
+  filter(GA_in_cluster==&quot;GA|GT in cluster&quot;) %&gt;%
+  ggplot(aes(x=IntronType, fill=IntronType, y=deltapsi)) +
+  geom_violin() +
+  coord_cartesian(ylim=c(-0.1, 0.1)) +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  ggtitle(&quot;Alt 5&#39;ss might be a part of cryptic exon activation&quot;) +
+  labs(caption=&quot;GA|GT intron clusters have similar median effect of alt 3&#39;ss, consistent with cryptic exon&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-23-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, So I feel confident now that what usually happens is that when there is a cluster with a GA|GT intron, it gets increased as an alt 5’ss, concominant with an increase in alt 3’ss to create a new exon, and sometimes a new intron comes too… and all this happens at the expense of annotated introns.</p>
+<p>Now let’s look at more than jus the GA|GT. For example, filtering for GA|GT, let’s make the same plot for the two nucleotides upstream (NNGA|GT)</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  mutate(UpstreamOfGAGT = substr(DonorSeq, 1, 2)) %&gt;%
+  ggplot(aes(x=logef, color=treatment)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  ggtitle(&quot;Effect sizes for NNGA|GT introns, grouped by NN&quot;) +
+  coord_cartesian(xlim=c(-8, 8)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~UpstreamOfGAGT) +
+  theme_light() +
+  labs(caption=&quot;Only FDR&lt;0.01 GA|GT introns included&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  mutate(UpstreamOfGAGT = substr(DonorSeq, 1, 2)) %&gt;%
+  ggplot(aes(x=logef, color=treatment)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  ggtitle(&quot;Effect sizes for NNGA|GT introns, grouped by NN&quot;) +
+  coord_cartesian(xlim=c(-4, 4)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~UpstreamOfGAGT) +
+  theme_light() +
+  labs(caption=&quot;All GA|GT introns included&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-24-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  mutate(UpstreamOfGAGT = substr(DonorSeq, 1, 2)) %&gt;%
+  ggplot(aes(x=logef, color=treatment)) +
+  geom_histogram(breaks=seq(-8,8,0.2)) +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  ggtitle(&quot;Effect sizes for NNGA|GT introns, grouped by NN&quot;) +
+  coord_cartesian(xlim=c(-8, 8)) +
+  ylab(&quot;Number Signif Introns&quot;) +
+  facet_wrap(~UpstreamOfGAGT) +
+  theme_light() +
+  labs(caption=&quot;Only FDR&lt;0.01 GA|GT introns included&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-24-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I made some of these plots with filtering for only significant introns, and others including all introns. I think all introns might be the less biased way to do this analysis, to avoid winners curse effects.</p>
+<p>Ok, perhaps for all the drugs except for CUOME, AGGA|GT might be the most effected sequence… Note that we are looking into exonic sequences. There could be confounding factors from coding restraints. For example, nucleotides that are more likely to introduce stop codons might have weaker measured effects due to NMD dampening. Let’s approach this motif analysis a bit differently, maybe with MEME suite tools or something. I’ll get to that later…</p>
+<p>Let’s also check if affected GA|GT introns tend to be weaker in terms of the other part of the motif. I have scored 5’ss based on PWM (log-odds ratio). This log-odds ratio is formally defined as the log ratio of the probability of seeing the sequence in a 5’ss versus background (where background is uniform nucleotide probabilities):</p>
+<p><span class="math inline">\(log_2(\frac{Pr(Motif)}{Pr(Background)})\)</span></p>
+<p>and the resulting PWM can also be used to create this weblogo:</p>
+<div class="figure">
+<img src="assets/5ssPWM.png" alt="PWM" />
+<p class="caption">PWM</p>
+</div>
+<p>Let’s investigate how drug effects on GA|GT 5’ss introns is correlated with motif score. But first, to get some intuitions on this motif score, let’s plot the distribution for each class of splice sites annotations. I expect a weaker score generally for cryptic 5’ss.</p>
+<pre class="r"><code>SpliceTypeAnnotations %&gt;%
+  ggplot(aes(x=DonorScore, color=IntronType)) +
+  stat_ecdf() +
+  ylab(&quot;CumulativeFraction&quot;) +
+  coord_cartesian(xlim=c(2,12)) +
+  theme_classic() +
+  ggtitle(&quot;Alt 5&#39;ss gnerally have weaker 5&#39;ss motifs&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, it looks like the score typically ranges from 5-10 or so, and unannotated 5’ss introns (and “New introns” which by definition have both an unannotated 5’ss and unannoted 3’ss) have weaker scores. Similarly, let’s plot the distribution of scores for GA|GT versus non GA|GT introns. We could techincally just look up the effect of this from the PWM, but let’s plot the calculated distributoin of scores anyway…</p>
+<pre class="r"><code>SpliceTypeAnnotations %&gt;%
+  mutate(UpstreamOfDonor2BaseSeq = substr(DonorSeq, 3, 4))  %&gt;%
+  mutate(IsGAGTIntron = ifelse(UpstreamOfDonor2BaseSeq == &quot;GA&quot;, &quot;GA|GT&quot;, &quot;!GAGT&quot;)) %&gt;%
+  ggplot(aes(x=DonorScore, color=IsGAGTIntron)) +
+  stat_ecdf() +
+  ylab(&quot;CumulativeFraction&quot;) +
+  coord_cartesian(xlim=c(2,12)) +
+  theme_classic() +
+  ggtitle(&quot;GA|GT introns cause weaker 5&#39;ss motif score&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, that makes sense, GA|GT is a pretty weak 5’ss motif to begin with (best is AG|GT)…</p>
+<p>Now let’s see if the more “affected” GA|GT introns by the treatments tend to have weaker scores.</p>
+<p>Here I am plotting the effect size estimate of ALL GA|GT 5’ss introns as a function of log-odds 5’ss score. I negative correlation would make sense with the hypothesis that weak 5’ss will be more affected.</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  # filter(IntronType == &quot;Alt 5&#39;ss&quot;) %&gt;%
+  mutate(NominallySignificant = p&lt;0.05) %&gt;%
+  ggplot(aes(x=DonorScore, y=logef, color=NominallySignificant, group=treatment)) +
+  geom_point(alpha=0.3) +
+  geom_smooth(method=&quot;lm&quot;) +
+  geom_hline(yintercept = 0, linetype=&quot;dashed&quot;) +
+  facet_wrap(~treatment) +
+  coord_cartesian(xlim=c(2,12), ylim=c(-6,6)) +
+  theme_classic() +
+  ggtitle(&quot;Stronger 5&#39;ss are less affected by treatment&quot;)</code></pre>
+<pre><code>`geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, there is definitely some negative correlation, except for maybe in CUOME. I decided to color points by if the splicing event is nominally significant, which nearly all points are in this set of GA|GT introns. The correlation is quite weak, and even otherwise very strong GA|GT splice sites are affected. That is, this trend doesn’t explain much of the variance. Let’s also plot the same thing but for different classes of introns.</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  mutate(NominallySignificant = p&lt;0.05) %&gt;%
+  ggplot(aes(x=DonorScore, y=logef, color=IntronType)) +
+  geom_point(alpha=0.3) +
+  geom_smooth(method=&quot;lm&quot;) +
+  geom_hline(yintercept = 0, linetype=&quot;dashed&quot;) +
+  facet_wrap(~treatment) +
+  coord_cartesian(xlim=c(2,12), ylim=c(-6,6)) +
+  theme_classic() +
+  ggtitle(&quot;5&#39;ss score x logef effect interaction with intron type&quot;)</code></pre>
+<pre><code>`geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, there is a downward trend for “new splice site combination”, and “annotated”, and there isn’t so much a downward trend for alt 5’ss, though the effect sizes for those are so obviously positive. A summarised interpretation of this:</p>
+<ul>
+<li>Treatment nearly always increases crpytic GA|GT 5’SS, which tend to already have a weak splice site.</li>
+<li>Annotated 5’ss GA|GT tend to also increase in splicing, especially if they are otherwise weak 5’ splice sites, such that sometimes new splice sites combinations (eg exon skipping) can arise.</li>
+</ul>
+<p>Now let’s more carefully explore the differences between the drug treatments.</p>
+</div>
+<div id="how-do-the-treatments-affect-splicing-differently" class="section level4">
+<h4>How do the treatments affect splicing differently</h4>
+<p>So far, it seems CUOME still has a direct GA|GT splicing effect but just much weaker than SM2, and the other drugs are somewhere in between. I wonder to what extent the splicing changes are more or less identical as assessed by the order of the drugs ranked by effect on any given GA|GT splice site. Let’s randomly sample some introns and plot to explore… I’ll plot both the logef and the deltapsi since i’m not sure what metric makes more sense for this analysis…</p>
+<pre class="r"><code>sample_n_of &lt;- function(data, size, ...) {
+  dots &lt;- quos(...)
+  
+  group_ids &lt;- data %&gt;% 
+    group_by(!!! dots) %&gt;% 
+    group_indices()
+  
+  sampled_groups &lt;- sample(unique(group_ids), size)
+  
+  data %&gt;% 
+    filter(group_ids %in% sampled_groups)
+}
+
+
+set.seed(0)
+leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  group_by(intron) %&gt;%
+  mutate(IsSigInAny = any(p.adjust &lt; 0.01)) %&gt;%
+  ungroup() %&gt;%
+  filter(IsSigInAny) %&gt;%
+  add_count(intron) %&gt;%
+  filter(n==4) %&gt;%
+  sample_n_of(10, intron) %&gt;%
+  gather(key=&quot;EffectSizeMetric&quot;, value=&quot;EffectSize&quot;, logef, deltapsi) %&gt;%
+  ggplot(aes(x=treatment, y=EffectSize, color=EffectSizeMetric)) +
+  geom_point() +
+  ylab(&quot;splicing logef&quot;) +
+  xlab(&quot;treatments, randomly selected significant GA|GT introns&quot;) +
+  facet_wrap(~intron + EffectSizeMetric, scales = &quot;free_y&quot;, ncol=4) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  ggtitle(&quot;Are there common rank-order patterns of treatment effects?&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok a couple of clear patterns emerge. For example, there are quite a few introns where effect of SM2&gt;C2&gt;A10&gt;CUOME, or something roughly like that. And sometimes the patterns look a bit different whether you consider deltapsi or logef. Let’s make sure I understand exactly what the logef output by leafcutter is… I thought it would be <span class="math inline">\(log_2\frac{PSI_{treatment}}{PSI_{DMSO}}\)</span> . To make sure, let’s plot the logef calculated from the expression above (from the leafcutter PSI and deltapsi output values), versus the leafcutter logef value:</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  mutate(logef_calculated_from_psi = log2(psi_treatment/DMSO)) %&gt;%
+  ggplot(aes(x=logef, y= logef_calculated_from_psi)) +
+  xlim(c(-6,6)) +
+  ylim(c(-6,6)) +
+  # geom_hex(bins=100) +
+  geom_point(alpha=0.1) +
+  coord_cartesian(xlim=c(-6, 6), ylim=c(-6, 6)) +
+  theme_classic() +
+  ggtitle(&quot;Verification that leafcutter deltapsi is related to logef&quot;) +
+  labs(caption=&quot;Read markdown text above and below for description&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, yes, I think that expression is correct, though there is likely rounding errors and other reasons they won’t exactly match… But in general I think the logef and deltapsi values from leafcutter are related in the way that matches my understanding.</p>
+<p>In any case, I’ll continue to plot the effects both ways for this analysis of differences in treatment effects.</p>
+<p>It will be useful to look at more than 10 introns simultaneously. I think maybe a useful way to look at the data will be to standardize the effects with intron, the plot many lines overlayed. Notably, here I only filtered for introns that are significant (p.adjust&lt;0.01) in <strong>at least one</strong> condition, meaning some of these effect sizes are from non-significant changes in any particular treatment and the effect size estimates may be really noisy. I can consider filtering for effects that are significant in all treatments later, as a way to focus on the more robust measurements.</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  group_by(intron) %&gt;%
+  mutate(IsSigInAny = any(p.adjust &lt; 0.01)) %&gt;%
+  ungroup() %&gt;%
+  filter(IsSigInAny) %&gt;%
+  add_count(intron) %&gt;%
+  filter(n==4) %&gt;%
+  gather(key=&quot;EffectSizeMetric&quot;, value=&quot;EffectSize&quot;, logef, deltapsi) %&gt;%
+  group_by(EffectSizeMetric, intron) %&gt;%
+  mutate(StandardizedEffect = scale(EffectSize)) %&gt;%
+  ggplot(aes(x=treatment, y=StandardizedEffect, group=intron)) +
+  geom_line(alpha=0.1) +
+  ylab(&quot;standardized effect size&quot;) +
+  xlab(&quot;treatments, all significant GA|GT introns&quot;) +
+  facet_wrap(~EffectSizeMetric) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  ggtitle(&quot;All scaled significant effects&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Woah. interesting plot but hard to look at. There are a lot of different patterns. and the arbitrary ordering of the treatments can draw your eyes to a particular patterns, even if it is not the most important takeaway… For example, my eyes are drawn to the density of lines that go up while passing from CUOME to SM2, whereas maybe I don’t get to directly see the effects between A10 and CUOME. So I certainly need a less arbitrary way of analyzing these patterns. What I eventually think could be a fruitful approach is to cluster introns based on these patterns, and then do motif analysis (eg MEME) to understand why some introns are in a cluster that is more affected by treatment X and least by Y, for example.</p>
+<p>I should note that technically this practice of plotting effect sizes after filtering for significance introduces biases in effect size estimates due to winner’s curse effects… I am essentially double dipping the data to do both significance testing and effect size estimation. In practice I don’t know if these winner’s curse effects biases are the same for all treatments, which have different Pvalue distributions and different numbers of FDR significant introns. Perhap’s I should consider only filters by nominal Pvalues, so hopefully the winner’s curse bias isn’t so dependent on Pvalue distribution/FDR estimation.</p>
+<p>So to (hopefully) cut down a bit on the density while select the more robust effect size estimates in a less biased manner, let’s replot but filter for introns that are that nominally significant in all treatments.</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  group_by(intron) %&gt;%
+  mutate(IsNominallySigAll = all(p &lt; 0.01)) %&gt;%
+  ungroup() %&gt;%
+  filter(IsNominallySigAll) %&gt;%
+  add_count(intron) %&gt;%
+  filter(n==4) %&gt;%
+  gather(key=&quot;EffectSizeMetric&quot;, value=&quot;EffectSize&quot;, logef, deltapsi) %&gt;%
+  group_by(EffectSizeMetric, intron) %&gt;%
+  mutate(StandardizedEffect = scale(EffectSize)) %&gt;%
+  ggplot(aes(x=treatment, y=StandardizedEffect, group=intron)) +
+  geom_line(alpha=0.1) +
+  ylab(&quot;standardized effect size&quot;) +
+  xlab(&quot;treatments, all significant GA|GT introns&quot;) +
+  facet_wrap(~EffectSizeMetric) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  labs(caption=&quot;All introns nominally significant P&lt;0.01&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, I should still consider clustering samples, since it fixes the arbitrary ordering problem. Let’s try a hiearchal clustering first, and visualize the dendrogram. There may be obvious groups from this.</p>
+<pre class="r"><code>d.deltapsi &lt;- leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  group_by(intron) %&gt;%
+  mutate(IsNominallySigAll = all(p &lt; 0.01)) %&gt;%
+  ungroup() %&gt;%
+  filter(IsNominallySigAll) %&gt;%
+  add_count(intron) %&gt;%
+  filter(n==4) %&gt;%
+  gather(key=&quot;EffectSizeMetric&quot;, value=&quot;EffectSize&quot;, logef, deltapsi) %&gt;%
+  group_by(EffectSizeMetric, intron) %&gt;%
+  mutate(StandardizedEffect = scale(EffectSize)) %&gt;%
+  ungroup() %&gt;%
+  filter(EffectSizeMetric==&quot;deltapsi&quot;) %&gt;%
+  select(StandardizedEffect, intron, treatment) %&gt;%
+  spread(key = &quot;treatment&quot;, value=&quot;StandardizedEffect&quot;) %&gt;%
+  dist()
+
+d.logef &lt;- leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  group_by(intron) %&gt;%
+  mutate(IsNominallySigAll = all(p &lt; 0.01)) %&gt;%
+  ungroup() %&gt;%
+  filter(IsNominallySigAll) %&gt;%
+  add_count(intron) %&gt;%
+  filter(n==4) %&gt;%
+  gather(key=&quot;EffectSizeMetric&quot;, value=&quot;EffectSize&quot;, logef, deltapsi) %&gt;%
+  group_by(EffectSizeMetric, intron) %&gt;%
+  mutate(StandardizedEffect = scale(EffectSize)) %&gt;%
+  ungroup() %&gt;%
+  filter(EffectSizeMetric==&quot;logef&quot;) %&gt;%
+  select(StandardizedEffect, intron, treatment) %&gt;%
+  spread(key = &quot;treatment&quot;, value=&quot;StandardizedEffect&quot;) %&gt;%
+  dist()
+
+
+ward &lt;- hclust(d.deltapsi, method=&quot;ward.D&quot;)
+complete &lt;- hclust(d.deltapsi)
+
+plot(ward)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot(complete)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-33-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I wasn’t sure what was the best way to do the clustering so I tried two methods, and will get some sense of the similarity by grouping the tree into four and looking at the concordance of those</p>
+<pre class="r"><code>NumGroups &lt;- 4
+
+groups.ward &lt;- cutree(ward, k=NumGroups)
+groups.complete &lt;- cutree(complete, k=NumGroups)
+
+data.frame(groups.ward, groups.complete) %&gt;%
+  ggplot(aes(x=groups.ward, fill=as.factor(groups.complete))) +
+  geom_bar() +
+  ggtitle(&quot;cluster groupings are sensitive to clustering method&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so the choice of clustering method does seem to make a bit of a difference, in the sense that if you cut the dendrogram into 4 groups, the resulting groups won’t be quite the same depending on these two clustering methods… Let’s plot the clustering of one of the ways as a heatmap showing the delta psi effect sizes</p>
+<p>Let’s see if it makes a difference if I do the same clustering algorithm but compute distance matrix based on deltapsi vs logef:</p>
+<pre class="r"><code>groups.deltapsi &lt;- hclust(d.deltapsi) %&gt;% cutree(k=NumGroups)
+groups.logef &lt;- hclust(d.logef) %&gt;% cutree(k=NumGroups)
+
+data.frame(groups.deltapsi, groups.logef) %&gt;%
+  ggplot(aes(x=groups.ward, fill=as.factor(groups.complete))) +
+  geom_bar() +
+   ggtitle(&quot;cluster groupings are sensitive to using deltapsi vs logef&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so even whether I use deltapsi or logef makes the clusters not so robust. basically, how I cluster introns into these groups is very subjective. Let’s try one more thing before giving up on this clustering idea… Let’s try plotting the clustering of samples and introns based on deltapsi from each replicate, for these same set of nominally significant in all GA|GT introns. I think visually seeing the heatmap can be useful, no matter the clustering method.</p>
+<pre class="r"><code>GAGTIntronsToPlot &lt;- leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  group_by(intron) %&gt;%
+  mutate(IsNominallySigAll = all(p &lt; 0.01)) %&gt;%
+  ungroup() %&gt;%
+  filter(IsNominallySigAll) %&gt;%
+  add_count(intron) %&gt;%
+  filter(n==4) %&gt;%
+  pull(intron) %&gt;% unique()
+
+PSI.table %&gt;%
+  select(intron, PSI, Sample) %&gt;%
+  filter(intron %in% GAGTIntronsToPlot) %&gt;%
+  spread(key=&quot;Sample&quot;, value=&quot;PSI&quot;) %&gt;%
+  mutate(DMSO.Avg = (DMSO.1 + DMSO.2 + DMSO.3)/3) %&gt;%
+  mutate_at(vars(-intron), funs(. - DMSO.Avg)) %&gt;%
+  select(-DMSO.Avg) %&gt;%
+  column_to_rownames(&quot;intron&quot;) %&gt;%
+  as.matrix() %&gt;%
+  heatmap.2(trace=&quot;none&quot;, col=brewer.pal(11,&quot;Spectral&quot;))</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>PSI.table %&gt;%
+  select(intron, PSI, Sample) %&gt;%
+  filter(intron %in% GAGTIntronsToPlot) %&gt;%
+  spread(key=&quot;Sample&quot;, value=&quot;PSI&quot;) %&gt;%
+  mutate(DMSO.Avg = (DMSO.1 + DMSO.2 + DMSO.3)/3) %&gt;%
+  mutate_at(vars(-intron), funs(. - DMSO.Avg)) %&gt;%
+  select(-DMSO.Avg) %&gt;%
+  column_to_rownames(&quot;intron&quot;) %&gt;%
+  as.matrix() %&gt;%
+  heatmap.2(trace=&quot;none&quot;, col=brewer.pal(11,&quot;Spectral&quot;), hclustfun = function(x) hclust(x,method = &#39;ward.D&#39;))</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-36-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>PSI.table %&gt;%
+  select(intron, PSI, Sample) %&gt;%
+  filter(intron %in% GAGTIntronsToPlot) %&gt;%
+  spread(key=&quot;Sample&quot;, value=&quot;PSI&quot;) %&gt;%
+  mutate(DMSO.Avg = (DMSO.1 + DMSO.2 + DMSO.3)/3) %&gt;%
+  mutate_at(vars(-intron), funs(. - DMSO.Avg)) %&gt;%
+  select(-DMSO.Avg) %&gt;%
+  column_to_rownames(&quot;intron&quot;) %&gt;%
+  as.matrix() %&gt;%
+  t() %&gt;%
+  scale(center=F) %&gt;%
+  t() %&gt;%
+  heatmap.2(trace=&quot;none&quot;, col=brewer.pal(11,&quot;Spectral&quot;))</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-36-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, for the first heatmap plot, each row is an intron, each column is a sample, and the color is where I computed the delta-PSI as <span class="math inline">\(\Delta PSI = \frac{PSI_{treat}}{mean(PSI_{DMSO})}\)</span>. For the second for the second version of the plot, it’s the same thing but with the “Ward” clustering method instead of the default. In the third, it’s the same as the first but I scaled each row before plotting and clustering (divide by standard deviation).</p>
+<p>In this way, all the clustering of samples is relatively similar. The clustering of introns I think is not. And it could just be my eyes overinterpreting these clustering, but I feel like perhaps there is a small group of introns that makes C2 look more like SM2 than A10. It would be interesting to compare some of these clustering patterns to the molecular structures.</p>
+<p>I will hold off on trying to cluster introns to do motif analysis until later, if ever, since I don’t currently see a robust way to do that.</p>
+<p>For now maybe another way to understand similarites and differences in effects between treatments is to visualize a regression between splicing effect sizes between treatments…</p>
+<p>First let’s just plot the scatter plot between logef between a pair of treatments for all GA|GT introns measured.</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  select(intron, logef, treatment) %&gt;%
+  spread(&quot;treatment&quot;, &quot;logef&quot;) %&gt;%
+ggplot(aes(x=A10, y=SM2)) +
+  geom_point(alpha=0.3) +
+  coord_cartesian(xlim=c(-6, 6), ylim=c(-6, 6)) +
+  theme_classic() +
+  ggtitle(&quot;Splicing b/n these treatments are well correlated&quot;) +
+  labs(caption=&quot;GA|GT introns only&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-37-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Wow, that is a striking correlation. And a lot of effects that are very high in SM2 but low in A10 (or vice versa) are likely just due noisy effect size estimates from low junction read counts. In particular, all the points lie roughly along either axis I think are suspiciously likely to be technical artefects from low junction read counts. Let’s plot the same thing for all pairs of treatments, and calculate spearman correlation coefficient:</p>
+<pre class="r"><code>lower_limitrange_point &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_point(..., alpha=0.3) + 
+    scale_y_continuous(limits = c(-5, 5)) +
+    scale_x_continuous(limits = c(-5, 5)) +
+    geom_abline() +
+    theme_bw()
+}
+
+lower_limitrange_hex &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    xlim(c(-5,5)) +
+    ylim(c(-5,5)) +
+    geom_abline() +
+    geom_hex(..., bins=50) + 
+    scale_fill_viridis_c(option=&quot;C&quot;) +
+    theme_bw()
+}
+
+diag_limitrange &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_density(...) + 
+    coord_cartesian(xlim=c(-5,5)) +
+    theme_bw()
+}
+
+
+leafcutter.ds.annotated %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  select(intron, logef, treatment) %&gt;%
+  spread(&quot;treatment&quot;, &quot;logef&quot;) %&gt;%
+  select(-intron) %&gt;%
+  ggpairs(
+    title=&quot;Pairwise splicing effect correlation. Only GA|GT introns&quot;,
+    upper=list(continuous = wrap(&quot;cor&quot;, method = &quot;spearman&quot;, hjust=0.7)),
+    lower=list(continuous = lower_limitrange_hex),
+    diag=list(continuous = diag_limitrange)
+    )</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, the spearman correlation between about 0.4 to about 0.85 depending on the pairwise comparison… And some of the lack of correlation is certainly just technical noise… In general I would say these treatments are quite similar. Let’s make the same plot for the “indirect effects”, that is, for introns in clusters without a GA|GT intron:</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  group_by(cluster, treatment) %&gt;%
+  filter(!any(&quot;GA&quot; %in% UpstreamOfDonor2BaseSeq)) %&gt;%
+  ungroup() %&gt;%
+  select(intron, logef, treatment) %&gt;%
+  spread(&quot;treatment&quot;, &quot;logef&quot;) %&gt;%
+  select(-intron) %&gt;%
+  ggpairs(
+    title=&quot;Pairwise splicing effect correlation. All introns&quot;,
+    upper=list(continuous = wrap(&quot;cor&quot;, method = &quot;spearman&quot;, hjust=0.7)),
+    lower=list(continuous = lower_limitrange_hex),
+    diag=list(continuous = diag_limitrange)
+    )</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-39-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>So there is some (more modest) correlation even when considering introns that don’t have a GA|GT intron in the cluster. Let’s revisit the idea that some of these non GA|GT intron splicing effects might be ‘direct’ effects on 5’ss:U1snRNA pairing at a different bulge. For example, I think another candidate sequence to explore besides gA|gt (where A represents a bulged nucleotide from u1 snRNA) would be ag|gtAaagt, since it also contains a bulged adenosine but would otherwise pair perfectly to u1.</p>
+<div class="figure">
+<img src="assets/5ssPWM.png" alt="Permuted null." />
+<p class="caption">Permuted null.</p>
+</div>
+<p>Let’s see if any of introns of these hand-selected candidate sequence were tested for leafcutter effects and if they have a general increase in splicing, as a signature of direct effects. First I will make a plot for the established effect of gA|gtaag introns with a bulged “A”, then I will make some analogous plots for other bulged snRNA:5’ss pairings described in the literature or hypothesized by me.</p>
+<pre class="r"><code>PlotEffectSizeDistribution &lt;- function(data){
+  ggplot(data, aes(x=logef, color=treatment)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  coord_cartesian(xlim=c(-2, 2)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  xlab(&quot;log2(SplicingFoldChange)&quot;) +
+  facet_wrap(~treatment) +
+  theme_light()  +
+  theme(legend.position = &quot;none&quot;)
+}
+
+leafcutter.ds.annotated %&gt;%
+  filter(str_detect(DonorSeq, &quot;\\w\\wAGGTAAG\\w&quot;)) %&gt;% 
+  PlotEffectSizeDistribution +
+  ggtitle(&quot;Effects for nnag|guaagn introns; (optimal u1:5&#39;ss pairing)&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-40-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(str_detect(DonorSeq, &quot;\\w\\wGAGTAAG\\w&quot;)) %&gt;% 
+  PlotEffectSizeDistribution +
+  ggtitle(&quot;Effects for nngA|guaagn introns; (bulged A)&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-41-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>pre-mRNAs with sequence most consistent with bulged base pairing like in my hypothetical example (ag|gtAaagt):</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(str_detect(DonorSeq, &quot;\\w\\w\\wGGTAAAGT&quot;)) %&gt;%
+  PlotEffectSizeDistribution +
+  ggtitle(&quot;Effects for nnng|guAaagu introns; (bulged A)&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>pre-mRNAs with sequence most consistent with shifted base pairing like <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3566305/">Fig1C</a>:</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(str_detect(DonorSeq, &quot;\\w\\wCAGTTAAG\\w&quot;)) %&gt;%
+  PlotEffectSizeDistribution +
+  ggtitle(&quot;Effects for nnca|guuaagn introns; (shifted register)&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-43-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>pre-mRNAs with sequence most consistent with bulged base pairing like <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3566305/">Fig1D</a>:</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(str_detect(DonorSeq, &quot;\\w\\w\\wGGTTAAG\\w&quot;)) %&gt;%
+  PlotEffectSizeDistribution +
+  ggtitle(&quot;Effects for nnng|guUaagn introns; (bulge at T)&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-44-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok interesting. I think maybe there is also an effect for introns with this sequence G|GTTAAG in which the the second U would be bulged. Similar to gA|gt, SM2 has the stronger efect and CUOME the weakest.</p>
+<p>Let’s check one more bulged pairing that is also described in the review:</p>
+<p>pre-mRNAs with sequence most consistent with bulged base pairing like <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3566305/">Fig1E</a>:</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(str_detect(DonorSeq, &quot;\\w\\w\\wGGTAGTA\\w&quot;)) %&gt;%
+  PlotEffectSizeDistribution +
+  ggtitle(&quot;Effects for nnng|gua.guan introns; (bulge in snRNA at .)&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-45-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(str_detect(DonorSeq, &quot;^\\w\\w\\w\\wGTAA\\wGT&quot;)) %&gt;%
+  PlotEffectSizeDistribution +
+  ggtitle(&quot;Effects for nnnn|guaaNgn introns; (bulged N)&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-46-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>So from this crude sequence analysis of handpicked 5’ss sequences: gA|gt has an obvious and strong increase in splicing, and as has been described in the literature it is due to stabilization of the -1A in the snRNA:5’ss duplex. Here I also see a smaller but believable (imo) effect for g|gtTaag where the +3T would be bulged and possibily stabilized by the small molecules… But since T in this case would be bulged and un-paired from u1, maybe other nucleotides (eg A) have a stronger effect if they are at this position. So let’s take this one step furher to look the effect of the N nucleotide in introns that match g|gtNaag:</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(str_detect(DonorSeq, &quot;\\w\\w\\wGGT\\wAAG\\w&quot;)) %&gt;%
+  mutate(N = substr(DonorSeq, 7,7)) %&gt;%
+  ggplot(aes(x=logef, color=treatment)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  coord_cartesian(xlim=c(-2, 2)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_grid(cols = vars(treatment), rows=vars(N)) +
+  ggtitle(&quot;Effects for nnng|guNaagu introns; (bulged N)&quot;) +
+  theme_light() </code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-47-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, it seems I really only see that effect for g|gtTaag and not other nucleotides at that position. Let’s summarise all these results about testing specific sequences of introns for assymetrical effects, into a single heatmap.</p>
+<pre class="r"><code>PlotOut &lt;- leafcutter.ds.annotated %&gt;%
+  # filter(IntronType == &quot;Alt 5&#39;ss&quot;) %&gt;%
+  select(intron, treatment, logef, DonorSeq) %&gt;%
+  mutate(
+    `11_nnng|guUaag` = str_detect(DonorSeq, &quot;^\\w\\w\\wGGTTAAG&quot;),
+    `2_nngA|gunnnn` = str_detect(DonorSeq, &quot;^\\w\\wGAGT&quot;),
+    `3_nngA|guaagn` = str_detect(DonorSeq, &quot;^\\w\\wGAGTAAG&quot;),
+    `4_nagA|guaagn` = str_detect(DonorSeq, &quot;^\\wAGAGTAAG\\w&quot;),
+    `5_nGgA|guaagn` = str_detect(DonorSeq, &quot;^\\wGGAGTAAG\\w&quot;),
+    `6_nCgA|guaagn` = str_detect(DonorSeq, &quot;^\\wCGAGTAAG\\w&quot;),
+    `7_nUgA|guaagn` = str_detect(DonorSeq, &quot;^\\wTGAGTAAG\\w&quot;),
+    `7.2_nagC|guaagn` = str_detect(DonorSeq, &quot;^\\wGACGTAAG\\w&quot;),
+    `7.3_nagG|guaagn` = str_detect(DonorSeq, &quot;^\\wGAGGTAAG\\w&quot;),
+    `8_nngU|guaagn` = str_detect(DonorSeq, &quot;^\\w\\wGTGTAAG&quot;),
+    `9_nagU|guaagn` = str_detect(DonorSeq, &quot;^\\wAGTGTAAG&quot;),
+    `1_nnag|guaagn` = str_detect(DonorSeq, &quot;^\\w\\wAGGTAAG\\w&quot;),
+    `10_nnng|guVaag` = str_detect(DonorSeq, &quot;^\\w\\w\\wGGT[ACG]AAG&quot;),
+    `9.5_nnnn|guaaHg` = str_detect(DonorSeq, &quot;^\\w\\w\\w\\wGTAA[ACT]G&quot;)
+  ) %&gt;%
+  filter_at(vars(-c(&quot;intron&quot;, &quot;treatment&quot;, &quot;logef&quot;, &quot;DonorSeq&quot;)), any_vars(. == T)) %&gt;%
+  gather(key=&quot;Pattern&quot;, value=&quot;IsMatch&quot;, -c(&quot;intron&quot;, &quot;treatment&quot;, &quot;logef&quot;, &quot;DonorSeq&quot;)) %&gt;%
+  filter(IsMatch) %&gt;%
+  group_by(Pattern, treatment) %&gt;%
+  summarise(median = median(logef),
+            p = wilcox.test(logef, alternative=&quot;greater&quot;)$p.value,
+            n = sum(IsMatch)) %&gt;%
+  ungroup() %&gt;%
+  separate(Pattern, into = c(&quot;PlotOrder&quot;, &quot;Pattern&quot;), sep = &quot;_&quot;, convert=T) %&gt;%
+  arrange(PlotOrder) %&gt;%
+  ggplot(aes(x=reorder(Pattern, desc(PlotOrder)), y=treatment, fill=median)) +
+  # geom_point(aes(size=-log10(p), color=median)) +
+  geom_tile() +
+  geom_text(aes(label=paste0(&quot;p=&quot;,format.pval(p, digits=2), &quot;\nn=&quot;, n) ), size=3) +
+  # scale_fill_viridis_c(option = &quot;E&quot;, limits = c(-1.3, 1.3)) +
+  # scale_fill_distiller(palette = &quot;Spectral&quot;, limits = c(-1.3, 1.3)) +
+  scale_fill_gradient2(name=&quot;Median log2(FoldChange)&quot;) +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  xlab(&quot;5&#39;Splice Site Pattern,\npredicted bulges and mismatches capitalized&quot;) +
+  coord_flip() +
+  theme_classic() +
+  theme(axis.text.y=element_text(size=16,  family=&quot;mono&quot;)) +
+  theme(legend.position=&quot;bottom&quot;) +
+  ggtitle(&quot;Summary heatmap of median effects by 5&#39;ss pattern&quot;)
+PlotOut</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-48-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(&quot;../code/scratch/BulgeTests.table.pdf&quot;, PlotOut, height=7, width=7)</code></pre>
+<p>TODO: also check for systematic bulge effects at 3’ss and bp. for example, the consensus bp that perfectly complements u2 snRNA would be CTAAC. What if we had CTAAAC… would those cryptic 3’ss get activated. Or at the 3’ss, would TAAG be preferentially activated</p>
+</div>
+<div id="how-does-differential-splicing-relate-to-expression" class="section level4">
+<h4>How does differential splicing relate to expression?</h4>
+<p>Another thing Jingxin suggested plotting is to reproduce something his postdoc noticed: that splicing changes are generally associated with a non-symetrical signal in expression change.</p>
+<p>Let’s merge the differential splicing and dfferential expression results by host gene to investigate:</p>
+<p>Before merging tables, I am curious how often introns overlap more than one gene, since these would be sort of ambiguous cases on how I should deal with them. How many genes can each intron be attribued to:</p>
+<pre class="r"><code>SpliceTypeAnnotations %&gt;%
+  head(10000) %&gt;%
+    separate_rows(gene_names, sep = &quot;,&quot;) %&gt;%
+  count(Intron) %&gt;%
+  ggplot(aes(x=n)) +
+  geom_histogram() +
+  ggtitle(&quot;How many host-genes annotated for each intron&quot;)</code></pre>
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-49-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, the vast majority of introns that can be attributed to a gene are attributed to exactly one host gene.</p>
+<p>Before merging the results, let’s still filter out introns that can’t be mapped to any gene or that map to more than one host gene… Then let’s plot a scatter plot to see any potential correlation between splicing effects and expression effects. Here I’ll filter for the max-within-intron delta-psi</p>
+<pre class="r"><code>DatToReproduceSplicingExpressionEffect &lt;- leafcutter.ds.annotated %&gt;%
+  filter((!is.na(gene_names)) &amp; str_detect(gene_ids, &quot;,&quot;, negate=T)) %&gt;%
+  mutate(gene_ids=str_replace(gene_ids, &quot;\\..+$&quot;, &quot;&quot;)) %&gt;%
+  inner_join(
+    (DE.results %&gt;%
+       mutate(gene_ids=str_replace(EnsemblID, &quot;\\..+$&quot;, &quot;&quot;))), 
+    by=c(&quot;treatment&quot;,&quot;gene_ids&quot;))
+
+
+# DE.results %&gt;% pull(treatment) %&gt;% unique()
+
+DatToReproduceSplicingExpressionEffect %&gt;%
+  group_by(treatment, cluster) %&gt;%
+  filter(abs(deltapsi) == max(abs(deltapsi))) %&gt;%
+  ungroup() %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  ggplot(aes(x=deltapsi, y=logFC)) +
+  geom_point(alpha=0.05) +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  ggtitle(&quot;Scatter of host-gene expression change vs splicing change&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-50-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>First of all I clearly see some assymetrical effects in the sense that there are more downregulated genes than up in general.</p>
+<p>I think this could replicate what Jingxin’s postdoc, Jungxin Zhao found by plotting volcano plots. Reproducing exactly what he plotted might take a little more work since it requires thinking about exon inclusion/skipping which is a bit different from leafcutter intron-centric measurements… But let’s explore this correlation b/n expression and splicing a bit more… Firstly let’s do the same but filter just for the likely “direct” targets that have GA|GT 5’ splice sites</p>
+<pre class="r"><code>DatToReproduceSplicingExpressionEffect %&gt;%
+  mutate(IsGAGTIntron = ifelse(UpstreamOfDonor2BaseSeq == &quot;GA&quot;, &quot;GA|GT&quot;, &quot;!GAGT&quot;)) %&gt;%
+  mutate(IsSplicingChangeSignificant = ifelse(p.adjust &lt; 0.01, &quot;Sig&quot;, &quot;NS&quot;)) %&gt;%
+  mutate(IsSigIsGAGT = paste(IsGAGTIntron, IsSplicingChangeSignificant)) %&gt;%
+  ggplot(aes(x=deltapsi, y=logFC)) +
+  geom_point(alpha=0.1) +
+  geom_smooth(method=&quot;lm&quot;) +
+  facet_grid(rows = vars(treatment), cols = vars(IsSigIsGAGT)) +
+  theme_bw() +
+  ggtitle(&quot;Increase in GA|GT intron-splicing generally with downregulation&quot;)</code></pre>
+<pre><code>`geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-51-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, perhaps there is some assymetry here, wherein the GA|GT 5’ splice sites, as plotted above are generally upregulated in splicing, while there host genes are more likely to be downregulated at expression level. Perhaps the model is that the GA splice sites generally induce cryptic splicing that mediates NMD.</p>
+<p>Let’s investigate a bit more by plotting whether the introns are annotated vs unannotated (cryptic). Let’s also facet by whether the 5’ss is GA|GT rather than filter for that.</p>
+<pre class="r"><code>DatToReproduceSplicingExpressionEffect %&gt;%
+  filter(treatment==&quot;SM2&quot;) %&gt;%
+  mutate(IsSplicingChangeSignificant = ifelse(p.adjust &lt; 0.01, &quot;Sig&quot;, &quot;NS&quot;)) %&gt;%
+  ggplot(aes(x=deltapsi, y=logFC)) +
+  geom_point(alpha=0.3, aes(color=IntronType)) +
+  geom_hline(yintercept = 0, linetype=&quot;dashed&quot;) +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  ylab(&quot;Host gene expression\nlog2(FoldChange)&quot;) +
+  xlab(&quot;Splicing change\nDeltaPSI&quot;) +
+  # facet_wrap(~IsSplicingChangeSignificant) +
+  theme_bw() +
+  ggtitle(&quot;Increase in cryptic splice sites associated with host-gene downregulation&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>DatToReproduceSplicingExpressionEffect %&gt;%
+  mutate(IsGAGTIntron = ifelse(UpstreamOfDonor2BaseSeq == &quot;GA&quot;, &quot;GA|GT&quot;, &quot;!GAGT&quot;)) %&gt;%
+  mutate(IsSplicingChangeSignificant = ifelse(p.adjust &lt; 0.01, &quot;Sig&quot;, &quot;NS&quot;)) %&gt;%
+  mutate(IsSigIsGAGT = paste(IsGAGTIntron, IsSplicingChangeSignificant)) %&gt;%
+  ggplot(aes(x=deltapsi, y=logFC)) +
+  geom_point(alpha=0.3, aes(color=IntronType)) +
+  geom_hline(yintercept = 0, linetype=&quot;dashed&quot;) +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  ylab(&quot;Host gene expression\nlog2(FoldChange)&quot;) +
+  xlab(&quot;Splicing change\nDeltaPSI&quot;) +
+  facet_grid(rows = vars(treatment), cols = vars(IsSigIsGAGT)) +
+  theme_bw() +
+  theme(legend.position=&quot;bottom&quot;) +
+  ggtitle(&quot;Increase in cryptic splice sites associated with host-gene downregulation&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-52-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I think this plot is pretty consistent with that model about cryptic 5’ss that induce host transcript downregulation, possibly by NMD. Upregulation of cryptic 3’ss also tend to have a host transcript downregulation effect, but the direct effects (those at GA|GT 5’ss) tend to overwhelmingly be activation of cryptic 5’ss.</p>
+<p>Let’s consider different ways to present similar information graphically.</p>
+<p>let’s try, a volcano plot of DE expression, plotted by significant splice types, just for SM2:</p>
+<pre class="r"><code>DatToReproduceSplicingExpressionEffect %&gt;%
+  filter(treatment == &quot;SM2&quot;) %&gt;%
+  mutate(
+    DE = case_when(
+      FDR &lt; 0.01 &amp; sign(logFC) == 1 ~ &quot;Up&quot;,
+      FDR &lt; 0.01 &amp; sign(logFC) == -1 ~ &quot;Down&quot;,
+      TRUE ~ &quot;NS&quot;
+    )
+  ) %&gt;%
+  ggplot(aes(x=deltapsi, y=-log10(p.adjust), color=DE )) +
+  geom_point(alpha=0.2) +
+  facet_wrap(~IntronType) +
+  theme_classic() +
+  ggtitle(&quot;Increase in cryptic splice sites associated with host-gene downregulation&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-53-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Lastly, let’s try visualizing as stacked bar graphs showing the proportion of up vs down vs not-significant host gene changes upon up/down/NS change in splicing types. I think this is an important way to show the data for the technical detail that cryptic splice sites are just harder to identify decreases for since they are already rare by nature. But if you categorize the cryptic splice sites that you DO see decreases for, and see different host gene changes in that group versus the cryptic splice sites that increase, then I will be more convinced that this isn’t technical detail is the whole explanation.</p>
+<pre class="r"><code>DatToReproduceSplicingExpressionEffect %&gt;%
+  filter(treatment == &quot;SM2&quot;) %&gt;%
+  group_by(treatment, cluster) %&gt;%
+  filter(abs(deltapsi)==max(abs(deltapsi))) %&gt;%
+  filter(abs(deltapsi) &gt; 0.05) %&gt;%
+  ungroup() %&gt;%
+  mutate(
+    SplicingSign = case_when(
+      p.adjust &lt; 0.01 &amp; sign(deltapsi) == 1 ~ &quot;SplicingIncrease&quot;,
+      p.adjust &lt; 0.01 &amp; sign(deltapsi) == -1 ~ &quot;SplicingDecrease&quot;,
+      p.adjust &gt; 0.01 ~ &quot;Splicing NS&quot;
+    ),
+    ExpressionSign = case_when(
+      FDR &lt; 0.01 &amp; sign(logFC) == 1 ~ &quot;ExpressionIncrease&quot;,
+      FDR &lt; 0.01 &amp; sign(logFC) == -1 ~ &quot;ExpressionDecrease&quot;,
+      FDR &gt; 0.01 ~ &quot;Expression NS&quot;
+    )
+  ) %&gt;%
+  count(IntronType, treatment, SplicingSign, ExpressionSign) %&gt;%
+  mutate(ExpressionSign = fct_relevel(ExpressionSign, &quot;ExpressionIncrease&quot;, &quot;Expression NS&quot;, &quot;ExpressionDecrease&quot;)) %&gt;%
+  ggplot(aes(
+    x=SplicingSign,
+    y=n,
+    fill=ExpressionSign
+  )) +
+    geom_col(position=&quot;fill&quot;) +
+    ylab(&quot;Fraction&quot;) +
+    facet_wrap(~IntronType) +
+    scale_x_discrete(name=&quot;SplicingChange&quot;, limits=c(&quot;SplicingDecrease&quot;,&quot;Splicing NS&quot;,&quot;SplicingIncrease&quot;)) +
+    scale_fill_brewer(name=&quot;HostGeneExpressionChange&quot;, limits=c(&quot;ExpressionIncrease&quot;, &quot;Expression NS&quot;, &quot;ExpressionDecrease&quot;), palette = &quot;Spectral&quot;) +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    ggtitle(&quot;Increase in cryptic splice sites associated with host-gene downregulation&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-54-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="checking-known-splice-targets-from-the-literature" class="section level4">
+<h4>Checking known splice targets from the literature</h4>
+<p>Next, we can also use these splice site annotations to match significant splicing changes to host genes. Let’s check on the SNCA and MAPT genes Jingxin is interseted in. I’ll also search for GAPDH introns as a positive control to make sure the code works as expected.</p>
+<pre class="r"><code>SpliceTypeAnnotations %&gt;%
+  filter(str_detect(gene_names, pattern=GenesOfInterest)) %&gt;%
+  sample_n(10)</code></pre>
+<pre><code># A tibble: 10 x 10
+   Intron strand exons_skipped anchor gene_names gene_ids splice_site
+   &lt;chr&gt;  &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;      
+ 1 chr4_… +                  1 NDA    HTT        ENSG000… GT-AG      
+ 2 chr4_… +                  0 DA     HTT        ENSG000… GT-AG      
+ 3 chr5_… +                  1 A      SNCAIP     ENSG000… GT-AG      
+ 4 chr4_… +                  0 A      HTT        ENSG000… GT-AG      
+ 5 chr12… -                  1 NDA    FOXM1      ENSG000… GT-AG      
+ 6 chr12… -                  0 D      FOXM1      ENSG000… GT-AG      
+ 7 chr12… -                  2 A      FOXM1      ENSG000… GT-AG      
+ 8 chr14… -                  0 A      GALC       ENSG000… GT-AG      
+ 9 chr5_… +                  1 DA     SNCAIP     ENSG000… GT-AG      
+10 chr4_… +                  1 NDA    HTT        ENSG000… GT-AG      
+# … with 3 more variables: IntronType &lt;chr&gt;, DonorSeq &lt;chr&gt;,
+#   DonorScore &lt;dbl&gt;</code></pre>
+<pre class="r"><code>SpliceTypeAnnotations %&gt;%
+  filter(str_detect(gene_names, pattern=GenesOfInterest)) %&gt;%
+  inner_join(
+    (
+      leafcutter.ds %&gt;%
+        mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;))
+    ), by=&quot;Intron&quot;)</code></pre>
+<pre><code># A tibble: 19 x 22
+   Intron strand exons_skipped anchor gene_names gene_ids splice_site
+   &lt;chr&gt;  &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;      
+ 1 chr12… -                  0 DA     FOXM1      ENSG000… GT-AG      
+ 2 chr12… -                  0 DA     FOXM1      ENSG000… GT-AG      
+ 3 chr12… -                  0 DA     FOXM1      ENSG000… GT-AG      
+ 4 chr12… -                  0 DA     FOXM1      ENSG000… GT-AG      
+ 5 chr14… -                  0 DA     GALC       ENSG000… GT-AG      
+ 6 chr14… -                  0 DA     GALC       ENSG000… GT-AG      
+ 7 chr14… -                  0 DA     GALC       ENSG000… GT-AG      
+ 8 chr4_… +                  0 DA     HTT        ENSG000… GT-AG      
+ 9 chr4_… +                  0 DA     HTT        ENSG000… GT-AG      
+10 chr4_… +                  0 DA     HTT        ENSG000… GT-AG      
+11 chr4_… +                  0 DA     HTT        ENSG000… GT-AG      
+12 chr4_… +                  0 DA     HTT        ENSG000… GT-AG      
+13 chr4_… +                  0 DA     HTT        ENSG000… GT-AG      
+14 chr4_… +                  0 DA     HTT        ENSG000… GT-AG      
+15 chr4_… +                  0 DA     HTT        ENSG000… GT-AG      
+16 chr5_… +                  0 DA     SMN2       ENSG000… GT-AG      
+17 chr5_… +                  0 DA     SMN2       ENSG000… GT-AG      
+18 chr5_… +                  0 DA     SMN2       ENSG000… GT-AG      
+19 chr5_… +                  0 DA     SMN2       ENSG000… GT-AG      
+# … with 15 more variables: IntronType &lt;chr&gt;, DonorSeq &lt;chr&gt;,
+#   DonorScore &lt;dbl&gt;, intron &lt;chr&gt;, logef &lt;dbl&gt;, psi_treatment &lt;dbl&gt;,
+#   DMSO &lt;dbl&gt;, deltapsi &lt;dbl&gt;, treatment &lt;chr&gt;, cluster &lt;chr&gt;,
+#   status &lt;chr&gt;, loglr &lt;dbl&gt;, df &lt;dbl&gt;, p &lt;dbl&gt;, p.adjust &lt;dbl&gt;</code></pre>
+<p>It appears none of the junctions in SNCA or MAPT genes passed filters for testing. They may have been two lowly expressed to test for leafcutter, and I was fairly permissive already for filtering junctions for differential splicing testing. I think these genes just aren’t well expressed enough to really glean splicing information at these specific genes. If I want to analyze them at all I will have to go back to more raw data before leafcutter testing which does some filtering.</p>
+<p>Let’s read in the leafcutter count table and search for these genes:</p>
+<pre class="r"><code>PSI.table %&gt;%
+  mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  inner_join(SpliceTypeAnnotations, by=&quot;Intron&quot;) %&gt;%
+  filter(str_detect(gene_names, pattern=c(&quot;SNCA&quot;, &quot;MAPT&quot;)))</code></pre>
+<pre><code># A tibble: 0 x 16
+# … with 16 variables: intron &lt;chr&gt;, Sample &lt;chr&gt;, Count &lt;int&gt;,
+#   Cluster &lt;chr&gt;, ClusterSum &lt;int&gt;, PSI &lt;dbl&gt;, Intron &lt;chr&gt;,
+#   strand &lt;chr&gt;, exons_skipped &lt;dbl&gt;, anchor &lt;chr&gt;, gene_names &lt;chr&gt;,
+#   gene_ids &lt;chr&gt;, splice_site &lt;chr&gt;, IntronType &lt;chr&gt;, DonorSeq &lt;chr&gt;,
+#   DonorScore &lt;dbl&gt;</code></pre>
+<p>These genes also apparently did not pass default leafcutter clustering parameters. Let’s read in a redo of the splice junction count table with more permissive leafcutter parameters for filtering lowly expressed junctions.</p>
+<pre class="r"><code>counts.permissive &lt;- read.table(&quot;../code/SplicingAnalysis/leafcutter/clustering_permissive/autosomes/leafcutter_perind_numers.counts.gz&quot;, sep = &#39; &#39;,  header=T) %&gt;%
+  rownames_to_column(&quot;intron&quot;) %&gt;%
+  gather(key=&quot;Sample&quot;, value=&quot;Count&quot;, -intron)
+
+PSI.table.permissive &lt;- counts.permissive %&gt;%
+  mutate(Cluster = str_replace(intron, &quot;.+:(.+)$&quot;, &quot;\\1&quot;)) %&gt;%
+  group_by(Sample, Cluster) %&gt;%
+  mutate(ClusterSum = sum(Count)) %&gt;%
+  mutate(PSI = Count/ClusterSum * 100) %&gt;%
+  ungroup()
+
+PSI.table.permissive %&gt;%
+  mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  inner_join(SpliceTypeAnnotations, by=&quot;Intron&quot;) %&gt;%
+  filter(str_detect(gene_names, pattern=c(&quot;SNCA&quot;, &quot;MAPT&quot;))) %&gt;% head()</code></pre>
+<pre><code># A tibble: 6 x 16
+  intron Sample Count Cluster ClusterSum   PSI Intron strand exons_skipped
+  &lt;chr&gt;  &lt;chr&gt;  &lt;int&gt; &lt;chr&gt;        &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;          &lt;dbl&gt;
+1 chr4:… A10.1      3 clu_13…          3 100   chr4_… -                  2
+2 chr5:… A10.1      0 clu_14…          8   0   chr5_… +                  1
+3 chr5:… A10.1      5 clu_14…          8  62.5 chr5_… +                  1
+4 chr5:… A10.1      0 clu_14…          8   0   chr5_… +                  0
+5 chr5:… A10.1      2 clu_14…          7  28.6 chr5_… +                  1
+6 chr5:… A10.1      0 clu_14…          7   0   chr5_… +                  0
+# … with 7 more variables: anchor &lt;chr&gt;, gene_names &lt;chr&gt;, gene_ids &lt;chr&gt;,
+#   splice_site &lt;chr&gt;, IntronType &lt;chr&gt;, DonorSeq &lt;chr&gt;, DonorScore &lt;dbl&gt;</code></pre>
+<p>Ok. So now we have some junctions for SNCA and MAPT… Let’s plot admixture plots for all the GA|GT-containing clusters overlapping all the genes of interest:</p>
+<pre class="r"><code>PSI.table.permissive.genesofinterest &lt;- PSI.table.permissive %&gt;%
+  mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  inner_join(SpliceTypeAnnotations, by=&quot;Intron&quot;) %&gt;%
+  mutate(UpstreamOfDonor2BaseSeq = substr(DonorSeq, 3, 4)) %&gt;%
+  mutate(IsGAGT = UpstreamOfDonor2BaseSeq== &quot;GA&quot;) %&gt;%
+  filter(gene_names %in% c(&quot;SNCA&quot;, &quot;MAPT&quot;)) %&gt;%
+  group_by(Cluster) %&gt;%
+  mutate(GA_in_cluster = ifelse(any(&quot;GA&quot; %in% UpstreamOfDonor2BaseSeq), &quot;GA|GT in cluster&quot;, &quot;GA|GT not in cluster&quot;)) %&gt;%
+  ungroup()
+
+
+colourCount = length(unique(PSI.table.permissive.genesofinterest$intron))
+getPalette = colorRampPalette(brewer.pal(9, &quot;Set1&quot;))
+
+PSI.table.permissive.genesofinterest %&gt;%
+  mutate(Cluster_label = paste(Cluster, gene_names)) %&gt;%
+  sample_frac() %&gt;%
+  ggplot(aes(x=Sample, y=Count, fill=Intron, color=IsGAGT)) +
+  geom_col() +
+  facet_wrap(~Cluster_label) +
+  scale_fill_manual(values = getPalette(colourCount)) +
+  theme_classic() +
+  # theme(legend.position=&quot;none&quot;) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-58-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, none of the introns in SNCA or MAPT that we detected are GAGT introns (which I assume the ones that were previously documented in the literature are) so we just can’t measure those splicing of those introns in this dataset, despite that we have differential expression results that are consistent with the literature.</p>
+<p>Let’s try looking at GA|GT splicing in the other genes of interest noted in the literature too (eg HTT, etc)…</p>
+<ul>
+<li>I’m going to turn this block off for now… The plotting looks like a mess because there is too many introns being plotted, and I’ll have to manually go thru the literature to find the exact splice sites of interset to focus on for plotting.</li>
+</ul>
+<pre class="r"><code>PSI.table.permissive.genesofinterest &lt;- PSI.table.permissive %&gt;%
+  mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  inner_join(SpliceTypeAnnotations, by=&quot;Intron&quot;) %&gt;%
+  mutate(UpstreamOfDonor2BaseSeq = substr(DonorSeq, 3, 4)) %&gt;%
+  mutate(IsGAGT = UpstreamOfDonor2BaseSeq== &quot;GA&quot;) %&gt;%
+  filter(gene_names %in% GenesOfInterest) %&gt;%
+  group_by(Cluster) %&gt;%
+  mutate(GA_in_cluster = ifelse(any(&quot;GA&quot; %in% UpstreamOfDonor2BaseSeq), &quot;GA|GT in cluster&quot;, &quot;GA|GT not in cluster&quot;)) %&gt;%
+  ungroup()
+
+colourCount = length(unique(PSI.table.permissive.genesofinterest$intron))
+getPalette = colorRampPalette(brewer.pal(9, &quot;Set1&quot;))
+
+PSI.table.permissive.genesofinterest %&gt;%
+  filter(GA_in_cluster == &quot;GA|GT in cluster&quot;) %&gt;%
+  mutate(Cluster_label = paste(Cluster, gene_names)) %&gt;%
+  sample_frac() %&gt;%
+  ggplot(aes(x=Sample, y=PSI, fill=Intron, color=IsGAGT)) +
+  geom_col() +
+  facet_wrap(~Cluster_label) +
+  scale_fill_manual(values = getPalette(colourCount)) +
+  theme_classic() +
+  # theme(legend.position=&quot;none&quot;) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))</code></pre>
+</div>
+</div>
+<div id="using-clinvar-to-prioritize-potential-therapeutic-targets" class="section level3">
+<h3>Using ClinVar to prioritize potential therapeutic targets</h3>
+<p>So finally, I think it will be interesting to look at Pangolin expected splicing changes in response to ClinVar pathogenic mutations, and see if any of these drugs work in counteracting direction across any genes. Much like the Nature communications paper (I forget the authors, I’ll link it later here.). I should note this straightforward thinking of treatment to combat pathogenic splicing changes isn’t the only way these could be used therapeutically. For example, in SMN2, there is a naturally occuring poison exon that can be skipped by treatment, which leads to SMN2 upregulation and partial rescue of pathogenic loss-of-function mutations in SMN1. So in addition to this direct approach of looking at pathogenic splicing mutations to oppose, I should also consider pipeline that uses information about poison exons, and the mode of inheritance of diseases.</p>
+<p>In any case, as for the straightforward approach about reversing pathogenic splicing mutations, let’s first read in the ClinVar data with Pangolin splicing effect predictions, which I eventually hope to use to help annotate more potentially clinically relevant splicing events</p>
+<div id="explore-clinvar-molecular-and-clinical-significant-annotations" class="section level4">
+<h4>Explore ClinVar molecular and clinical significant annotations</h4>
+<pre class="r"><code># table of gwas considered
+ClinVar &lt;- read_tsv(&quot;../code/scratch/test.txt.gz&quot;, col_names = c(&quot;Chr&quot;, &quot;Pos&quot;, &quot;Sig&quot;, &quot;Condition&quot;, &quot;MolecularSig&quot;, &quot;Pangolin&quot;, &quot;OMIM&quot;)) %&gt;%
+  separate(MolecularSig, into=c(&quot;MolSigCode&quot;, &quot;MolSigDescription&quot;), sep=&quot;\\|&quot;) %&gt;%
+  separate(Pangolin, into=c(&quot;Gene&quot;, &quot;GreatestUp&quot;, &quot;GreatestDown&quot;), sep=&quot;\\|&quot;) %&gt;%
+  separate(GreatestUp, into=c(&quot;PangolinRelPosUp&quot;, &quot;PangolinChangeUp&quot;), sep=&quot;:&quot;, convert=T) %&gt;%
+  separate(GreatestDown, into=c(&quot;PangolinRelPosDown&quot;, &quot;PangolinChangeDown&quot;), sep=&quot;:&quot;, convert=T) %&gt;%
+  mutate(PangolinChangeDown = as.numeric(PangolinChangeDown)) %&gt;%
+  filter(!is.na(PangolinChangeDown)) %&gt;%
+  mutate(PangolinAbsPosUp = Pos + PangolinRelPosUp) %&gt;%
+  mutate(PangolinAbsPosDown = Pos + PangolinRelPosDown)</code></pre>
+<pre><code>Parsed with column specification:
+cols(
+  Chr = col_double(),
+  Pos = col_double(),
+  Sig = col_character(),
+  Condition = col_character(),
+  MolecularSig = col_character(),
+  Pangolin = col_character(),
+  OMIM = col_character()
+)</code></pre>
+<pre class="r"><code>ClinVar %&gt;% pull(MolSigDescription) %&gt;% unique()</code></pre>
+<pre><code> [1] &quot;intron_variant&quot;                     
+ [2] &quot;synonymous_variant&quot;                 
+ [3] &quot;missense_variant&quot;                   
+ [4] &quot;initiatior_codon_variant&quot;           
+ [5] &quot;frameshift_variant&quot;                 
+ [6] &quot;nonsense&quot;                           
+ [7] &quot;inframe_deletion&quot;                   
+ [8] &quot;inframe_insertion&quot;                  
+ [9] &quot;3_prime_UTR_variant&quot;                
+[10] &quot;non-coding_transcript_variant&quot;      
+[11] &quot;5_prime_UTR_variant&quot;                
+[12] &quot;splice_donor_variant&quot;               
+[13] &quot;splice_acceptor_variant&quot;            
+[14] &quot;inframe_indel&quot;                      
+[15] &quot;stop_lost&quot;                          
+[16] &quot;genic_upstream_transcript_variant&quot;  
+[17] &quot;no_sequence_alteration&quot;             
+[18] &quot;genic_downstream_transcript_variant&quot;</code></pre>
+<pre class="r"><code>MolSigsToLump &lt;- c(&quot;inframe_insertion&quot;, &quot;non-coding_transcript_variant&quot;, &quot;inframe_indel&quot;, &quot;genic_downstream_transcript_variant&quot;, &quot;5_prime_UTR_variant&quot;, &quot;inframe_deletion&quot;, &quot;3_prime_UTR_variant&quot;, &quot;genic_upstream_transcript_variant&quot; , &quot;no_sequence_alteration&quot;, &quot;intron_variant&quot;)
+MolSigsSplicing &lt;- c(&quot;splice_donor_variant&quot;, &quot;splice_acceptor_variant&quot;)
+
+ClinVar &lt;- ClinVar %&gt;%
+  mutate(MolSigDescription_simplified = case_when(
+    MolSigDescription %in% MolSigsToLump ~ &quot;Other small effects&quot;,
+    MolSigDescription %in% MolSigsSplicing ~ &quot;SpliceSiteVariant&quot;,
+    T ~ MolSigDescription
+  ))
+
+ClinVar %&gt;%
+  count(Sig, MolSigDescription_simplified) %&gt;%
+  ggplot(aes(x=Sig, y=n, fill=MolSigDescription_simplified)) +
+  geom_col(pos=&quot;stack&quot;) +
+  ylab(&quot;Num ClinVar mutations&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  ggtitle(&quot;Pathogenic/LikelyPathogenic variants enriched for SpiceSiteVariants&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-60-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ClinVar %&gt;%
+  count(Sig, MolSigDescription_simplified) %&gt;%
+  ggplot(aes(x=Sig, y=n, fill=MolSigDescription_simplified)) +
+  geom_col(pos=&quot;fill&quot;) +
+  ylab(&quot;Fraction ClinVar mutations&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    ggtitle(&quot;Pathogenic/LikelyPathogenic variants enriched for SpiceSiteVariants&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-60-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok that was a peek at the ClinVar database. Eventually I will fold in the Pangolin splicing change predictions on pathogenic or likely pathogenic variants in splice sites, to see if any of the treatments switch splicing in counteracticting directions.</p>
+</div>
+<div id="explore-pangolin-splicing-effect-predictions" class="section level4">
+<h4>Explore Pangolin splicing effect predictions</h4>
+<p>As a santiy check that Pangolin results make sense, let’s subset the clinvar mutations annotated as splice site mutations, and check the max predicted Pangolin splicing change effect size.</p>
+<pre class="r"><code>ClinVar %&gt;%
+  mutate(SplicingVariant = MolSigDescription %in% MolSigsSplicing) %&gt;%
+  select(SplicingVariant, PangolinChangeDown, PangolinChangeUp) %&gt;%
+  gather(key=&quot;PangolinDirection&quot;, &quot;EffectSize&quot;, -SplicingVariant) %&gt;%
+  mutate(SplicingVariant=if_else(SplicingVariant, &quot;SpliceSiteVariant&quot;, &quot;NotSpliceSiteVariant&quot;)) %&gt;%
+  ggplot(aes(x=PangolinDirection, y=EffectSize)) +
+  geom_violin() +
+  ylab(&quot;Pangolin predicted splicing effect size&quot;) +
+  facet_wrap(~SplicingVariant) +
+  theme_bw() +
+  ggtitle(&quot;ClinVar SpliceSiteVariant annotations have large predicted splicing effects&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-61-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, that makes sense. ClinVar splice site variants have much larger Pangolin predicted effects on splicing.</p>
+<p>First, I want to be sure I understand what the ClinVar “splice_donor_variant” and “splice_acceptor_variant” codes really mean (is it only variants in the essential GT-AG, or does it extend farther into the intronic motifs?)… I tried looking thru documentation online for this, but couldn’t find a detailed description. So let’s plot the distribution of distances between the max Pangolin effected splice sites and the variant:</p>
+<pre class="r"><code>ClinVar %&gt;%
+  filter(MolSigDescription %in% MolSigsSplicing) %&gt;%
+  select(Pos, PangolinRelPosUp, PangolinRelPosDown, MolSigDescription) %&gt;%
+  gather(key=&quot;PangolinDirection&quot;, &quot;RelativeDist&quot;, PangolinRelPosUp, PangolinRelPosDown) %&gt;%
+  group_by(Pos, PangolinDirection, MolSigDescription) %&gt;%
+  filter(abs(RelativeDist) == min(abs(RelativeDist))) %&gt;%
+  ungroup() %&gt;%
+  distinct(.keep_all = T) %&gt;%
+  ggplot(aes(x=RelativeDist)) +
+  geom_histogram(breaks=seq(-10,10)) +
+  coord_cartesian(xlim=c(-10,10)) +
+  facet_wrap(~PangolinDirection+MolSigDescription) +
+  theme_classic() +
+  ggtitle(&quot;I think SpliceSiteVariants refers only to GT-AG&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-62-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>It’s hard to exactly interpret this, especially since I am considering relative position without regard to strand, so there are sort of mirrored effects going on… But since for both “splice_donor_variant” and “splice_acceptor_variant” observations, there is such a strong signal at -2 to -1 I think it is likely that both of those codes refer to just the essential GT and AG 5’ and 3’ splice sites.</p>
+<p>So we may also want to consider some of the ClinVar variants with strong Pangolin splicing effects even if they aren’t SpliteSiteVariants. For example, I think that variants coded as “intron_variant” may include important variants at the a splice site motif (besides the essential GT-AG, which would be coded as “splice_donor_variant” and “splice_acceptor_variant”). So first, let’s see how many of these other categories there are, within the pathogenic or likely pathogenic categories that have Pangolin predicted splicing effects…</p>
+<pre class="r"><code>ClinVar$Sig %&gt;% table()</code></pre>
+<pre><code>.
+                                     Affects 
+                                          96 
+                                 association 
+                                         188 
+                                      Benign 
+                                      137204 
+                        Benign/Likely_benign 
+                                       19475 
+                         confers_sensitivity 
+                                           2 
+Conflicting_interpretations_of_pathogenicity 
+                                       41246 
+                               drug_response 
+                                        1546 
+                               Likely_benign 
+                                      211331 
+                           Likely_pathogenic 
+                                       32730 
+                                not_provided 
+                                        8937 
+                                       other 
+                                         835 
+                                  Pathogenic 
+                                       69290 
+                Pathogenic/Likely_pathogenic 
+                                        8277 
+                                  protective 
+                                          20 
+                                 risk_factor 
+                                         278 
+                      Uncertain_significance 
+                                      317711 </code></pre>
+<pre class="r"><code>PlotTypesOfPathogenicVariantsAndPangolinEffects &lt;- ClinVar %&gt;%
+  filter(Sig %in% c(&quot;Pathogenic&quot;, &quot;Pathogenic/Likely_pathogenic&quot;, &quot;Likely_pathogenic&quot;)) %&gt;%
+  group_by(Chr, Pos) %&gt;%
+  mutate(LargestPangolinChange = max(abs(PangolinChangeDown), abs(PangolinChangeUp))) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=LargestPangolinChange, fill=MolSigDescription_simplified)) +
+  geom_histogram() +
+  ylab(&quot;Number variants&quot;) +
+  theme_bw() +
+  ggtitle(&quot;Some Non &#39;SpliceSiteVariants&#39; have appreciable predicted splicing effects&quot;)
+
+PlotTypesOfPathogenicVariantsAndPangolinEffects</code></pre>
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-63-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>## Zooming in...
+PlotTypesOfPathogenicVariantsAndPangolinEffects +
+  coord_cartesian(ylim=c(0, 5000))</code></pre>
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-63-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>PlotTypesOfPathogenicVariantsAndPangolinEffects +
+  coord_cartesian(ylim=c(0, 5000))</code></pre>
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-63-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>It seems that pangolin does identify some “Pathogenic” or “Likely pathogenic” variants with potentially meaningful predicted splicing effects (say &gt;0.25) that are not SpliceSiteVariants… But splice site variants seems to capture most of these large effects.</p>
+<p>Here I’ll plot the types of molecular changes for likely pathogenic SNPs with Pangolin changes &gt; 0.1, as the ClinVar variants to consider merging with leafcutter results…</p>
+<pre class="r"><code>ClinVar %&gt;%
+  filter(Sig %in% c(&quot;Pathogenic&quot;, &quot;Pathogenic/Likely_pathogenic&quot;, &quot;Likely_pathogenic&quot;)) %&gt;%
+  group_by(Chr, Pos) %&gt;%
+  mutate(LargestPangolinChange = max(abs(PangolinChangeDown), abs(PangolinChangeUp))) %&gt;%
+  ungroup() %&gt;%
+  filter(LargestPangolinChange &gt; 0.1) %&gt;%
+  ggplot(aes(x=MolSigDescription)) +
+  geom_bar() +
+  ylab(&quot;Number variants&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  ggtitle(&quot;Number variants with PredictedSplicingChange &gt; 0.1&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-64-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Hmmm, some of these variants that Pangolin likely picks up on are definitely not directly splicing related and not good candidates for reversal by drug treatment. For example, frameshift mutations. So I’ll keep all the variants that have Pangolin changes &gt; 1 AND are not in some of those categories:</p>
+<pre class="r"><code>MolecularCategoriesToInclude &lt;- c(&quot;splice_acceptor_variant&quot;, &quot;splice_donor_variant&quot;, &quot;synonymous_variant&quot;, &quot;intron_variant&quot;, &quot;missense_variant&quot;)
+SigCategoriesToInclude &lt;- c(&quot;Pathogenic&quot;, &quot;Pathogenic/Likely_pathogenic&quot;, &quot;Likely_pathogenic&quot;)
+
+
+ClinVar %&gt;%
+  filter(Sig %in% SigCategoriesToInclude) %&gt;%
+  group_by(Chr, Pos) %&gt;%
+  mutate(LargestPangolinChange = max(abs(PangolinChangeDown), abs(PangolinChangeUp))) %&gt;%
+  ungroup() %&gt;%
+  filter(LargestPangolinChange &gt; 0.1) %&gt;%
+  filter(MolSigDescription %in% MolecularCategoriesToInclude) %&gt;%
+  ggplot(aes(x=LargestPangolinChange, fill=MolSigDescription)) +
+  geom_histogram() +
+  ylab(&quot;Number variants&quot;) +
+  theme_bw() +
+  ggtitle(&quot;Variants including to merge with diffSplicing results&quot;)</code></pre>
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-65-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="prioritize-splicing-pathogenic-introns-that-might-be-counteracted-by-treatment" class="section level4">
+<h4>Prioritize splicing-pathogenic introns that might be counteracted by treatment</h4>
+<p>Ok, now that I’ve decided what ClinVar variants to consider merging with the differential splicing (and possibly expression) results… I will merge the differential splicing results with ClinVar. I’ll plot the Pangolin effect on splicing for a pathogenic condition associated variant as a black dot, and add the treatment’s measured in vitro effect on the same splice site for splice site changes that are significant by leafcutter. I expect there to be so many results that I’ll just randomly select a smaller number for visual presentation.</p>
+<p>Some notes and filters for exactly how I do this:</p>
+<ul>
+<li>ClinVar variants with Pangolin predicted splicing change &lt;0.1 <span class="math inline">\(\Delta PSI\)</span> (PSI refers to a specific splice site) were excluded.</li>
+<li>Only ClinVar variants annotated in the following molecular categories were included: splice_acceptor_variant, splice_donor_variant, synonymous_variant, intron_variant, missense_variant</li>
+<li>Only ClinVar variants annotated in the following clinical significance categories were included: Pathogenic, Pathogenic/Likely_pathogenic, Likely_pathogenic</li>
+<li>Pangolin splicing effects of a mutation are reported as the two splice sites with the greatest up and greatest down change. Here I considered only the splice site with the greater absolute value Pangolin effect, then to estimate the effect of the drug treatment on the same splice site, I summed up the deltapsi for all introns that contain that splice site</li>
+<li>After estimateing the treatment effect on the Pangolin most effected splice site, to prioritize the most likely direct effects, only splice sites that are in a cluster with GA|GT were considered, and with nominal p&lt;0.01 (not using FDR/p.adjust because it is likely overly conservative, since genomewide FDR estimation uses higher proportion of more negative tests from non GA|GT introns)</li>
+<li>In the data frame table that I construct, for each (splice site):(treatment):(condition) trio that passes the above filters, in the same row I report DE results for the host gene and leafcutter results for the GA|GT intron with the largest deltapsi (which doesn’t necessarily have to contain the same exact splice site as the Pangolin effect; it need only be in the same cluster).</li>
+</ul>
+<pre class="r"><code>ClinVar %&gt;% pull(Sig) %&gt;% unique()</code></pre>
+<pre><code> [1] &quot;Uncertain_significance&quot;                      
+ [2] &quot;Likely_benign&quot;                               
+ [3] &quot;Benign&quot;                                      
+ [4] &quot;Likely_pathogenic&quot;                           
+ [5] &quot;Pathogenic&quot;                                  
+ [6] &quot;Affects&quot;                                     
+ [7] &quot;Conflicting_interpretations_of_pathogenicity&quot;
+ [8] &quot;Benign/Likely_benign&quot;                        
+ [9] &quot;not_provided&quot;                                
+[10] &quot;Pathogenic/Likely_pathogenic&quot;                
+[11] &quot;risk_factor&quot;                                 
+[12] &quot;association&quot;                                 
+[13] &quot;other&quot;                                       
+[14] &quot;drug_response&quot;                               
+[15] &quot;protective&quot;                                  
+[16] &quot;confers_sensitivity&quot;                         </code></pre>
+<pre class="r"><code>ClinVar %&gt;%
+  count(Chr, Pos, Gene, Condition) %&gt;%
+  arrange(desc(n))</code></pre>
+<pre><code># A tibble: 820,677 x 5
+     Chr      Pos Gene        Condition                                   n
+   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;                                   &lt;int&gt;
+ 1    15   4.34e7 ENSG000001… [&#39;not_provided&#39;]                           19
+ 2     3   3.70e7 ENSG000000… [&#39;Hereditary_nonpolyposis_colorectal_n…    17
+ 3     3   2.56e7 ENSG000000… [&#39;not_provided&#39;]                           13
+ 4    11   2.88e6 ENSG000001… [&#39;Beckwith-Wiedemann_syndrome&#39;]            12
+ 5    14   9.51e7 ENSG000001… [&#39;DICER1-related_pleuropulmonary_blast…    11
+ 6    18   5.11e7 ENSG000001… [&#39;Myhre_syndrome|Hereditary_hemorrhagi…    10
+ 7     2   1.65e8 ENSG000001… [&#39;Seizures&#39;, &#39;_benign_familial_infanti…     9
+ 8     2   2.06e8 ENSG000000… [&#39;not_provided&#39;]                            9
+ 9    11   9.44e7 ENSG000000… [&#39;Ataxia-telangiectasia-like_disorder_…     9
+10    17   1.81e7 ENSG000000… [&#39;not_provided&#39;]                            9
+# … with 820,667 more rows</code></pre>
+<pre class="r"><code># Merge ClinVar table with leafcutter and DE results in a way that makes sense
+ClinVarPangolinResults.merged.with.leafcutter &lt;- ClinVar %&gt;%
+  select(Sig, MolSigDescription, Chr, Pos, Condition, Gene, PangolinChangeUp, PangolinAbsPosUp, PangolinChangeDown, PangolinAbsPosDown) %&gt;%
+  filter(Sig %in% SigCategoriesToInclude) %&gt;%
+  filter(MolSigDescription %in% MolecularCategoriesToInclude) %&gt;%
+  # group_by(Chr, Pos) %&gt;%
+  mutate(LargestPangolinChange = pmax(abs(PangolinChangeDown), abs(PangolinChangeUp))) %&gt;%
+  # ungroup() %&gt;%
+  filter(LargestPangolinChange &gt; 0.1) %&gt;%
+  arrange(desc(LargestPangolinChange)) %&gt;%
+  distinct(Chr, Pos, Condition, .keep_all = T) %&gt;%
+  unite(PangolinUp, PangolinChangeUp, PangolinAbsPosUp) %&gt;%
+  unite(PangolinDown, PangolinChangeDown, PangolinAbsPosDown) %&gt;%
+  gather(&quot;PangolinDirection&quot;, &quot;EffectSize_SpliceSitePos&quot;, PangolinUp, PangolinDown) %&gt;%
+  separate(EffectSize_SpliceSitePos, into = c(&quot;PangolinEffectSize&quot;, &quot;SpliceSitePos&quot;), sep = &quot;_&quot;, convert=T) %&gt;%
+  unite(SpliceSitePos, Chr, SpliceSitePos) %&gt;%
+  group_by(Pos) %&gt;%
+  filter(abs(PangolinEffectSize) == max(abs(PangolinEffectSize))) %&gt;%
+  ungroup() %&gt;%
+  # distinct(SpliceSitePos, .keep_all=T) %&gt;%
+  inner_join(
+    x=(
+      leafcutter.ds.annotated %&gt;%
+      group_by(cluster) %&gt;%
+      mutate(GA_in_cluster = any(UpstreamOfDonor2BaseSeq == &quot;GA&quot;)) %&gt;%
+      ungroup() %&gt;%
+      filter(GA_in_cluster) %&gt;%
+      separate(intron, into=c(&quot;chr&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;cluster&quot;), sep = &quot;:&quot;, remove=F ) %&gt;%
+      mutate(chr = str_remove(chr, &quot;chr&quot;) ) %&gt;%
+      gather(key=&quot;start_or_stop&quot;, &quot;SpliceSitePos&quot;, start, stop) %&gt;%
+      mutate(SpliceSitePos = paste(chr, SpliceSitePos, sep = &quot;_&quot;))
+    ),
+    y=.,
+    by=&quot;SpliceSitePos&quot;
+  ) %&gt;%
+  mutate(DonorOrAcceptor = case_when(
+    strand == &quot;+&quot; &amp; start_or_stop == &quot;start&quot; ~ &quot;5&#39;ss&quot;,
+    strand == &quot;-&quot; &amp; start_or_stop == &quot;stop&quot; ~ &quot;5&#39;ss&quot;,
+    strand == &quot;+&quot; &amp; start_or_stop == &quot;stop&quot; ~ &quot;3&#39;ss&quot;,
+    strand == &quot;-&quot; &amp; start_or_stop == &quot;start&quot; ~ &quot;3&#39;ss&quot;
+  )) %&gt;%
+  mutate(Condition = str_remove_all(Condition, &quot;[\\[\\]&#39;]&quot;)) %&gt;%
+  group_by(SpliceSitePos, treatment) %&gt;%
+  mutate(TreatmentEffect = sum(deltapsi)) %&gt;%
+  ungroup() %&gt;%
+  # arrange() #First by GA, then by deltapsi
+  distinct(SpliceSitePos, treatment, .keep_all = T) %&gt;%
+  select(cluster,treatment, GA_in_cluster:TreatmentEffect) %&gt;%
+  inner_join( 
+    (DatToReproduceSplicingExpressionEffect %&gt;%
+       arrange(desc(UpstreamOfDonor2BaseSeq==&quot;GA&quot;), desc(deltapsi)) %&gt;%
+       distinct(treatment, cluster, .keep_all = T) %&gt;%
+       separate(cluster, into=c(&quot;chrom&quot;, &quot;cluster&quot;), sep = &quot;:&quot;)
+    ),
+    by = c(&quot;cluster&quot;, &quot;treatment&quot;)
+  ) %&gt;%
+  filter(p &lt; 0.01) %&gt;%
+  filter(Condition != &quot;[&#39;not_provided&#39;]&quot;) %&gt;%
+  mutate(EffectSum = PangolinEffectSize + TreatmentEffect) %&gt;%
+  mutate(ID = paste(GeneSymbol, DonorOrAcceptor, SpliceSitePos, Condition))
+
+hist(ClinVarPangolinResults.merged.with.leafcutter$LargestPangolinChange, breaks=30, xlim=c(0,1))</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-66-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>head(ClinVarPangolinResults.merged.with.leafcutter)</code></pre>
+<pre><code># A tibble: 6 x 46
+  cluster treatment GA_in_cluster start_or_stop SpliceSitePos Sig  
+  &lt;chr&gt;   &lt;chr&gt;     &lt;lgl&gt;         &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;
+1 clu_12… A10       TRUE          start         1_224418416   Like…
+2 clu_14… A10       TRUE          start         10_124408965  Like…
+3 clu_15… A10       TRUE          start         12_21499615   Like…
+4 clu_17… A10       TRUE          start         13_102649486  Like…
+5 clu_18… A10       TRUE          start         15_40413087   Path…
+6 clu_19… A10       TRUE          start         15_67066360   Like…
+# … with 40 more variables: MolSigDescription &lt;chr&gt;, Pos &lt;dbl&gt;,
+#   Condition &lt;chr&gt;, Gene &lt;chr&gt;, LargestPangolinChange &lt;dbl&gt;,
+#   PangolinDirection &lt;chr&gt;, PangolinEffectSize &lt;dbl&gt;,
+#   DonorOrAcceptor &lt;chr&gt;, TreatmentEffect &lt;dbl&gt;, intron &lt;chr&gt;,
+#   logef &lt;dbl&gt;, psi_treatment &lt;dbl&gt;, DMSO &lt;dbl&gt;, deltapsi &lt;dbl&gt;,
+#   chrom &lt;chr&gt;, status &lt;chr&gt;, loglr &lt;dbl&gt;, df &lt;dbl&gt;, p &lt;dbl&gt;,
+#   p.adjust &lt;dbl&gt;, Intron &lt;chr&gt;, strand &lt;chr&gt;, exons_skipped &lt;dbl&gt;,
+#   anchor &lt;chr&gt;, gene_names &lt;chr&gt;, gene_ids &lt;chr&gt;, splice_site &lt;chr&gt;,
+#   IntronType &lt;chr&gt;, DonorSeq &lt;chr&gt;, DonorScore &lt;dbl&gt;,
+#   UpstreamOfDonor2BaseSeq &lt;chr&gt;, EnsemblID &lt;chr&gt;, GeneSymbol &lt;chr&gt;,
+#   logFC &lt;dbl&gt;, logCPM &lt;dbl&gt;, F &lt;dbl&gt;, PValue &lt;dbl&gt;, FDR &lt;dbl&gt;,
+#   EffectSum &lt;dbl&gt;, ID &lt;chr&gt;</code></pre>
+<pre class="r"><code>dim(ClinVarPangolinResults.merged.with.leafcutter)</code></pre>
+<pre><code>[1] 226  46</code></pre>
+<pre class="r"><code>ToPlot &lt;- ClinVarPangolinResults.merged.with.leafcutter %&gt;%
+  sample_n(50)
+ggplot(ToPlot, aes(x=ID, xend=ID, color=treatment)) +
+    geom_segment( aes(y=PangolinEffectSize, yend=EffectSum)) +
+    geom_point(aes(y = PangolinEffectSize), size=3, color=&quot;black&quot;) +
+    geom_point(aes(y = EffectSum)) +
+    geom_hline(aes(yintercept=0), linetype=&quot;dashed&quot;) +
+    scale_x_discrete(labels=setNames(substr(ToPlot$Condition, 1, 20), ToPlot$ID)) +
+    facet_grid(rows=vars(treatment), scales = &quot;free&quot;, space=&quot;free&quot;) +
+    ylim(c(-1, 0.25)) +
+    xlab(&quot;ClinVar Condition&quot;) +
+    ylab(&quot;Pangolin + treatment\nsplicing effect\nSplice site deltaPSI&quot;) +
+    coord_flip() +
+    theme_light() +
+    theme(legend.position=&quot;none&quot;) +
+  ggtitle(&quot;Random sample of ClinVar data and sig leafcutter results merged&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-66-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so that was a random sample. From ~250 rows overall where a significant leafcutter change could be linked to a ClinVar splice site predicted to be changed by Pangolin. There’s a few things that I notice that could be improved for better filtering and prestentation of the most relevant/interesting results: Most of these clinVar splice site mutations have predicted effects that are almost complete knock out of splice site, presumably mutating the near essential GT-AG sequences. I don’t forsee any of these drugs rescuing splice sites that are mutated at GT-AG… More likely is that more modest splice site mutations that have less Pangolin predicted effects can be rescused. Therefore, I will filter out the results where Pangolin predicts a &gt;95% decrease in splice site usage, to focus what I believe to be the more ‘fixable’ splicing defects. I may also consider filtering just for the cases where the drug effect is in opposite direction as Pangolin prediction. Secondly, I notice that there are multiple lines for the same condition. Nextly, there are still quate a few uninformative condition annotations (‘not_provided’, ‘See cases’) can can be filtered out.</p>
+<p>First let’s filter those out.</p>
+<pre class="r"><code>#What are the most represented conditions. Some of these are porbably the unformative ones I should filter out
+ClinVarPangolinResults.merged.with.leafcutter %&gt;%
+  count(Condition) %&gt;%
+  arrange(desc(n)) %&gt;%
+  head()</code></pre>
+<pre><code># A tibble: 6 x 2
+  Condition                                                               n
+  &lt;chr&gt;                                                               &lt;int&gt;
+1 not_provided                                                           43
+2 Primary_hyperoxaluria, _type_II                                        16
+3 Ellis-van_Creveld_syndrome                                              8
+4 Hereditary_cancer-predisposing_syndrome                                 6
+5 Joubert_syndrome_15                                                     6
+6 Microcephaly, _normal_intelligence_and_immunodeficiency|Hereditary…     6</code></pre>
+<pre class="r"><code>ClinVarPangolinResults.merged.with.leafcutter &lt;- ClinVarPangolinResults.merged.with.leafcutter %&gt;%
+  filter(! Condition %in% c(&quot;not_provided&quot;, &quot;See_cases&quot;) )</code></pre>
+<!-- Now let's see how many (condition x treatment) combinations still have multiple rows, and why that might be -->
+<p>let’s also filter out the ones with Pangolin effects greater than 95% decrease, filter for ones that work in opposite direction as treatment, and then plot.</p>
+<pre class="r"><code># not consolidating
+ToPlot &lt;- ClinVarPangolinResults.merged.with.leafcutter %&gt;%
+  filter(!sign(PangolinEffectSize) == sign(TreatmentEffect)) %&gt;%
+  filter(PangolinEffectSize &gt; -0.95) %&gt;%
+  filter(TreatmentEffect&gt;0.05)
+
+ToPlot</code></pre>
+<pre><code># A tibble: 5 x 46
+  cluster treatment GA_in_cluster start_or_stop SpliceSitePos Sig  
+  &lt;chr&gt;   &lt;chr&gt;     &lt;lgl&gt;         &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;
+1 clu_93… A10       TRUE          start         6_42704611    Path…
+2 clu_65… C2        TRUE          start         4_80275012    Path…
+3 clu_14… A10       TRUE          stop          11_68760256   Path…
+4 clu_11… A10       TRUE          stop          8_18064457    Like…
+5 clu_14… SM2       TRUE          stop          11_68760256   Path…
+# … with 40 more variables: MolSigDescription &lt;chr&gt;, Pos &lt;dbl&gt;,
+#   Condition &lt;chr&gt;, Gene &lt;chr&gt;, LargestPangolinChange &lt;dbl&gt;,
+#   PangolinDirection &lt;chr&gt;, PangolinEffectSize &lt;dbl&gt;,
+#   DonorOrAcceptor &lt;chr&gt;, TreatmentEffect &lt;dbl&gt;, intron &lt;chr&gt;,
+#   logef &lt;dbl&gt;, psi_treatment &lt;dbl&gt;, DMSO &lt;dbl&gt;, deltapsi &lt;dbl&gt;,
+#   chrom &lt;chr&gt;, status &lt;chr&gt;, loglr &lt;dbl&gt;, df &lt;dbl&gt;, p &lt;dbl&gt;,
+#   p.adjust &lt;dbl&gt;, Intron &lt;chr&gt;, strand &lt;chr&gt;, exons_skipped &lt;dbl&gt;,
+#   anchor &lt;chr&gt;, gene_names &lt;chr&gt;, gene_ids &lt;chr&gt;, splice_site &lt;chr&gt;,
+#   IntronType &lt;chr&gt;, DonorSeq &lt;chr&gt;, DonorScore &lt;dbl&gt;,
+#   UpstreamOfDonor2BaseSeq &lt;chr&gt;, EnsemblID &lt;chr&gt;, GeneSymbol &lt;chr&gt;,
+#   logFC &lt;dbl&gt;, logCPM &lt;dbl&gt;, F &lt;dbl&gt;, PValue &lt;dbl&gt;, FDR &lt;dbl&gt;,
+#   EffectSum &lt;dbl&gt;, ID &lt;chr&gt;</code></pre>
+<pre class="r"><code>ggplot(ToPlot, aes(x=ID, xend=ID, color=treatment)) +
+    geom_segment( aes(y=PangolinEffectSize, yend=EffectSum)) +
+    geom_point(aes(y = PangolinEffectSize), size=3, color=&quot;black&quot;) +
+    geom_point(aes(y = EffectSum)) +
+    geom_hline(aes(yintercept=0), linetype=&quot;dashed&quot;) +
+    scale_x_discrete(labels=setNames(substr(ToPlot$ID, 1, 30), ToPlot$ID)) +
+    facet_grid(rows=vars(treatment), scales = &quot;free&quot;, space=&quot;free&quot;) +
+    ylim(c(-1, 0.25)) +
+    xlab(&quot;ClinVar Condition&quot;) +
+    ylab(&quot;Pangolin + treatment\nsplicing effect\nSplice site deltaPSI&quot;) +
+    coord_flip() +
+    theme_light() +
+    theme(legend.position=&quot;none&quot;) +
+  labs(caption=&quot;All GA|GT introns with meaningful antagonist effects included&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-68-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, actually let’s filter for ones where the treatment effect is at least say 0.05. Let’s also plot the effected splice site in the label</p>
+<p>Finally, let’s plot the splicing admixture plot for that splice cluster that appears significant in multiple conditions:</p>
+<pre class="r"><code># clu_613_-
+
+Mode &lt;- function(x) {
+  ux &lt;- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+PSI.table %&gt;%
+  filter(Cluster %in% c(&quot;clu_613_-&quot;, &quot;clu_12905_+&quot;, &quot;clu_20571_-&quot;)) %&gt;%
+  mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  inner_join(SpliceTypeAnnotations, by=&quot;Intron&quot;) %&gt;%
+  left_join(
+    (ToPlot %&gt;%
+       arrange(cluster, deltapsi) %&gt;%
+       distinct(cluster, .keep_all = T)
+     ),
+    by = c(&quot;Cluster&quot;=&quot;cluster&quot;)
+    ) %&gt;%
+  group_by(Cluster) %&gt;%
+  mutate(Gene = Mode(gene_names)) %&gt;%
+  ungroup() %&gt;%
+  mutate(ContainsPangolinMostAffectedSpliceSite = intron.x == intron.y) %&gt;%
+  mutate(Cluster_label = paste0(Cluster, &quot; &quot;, Gene, &quot;\n&quot;, Condition)) %&gt;%
+  ggplot(aes(x=Sample, y=PSI, fill=Intron, color=ContainsPangolinMostAffectedSpliceSite)) +
+  geom_col() +
+  facet_wrap(~Cluster_label) +
+  scale_fill_manual(values = getPalette(17)) +
+  theme_classic() +
+  # theme(legend.position=&quot;none&quot;) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))</code></pre>
+<pre class="r"><code>PSI.table %&gt;%
+  filter(Cluster %in% c(&quot;clu_613_-&quot;)) %&gt;%
+  mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  inner_join(SpliceTypeAnnotations, by=&quot;Intron&quot;) %&gt;%
+  left_join(
+    (ToPlot %&gt;%
+       arrange(cluster, deltapsi) %&gt;%
+       distinct(cluster, .keep_all = T)
+     ),
+    by = c(&quot;Cluster&quot;=&quot;cluster&quot;)
+    ) %&gt;%
+  group_by(Cluster) %&gt;%
+  mutate(Gene = Mode(gene_names)) %&gt;%
+  ungroup() %&gt;%
+  mutate(ContainsPangolinMostAffectedSpliceSite = intron.x == intron.y) %&gt;%
+  mutate(Cluster_label = paste0(Cluster, &quot; &quot;, Gene, &quot;\n&quot;, Condition)) %&gt;%
+  ggplot(aes(x=Sample, y=PSI, fill=Intron)) +
+  geom_col() +
+  facet_wrap(~Cluster_label) +
+  scale_fill_manual(values = getPalette(17)) +
+  theme_classic() +
+  # theme(legend.position=&quot;none&quot;) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ToPlot %&gt;%
+  select(intron) %&gt;%
+  distinct() %&gt;%
+  separate(intron, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;cluster&quot;)) %&gt;%
+  write_tsv(&quot;../output/PioritizedIntronTargets.bed&quot;, col_names = F)
+
+PlotOut &lt;- PSI.table %&gt;%
+  filter(Cluster %in% c(&quot;clu_613_-&quot;, &quot;clu_12905_+&quot;, &quot;clu_20571_-&quot;)) %&gt;%
+  mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  inner_join(SpliceTypeAnnotations, by=&quot;Intron&quot;) %&gt;%
+  left_join(
+    (ToPlot %&gt;%
+       arrange(cluster, deltapsi) %&gt;%
+       distinct(cluster, .keep_all = T)
+     ),
+    by = c(&quot;Cluster&quot;=&quot;cluster&quot;)
+    ) %&gt;%
+  group_by(Cluster) %&gt;%
+  mutate(Gene = Mode(gene_names)) %&gt;%
+  ungroup() %&gt;%
+  mutate(ContainsPangolinMostAffectedSpliceSite = intron.x == intron.y) %&gt;%
+  mutate(Cluster_label = paste0(Cluster, &quot; &quot;, Gene, &quot;\n&quot;, Condition)) %&gt;%
+  ggplot(aes(x=Sample, y=PSI, fill=Intron, color=ContainsPangolinMostAffectedSpliceSite)) +
+  geom_col() +
+  facet_wrap(~Cluster_label) +
+  scale_fill_manual(values = getPalette(17)) +
+  theme_classic() +
+  # theme(legend.position=&quot;none&quot;) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  theme(strip.text.x = element_text(size = 6))
+
+ggsave(&quot;../output/PioritizedIntronTargets.pdf&quot;, PlotOut, width=14, height=6)
+
+PSI.table %&gt;%
+  filter(Cluster %in% c(&quot;clu_613_-&quot;)) %&gt;%
+  mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  inner_join(SpliceTypeAnnotations, by=&quot;Intron&quot;) %&gt;%
+  left_join(
+    (ToPlot %&gt;%
+       arrange(cluster, deltapsi) %&gt;%
+       distinct(cluster, .keep_all = T)
+     ),
+    by = c(&quot;Cluster&quot;=&quot;cluster&quot;)
+    )</code></pre>
+<p>TODO:</p>
+<p>Consider using the ClinVar database a different ways:</p>
+<p>Some ideas:</p>
+<ul>
+<li>identify ClinVar variants that cause frame-shifts and early stop codons, and intersect with leafcutter results for the ones that might skip those exons, and hopefully rescue expression. If the ClinVar variant is not present in the experimental (likely healthy-donor) fibroblasts (and they presumably are not), we perhaps wouldn’t expect expression changes to be present in our DE results</li>
+<li>Similarly, get list of ClinVar mutations with dominant negative inheritence mode, and identify splicing changes that might exon-skip the mutation.</li>
+<li>get list (perhaps OMIM?) of genes and disease-causal-effect directions and intersect with leafcutter results and DE results that are consistent with a rescue effect.</li>
+</ul>
+</div>
+<div id="prioritize-treatment-effects-that-may-suppress-dominant-negative-mutations-in-exons" class="section level4">
+<h4>Prioritize treatment effects that may suppress dominant negative mutations in exons</h4>
+<p>First, to explore the molecular characteristics of autosomal dominant conditions, let’s plot the molecular siginficance code distribution for conditions annotated with “autosomal_dominant” in the condition description…</p>
+<pre class="r"><code>ClinVar &lt;- ClinVar %&gt;%
+  filter(Sig %in% SigCategoriesToInclude) %&gt;%
+  mutate(ModeOfInheritence = case_when(
+    str_detect(Condition, &quot;utosomal_dominant&quot;) ~ &quot;Autosomal_dominant&quot;,
+    str_detect(Condition, &quot;utosomal_recessive&quot;) ~ &quot;Autosomal_recessive&quot;,
+    TRUE ~ &quot;other&quot;))
+
+ClinVar %&gt;%
+  filter(Sig %in% SigCategoriesToInclude) %&gt;%
+  filter(str_detect(Condition, &quot;gain_of&quot;)) %&gt;%
+  pull(Condition) %&gt;% unique()</code></pre>
+<pre><code>[1] &quot;[&#39;Hyper-IgE_recurrent_infection_syndrome_1&#39;, &#39;_autosomal_dominant|Autoimmune_disease&#39;, &#39;_multisystem&#39;, &#39;_infantile-onset&#39;, &#39;_1|STAT3_gain_of_function|not_provided&#39;]&quot;
+[2] &quot;[&#39;Hyper-IgE_recurrent_infection_syndrome_1&#39;, &#39;_autosomal_dominant|Inherited_Immunodeficiency_Diseases|Inborn_genetic_diseases|STAT3_gain_of_function|not_provided&#39;]&quot; 
+[3] &quot;[&#39;Hyper-IgE_recurrent_infection_syndrome_1&#39;, &#39;_autosomal_dominant|STAT3_gain_of_function|not_provided&#39;]&quot;                                                             
+[4] &quot;[&#39;Hyper-IgE_recurrent_infection_syndrome_1&#39;, &#39;_autosomal_dominant|Hyper-IgE_syndrome|STAT3_gain_of_function|not_provided&#39;]&quot;                                          
+[5] &quot;[&#39;Hyper-IgE_recurrent_infection_syndrome_1&#39;, &#39;_autosomal_dominant|STAT3_gain_of_function&#39;]&quot;                                                                          
+[6] &quot;[&#39;Hyper-IgE_recurrent_infection_syndrome_1&#39;, &#39;_autosomal_dominant|Inherited_Immunodeficiency_Diseases|STAT3_gain_of_function|not_provided&#39;]&quot;                         
+[7] &quot;[&#39;Hyper-IgE_recurrent_infection_syndrome_1&#39;, &#39;_autosomal_dominant|Autoimmune_disease&#39;, &#39;_multisystem&#39;, &#39;_infantile-onset&#39;, &#39;_1|STAT3_gain_of_function&#39;]&quot;             </code></pre>
+<pre class="r"><code>ClinVar %&gt;%
+  filter(Sig %in% SigCategoriesToInclude) %&gt;%
+  count(ModeOfInheritence) %&gt;%
+  ggplot(aes(x=ModeOfInheritence, y=n)) +
+  geom_col() +
+  ylab(&quot;Number ClinVar mutations&quot;) +
+  scale_y_continuous(trans=&quot;log10&quot;) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  ggtitle(&quot;Mode of inheritence in ClinVar/OMIM&quot;)</code></pre>
+<p><img src="figure/20211216_DifferentialSplicing.Rmd/unnamed-chunk-71-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div id="this-is-where-i-left-off." class="section level5">
+<h5>This is where I left off.</h5>
+<p>Let’s</p>
+<p>TODO:</p>
+<p>I downloaded the <a href="https://www.omim.org">OMIM</a> dataset, which is somewhat overlapping from entries in ClinVar, but I notice the OMIM tables occasionally have more information in the form of relevant keywords (like “autosomal recessive”) in the condition description. This might be more useful to prioritize the most promising candidates clinical targets. For example, for a condition that is inherited as autosomal dominant, it might be more feasible to treat by downregulateed the affected gene thru activation of cryptic splicing.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.1 (2019-07-05)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Scientific Linux 7.4 (Nitrogen)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.2.19-el7-x86_64/lib/libopenblas_haswellp-r0.2.19.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] GGally_1.4.0       RColorBrewer_1.1-2 ggrepel_0.9.1     
+ [4] edgeR_3.26.5       limma_3.40.6       gplots_3.0.1.1    
+ [7] forcats_0.4.0      stringr_1.4.0      dplyr_0.8.3       
+[10] purrr_0.3.4        readr_1.3.1        tidyr_1.1.0       
+[13] tibble_2.1.3       ggplot2_3.3.3      tidyverse_1.3.0   
+
+loaded via a namespace (and not attached):
+ [1] httr_1.4.1         viridisLite_0.3.0  splines_3.6.1     
+ [4] jsonlite_1.6       modelr_0.1.8       gtools_3.8.1      
+ [7] assertthat_0.2.1   cellranger_1.1.0   yaml_2.2.0        
+[10] pillar_1.4.2       backports_1.1.4    lattice_0.20-38   
+[13] glue_1.3.1         digest_0.6.20      promises_1.0.1    
+[16] rvest_0.3.5        colorspace_1.4-1   Matrix_1.2-18     
+[19] htmltools_0.3.6    httpuv_1.5.1       plyr_1.8.4        
+[22] pkgconfig_2.0.2    broom_0.5.2        haven_2.3.1       
+[25] scales_1.1.0       gdata_2.18.0       later_0.8.0       
+[28] git2r_0.26.1       mgcv_1.8-28        generics_0.0.2    
+[31] farver_2.1.0       ellipsis_0.2.0.1   withr_2.4.1       
+[34] hexbin_1.27.3      cli_2.2.0          magrittr_1.5      
+[37] crayon_1.3.4       readxl_1.3.1       evaluate_0.14     
+[40] fs_1.3.1           fansi_0.4.0        nlme_3.1-140      
+[43] xml2_1.3.2         tools_3.6.1        hms_0.5.3         
+[46] lifecycle_0.1.0    munsell_0.5.0      reprex_0.3.0      
+[49] locfit_1.5-9.1     compiler_3.6.1     caTools_1.17.1.2  
+[52] rlang_0.4.10       grid_3.6.1         rstudioapi_0.10   
+[55] bitops_1.0-6       labeling_0.3       rmarkdown_1.13    
+[58] gtable_0.3.0       DBI_1.1.0          reshape_0.8.8     
+[61] R6_2.4.0           lubridate_1.7.4    knitr_1.23        
+[64] utf8_1.1.4         workflowr_1.6.2    rprojroot_2.0.2   
+[67] KernSmooth_2.23-15 stringi_1.4.3      Rcpp_1.0.5        
+[70] vctrs_0.3.1        dbplyr_1.4.2       tidyselect_1.1.0  
+[73] xfun_0.8          </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
