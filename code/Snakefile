@@ -1,12 +1,20 @@
 # The main entry point of your workflow.
 # After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
 
-include: "rules/common.smk"
+
 configfile: "config/config.yaml"
+
+include: "rules/common.smk"
+include: "rules/RE_Alignment.smk"
+include: "rules/RE_CallEditingSites.smk"
+include: "rules/RE_FilterEditingSites.smk"
+
+
 
 autosomes = [str(i) for i in range(1,23)]
 wildcard_constraints:
-    chrom = "|".join(autosomes)
+    chrom = "|".join(autosomes),
+    sample = "[A-Z][A-Z0-9]*-[1-3]"
 
 localrules:
     all,
@@ -29,7 +37,9 @@ rule all:
         # expand("SplicingAnalysis/juncbedfiles/{sample}.bed.gz", sample=samples.index)
         "SplicingAnalysis/leafcutter/clustering_permissive/autosomes/leafcutter_perind.counts.gz",
         "SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz",
-        "../output/ClinVar.PangolinResults.tsv.gz"
+        "../output/ClinVar.PangolinResults.tsv.gz",
+        expand("RE_Results/EditLevel/{sample}.txt", sample=SAMPLE_NAMES)
+
         # expand("ClinVar/ByChrom/{chrom}.vcf", chrom=autosomes),
         # expand("ClinVar/ByChrom/{chrom}.pangolin.vcf", chrom=autosomes)
         # The first rule should define the default target files

@@ -3,3 +3,39 @@
 # one row per sample. It can be parsed easily via pandas.
 
 samples: config/samples.tsv
+
+
+
+
+# for RNA editing
+# reference sequence Ch38
+FA_HS38: "/project2/yangili1/cdai/genome_index/hs38/GRCh38.primary_assembly.genome.fa"
+
+# thoursand genome phase 3 snps with AF > 1%
+KGP3: "/project2/yangili1/cdai/SNP/1kg_phase3_AF_above_1pct_snps.vcf.gz"
+
+# dbSNP version 138, used for BaseRecalibrator
+dbSNP: "/project2/yangili1/cdai/SNP/Homo_sapiens_assembly38.dbsnp138.vcf.gz"
+
+# STAR 2.7.7a genome index
+STAR_INDEX_DIR: "/project2/yangili1/cdai/genome_index/hs38/STAR-2.7.7a"
+
+# VCF used for STAR alignment
+STAR_VCF: '/project2/yangili1/cdai/SNP/STAR_wasp_from_dbsnp138_hs38.vcf.gz'
+
+# rediportal database and header, used for bcftools annotate
+DB: '/project2/yangili1/cdai/mRNA-editing/Data-shared/RADAR_from_REDIportal_hg38.bed.gz'
+DB_HEADER: '/project2/yangili1/cdai/mRNA-editing/Data-shared/vcf_header_RADAR.txt'
+
+# gencode intron exon annotation
+GENCODE: '/project2/yangili1/cdai/genome_index/hs38/gencode_exon_intron_v38_anno.bed'
+
+# repeats annotation from repeat masker
+REPEATS: '/project2/yangili1/cdai/mRNA-editing/Data-shared/UCSC_repeatMasker.bed'
+REPEATS_LOOKUP: '/project2/yangili1/cdai/mRNA-editing/Data-shared/repeatMasker_lookup.tsv'
+
+# simple repeats annotation
+SIMPLE_REPEATS: '/project2/yangili1/cdai/mRNA-editing/Data-shared/simpleRepeats.bed'
+
+# Homoplymer locations in Ch38
+HOMOPOLYMER: '/project2/yangili1/cdai/mRNA-editing/Data-shared/hs38_homopolymer_ge5.bed'
