@@ -11,14 +11,17 @@
 #Use hard coded arguments in interactive R session, else use command line args
 if(interactive()){
     args <- scan(text=
-                 "InteractiveMode Test Args", what='character')
+                 "../data/BradleyDistTo3ss.txt.gz Meme/PSP/BP.txt", what='character')
 } else{
     args <- commandArgs(trailingOnly=TRUE)
 }
 
+f_in <- args[1]
+f_out <- args[2]
+
 library(tidyverse)
 
-bp_dist <- read_delim("../data/BradleyDistTo3ss.txt.gz", delim=' ', col_names = c("intron_type", "dist"))
+bp_dist <- read_delim(f_in, delim=' ', col_names = c("intron_type", "dist"))
 
 bp_dist %>%
     filter(intron_type == "u2") %>%
@@ -44,6 +47,7 @@ bp_dist %>%
     # quantile(c(0.05, 0.95))
 
 
+write_lines(c(">BP 5"), f_out)
 
 bp_dist %>%
     filter(intron_type == "u2") %>%
@@ -53,5 +57,6 @@ bp_dist %>%
     full_join(data.frame(dist=1:50), by="dist") %>%
     arrange(dist) %>%
     replace_na(list(n=0)) %>%
-    pull(n)
+    pull(n) %>% paste(collapse = ' ') %>%
+    write_lines(f_out, append=T)
     

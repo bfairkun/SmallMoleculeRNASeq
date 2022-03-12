@@ -9,6 +9,9 @@ samples['Treatment'] = [i[0] for i in samples.index.str.split('-')]
 Treatments = samples['Treatment'].unique()
 NonControlTreatments = [i for i in Treatments if i != 'DMSO']
 
+SAMPLE_NAMES = samples.index
+AUTOSOMES = ['chr' + str(i) for i in range(1,23)]
+CHROMS = AUTOSOMES + ['chrX', 'chrY']
 
 
 
