@@ -161,7 +161,7 @@ rule Filter_Simple_Repeats:
 rule GatherSpliceJunctions:
     message: '''### Make Bed files of coordinates of 4bp adjacent to splice sites in introns '''
     input: "Alignments/STAR_Align/{sample}/SJ.out.tab"
-    output: "RE_Results/Alignment/STAR/SJ/{sample}.SJ.4bpIntron.bed"
+    output: "RE_Results/Alignments/SJ/{sample}.SJ.4bpIntron.bed"
     log: 'logs/GatherSpliceJunctions/{sample}.log'
     threads: 1
     shell:
@@ -245,3 +245,14 @@ rule QuantEditingLevel:
     output: 'RE_Results/EditLevel/{sample}.txt'
     log: 'logs/QuantEditingLevel/{sample}.log'
     script: '../scripts/quantEditLevel.R'
+
+rule GatherEditings:
+    message: '### Gather all sites and editing levels'
+    input: expand('RE_Results/EditLevel/{sample}.txt', sample=SAMPLE_NAMES)
+    output: 'RE_Results/EditLevel/GatheredEditingLevels.bed' # same format as phenotype bed file
+    log: 'logs/GatherEditingLevel.log'
+    params: 
+        ap_min = 1, # min edited reads
+        N_min = 1 # min number of samples
+    threads: 1
+    script: '../scripts/gather_editing.R'

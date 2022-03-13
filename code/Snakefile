@@ -20,7 +20,8 @@ localrules:
     all,
     pangolin,
     SplitClinVarVcfByChrom,
-    DE_testing
+    DE_testing,
+    GatherEditings
 
 # Instead of using samples.tsv file, a quick/dirty way to apply rules over grob of existing files is this:
 # IDS, = glob_wildcards("Path/To/{MyFileNames}.bed.gz")
@@ -38,7 +39,7 @@ rule all:
         "SplicingAnalysis/leafcutter/clustering_permissive/autosomes/leafcutter_perind.counts.gz",
         "SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz",
         "../output/ClinVar.PangolinResults.tsv.gz",
-        expand("RE_Results/EditLevel/{sample}.txt", sample=SAMPLE_NAMES)
+        'RE_Results/EditLevel/GatheredEditingLevels.bed'
 
         # expand("ClinVar/ByChrom/{chrom}.vcf", chrom=autosomes),
         # expand("ClinVar/ByChrom/{chrom}.pangolin.vcf", chrom=autosomes)
