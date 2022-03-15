@@ -11,52 +11,52 @@
 #Use hard coded arguments in interactive R session, else use command line args
 if(interactive()){
     args <- scan(text=
-                 "../data/BradleyDistTo3ss.txt.gz Meme/PSP/BP.txt", what='character')
+                 "../data/BradleyDistTo3ss.txt.gz scratch/memetest.50.fa.tab Meme/PSP/BP.psp Meme/Fasta/BP.fa 5", what='character')
 } else{
     args <- commandArgs(trailingOnly=TRUE)
 }
 
-f_in <- args[1]
-f_out <- args[2]
+bradley_bp_dist_in <- args[1]
+f_in <- args[2]
+f_psp_out <- args[3]
+f_fa_out <- args[4]
+w <- as.numeric(args[5])
 
 library(tidyverse)
 
-bp_dist <- read_delim(f_in, delim=' ', col_names = c("intron_type", "dist"))
-
-bp_dist %>%
-    filter(intron_type == "u2") %>%
-    filter(dist < 100 & dist > 5) %>%
-    pull(dist) %>%
-    hist()
-    # quantile(c(0.05, 0.95))
-
-bp_dist %>%
-    filter(intron_type == "u2") %>%
-    # filter(dist < 100 & dist > 5) %>%
-    filter(dist < 95 & dist > 5) %>%
-    ggplot(aes(x=dist)) +
-    geom_density(bw=3)
-    # quantile(c(0.05, 0.95))
-
-bp_dist %>%
-    filter(intron_type == "u2") %>%
-    # filter(dist < 100 & dist > 5) %>%
-    filter(dist <= 50 & dist >= 5) %>%
-    ggplot(aes(x=dist)) +
-    geom_bar()
-    # quantile(c(0.05, 0.95))
-
-
+bp_dist <- read_delim(bradley_bp_dist_in, delim=' ', col_names = c("intron_type", "dist"))
+dat <- read_tsv(f_in, col_names=c("Name", "Seq"))
 write_lines(c(">BP 5"), f_out)
 
+priors <- 
 bp_dist %>%
     filter(intron_type == "u2") %>%
     # filter(dist < 100 & dist > 5) %>%
-    filter(dist <= 50 & dist >= 5) %>%
+    filter(dist <= 100 & dist >= 8) %>%
     count(dist) %>%
-    full_join(data.frame(dist=1:50), by="dist") %>%
-    arrange(dist) %>%
+    mutate(n= lag(n, 2)) %>%
+    right_join(data.frame(dist=1:50), by="dist") %>%
     replace_na(list(n=0)) %>%
-    pull(n) %>% paste(collapse = ' ') %>%
-    write_lines(f_out, append=T)
-    
+    arrange(desc(dist)) %>%
+    mutate(rn = row_number()) %>%
+    mutate(n = rev(n)) %>%
+    mutate(n = case_when(
+                         rn < w ~ 0,
+                         TRUE ~ n
+                         )) %>%
+    mutate(prior = n/sum(n)) %>%
+    # ggplot(aes(x=dist, y=prior)) +
+    # geom_line()
+    arrange(dist) %>% pull(prior)
+priors
+
+dat %>%
+    mutate(str_out = str_glue(">{Name}\n{paste(priors[1:45], collapse=' ')}")) %>%
+    select(str_out) %>%
+    write.table(f_psp_out, col.names=F, quote=F, row.names=F)
+
+dat %>%
+    mutate(Seq = substr(Seq, 0, 45)) %>%
+    mutate(str_out = str_glue(">{Name}\n{Seq}")) %>%
+    select(str_out) %>%
+    write.table(f_fa_out, col.names=F, quote=F, row.names=F)
