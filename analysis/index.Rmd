@@ -11,3 +11,10 @@ editor_options:
 Welcome to my research website.
 
 [Splicing analysis notebook entry](20211216_DifferentialSplicing.html)
+
+[first glance at tiration series data notebook entry](20220629_FirstGlanceTitrationSeries.html)
+
+[DE testing and fitting curves to dose-response data](20220707_TitrationSeries_DE_testing.html)
+
+[fitting curves to dose-response data bit more carefully](20220712_FitDoseResponseModels.html)
+

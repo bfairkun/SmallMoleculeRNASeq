@@ -1,0 +1,742 @@
+---
+title: "20220712_FitDoseResponseModel"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Intro
+
+Here I will fit dose response curves using [drc](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0146021).
+
+
+- C2-C5-1: 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316 nM
+- Branaplam: 3,160, 1000, 316, 100, 31.6, 10, 3.16, 1 nM. 
+- Risdiplam: 10,000, 3,160, 1000, 316, 100, 31.6, 10, 3.16 nM
+
+## Results
+
+First load in libraries
+
+```{r}
+library(tidyverse)
+library(edgeR)
+library(RColorBrewer)
+library(gplots)
+library(viridis)
+library(broom)
+library(qvalue)
+library(drc)
+
+library(sandwich)
+library(lmtest)
+```
+
+...and read in data, and subset genes with mean expression $log_2(CountPerMillion)>1$. 
+
+```{r}
+dat <- read_tsv("../code/featureCounts/Counts.titration_series.txt", comment="#") %>%
+  rename_at(vars(-(1:6)), ~str_replace(.x, "Alignments/STAR_Align/TitrationExp(.+?)/Aligned.sortedByCoord.out.bam", "\\1")) %>%
+  dplyr::select(Geneid, everything(), -c(2:6)) %>%
+  column_to_rownames("Geneid") %>%
+  DGEList()
+
+ColorsTreatments <- c("blue"="Bran", "red"="C2C5", "green"="Ris")
+
+mean.cpm <- dat %>%
+    cpm(log=T) %>%
+    apply(1, mean)
+
+ExpressedGenes.CPM <- dat[mean.cpm>1,] %>%
+  calcNormFactors() %>%
+  cpm(prior.count=0.1)
+
+# Read in gene names. Note that ensembl_id to hgnc_symbol is not a 1-to-1 mapping
+geneNames <- read_tsv("../data/Genes.list.txt") %>%
+  mutate(hgnc_symbol = coalesce(hgnc_symbol,ensembl_gene_id)) %>%
+  inner_join(data.frame(ensembl.full=rownames(ExpressedGenes.CPM)) %>%
+               mutate(ensembl_gene_id = str_remove(ensembl.full, "\\..+$")),
+             by = "ensembl_gene_id"
+             ) %>%
+  dplyr::select(ensembl.full, hgnc_symbol)
+
+```
+
+Now I will tidy the data a little bit, adding dose information to each sample. For purposes of model fitting, I will add all three DMSO replicates to each titration series as $dose=0$, which can be handled by the standard 4 parameter log-logistic model implemented in `drc`.
+
+```{r}
+dat.long <- ExpressedGenes.CPM %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into=c("Treatment", "TitrationPoint"), remove = F, convert = T)
+
+dat.DMSO <- dat.long %>%
+  filter(Treatment == "DMSO") %>%
+  mutate(dose.nM = 0) %>%
+  bind_rows(., ., ., .id="Treatment") %>%
+  mutate(Treatment = case_when(
+    Treatment == 1 ~ "Bran",
+    Treatment == 2 ~ "Ris",
+    Treatment == 3 ~ "C2C5"
+  ))
+
+
+Doses <- data.frame(C2C5=c(1000, 316, 100, 31.6, 10, 3.16, 1, 0.316),
+           Bran=c(3160, 1000, 316, 100, 31.6, 10, 3.16, 1),
+           Ris=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16)) %>%
+  mutate(TitrationPoint = 1:8) %>%
+  gather(key="Treatment", value="dose.nM", -TitrationPoint)
+
+dat.tidy <- dat.long %>%
+  filter(!Treatment == "DMSO") %>%
+  inner_join(Doses, by=c("Treatment", "TitrationPoint")) %>%
+  bind_rows(dat.DMSO) %>%
+  inner_join(geneNames, by=c("gene"="ensembl.full"))
+
+
+head(dat.tidy)
+```
+
+Now that the data is "tidy", with one row for each treatment:dose:gene combination, I should be able to easily fit models for each treatment:gene group.
+
+Let's pick one treatment:gene combination for an illustrative example, and fit the 4 parameter log-logistic model, constraining the upper and lower limit parameters to be position (since CPM cannot be negative).
+
+```{r}
+fitted_curve <- dat.tidy %>%
+  filter(hgnc_symbol=="STAT1" & Treatment == "Ris") %>%
+  drm(formula = cpm ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+      lowerl = c(NA, 0, 0, NA))
+
+plot(fitted_curve, type="all")
+
+summary(fitted_curve)
+
+glance(fitted_curve)
+
+
+```
+
+According to the `drc` author's [Plos-one paper supplement](https://storage.googleapis.com/plos-corpus-prod/10.1371/journal.pone.0146021/1/pone.0146021.s001.pdf?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=wombat-sa%40plos-prod.iam.gserviceaccount.com%2F20220712%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20220712T163957Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=43cf69778f63c847d3cfe6336fad0a7de493d2323aa4abdfeb96ebf2511ec7d086dcbdaba45c72e71004f9b06f9ec1789225f96fac3b0ed64d70052571ca48a07ee2783eb193aaea658dfca5285499ce8bcb7c74bd3d0924e24d419bbc683ee74a095619be0aab9b93557e7be5cb7a3f80042f3c95b36da7ad9b4212e53d7e284b5b94c10fb41960ef5f0ac69948c3ca3701b624861e3ca45493048a880b7f36028471441cbc3e1d3561f6ff98321698f8f635a06458bbd166c25e37f7f09365d980f5282c7493325396fc37c593b937036bb5c677ede6d326e337b77542b4ccf6646d1aba7342159df64ddbc39c603d0954bd3c7e5a227ddb5db1d55c42bb2f), more robust estimates of coefficeint standard errors can be obtained like this:
+
+
+
+```{r}
+coeftest(fitted_curve, vcov = sandwich)
+```
+
+It's not clear to me whether the response I should be fitting should be $CPM$ or $log(CPM)$ for gene expression level. Let's repeat the process now modelling $log(CPM)$
+
+```{r}
+fitted_curve <- dat.tidy %>%
+  filter(hgnc_symbol=="STAT1" & Treatment == "Ris") %>%
+  drm(formula = log(cpm) ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+      lowerl = c())
+
+plot(fitted_curve, type="all")
+
+summary(fitted_curve)
+
+coeftest(fitted_curve, vcov = sandwich)
+
+glance(fitted_curve)
+
+
+```
+
+That also looks like a good fit. Just as a sanity check, let's compare the AIC between this model, versus a linear model.
+
+```{r}
+# glance at some stats about the log-logistic model fit
+glance(fitted_curve)
+
+#fit an linear model
+fitted_curve.lm <- dat.tidy %>%
+  filter(hgnc_symbol=="STAT1" & Treatment == "Ris") %>%
+  lm(formula = log(cpm) ~ dose.nM,
+                    data = .)
+
+# glance at some stats about the log-logistic model fit
+glance(fitted_curve.lm)
+
+```
+
+The log-logistic model is obviously a reasonable fit, and the AIC also shows this log-linear model is a better fit than the simple linear model.
+
+
+For now I will continue just modelling $CPM$ (as opposed to $log(CPM)$) for simplicity, and at least attempt to fit a log-logistic model for each gene... I can think later about how to prune out the questionable model fits before subsequent analyses. One sort of reasonable way to prune out questionable models I think will be to simply to fit a linear model and only consider gene:treatment combinations where the log-linear fit model is obviously better than the simple linear model ($\Delta AIC>2$).
+
+Now let's try to fit to all gene:treatment combinations...
+
+
+Actually, to save computation time, at first let's just try fitting to 100 gene:treatment combinations, and peruse the results.
+
+```{r}
+sample_n_of <- function(data, size, ...) {
+  dots <- quos(...)
+  
+  group_ids <- data %>% 
+    group_by(!!! dots) %>% 
+    group_indices()
+  
+  sampled_groups <- sample(unique(group_ids), size)
+  
+  data %>% 
+    filter(group_ids %in% sampled_groups)
+}
+
+GenesOfInterest <- c("MAPT", "SNCA", "SMN2", "HTT", "GALC", "FOXM1", "STAT1", "AKT3", "PDGFRB")
+
+# had to use possibly wrapper function to handle errors, like when drm fitting does not converge
+safe_drm <- possibly(drm, otherwise=NA)
+
+
+set.seed(0)
+dat.fitted <-
+  dat.tidy %>%
+  sample_n_of(100, Treatment, gene) %>%
+  group_by(Treatment, gene) %>% 
+  # filter(hgnc_symbol=="STAT1") %>%
+  # filter(hgnc_symbol %in% GenesOfInterest) %>%
+  nest(-Treatment, -gene) %>%
+  mutate(model = map(data, ~safe_drm(formula = cpm ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))))) %>%
+  # filter out the wrapper functions that returned list with NA
+  filter(!anyNA(model))
+
+dat.fitted.summarised <- dat.fitted %>%
+  mutate(results = map(model, tidy)) %>%
+  unnest(results) %>%
+  mutate(summary = map(model, glance)) %>%
+  unnest(summary)
+
+dat.fitted %>%
+  mutate(resid = map(model, residuals)) %>%
+  unnest(data, resid) %>%
+  ggplot(aes(x=log(cpm), y=resid)) +
+  coord_cartesian(xlim=c(0,6), ylim=c(-20,20)) +
+  labs(title="Residuals as a function of CPM", caption="modelled CPM; not logCPM") +
+  geom_point() +
+  theme_bw()
+
+```
+
+So there is sort of unsurprisingly some heterskedastic errors... More reason to try modelling log(CPM)...
+
+Let's also check the data for a gene where the model could not be fit: ENSG00000180773.15 with risdiplam.
+
+```{r}
+dat.tidy %>%
+  filter(gene == "ENSG00000180773.15") %>%
+  ggplot(aes(x=dose.nM, y=cpm, color=Treatment)) +
+  geom_point() +
+  geom_smooth(method="loess") +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+```
+
+Ok, I can kind of understand how this the model fitting might be weird for this data.
+
+Let's try fitting model to logCPM now...
+
+```{r}
+set.seed(0)
+dat.fitted <-
+  dat.tidy %>%
+  sample_n_of(100, Treatment, gene) %>%
+  group_by(Treatment, gene) %>% 
+  # filter(hgnc_symbol=="STAT1") %>%
+  # filter(hgnc_symbol %in% GenesOfInterest) %>%
+  nest(-Treatment, -gene) %>%
+  mutate(model = map(data, ~safe_drm(formula = log(cpm) ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))))) %>%
+  # filter out the wrapper functions that returned list with NA
+  filter(!anyNA(model))
+
+dat.fitted.summarised <- dat.fitted %>%
+  mutate(results = map(model, tidy)) %>%
+  unnest(results) %>%
+  mutate(summary = map(model, glance)) %>%
+  unnest(summary)
+
+dat.fitted %>%
+  mutate(resid = map(model, residuals)) %>%
+  unnest(data, resid) %>%
+  ggplot(aes(x=log(cpm), y=resid)) +
+  coord_cartesian(xlim=c(0,6), ylim=c(-1,1)) +
+  labs(title="Residuals as a function of CPM", caption="modelled CPM; not logCPM") +
+  geom_point() +
+  theme_bw()
+```
+
+I think that is generally nicer... Let's manually inspect dose response data points for genes of interest after log transforming the expression...
+
+```{r}
+dat.tidy %>%
+  filter(hgnc_symbol %in% GenesOfInterest) %>%
+  ggplot(aes(x=dose.nM, y=log2(cpm), color=Treatment)) +
+  geom_point() +
+  geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))), se = FALSE) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~hgnc_symbol, scales="free_y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+```
+
+Hmm, based on these genes I'm still not sure if log transforming the CPM makes more sense, given that the field-standard model for dose-response curves is a sigmoidal shape log-logistic model. When viewed on this log-scale is notable that the effects keep going in terms of fold change, even at high doses... Contrast this to the same data plotted not on log-scale:
+
+```{r}
+dat.tidy %>%
+  filter(hgnc_symbol %in% GenesOfInterest) %>%
+  ggplot(aes(x=dose.nM, y=cpm, color=Treatment)) +
+  geom_point() +
+  geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))), se = FALSE) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~hgnc_symbol, scales="free_y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+```
+
+I think whether to log-transform the data almost depends on what we will do with the downstream analsis. Because the true effects on splicing still continue at low doses, so we might care most about as accurately modeling all these effects... In contrast, if we care about finding the genes therapeutic target genes, an effective knockdown might be better ascertained without log transform. Let's fit a model to all gene:treatment combinations now and use log-transformed CPM as response variable.
+
+Update: actually, this is a long computation for this notebook, let's not evaluate this code block, and I'll just use this notebook to prototype the model-fitting procedure before using a proper Rscript to fit models to all genes...
+
+```{r, eval=F}
+dat.fitted <-
+  dat.tidy %>%
+  group_by(Treatment, gene) %>% 
+  nest(-Treatment, -gene) %>%
+  mutate(model = map(data, ~safe_drm(formula = log2(cpm) ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))))) %>%
+  # filter out the wrapper functions that returned list with NA
+  filter(!anyNA(model))
+```
+
+Let's do some more careful comparisons between fit with log CPM versus CPM:
+
+```{r}
+set.seed(0)
+dat.fitted <-
+  dat.tidy %>%
+  sample_n_of(100, Treatment, gene) %>%
+  group_by(Treatment, gene) %>% 
+  # filter(hgnc_symbol=="STAT1") %>%
+  # filter(hgnc_symbol %in% GenesOfInterest) %>%
+  nest(-Treatment, -gene) %>%
+  mutate(model.cpm.LL4 = map(data, ~safe_drm(formula = cpm ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))))) %>%
+  mutate(model.log2cpm.LL4 = map(data, ~safe_drm(formula = log2(cpm) ~ dose.nM,
+                      data = .,
+                      fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))))) %>%
+  # filter out the wrapper functions that returned list with NA
+  filter((!anyNA(model.cpm.LL4)) & (!anyNA(model.log2cpm.LL4))) %>%
+  ungroup()
+
+dat.fitted.summarised <- dat.fitted %>%
+  gather(key="ModelName", value="model", model.cpm.LL4, model.log2cpm.LL4) %>%
+  mutate(results = map(model, tidy)) %>%
+  unnest(results) %>%
+  mutate(summary = map(model, glance)) %>%
+  unnest(summary)
+
+dat.fitted.summarised %>%
+  # select(gene, Treatment, ModelName, estimate, term)
+  # spread(key="ModelName", value="estimate")
+  mutate(estimate = case_when(
+    (term %in% c("LowerLimit", "UpperLimit")) & (ModelName == "model.log2cpm.LL4") ~ 2**estimate,
+    TRUE ~ estimate
+  )) %>%
+  pivot_wider(names_from = "ModelName", values_from="estimate", id_cols=c("gene", "Treatment", "term")) %>%
+  ggplot(aes(x=model.cpm.LL4, y=model.log2cpm.LL4)) +
+    geom_point() +
+    scale_x_continuous(trans="log10") +
+    scale_y_continuous(trans="log10") +
+    facet_wrap(~term, scales="free") +
+    theme_bw() +
+    labs(title="Correlation of parameter point estimates with two models", caption="4 paramaeter log-logistic, modelling either logCPM or CPM\nLowerLimit and UpperLimit parameters converted to linear scale before plotting in log2CPM model")
+
+```
+
+Ok, so the actual parameter estimates are more or less identical whether I model CPM or logCPM. In theory, heterskedastic erros should bias the paramater estiamtes, but only their standard errors.
+
+Let's compare AIC between the fit models versus simple linear regression.
+
+```{r}
+
+mselect(fitted_curve, linreg=T)["Lin", "IC"]
+modelFit(fitted_curve)
+plot(fitted_curve)
+
+dat.fitted %>%
+  gather(key="ModelName", value="model", model.cpm.LL4, model.log2cpm.LL4) %>%
+  mutate(mselect.results = map(model, mselect, linreg=T)) %>%
+  mutate(ModelFit = map(model, modelFit)) %>%
+  rowwise() %>%
+  mutate(DeltaAIC = mselect.results["LL.4", "IC"] - mselect.results["Lin", "IC"]) %>%
+  rowwise() %>%
+  mutate(Pval = ModelFit['DRC model', 'p value']) %>%
+  ungroup() %>%
+  ggplot(aes(x=DeltaAIC, fill=ModelName)) +
+  geom_histogram() +
+  theme_bw() +
+  labs(x="Delta AIC with linear model", caption="More negative means better fit with LL.4 model")
+
+
+```
+
+Let's plot the original dose response points and the models and those model fit summary stats:
+
+```{r fig.height=10, fig.width=10}
+set.seed(1)
+dat.fitted %>%
+  gather(key="ModelName", value="model", model.cpm.LL4, model.log2cpm.LL4) %>%
+  filter(ModelName == "model.log2cpm.LL4") %>%
+  mutate(mselect.results = map(model, mselect, linreg=T)) %>%
+  mutate(ModelFit = map(model, modelFit)) %>%
+  rowwise() %>%
+  mutate(DeltaAIC = mselect.results["LL.4", "IC"] - mselect.results["Lin", "IC"]) %>%
+  rowwise() %>%
+  mutate(Pval = ModelFit['DRC model', 'p value']) %>%
+  ungroup() %>%
+  sample_n(20) %>%
+  unnest(data) %>%
+  ggplot(aes(x=dose.nM, y=cpm, color=Treatment)) +
+  geom_label(data = (
+    . %>%
+      distinct(Treatment, gene, .keep_all = T) %>%
+      group_by(gene) %>%
+      mutate(vjust = 1 * row_number()) %>%
+      ungroup()),
+    aes(label = paste0("DeltaAIC: ",signif(DeltaAIC,2), "\nP:", format.pval(Pval, digits = 2)), vjust=vjust),
+    x=-Inf, y=Inf, size=3, hjust=-0.1
+  ) +
+  geom_point() +
+  geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))), se = FALSE) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~hgnc_symbol, scales="free") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+```
+
+So a lot of things have a negative AIC (roughly meaning the four parameter log logistic model is better fit than simple linear model). The P value is also a test of if a simple anova model is better fit than the drc model, wherin small P-values indicate anova model is better. This practice of looking at actual curves and then inspecting the summary stats about how quality of the model is good.
+
+Let me get some sense of the distribution of P values for this test
+
+```{r}
+dat.fitted %>%
+  gather(key="ModelName", value="model", model.cpm.LL4, model.log2cpm.LL4) %>%
+  mutate(mselect.results = map(model, mselect, linreg=T)) %>%
+  mutate(ModelFit = map(model, modelFit)) %>%
+  rowwise() %>%
+  mutate(DeltaAIC = mselect.results["LL.4", "IC"] - mselect.results["Lin", "IC"]) %>%
+  rowwise() %>%
+  mutate(Pval = ModelFit['DRC model', 'p value']) %>%
+  ungroup() %>%
+  ggplot(aes(x=Pval)) +
+  geom_histogram(bins=20) +
+  facet_wrap(~ModelName)
+```
+
+Ok that test might be reasonably calibrated. Maybe that is the simplest way I should evaluate goodness of fit.
+
+Let's also look at distribution of DeltaAIC
+
+```{r}
+dat.fitted %>%
+  gather(key="ModelName", value="model", model.cpm.LL4, model.log2cpm.LL4) %>%
+  mutate(mselect.results = map(model, mselect, linreg=T)) %>%
+  mutate(ModelFit = map(model, modelFit)) %>%
+  rowwise() %>%
+  mutate(DeltaAIC = mselect.results["LL.4", "IC"] - mselect.results["Lin", "IC"]) %>%
+  rowwise() %>%
+  mutate(Pval = ModelFit['DRC model', 'p value']) %>%
+  ungroup() %>%
+  ggplot(aes(x=DeltaAIC)) +
+  geom_histogram(bins=20) +
+  facet_wrap(~ModelName)
+```
+
+Let's look at the raw data and fits for different ranges of DeltaAIC. From the previous plots a very negative deltaAIC might be a reasonable way to filter for reasonable fits.
+
+```{r}
+
+```
+
+
+
+Now I also want to inspect the standard errors of the parameter estimates. As before, I can either model logCPM as the response, or plain CPM and then use `coeftest(fitted_curve, vcov = sandwich)` to get more robust standard error estimates, instead of the biased standard errors (biased because of heterskedascity) output of drc.
+
+```{r}
+coeftest(fitted_curve, vcov = sandwich)
+
+
+dat.fitted %>%
+  # head() %>%
+  gather(key="ModelName", value="model", model.cpm.LL4, model.log2cpm.LL4) %>%
+  mutate(results = map(model, tidy)) %>%
+  mutate(results.robust = map(model, coeftest, vcov = sandwich)) %>%
+  rowwise() %>%
+  mutate(robust_estimate.Steepness = results.robust[1,1]) %>%
+  mutate(robust_estimate.LowerLimit = results.robust[2,1]) %>%
+  mutate(robust_estimate.UpperLimit = results.robust[3,1]) %>%
+  mutate(robust_estimate.ED50 = results.robust[4,1]) %>%
+  mutate(robust_se.Steepness = results.robust[1,2]) %>%
+  mutate(robust_se.LowerLimit = results.robust[2,2]) %>%
+  mutate(robust_se.UpperLimit = results.robust[3,2]) %>%
+  mutate(robust_se.ED50 = results.robust[4,2]) %>%
+  unnest(results) %>%
+  pivot_longer(starts_with("robust_estimate"), names_to = "term2", names_prefix="robust_estimate.", values_to="robust.estimate") %>%
+  filter(term==term2) %>%
+  ggplot(aes(x=estimate, y=robust.estimate)) +
+    geom_point() +
+    scale_x_continuous(trans="log10") +
+    scale_y_continuous(trans="log10") +
+    facet_grid(rows=vars(ModelName), cols=vars(term)) +
+    theme_bw() +
+    labs(title="Correlation of parameter point estimates with two models and two estimate functions")
+
+
+```
+
+Ok, so clearly whether you use the standard drc output or the `coeftest(fitted_curve, vcov = sandwich)` (labelled as "robust estimate" above) you get the same number. Now check the same thing for standard error.
+
+```{r}
+dat.fitted %>%
+  # head() %>%
+  gather(key="ModelName", value="model", model.cpm.LL4, model.log2cpm.LL4) %>%
+  mutate(results = map(model, tidy)) %>%
+  mutate(results.robust = map(model, coeftest, vcov = sandwich)) %>%
+  rowwise() %>%
+  mutate(robust_estimate.Steepness = results.robust[1,1]) %>%
+  mutate(robust_estimate.LowerLimit = results.robust[2,1]) %>%
+  mutate(robust_estimate.UpperLimit = results.robust[3,1]) %>%
+  mutate(robust_estimate.ED50 = results.robust[4,1]) %>%
+  mutate(robust_se.Steepness = results.robust[1,2]) %>%
+  mutate(robust_se.LowerLimit = results.robust[2,2]) %>%
+  mutate(robust_se.UpperLimit = results.robust[3,2]) %>%
+  mutate(robust_se.ED50 = results.robust[4,2]) %>%
+  unnest(results) %>%
+  pivot_longer(starts_with("robust_se"), names_to = "term2", names_prefix="robust_se.", values_to="robust.se") %>%
+  filter(term==term2) %>%
+  ggplot(aes(x=std.error, y=robust.se)) +
+    geom_abline(color="red") +
+    geom_point() +
+    scale_x_continuous(trans="log10") +
+    scale_y_continuous(trans="log10") +
+    facet_grid(rows=vars(ModelName), cols=vars(term)) +
+    theme_bw() +
+    labs(title="Correlation of parameter point estimates with two models and two estimate functions")
+
+
+
+```
+
+So the drc standard error can sometimes be upwardly biased, at least compared to the so called robust method. And this is true whether for both the logCPM and CPM models. I think I will just rely on the std error estimates directly from drc for simplicity, but I will use use the logCPM model.
+
+Also one thing I can do is fit models for all the small molecule titration series at once, and tell drc that all three fits should have the same lower value (DMSO control). That seems the most proper way to use the DMSO samples.
+
+```{r, eval=F}
+dat.fitted.FixSameLowerLimit <- dat.tidy %>%
+  # sample_n_of(100, Treatment, gene) %>%
+  # group_by(Treatment, gene) %>% 
+  # filter(hgnc_symbol=="STAT1") %>%
+  filter(hgnc_symbol %in% GenesOfInterest) %>%
+  nest(data=-gene) %>%
+  mutate(model = map(data, ~safe_drm(formula = cpm ~ dose.nM,
+                    curveid = Treatment,
+                    data = .,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    pmodels=data.frame(Treatment, 1, Treatment, Treatment)
+                    ))) %>%
+  # filter out the wrapper functions that returned list with NA
+  filter(!anyNA(model))
+
+
+dat.tidy.test <- dat.tidy %>%
+  filter(hgnc_symbol=="RRM2B")
+  # filter(hgnc_symbol=="STAT1")
+
+
+
+
+fit <- drm(formula = cpm ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    pmodels=data.frame(Treatment, 1, Treatment, Treatment))
+plot(fit)
+
+dat.tidy.test <- dat.tidy %>%
+  filter(gene == "ENSG00000174574.16" & Treatment == "Bran")
+fit <- drm(formula = cpm ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    pmodels=data.frame(Treatment, Treatment, Treatment, Treatment))
+plot(fit)
+summary(fit)
+```
+
+Update:
+
+- fitting models with the same lower limit (limit as dose approaches 0) is tricky because all the models are parameterised such that lower limit parameter is the defined as the the lower of the two limit parameters, so one would have to know ahead of time which parameter (the "LowerLimit" or the "UpperLimit" is the one that corresponds to limit as dose approaches 0).
+
+For now let's fit things as I have been doing, and start comparing parameter estimates between treatments.
+
+```{r}
+set.seed(0)
+dat.fitted <-
+  dat.tidy %>%
+  sample_n_of(100, gene) %>%
+  group_by(Treatment, gene) %>% 
+  # filter(hgnc_symbol=="STAT1") %>%
+  # filter(hgnc_symbol %in% GenesOfInterest) %>%
+  nest(-Treatment, -gene) %>%
+  mutate(model.cpm.LL4 = map(data, ~safe_drm(formula = cpm ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))))) %>%
+  mutate(model.log2cpm.LL4 = map(data, ~safe_drm(formula = log2(cpm) ~ dose.nM,
+                      data = .,
+                      fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))))) %>%
+  # filter out the wrapper functions that returned list with NA
+  filter((!anyNA(model.cpm.LL4)) & (!anyNA(model.log2cpm.LL4))) %>%
+  ungroup()
+
+
+dat.to.plot <- dat.fitted %>%
+  gather(key="ModelName", value="model", model.cpm.LL4, model.log2cpm.LL4) %>%
+  filter(ModelName == "model.log2cpm.LL4") %>%
+  mutate(results = map(model, tidy)) %>%
+  mutate(mselect.results = map(model, mselect, linreg=T)) %>%
+  mutate(ModelFit = map(model, modelFit)) %>%
+  rowwise() %>%
+  mutate(DeltaAIC = mselect.results["LL.4", "IC"] - mselect.results["Lin", "IC"]) %>%
+  rowwise() %>%
+  mutate(Pval = ModelFit['DRC model', 'p value']) %>%
+  unnest(results) %>%
+  filter(Treatment %in% c("Ris", "Bran")) %>%
+  dplyr::select(Treatment, gene, estimate, std.error, Pval, DeltaAIC, term)
+  # spread(Treatment, estimate)
+  
+  
+
+dat.to.plot %>%
+  pivot_wider(names_from=c("Treatment"), values_from=c("estimate", "std.error", "Pval", "DeltaAIC"), id_cols=c("gene", "term")) %>%
+  drop_na() %>%
+  ggplot(aes(x=DeltaAIC_Bran, DeltaAIC_Ris)) +
+  geom_point() +
+    theme_bw()
+
+dat.to.plot %>%
+  pivot_wider(names_from=c("Treatment"), values_from=c("estimate", "std.error", "Pval", "DeltaAIC"), id_cols=c("gene", "term")) %>%
+  drop_na() %>%
+  ggplot(aes(x=-log10(Pval_Bran), -log10(Pval_Ris))) +
+  geom_point() +
+    theme_bw()
+
+dat.to.plot %>%
+  pivot_wider(names_from=c("Treatment"), values_from=c("estimate", "std.error", "Pval", "DeltaAIC"), id_cols=c("gene", "term")) %>%
+  drop_na() %>%
+  ggplot(aes(x=-log10(Pval_Bran), y=DeltaAIC_Bran)) +
+  geom_point() +
+    theme_bw()
+
+dat.to.plot %>%
+  pivot_wider(names_from=c("Treatment"), values_from=c("estimate", "std.error", "Pval", "DeltaAIC"), id_cols=c("gene", "term")) %>%
+  drop_na() %>%
+  rowwise() %>%
+  mutate(meanDeltaAIC = mean(DeltaAIC_Ris, DeltaAIC_Bran)) %>%
+  ungroup() %>%
+  ggplot(aes(x=estimate_Bran, y=estimate_Ris, color=meanDeltaAIC)) +
+  geom_abline() +
+  geom_errorbar(aes(xmin = estimate_Bran-std.error_Bran, xmax=estimate_Bran+std.error_Bran)) +
+  geom_errorbar(aes(ymin = estimate_Ris-std.error_Ris, ymax=estimate_Ris+std.error_Ris)) +
+  geom_point() +
+  scale_x_continuous(trans="log10") +
+  scale_y_continuous(trans="log10") +
+  facet_wrap(~term, scales="free") +
+  theme_bw()
+
+```
+
+Let's check out some individual models for individual points on these plots... starting with this red point
+
+```{r}
+
+PointsOfInterest <- dat.to.plot %>%
+  filter(term=="ED50" & Treatment == "Bran" & estimate <5) %>%
+  pull(gene)
+
+dat.to.plot %>%
+  pivot_wider(names_from=c("Treatment"), values_from=c("estimate", "std.error", "Pval", "DeltaAIC"), id_cols=c("gene", "term")) %>%
+  drop_na() %>%
+  rowwise() %>%
+  mutate(meanDeltaAIC = mean(DeltaAIC_Ris, DeltaAIC_Bran)) %>%
+  ungroup() %>%
+  mutate(IsPointOfInterest = gene %in% PointsOfInterest) %>%
+  ggplot(aes(x=estimate_Bran, y=estimate_Ris, color=IsPointOfInterest)) +
+  geom_abline() +
+  geom_errorbar(aes(xmin = estimate_Bran-std.error_Bran, xmax=estimate_Bran+std.error_Bran)) +
+  geom_errorbar(aes(ymin = estimate_Ris-std.error_Ris, ymax=estimate_Ris+std.error_Ris)) +
+  geom_point() +
+  # geom_text(aes(label=gene), size=2) +
+  scale_x_continuous(trans="log10") +
+  scale_y_continuous(trans="log10") +
+  facet_wrap(~term, scales="free") +
+  theme_bw()
+```
+
+
+```{r}
+
+
+
+dat.tidy.test <- dat.tidy %>%
+  filter(gene == "ENSG00000160117.16")
+fit <- drm(formula = log2(cpm) ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    pmodels=data.frame(Treatment, Treatment, Treatment, Treatment))
+plot(fit)
+summary(fit)
+
+dat.tidy.test <- dat.tidy %>%
+  filter(gene == "ENSG00000075239.14")
+fit <- drm(formula = log2(cpm) ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    pmodels=data.frame(Treatment, Treatment, Treatment, Treatment))
+plot(fit)
+summary(fit)
+
+dat.tidy.test <- dat.tidy %>%
+  filter(gene == "ENSG00000136436.14")
+fit <- drm(formula = log2(cpm) ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    pmodels=data.frame(Treatment, Treatment, Treatment, Treatment))
+plot(fit)
+summary(fit)
+
+
+```
+
+
+Ok, lot's of interseting things going on.
+

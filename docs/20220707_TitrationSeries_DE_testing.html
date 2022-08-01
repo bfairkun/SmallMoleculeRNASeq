@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>DE testing from dose-response series</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">small molecular splicing RNA-seq</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">DE testing from dose-response series</h1>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#intro">Intro</a></li>
+<li><a href="#differential-expression-testing">Differential expression testing</a></li>
+<li><a href="#model-fitting">Model fitting</a></li>
+</ul>
+</div>
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-07-11
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>20211209_JingxinRNAseq/analysis/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed19900924code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(19900924)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed19900924code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(19900924)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreee6f410c311b9ed1d1a307ce295d59fe5c8028c3ctargetblanke6f410ca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/e6f410c311b9ed1d1a307ce295d59fe5c8028c3c" target="_blank">e6f410c</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreee6f410c311b9ed1d1a307ce295d59fe5c8028c3ctargetblanke6f410ca" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/e6f410c311b9ed1d1a307ce295d59fe5c8028c3c" target="_blank">e6f410c</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    ._.DS_Store
+    Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    code/.DS_Store
+    Ignored:    code/._.DS_Store
+    Ignored:    code/._DOCK7.pdf
+    Ignored:    code/._DOCK7_DMSO1.pdf
+    Ignored:    code/._DOCK7_SM2_1.pdf
+    Ignored:    code/._FKTN_DMSO_1.pdf
+    Ignored:    code/._FKTN_SM2_1.pdf
+    Ignored:    code/._MAPT.pdf
+    Ignored:    code/._PKD1_DMSO_1.pdf
+    Ignored:    code/._PKD1_SM2_1.pdf
+    Ignored:    code/.snakemake/
+    Ignored:    code/5ssSeqs.tab
+    Ignored:    code/Alignments/
+    Ignored:    code/ChemCLIP/
+    Ignored:    code/ClinVar/
+    Ignored:    code/DE_testing/
+    Ignored:    code/DE_tests.mat.counts.gz
+    Ignored:    code/DE_tests.txt.gz
+    Ignored:    code/Fastq/
+    Ignored:    code/FastqFastp/
+    Ignored:    code/Meme/
+    Ignored:    code/OMIM/
+    Ignored:    code/Session.vim
+    Ignored:    code/SplicingAnalysis/
+    Ignored:    code/featureCounts/
+    Ignored:    code/log
+    Ignored:    code/logs/
+    Ignored:    code/scratch/
+    Ignored:    data/._Hijikata_TableS1_41598_2017_8902_MOESM2_ESM.xls
+    Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
+    Ignored:    output/._PioritizedIntronTargets.pdf
+
+Untracked files:
+    Untracked:  analysis/20220707_TitrationSeries_DE_testing.Rmd
+
+Unstaged changes:
+    Modified:   analysis/20220629_FirstGlanceTitrationSeries.Rmd
+    Modified:   analysis/index.Rmd
+
+Staged changes:
+    Modified:   analysis/20211216_DifferentialSplicing.Rmd
+    New:        analysis/20220629_FirstGlanceTitrationSeries.Rmd
+    Modified:   analysis/index.Rmd
+    Modified:   code/Snakefile
+    New:        code/config/samples.titrationseries.tsv
+    New:        code/rules/ProcessTitrationSeries.smk
+    New:        code/rules/RNASeqProcessing.smk
+    Modified:   code/rules/common.smk
+    New:        code/rules/pangolin.smk
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>See <a href="20220629_FirstGlanceTitrationSeries.html">previous notebook entry</a> about experiment design and first look analysis of titration series RNA-seq experiment with C2C5, branaplam, and risdiplam…</p>
+<p>In that notebook, for sake of time, I focused on the set of genes identified as differentially expressed in a previous experiment using fibroblasts (3 replicates of DMSO, 3 replicates of each treatment, with different small molecule treatments)… Obviously this is un-ideal… Better would be to identify differentially expressed genes directly from this titration experiment in LCLs. But because we only have one replicate and many doses, the experiment design is a bit different than the models easiest to implement with standard tools for differential expression (edgeR/DESeq)… I think maybe an easier way to reasonably identify DE genes from this dataset would be just to use a spearman test, testing for a monotonic association between dose and gene expression. I will implement that here, and check the results, to get a sense of how many “DE” genes I discover this way, and check the dose response curves for a random set of those (controlled for FDR) to make sure they are reasonably believable since this is not your standard differential expression test (though I do think it makes sense for this experiment design)</p>
+<p>let’s read in the data and start testing for differential expression.</p>
+</div>
+<div id="differential-expression-testing" class="section level2">
+<h2>Differential expression testing</h2>
+<pre class="r"><code>library(tidyverse)
+library(edgeR)
+library(RColorBrewer)
+library(gplots)
+library(viridis)
+library(broom)
+library(qvalue)
+library(drc)
+
+
+sample_n_of &lt;- function(data, size, ...) {
+  dots &lt;- quos(...)
+  
+  group_ids &lt;- data %&gt;% 
+    group_by(!!! dots) %&gt;% 
+    group_indices()
+  
+  sampled_groups &lt;- sample(unique(group_ids), size)
+  
+  data %&gt;% 
+    filter(group_ids %in% sampled_groups)
+}
+
+dat &lt;- read_tsv(&quot;../code/featureCounts/Counts.titration_series.txt&quot;, comment=&quot;#&quot;) %&gt;%
+  rename_at(vars(-(1:6)), ~str_replace(.x, &quot;Alignments/STAR_Align/TitrationExp(.+?)/Aligned.sortedByCoord.out.bam&quot;, &quot;\\1&quot;)) %&gt;%
+  dplyr::select(Geneid, everything(), -c(2:6)) %&gt;%
+  column_to_rownames(&quot;Geneid&quot;) %&gt;%
+  DGEList()
+
+ColorsTreatments &lt;- c(&quot;blue&quot;=&quot;Bran&quot;, &quot;red&quot;=&quot;C2C5&quot;, &quot;green&quot;=&quot;Ris&quot;)</code></pre>
+<p>Before testing for differential expression, let’s filter for expressed genes. Here I’ll use a filter of average counts per million &gt; 1.</p>
+<pre class="r"><code>mean.cpm &lt;- dat %&gt;%
+    cpm(log=T) %&gt;%
+    apply(1, mean)
+
+ExpressedGenes.CPM &lt;- dat[mean.cpm&gt;1,] %&gt;%
+  calcNormFactors() %&gt;%
+  cpm(prior.count=0.1)</code></pre>
+<p>Now let’s perform spearman test, looking for monotonic association between dosage and expression.</p>
+<pre class="r"><code>test.results &lt;- ExpressedGenes.CPM %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  nest(-Treatment, -gene) %&gt;% 
+  mutate(cor=map(data,~cor.test(.x$TitrationPoint, .x$cpm, method = &quot;sp&quot;))) %&gt;%
+  mutate(tidied = map(cor, tidy)) %&gt;% 
+  unnest(tidied, .drop = T)
+
+test.results %&gt;%
+  ggplot(aes(x=p.value)) +
+  geom_histogram() +
+  facet_wrap(~Treatment, scales=&quot;free_y&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220707_TitrationSeries_DE_testing.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>test.results %&gt;%
+  ggplot(aes(x=estimate)) +
+  geom_histogram() +
+  facet_wrap(~Treatment, scales=&quot;free_y&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220707_TitrationSeries_DE_testing.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The P value histograms actually look reasonable. And the effect sizes (correlation coefficients) are roughly symetrical about 0. Perhaps an alternative way to check that the test is reasonably calibrated is to permute the titration point labels…</p>
+<pre class="r"><code>mat &lt;- ExpressedGenes.CPM %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), convert = T) %&gt;%
+  filter(!Treatment==&quot;DMSO&quot;) %&gt;%
+  unite(Rowname, gene, Treatment) %&gt;%
+  pivot_wider(names_from = &quot;TitrationPoint&quot;, values_from=&quot;cpm&quot;, id_cols=&quot;Rowname&quot;) %&gt;%
+  column_to_rownames(&quot;Rowname&quot;) %&gt;%
+  as.matrix()
+
+
+mat.permuted &lt;- matrix(nrow=nrow(mat), ncol=ncol(mat))
+for (i in 1:nrow(mat)){
+    mat.permuted[i,] &lt;- sample(mat[i,], size=ncol(mat))
+}
+rownames(mat.permuted) &lt;- rownames(mat)
+
+test.results.permuted &lt;- mat.permuted %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;rowname&quot;) %&gt;%
+  separate(rowname, into=c(&quot;gene&quot;, &quot;Treatment&quot;), sep=&quot;_&quot;) %&gt;%
+  gather(&quot;TitrationPoint&quot;, &quot;cpm&quot;, -gene, -Treatment) %&gt;%
+  mutate(TitrationPoint = as.numeric(str_remove(TitrationPoint, &quot;V&quot;))) %&gt;%
+  nest(-Treatment, -gene) %&gt;% 
+  mutate(cor=map(data,~cor.test(.x$TitrationPoint, .x$cpm, method = &quot;sp&quot;))) %&gt;%
+  mutate(tidied = map(cor, tidy)) %&gt;% 
+  unnest(tidied, .drop = T)
+
+test.results.permuted %&gt;%
+  ggplot(aes(x=p.value)) +
+  geom_histogram(bins=20) +
+  facet_wrap(~Treatment, scales=&quot;free_y&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220707_TitrationSeries_DE_testing.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Perhaps qq plots are a better way to visualize, since with only 8 titraion points i think there are a limited number of test result p values that makes histogram binning kind of weird.</p>
+<pre class="r"><code>bind_rows(test.results, test.results.permuted, .id=&quot;PermutedOrNot&quot;) %&gt;%
+  mutate(PermutedOrNot= recode(PermutedOrNot, !!!c(&#39;1&#39;=&quot;Real&quot;, &#39;2&#39;=&quot;Permuted&quot;))) %&gt;%
+  group_by(Treatment, PermutedOrNot) %&gt;%
+  mutate(expected.p = percent_rank(p.value)) %&gt;%
+  ggplot(aes(x=-log10(expected.p), y=-log10(p.value), color=Treatment)) +
+  geom_abline() +
+  geom_point() +
+  facet_wrap(~PermutedOrNot, scales=&quot;free&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220707_TitrationSeries_DE_testing.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I feel the test is decently calibrated at least based on permutations of dose, even though most genes are significant. One reason it may not be perfectly calibrated is when dealing with tie values from CPM values from pseudocounts. In any case, Let’s estimate FDR.</p>
+<pre class="r"><code>test.results &lt;-
+  test.results %&gt;%
+  filter(!Treatment==&quot;DMSO&quot;) %&gt;%
+  group_by(Treatment) %&gt;%
+  mutate(q = qvalue(p.value)$qvalues) %&gt;%
+  ungroup()
+
+test.results %&gt;%
+  filter(q &lt; 0.1) %&gt;%
+  distinct(gene) %&gt;% nrow()</code></pre>
+<pre><code>[1] 10710</code></pre>
+<p>Pretty much every gene is DE. Well, let’s just check out some dose-response genes for random genes then…</p>
+<pre class="r"><code>#Read in gene names so that we can plot with gene symbol instead of ensembl idea
+geneNames &lt;- read_tsv(&quot;../data/Genes.list.txt&quot;) %&gt;%
+  mutate(hgnc_symbol = coalesce(hgnc_symbol,ensembl_gene_id)) %&gt;%
+  inner_join(data.frame(ensembl.full=rownames(ExpressedGenes.CPM)) %&gt;%
+               mutate(ensembl_gene_id = str_remove(ensembl.full, &quot;\\..+$&quot;)),
+             by = &quot;ensembl_gene_id&quot;
+             ) %&gt;%
+  dplyr::select(ensembl.full, hgnc_symbol)
+
+
+
+
+set.seed(0)
+ExpressedGenes.CPM %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  # filter(gene %in% Genes.to.plot$gene) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene) %&gt;%
+  sample_n_of(15, gene) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  dplyr::select(-sample) %&gt;%
+  inner_join(test.results, by=c(&quot;gene&quot;, &quot;Treatment&quot;)) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  mutate(gene = recode(gene, !!!deframe(geneNames))) %&gt;%
+  mutate(FacetLabel = paste(gene)) %&gt;%
+  ggplot(aes(x=TitrationPoint, y=cpm, color=Color)) +
+  geom_line() +
+  geom_text(data = (
+    . %&gt;%
+      distinct(Treatment, FacetLabel, .keep_all = T) %&gt;%
+      group_by(FacetLabel) %&gt;%
+      mutate(vjust = 1 * row_number()) %&gt;%
+      ungroup()),
+    aes(label = paste0(signif(estimate,2), &quot;; P:&quot;,format.pval(p.value, digits=2)), vjust=vjust),
+    x=-Inf, y=Inf, size=3, hjust=-0.1
+  ) +
+  scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+  scale_x_reverse() +
+  facet_wrap(~FacetLabel, scales = &quot;free_y&quot;) +
+  labs(title = &quot;dose response of random genes, with spearman coef and P.val&quot;) +
+  theme_classic()</code></pre>
+<p><img src="figure/20220707_TitrationSeries_DE_testing.Rmd/unnamed-chunk-7-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>Hmm, I think the test results are actually reasonable… Keep in mind that the correlation coefficient is between dose and CPM, and highest dose is labelled as “1”, so a negative correlation coefficient means it expression goes up with dose. It does seem the majority of genes have obvious dose-response effects, as the test results indicate.</p>
+<p>Let’s see if there is an obvious bias in effect directions.</p>
+<p>Let’s again look at these plots with the P values for some select genes of interest…</p>
+<pre class="r"><code>GenesOfInterest &lt;- c(&quot;MAPT&quot;, &quot;SNCA&quot;, &quot;SMN2&quot;, &quot;HTT&quot;, &quot;GALC&quot;, &quot;FOXM1&quot;, &quot;STAT1&quot;, &quot;AKT3&quot;, &quot;PDGFRB&quot;)
+
+ExpressedGenes.CPM %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  dplyr::select(-sample) %&gt;%
+  inner_join(test.results, by=c(&quot;gene&quot;, &quot;Treatment&quot;)) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  inner_join(geneNames, by=c(&quot;gene&quot;=&quot;ensembl.full&quot;)) %&gt;%
+  mutate(gene = hgnc_symbol) %&gt;%
+  filter(gene %in% GenesOfInterest) %&gt;%
+  mutate(FacetLabel = paste(gene)) %&gt;%
+  ggplot(aes(x=TitrationPoint, y=cpm, color=Color)) +
+  geom_line() +
+  geom_text(data = (
+    . %&gt;%
+      distinct(Treatment, FacetLabel, .keep_all = T) %&gt;%
+      group_by(FacetLabel) %&gt;%
+      mutate(vjust = 1 * row_number()) %&gt;%
+      ungroup()),
+    aes(label = paste0(signif(estimate,2), &quot;; P:&quot;,format.pval(p.value, digits=2)), vjust=vjust),
+    x=-Inf, y=Inf, size=3, hjust=-0.1
+  ) +
+  scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+  scale_x_reverse() +
+  facet_wrap(~FacetLabel, scales = &quot;free_y&quot;) +
+  labs(title = &quot;dose response of random genes, with spearman coef and P.val&quot;) +
+  theme_classic()</code></pre>
+<p><img src="figure/20220707_TitrationSeries_DE_testing.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Cool. again, the spearman correlation test results with p values make sense. Maybe I should also try a simple linear model to test for non-zero slope, since the spearman test doesn’t really take into account that some big changes between titration points are more believable.</p>
+<p>For the future I think I will want to first perform some sort of test like this to filter for genes for which to attempt fitting logistic curves, then compare the EC50 between treatments.</p>
+<p>Maybe I should also do the same approach for splicing test… That is, quantify splicing ratios from leafcutter clustering script, then perform calculate spearman correlation coefficient and p value over dose-response series. It might be a good idea to first filter for reasonably expressed junctions first… Perhaps I should just also run the leafcutter <a href="http://davidaknowles.github.io/leafcutter/articles/sQTL.html">prepare_phenotype_table script</a> for filtering out lowly expressed junctions or ones that don’t vary, and then perform the spearman test on those set of junctions. This pre-processing (which includes z-score and qq-normalization) might also have the small advantage of eliminating identical values, which sort of breaks the spearman test.</p>
+<p>First let’s try fitting a model to dose-response data with <code>drc::drm</code></p>
+</div>
+<div id="model-fitting" class="section level2">
+<h2>Model fitting</h2>
+<p>For now let’s just focus on STAT1 gene, fit with standard 4-parameter logistic model from <code>drc::drm</code>, and plot the results and look at coefficients to make sure they make sense</p>
+<pre class="r"><code>data &lt;-
+  ExpressedGenes.CPM %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  inner_join(geneNames, by=c(&quot;gene&quot;=&quot;ensembl.full&quot;)) %&gt;%
+  filter(hgnc_symbol == &quot;STAT1&quot;) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene, -hgnc_symbol) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  # filter(Treatment == &quot;Bran&quot;) %&gt;%
+  mutate(Dose = 10**(-1*TitrationPoint)) %&gt;%
+  filter(!Treatment==&quot;DMSO&quot;)
+
+fitted_curve &lt;- drm(formula = cpm ~ Dose,
+                    data = data,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    curveid=Treatment)
+plot(fitted_curve, 
+     log=&#39;x&#39;, 
+     xlab = &#39;Drug concentration&#39;, 
+     ylab= &#39;Expression&#39;)</code></pre>
+<p><img src="figure/20220707_TitrationSeries_DE_testing.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>fitted_curve$coefficients</code></pre>
+<pre><code> Steepness:Bran  Steepness:C2C5   Steepness:Ris LowerLimit:Bran LowerLimit:C2C5 
+   8.381582e-01    6.577965e-01    8.519516e-01    5.737624e+01    1.260255e+01 
+ LowerLimit:Ris UpperLimit:Bran UpperLimit:C2C5  UpperLimit:Ris       ED50:Bran 
+   3.958516e+01    1.310430e+03    1.341513e+03    1.293949e+03    1.586313e-04 
+      ED50:C2C5        ED50:Ris 
+   7.246363e-05    9.071778e-05 </code></pre>
+<p>Let’s also try plotting data with ggplot2</p>
+<pre class="r"><code>ggplot(data, aes(x=Dose, y=cpm, color=Treatment)) +
+  geom_point() +
+  scale_x_continuous(trans=&quot;log10&quot;) +
+  geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))), se = FALSE) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220707_TitrationSeries_DE_testing.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Neat, let’s try fitting the model to more genes, just to get an intuition about how the model fits look for genes with not as perfect data…</p>
+<pre class="r"><code>ExpressedGenes.CPM %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  dplyr::select(-sample) %&gt;%
+  inner_join(test.results, by=c(&quot;gene&quot;, &quot;Treatment&quot;)) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  inner_join(geneNames, by=c(&quot;gene&quot;=&quot;ensembl.full&quot;)) %&gt;%
+  mutate(gene = hgnc_symbol) %&gt;%
+  filter(gene %in% GenesOfInterest) %&gt;%
+  mutate(FacetLabel = paste(gene)) %&gt;%
+  mutate(Dose = 10**(-1*TitrationPoint)) %&gt;%
+  filter(!Treatment==&quot;DMSO&quot;) %&gt;%
+  ggplot(aes(x=Dose, y=cpm, color=Color)) +
+    geom_point() +
+    scale_x_continuous(trans=&quot;log10&quot;) +
+    geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))), se = FALSE) +
+    scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+    facet_wrap(~FacetLabel, scales = &quot;free_y&quot;) +
+    labs(title = &quot;dose response of genes of interest, with model fit&quot;) +
+    theme_classic()</code></pre>
+<p><img src="figure/20220707_TitrationSeries_DE_testing.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok neat, the model fits look reasonable…</p>
+<p>I notice the <code>drc::drm</code> function has parameters for robust estimation. Let’s see how that differs.</p>
+<pre class="r"><code>ExpressedGenes.CPM %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  dplyr::select(-sample) %&gt;%
+  inner_join(test.results, by=c(&quot;gene&quot;, &quot;Treatment&quot;)) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  inner_join(geneNames, by=c(&quot;gene&quot;=&quot;ensembl.full&quot;)) %&gt;%
+  mutate(gene = hgnc_symbol) %&gt;%
+  filter(gene %in% GenesOfInterest) %&gt;%
+  mutate(FacetLabel = paste(gene)) %&gt;%
+  mutate(Dose = 10**(-1*TitrationPoint)) %&gt;%
+  filter(!Treatment==&quot;DMSO&quot;) %&gt;%
+  ggplot(aes(x=Dose, y=cpm, color=Color)) +
+    geom_point() +
+    scale_x_continuous(trans=&quot;log10&quot;) +
+    geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)), robust=&quot;median&quot;), se = FALSE) +
+    scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+    facet_wrap(~FacetLabel, scales = &quot;free_y&quot;) +
+    labs(title = &quot;dose response of genes of interest, with model fit&quot;) +
+    theme_classic()</code></pre>
+<p><img src="figure/20220707_TitrationSeries_DE_testing.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so for some genes with more questionable dose-response curves (eg AKT3), it certainly makes a difference in the visual shape of the curve, and the parameter estimates might be wildly different.</p>
+<p>I’ll have to extract parameter estimates and their standard errors in order to more carefully compare treatment effects…</p>
+<p>I also notice there there <code>type</code> parameter can specify different data types, so for example for low-count data (eg splicing) we can try specifying <code>type=&quot;Poisson&quot;</code>. I will have to read the documentation to make sure I understand how this works. And even if it is as simple as I think to specify <code>type=&quot;Poisson&quot;</code>, I would then we have to think about offsets for parameters based on library size or total read counts in clusters. That might be more trouble than it is worth trying to implement. There is also an option to specify limits for parameters, or keep certain parameters fixed. For example, I could fix the LowerLimit parameter to be the mean expression among DMSO replicates.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.1 (2019-07-05)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Scientific Linux 7.4 (Nitrogen)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.2.19-el7-x86_64/lib/libopenblas_haswellp-r0.2.19.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] drc_3.0-1          MASS_7.3-51.4      qvalue_2.16.0      broom_1.0.0       
+ [5] viridis_0.5.1      viridisLite_0.3.0  gplots_3.0.1.1     RColorBrewer_1.1-2
+ [9] edgeR_3.26.5       limma_3.40.6       forcats_0.4.0      stringr_1.4.0     
+[13] dplyr_1.0.9        purrr_0.3.4        readr_1.3.1        tidyr_1.2.0       
+[17] tibble_3.1.7       ggplot2_3.3.6      tidyverse_1.3.0   
+
+loaded via a namespace (and not attached):
+ [1] nlme_3.1-140       bitops_1.0-6       fs_1.3.1           lubridate_1.7.4   
+ [5] httr_1.4.1         rprojroot_2.0.2    tools_3.6.1        backports_1.4.1   
+ [9] utf8_1.1.4         R6_2.4.0           KernSmooth_2.23-15 mgcv_1.8-40       
+[13] DBI_1.1.0          colorspace_1.4-1   withr_2.4.1        tidyselect_1.1.2  
+[17] gridExtra_2.3      curl_3.3           compiler_3.6.1     git2r_0.26.1      
+[21] cli_3.3.0          rvest_0.3.5        xml2_1.3.2         sandwich_3.0-2    
+[25] labeling_0.3       caTools_1.17.1.2   scales_1.1.0       mvtnorm_1.1-3     
+[29] digest_0.6.20      foreign_0.8-71     rmarkdown_1.13     rio_0.5.16        
+[33] pkgconfig_2.0.2    htmltools_0.3.6    plotrix_3.8-2      highr_0.9         
+[37] dbplyr_1.4.2       rlang_1.0.3        readxl_1.3.1       rstudioapi_0.10   
+[41] farver_2.1.0       generics_0.1.3     zoo_1.8-10         jsonlite_1.6      
+[45] gtools_3.9.2.2     zip_2.0.3          car_3.0-5          magrittr_1.5      
+[49] Matrix_1.2-18      Rcpp_1.0.5         munsell_0.5.0      fansi_0.4.0       
+[53] abind_1.4-5        lifecycle_1.0.1    multcomp_1.4-19    stringi_1.4.3     
+[57] yaml_2.2.0         carData_3.0-5      plyr_1.8.4         grid_3.6.1        
+[61] gdata_2.18.0       promises_1.0.1     crayon_1.3.4       lattice_0.20-38   
+[65] haven_2.3.1        splines_3.6.1      hms_0.5.3          locfit_1.5-9.1    
+[69] knitr_1.39         pillar_1.7.0       codetools_0.2-18   reshape2_1.4.3    
+[73] reprex_0.3.0       glue_1.6.2         evaluate_0.15      data.table_1.14.2 
+[77] modelr_0.1.8       vctrs_0.4.1        httpuv_1.5.1       cellranger_1.1.0  
+[81] gtable_0.3.0       assertthat_0.2.1   xfun_0.31          openxlsx_4.1.0.1  
+[85] later_0.8.0        survival_2.44-1.1  workflowr_1.6.2    TH.data_1.1-1     
+[89] ellipsis_0.3.2    </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

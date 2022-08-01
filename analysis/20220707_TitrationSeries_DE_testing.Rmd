@@ -1,0 +1,380 @@
+---
+title: "DE testing from dose-response series"
+output: html_notebook
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Intro
+
+See [previous notebook entry](20220629_FirstGlanceTitrationSeries.html) about experiment design and first look analysis of titration series RNA-seq experiment with C2C5, branaplam, and risdiplam...
+
+
+In that notebook, for sake of time, I focused on the set of genes identified as differentially expressed in a previous experiment using fibroblasts (3 replicates of DMSO, 3 replicates of each treatment, with different small molecule treatments)... Obviously this is un-ideal... Better would be to identify differentially expressed genes directly from this titration experiment in LCLs. But because we only have one replicate and many doses, the experiment design is a bit different than the models easiest to implement with standard tools for differential expression (edgeR/DESeq)... I think maybe an easier way to reasonably identify DE genes from this dataset would be just to use a spearman test, testing for a monotonic association between dose and gene expression. I will implement that here, and check the results, to get a sense of how many "DE" genes I discover this way, and check the dose response curves for a random set of those (controlled for FDR) to make sure they are reasonably believable since this is not your standard differential expression test (though I do think it makes sense for this experiment design)
+
+
+let's read in the data and start testing for differential expression.
+
+## Differential expression testing
+
+```{r}
+library(tidyverse)
+library(edgeR)
+library(RColorBrewer)
+library(gplots)
+library(viridis)
+library(broom)
+library(qvalue)
+library(drc)
+
+
+sample_n_of <- function(data, size, ...) {
+  dots <- quos(...)
+  
+  group_ids <- data %>% 
+    group_by(!!! dots) %>% 
+    group_indices()
+  
+  sampled_groups <- sample(unique(group_ids), size)
+  
+  data %>% 
+    filter(group_ids %in% sampled_groups)
+}
+
+dat <- read_tsv("../code/featureCounts/Counts.titration_series.txt", comment="#") %>%
+  rename_at(vars(-(1:6)), ~str_replace(.x, "Alignments/STAR_Align/TitrationExp(.+?)/Aligned.sortedByCoord.out.bam", "\\1")) %>%
+  dplyr::select(Geneid, everything(), -c(2:6)) %>%
+  column_to_rownames("Geneid") %>%
+  DGEList()
+
+ColorsTreatments <- c("blue"="Bran", "red"="C2C5", "green"="Ris")
+```
+
+Before testing for differential expression, let's filter for expressed genes. Here I'll use a filter of average counts per million > 1.
+
+```{r}
+mean.cpm <- dat %>%
+    cpm(log=T) %>%
+    apply(1, mean)
+
+ExpressedGenes.CPM <- dat[mean.cpm>1,] %>%
+  calcNormFactors() %>%
+  cpm(prior.count=0.1)
+
+
+```
+
+Now let's perform spearman test, looking for monotonic association between dosage and expression.
+
+
+```{r}
+
+test.results <- ExpressedGenes.CPM %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into=c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  nest(-Treatment, -gene) %>% 
+  mutate(cor=map(data,~cor.test(.x$TitrationPoint, .x$cpm, method = "sp"))) %>%
+  mutate(tidied = map(cor, tidy)) %>% 
+  unnest(tidied, .drop = T)
+
+test.results %>%
+  ggplot(aes(x=p.value)) +
+  geom_histogram() +
+  facet_wrap(~Treatment, scales="free_y") +
+  theme_bw()
+
+test.results %>%
+  ggplot(aes(x=estimate)) +
+  geom_histogram() +
+  facet_wrap(~Treatment, scales="free_y") +
+  theme_bw()
+  
+```
+
+The P value histograms actually look reasonable. And the effect sizes (correlation coefficients) are roughly symetrical about 0. Perhaps an alternative way to check that the test is reasonably calibrated is to permute the titration point labels...
+
+```{r}
+mat <- ExpressedGenes.CPM %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into=c("Treatment", "TitrationPoint"), convert = T) %>%
+  filter(!Treatment=="DMSO") %>%
+  unite(Rowname, gene, Treatment) %>%
+  pivot_wider(names_from = "TitrationPoint", values_from="cpm", id_cols="Rowname") %>%
+  column_to_rownames("Rowname") %>%
+  as.matrix()
+
+
+mat.permuted <- matrix(nrow=nrow(mat), ncol=ncol(mat))
+for (i in 1:nrow(mat)){
+    mat.permuted[i,] <- sample(mat[i,], size=ncol(mat))
+}
+rownames(mat.permuted) <- rownames(mat)
+
+test.results.permuted <- mat.permuted %>%
+  as.data.frame() %>%
+  rownames_to_column("rowname") %>%
+  separate(rowname, into=c("gene", "Treatment"), sep="_") %>%
+  gather("TitrationPoint", "cpm", -gene, -Treatment) %>%
+  mutate(TitrationPoint = as.numeric(str_remove(TitrationPoint, "V"))) %>%
+  nest(-Treatment, -gene) %>% 
+  mutate(cor=map(data,~cor.test(.x$TitrationPoint, .x$cpm, method = "sp"))) %>%
+  mutate(tidied = map(cor, tidy)) %>% 
+  unnest(tidied, .drop = T)
+
+test.results.permuted %>%
+  ggplot(aes(x=p.value)) +
+  geom_histogram(bins=20) +
+  facet_wrap(~Treatment, scales="free_y") +
+  theme_bw()
+
+```
+
+Perhaps qq plots are a better way to visualize, since with only 8 titraion points i think there are a limited number of test result p values that makes histogram binning kind of weird.
+
+```{r}
+bind_rows(test.results, test.results.permuted, .id="PermutedOrNot") %>%
+  mutate(PermutedOrNot= recode(PermutedOrNot, !!!c('1'="Real", '2'="Permuted"))) %>%
+  group_by(Treatment, PermutedOrNot) %>%
+  mutate(expected.p = percent_rank(p.value)) %>%
+  ggplot(aes(x=-log10(expected.p), y=-log10(p.value), color=Treatment)) +
+  geom_abline() +
+  geom_point() +
+  facet_wrap(~PermutedOrNot, scales="free") +
+  theme_bw()
+```
+
+I feel the test is decently calibrated at least based on permutations of dose, even though most genes are significant. One reason it may not be perfectly calibrated is when dealing with tie values from CPM values from pseudocounts. In any case, Let's estimate FDR.
+
+```{r}
+test.results <-
+  test.results %>%
+  filter(!Treatment=="DMSO") %>%
+  group_by(Treatment) %>%
+  mutate(q = qvalue(p.value)$qvalues) %>%
+  ungroup()
+
+test.results %>%
+  filter(q < 0.1) %>%
+  distinct(gene) %>% nrow()
+  
+```
+
+Pretty much every gene is DE. Well, let's just check out some dose-response genes for random genes then...
+
+
+```{r, fig.height=10, fig.width=10}
+#Read in gene names so that we can plot with gene symbol instead of ensembl idea
+geneNames <- read_tsv("../data/Genes.list.txt") %>%
+  mutate(hgnc_symbol = coalesce(hgnc_symbol,ensembl_gene_id)) %>%
+  inner_join(data.frame(ensembl.full=rownames(ExpressedGenes.CPM)) %>%
+               mutate(ensembl_gene_id = str_remove(ensembl.full, "\\..+$")),
+             by = "ensembl_gene_id"
+             ) %>%
+  dplyr::select(ensembl.full, hgnc_symbol)
+
+
+
+
+set.seed(0)
+ExpressedGenes.CPM %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  # filter(gene %in% Genes.to.plot$gene) %>%
+  gather("sample", "cpm", -gene) %>%
+  sample_n_of(15, gene) %>%
+  separate(sample, into=c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  dplyr::select(-sample) %>%
+  inner_join(test.results, by=c("gene", "Treatment")) %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ "blue",
+    Treatment == "C2C5" ~ "red",
+    Treatment == "Ris" ~ "green")) %>%
+  mutate(gene = recode(gene, !!!deframe(geneNames))) %>%
+  mutate(FacetLabel = paste(gene)) %>%
+  ggplot(aes(x=TitrationPoint, y=cpm, color=Color)) +
+  geom_line() +
+  geom_text(data = (
+    . %>%
+      distinct(Treatment, FacetLabel, .keep_all = T) %>%
+      group_by(FacetLabel) %>%
+      mutate(vjust = 1 * row_number()) %>%
+      ungroup()),
+    aes(label = paste0(signif(estimate,2), "; P:",format.pval(p.value, digits=2)), vjust=vjust),
+    x=-Inf, y=Inf, size=3, hjust=-0.1
+  ) +
+  scale_color_identity(labels=ColorsTreatments, guide="legend") +
+  scale_x_reverse() +
+  facet_wrap(~FacetLabel, scales = "free_y") +
+  labs(title = "dose response of random genes, with spearman coef and P.val") +
+  theme_classic()
+```
+
+Hmm, I think the test results are actually reasonable... Keep in mind that the correlation coefficient is between dose and CPM, and highest dose is labelled as "1", so a negative correlation coefficient means it expression goes up with dose. It does seem the majority of genes have obvious dose-response effects, as the test results indicate.
+
+Let's see if there is an obvious bias in effect directions.
+
+Let's again look at these plots with the P values for some select genes of interest...
+
+```{r}
+GenesOfInterest <- c("MAPT", "SNCA", "SMN2", "HTT", "GALC", "FOXM1", "STAT1", "AKT3", "PDGFRB")
+
+ExpressedGenes.CPM %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into=c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  dplyr::select(-sample) %>%
+  inner_join(test.results, by=c("gene", "Treatment")) %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ "blue",
+    Treatment == "C2C5" ~ "red",
+    Treatment == "Ris" ~ "green")) %>%
+  inner_join(geneNames, by=c("gene"="ensembl.full")) %>%
+  mutate(gene = hgnc_symbol) %>%
+  filter(gene %in% GenesOfInterest) %>%
+  mutate(FacetLabel = paste(gene)) %>%
+  ggplot(aes(x=TitrationPoint, y=cpm, color=Color)) +
+  geom_line() +
+  geom_text(data = (
+    . %>%
+      distinct(Treatment, FacetLabel, .keep_all = T) %>%
+      group_by(FacetLabel) %>%
+      mutate(vjust = 1 * row_number()) %>%
+      ungroup()),
+    aes(label = paste0(signif(estimate,2), "; P:",format.pval(p.value, digits=2)), vjust=vjust),
+    x=-Inf, y=Inf, size=3, hjust=-0.1
+  ) +
+  scale_color_identity(labels=ColorsTreatments, guide="legend") +
+  scale_x_reverse() +
+  facet_wrap(~FacetLabel, scales = "free_y") +
+  labs(title = "dose response of random genes, with spearman coef and P.val") +
+  theme_classic()
+
+```
+
+Cool. again, the spearman correlation test results with p values make sense. Maybe I should also try a simple linear model to test for non-zero slope, since the spearman test doesn't really take into account that some big changes between titration points are more believable.
+
+For the future I think I will want to first perform some sort of test like this to filter for genes for which to attempt fitting logistic curves, then compare the EC50 between treatments.
+
+Maybe I should also do the same approach for splicing test... That is, quantify splicing ratios from leafcutter clustering script, then perform calculate spearman correlation coefficient and p value over dose-response series. It might be a good idea to first filter for reasonably expressed junctions first... Perhaps I should just also run the leafcutter [prepare_phenotype_table script](http://davidaknowles.github.io/leafcutter/articles/sQTL.html) for filtering out lowly expressed junctions or ones that don't vary, and then perform the spearman test on those set of junctions. This pre-processing (which includes z-score and qq-normalization) might also have the small advantage of eliminating identical values, which sort of breaks the spearman test.
+
+First let's try fitting a model to dose-response data with `drc::drm`
+
+## Model fitting
+
+For now let's just focus on STAT1 gene, fit with standard 4-parameter logistic model from `drc::drm`, and plot the results and look at coefficients to make sure they make sense
+
+```{r}
+
+data <-
+  ExpressedGenes.CPM %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  inner_join(geneNames, by=c("gene"="ensembl.full")) %>%
+  filter(hgnc_symbol == "STAT1") %>%
+  gather("sample", "cpm", -gene, -hgnc_symbol) %>%
+  separate(sample, into=c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  # filter(Treatment == "Bran") %>%
+  mutate(Dose = 10**(-1*TitrationPoint)) %>%
+  filter(!Treatment=="DMSO")
+
+fitted_curve <- drm(formula = cpm ~ Dose,
+                    data = data,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    curveid=Treatment)
+plot(fitted_curve, 
+     log='x', 
+     xlab = 'Drug concentration', 
+     ylab= 'Expression')
+
+fitted_curve$coefficients
+
+```
+
+Let's also try plotting data with ggplot2
+
+```{r}
+ggplot(data, aes(x=Dose, y=cpm, color=Treatment)) +
+  geom_point() +
+  scale_x_continuous(trans="log10") +
+  geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))), se = FALSE) +
+  theme_bw()
+```
+
+Neat, let's try fitting the model to more genes, just to get an intuition about how the model fits look for genes with not as perfect data...
+
+```{r}
+ExpressedGenes.CPM %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into=c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  dplyr::select(-sample) %>%
+  inner_join(test.results, by=c("gene", "Treatment")) %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ "blue",
+    Treatment == "C2C5" ~ "red",
+    Treatment == "Ris" ~ "green")) %>%
+  inner_join(geneNames, by=c("gene"="ensembl.full")) %>%
+  mutate(gene = hgnc_symbol) %>%
+  filter(gene %in% GenesOfInterest) %>%
+  mutate(FacetLabel = paste(gene)) %>%
+  mutate(Dose = 10**(-1*TitrationPoint)) %>%
+  filter(!Treatment=="DMSO") %>%
+  ggplot(aes(x=Dose, y=cpm, color=Color)) +
+    geom_point() +
+    scale_x_continuous(trans="log10") +
+    geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))), se = FALSE) +
+    scale_color_identity(labels=ColorsTreatments, guide="legend") +
+    facet_wrap(~FacetLabel, scales = "free_y") +
+    labs(title = "dose response of genes of interest, with model fit") +
+    theme_classic()
+
+```
+
+
+
+Ok neat, the model fits look reasonable... 
+
+I notice the `drc::drm` function has parameters for robust estimation. Let's see how that differs.
+
+```{r}
+ExpressedGenes.CPM %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into=c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  dplyr::select(-sample) %>%
+  inner_join(test.results, by=c("gene", "Treatment")) %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ "blue",
+    Treatment == "C2C5" ~ "red",
+    Treatment == "Ris" ~ "green")) %>%
+  inner_join(geneNames, by=c("gene"="ensembl.full")) %>%
+  mutate(gene = hgnc_symbol) %>%
+  filter(gene %in% GenesOfInterest) %>%
+  mutate(FacetLabel = paste(gene)) %>%
+  mutate(Dose = 10**(-1*TitrationPoint)) %>%
+  filter(!Treatment=="DMSO") %>%
+  ggplot(aes(x=Dose, y=cpm, color=Color)) +
+    geom_point() +
+    scale_x_continuous(trans="log10") +
+    geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")), robust="median"), se = FALSE) +
+    scale_color_identity(labels=ColorsTreatments, guide="legend") +
+    facet_wrap(~FacetLabel, scales = "free_y") +
+    labs(title = "dose response of genes of interest, with model fit") +
+    theme_classic()
+```
+
+Ok, so for some genes with more questionable dose-response curves (eg AKT3), it certainly makes a difference in the visual shape of the curve, and the parameter estimates might be wildly different.
+
+I'll have to extract parameter estimates and their standard errors in order to more carefully compare treatment effects...
+
+I also notice there there `type` parameter can specify different data types, so for example for low-count data (eg splicing) we can try specifying `type="Poisson"`. I will have to read the documentation to make sure I understand how this works. And even if it is as simple as I think to specify `type="Poisson"`, I would then we have to think about offsets for parameters based on library size or total read counts in clusters. That might be more trouble than it is worth trying to implement. There is also an option to specify limits for parameters, or keep certain parameters fixed. For example, I could fix the LowerLimit parameter to be the mean expression among DMSO replicates.

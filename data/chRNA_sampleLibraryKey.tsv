@@ -1,0 +1,22 @@
+#	Sample ID		Quibit value		Concentration 		concentration for 20uL in ug			volume to get 1.74ug		i5 primer	i7 primer		Quibit post library prep		ng/uL stock concentration
+1	1.1	DMSO rep 1	550	ng/mL	110	ng/ul	2.2			15.82		Universal 	1		234	ng/mL	46.8
+2	1.2	DMSO rep 2	610	ng/mL	122	ng/ul	2.44			14.26		Universal 	2		276	ng/mL	55.2
+3	1.3	DMSO rep 3	590	ng/mL	118	ng/ul	2.36			14.75		Universal 	3		225	ng/mL	45
+4	2.1	C2-C5 high rep 1	540	ng/mL	108	ng/ul	2.16			16.11		Universal 	4		194	ng/mL	38.8
+5	2.2	C2-C5 high rep 2	570	ng/mL	114	ng/ul	2.28			15.26		Universal 	5		253	ng/mL	50.6
+6	2.3	C2-C5 high rep 3	510	ng/mL	102	ng/ul	2.04			17.06		Universal 	6		263	ng/mL	52.6
+7	3.1	C2-C5 low rep 1	610	ng/mL	122	ng/ul	2.44			14.26		Universal 	7		330	ng/mL	66
+8	3.2	C2-C5 low rep 2	600	ng/mL	120	ng/ul	2.4			14.50		Universal 	8		258	ng/mL	51.6
+9	3.3	C2-C5 low rep 3	760	ng/mL	152	ng/ul	3.04			11.45		Universal 	9		338	ng/mL	67.6
+10	4.1	Risdiplam high rep 1	690	ng/mL	138	ng/ul	2.76			12.61		Universal 	10		341	ng/mL	68.2
+11	4.2	Risdiplam high rep 2	560	ng/mL	112	ng/ul	2.24			15.54		Universal 	11		283	ng/mL	56.6
+12	4.3	Risdiplam high rep 3	620	ng/mL	124	ng/ul	2.48			14.03		Universal 	12		231	ng/mL	46.2
+13	5.1	Risdiplam low rep 1	550	ng/mL	110	ng/ul	2.2			15.82		Universal 	13		185	ng/mL	37
+14	5.2	Risdiplam low rep 2	435	ng/mL	87	ng/ul	1.74			20.00		Universal 	14		160	ng/mL	32
+15	5.3	Risdiplam low rep 3	600	ng/mL	120	ng/ul	2.4			14.50		Universal 	15		223	ng/mL	44.6
+16	6.1	Branaplam high rep 1	680	ng/mL	136	ng/ul	2.72			12.79		Universal 	16		166	ng/mL	33.2
+17	6.2	Branaplam high rep 2	590	ng/mL	118	ng/ul	2.36			14.75		Universal 	18		125	ng/mL	25
+18	6.3	Branaplam high rep 3	560	ng/mL	112	ng/ul	2.24			15.54		Universal 	19		155	ng/mL	31
+19	7.1	Branaplam low rep 1	510	ng/mL	102	ng/ul	2.04			17.06		Universal 	20		225	ng/mL	45
+20	7.2	Branaplam low rep 2	570	ng/mL	114	ng/ul	2.28			15.26		Universal 	21		174	ng/mL	34.8
+21	7.3	Branaplam low rep 3	435	ng/mL	87	ng/ul	1.74			20.00		Universal 	22		200	ng/mL	40

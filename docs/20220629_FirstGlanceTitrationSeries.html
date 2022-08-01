@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>First glance at titration series</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">small molecular splicing RNA-seq</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">First glance at titration series</h1>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#intro">Intro</a></li>
+<li><a href="#gene-expression-analysis-qc">Gene expression analysis QC</a></li>
+<li><a href="#gene-expression-dose-response-plots">Gene expression dose-response plots</a></li>
+<li><a href="#splicing-quantification-qc">Splicing quantification QC</a></li>
+<li><a href="#splicing-dose-response-plots">Splicing dose-response plots</a></li>
+<li><a href="#explore-5ss-of-branaplam-specific-effects">Explore 5’ss of branaplam specific effects</a></li>
+<li><a href="#formally-fitting-dose-response-model">Formally fitting dose response model</a></li>
+</ul>
+</div>
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-07-06
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>20211209_JingxinRNAseq/analysis/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown file has staged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed19900924code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(19900924)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed19900924code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(19900924)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreee6f410c311b9ed1d1a307ce295d59fe5c8028c3ctargetblanke6f410ca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/e6f410c311b9ed1d1a307ce295d59fe5c8028c3c" target="_blank">e6f410c</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreee6f410c311b9ed1d1a307ce295d59fe5c8028c3ctargetblanke6f410ca" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/e6f410c311b9ed1d1a307ce295d59fe5c8028c3c" target="_blank">e6f410c</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    ._.DS_Store
+    Ignored:    analysis/figure/
+    Ignored:    code/.DS_Store
+    Ignored:    code/._.DS_Store
+    Ignored:    code/._DOCK7.pdf
+    Ignored:    code/._DOCK7_DMSO1.pdf
+    Ignored:    code/._DOCK7_SM2_1.pdf
+    Ignored:    code/._FKTN_DMSO_1.pdf
+    Ignored:    code/._FKTN_SM2_1.pdf
+    Ignored:    code/._MAPT.pdf
+    Ignored:    code/._PKD1_DMSO_1.pdf
+    Ignored:    code/._PKD1_SM2_1.pdf
+    Ignored:    code/.snakemake/
+    Ignored:    code/5ssSeqs.tab
+    Ignored:    code/Alignments/
+    Ignored:    code/ChemCLIP/
+    Ignored:    code/ClinVar/
+    Ignored:    code/DE_testing/
+    Ignored:    code/DE_tests.mat.counts.gz
+    Ignored:    code/DE_tests.txt.gz
+    Ignored:    code/Fastq/
+    Ignored:    code/FastqFastp/
+    Ignored:    code/Meme/
+    Ignored:    code/OMIM/
+    Ignored:    code/Session.vim
+    Ignored:    code/SplicingAnalysis/
+    Ignored:    code/featureCounts/
+    Ignored:    code/log
+    Ignored:    code/logs/
+    Ignored:    code/rules/.ProcessTitrationSeries.smk.swp
+    Ignored:    code/scratch/
+    Ignored:    data/._Hijikata_TableS1_41598_2017_8902_MOESM2_ESM.xls
+    Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
+    Ignored:    output/._PioritizedIntronTargets.pdf
+
+Unstaged changes:
+    Modified:   analysis/20220629_FirstGlanceTitrationSeries.Rmd
+
+Staged changes:
+    Modified:   analysis/20211216_DifferentialSplicing.Rmd
+    New:        analysis/20220629_FirstGlanceTitrationSeries.Rmd
+    Modified:   analysis/index.Rmd
+    Modified:   code/Snakefile
+    New:        code/config/samples.titrationseries.tsv
+    New:        code/rules/ProcessTitrationSeries.smk
+    New:        code/rules/RNASeqProcessing.smk
+    Modified:   code/rules/common.smk
+    New:        code/rules/pangolin.smk
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>In order to get a better sense of how these small molecule splicing modifiers are different, we need to account for the different effective concentrations/potencies that these drugs were administered in our first experiment. For example, if CUOME was administered at a higher concentration, would it start to resemeble risdiplam at the given concentration? If so, would the effects be similar to risdiplam at all introns/genes or just a subset?</p>
+<p>So we decided to perform a titration series and RNA-seq of three molecules:</p>
+<ul>
+<li>C2-C5-1: 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316 nM</li>
+<li>Branaplam: 3,160, 1000, 316, 100, 31.6, 10, 3.16, 1 nM.</li>
+<li>Risdiplam: 10,000, 3,160, 1000, 316, 100, 31.6, 10, 3.16 nM</li>
+</ul>
+<p>The libraries were stranded RNA-seq, sequenced to ~60-90M reads per sample. Here I am going to have a first look at the results, after quantifying gene expression with featureCounts. First read in the count table, and do some basic data QC</p>
+</div>
+<div id="gene-expression-analysis-qc" class="section level2">
+<h2>Gene expression analysis QC</h2>
+<pre class="r"><code>library(tidyverse)
+library(edgeR)
+library(RColorBrewer)
+library(gplots)
+library(viridis)
+
+dat &lt;- read_tsv(&quot;../code/featureCounts/Counts.titration_series.txt&quot;, comment=&quot;#&quot;) %&gt;%
+  select(-ends_with(&quot;_1&quot;)) %&gt;%
+  rename_at(vars(-(1:6)), ~str_replace(.x, &quot;Alignments/STAR_Align/TitrationExp(.+?)/Aligned.sortedByCoord.out.bam&quot;, &quot;\\1&quot;)) %&gt;%
+  select(Geneid, everything(), -c(2:6)) %&gt;%
+  column_to_rownames(&quot;Geneid&quot;) %&gt;%
+  DGEList()
+
+ColorsTreatments &lt;- c(&quot;blue&quot;=&quot;Bran&quot;, &quot;red&quot;=&quot;C2C5&quot;, &quot;green&quot;=&quot;Ris&quot;)
+
+Samples &lt;- dat$samples %&gt;%
+  rownames_to_column(&quot;Sample&quot;) %&gt;%
+  separate(Sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  rowwise() %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ rev(brewer.pal(n=8, name=&quot;Blues&quot;))[TitrationPoint],
+    Treatment == &quot;C2C5&quot; ~ rev(brewer.pal(n=8, name=&quot;Reds&quot;))[TitrationPoint],
+    Treatment == &quot;Ris&quot; ~ rev(brewer.pal(n=8, name=&quot;Greens&quot;))[TitrationPoint],
+    TRUE ~ &quot;gray&quot;
+  )) %&gt;%
+  ungroup() %&gt;%
+  select(Sample, Treatment, TitrationPoint, lib.size, Color)
+
+ggplot(Samples, aes(x=Sample, y=lib.size, fill=Color)) +
+  geom_col() +
+  scale_fill_identity() +
+  labs(x=&quot;Samples&quot;, y=&quot;Genic mapping readpairs&quot;, title=&quot;Mapped reads per sample&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, now let’s check correlation matrix of sample expression profiles and see how they cluster</p>
+<pre class="r"><code>#Calculate mean cpm and filter for expressed genes
+mean.cpm &lt;- dat %&gt;%
+    cpm(log=T) %&gt;%
+    apply(1, mean)
+
+ExpressedGeneCounts &lt;- dat[mean.cpm&gt;1,]
+
+#Speaman correlation matrix heatmap for CountsPerMillion expression
+ExpressedGeneCounts %&gt;%
+  cpm(log=T) %&gt;%
+  cor(method=&quot;pearson&quot;) %&gt;%
+  heatmap.2(trace=&quot;none&quot;, ColSideColors=Samples$Color, RowSideColors = Samples$Color, labRow=Samples$Sample, labCol=Samples$Sample, col=magma(15, direction = -1), key.title=&quot;pearson corr&quot;, main=&quot;CorrelationMatrix from gene expression&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Another way to visualize how samples cluster is to plot them in PC space…</p>
+<pre class="r"><code>pca.results.expression &lt;- ExpressedGeneCounts %&gt;%
+  cpm(log=T) %&gt;%
+  scale() %&gt;%
+  t() %&gt;%
+  prcomp()
+
+dim(ExpressedGeneCounts)</code></pre>
+<pre><code>[1] 11247    27</code></pre>
+<pre class="r"><code>PC.dat &lt;- pca.results.expression$x %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Sample&quot;) %&gt;%
+  select(Sample, PC1, PC2, PC3) %&gt;%
+  left_join(Samples, by=&quot;Sample&quot;)
+ggplot(PC.dat, aes(x=PC1, y=PC2, color=Color)) +
+  geom_point() +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA based on 11247 expressed genes&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(PC.dat, aes(x=PC2, y=PC3, color=Color)) +
+  geom_point() +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA based on 11247 expressed genes&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Again, we can see the low concentration doses resemble DMSO control. Out of this PC it seems that branaplam effects are distinct from C2C5/risdiplam effects…</p>
+</div>
+<div id="gene-expression-dose-response-plots" class="section level2">
+<h2>Gene expression dose-response plots</h2>
+<p>Now let’s make some of the plots yang was suggesting: - get DE down-regulated genes from previous analysis at set concentration - plot dose-response curves for these genes as heatmap, and allow heatmap function’s default distance matrix function and hierachal clustering alogorithm sort the rows of genes to pick out how some genes might have different effects than others to different treatments</p>
+<pre class="r"><code>DE.results &lt;- read_tsv(&quot;../code/DE_testing/Results.txt.gz&quot;) %&gt;%
+  separate(Geneid, into=c(&quot;EnsemblID&quot;, &quot;GeneSymbol&quot;), sep = &quot;_&quot;)
+
+DE.genes &lt;- DE.results %&gt;%
+  filter(FDR&lt;0.01) %&gt;%
+  filter(logFC &lt; -1) %&gt;%
+  distinct(EnsemblID) %&gt;%
+  pull(EnsemblID)
+
+ensembl_to_symbols &lt;- DE.results %&gt;%
+  distinct(EnsemblID, GeneSymbol) %&gt;%
+  deframe()
+
+length(intersect(DE.genes, rownames(ExpressedGeneCounts$counts)))</code></pre>
+<pre><code>[1] 920</code></pre>
+<pre class="r"><code>Plot.Titration.Heatmap.dat &lt;- ExpressedGeneCounts %&gt;%
+  cpm(log=F) %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  filter(gene %in% DE.genes) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  select(-sample) %&gt;%
+  pivot_wider(names_from = &quot;TitrationPoint&quot;, values_from = &quot;cpm&quot;) %&gt;%
+  unite(Rowname, gene, Treatment, remove = F) %&gt;%
+  drop_na() %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  select(Rowname, 11:3, everything())
+
+Plot.Titration.Heatmap.dat %&gt;%
+  column_to_rownames(&quot;Rowname&quot;) %&gt;%
+  select(1:8) %&gt;%
+  as.matrix() %&gt;%
+  t() %&gt;%
+  scale(scale=T, center=T) %&gt;%
+  t() %&gt;%
+  heatmap.2(trace=&quot;none&quot;, labRow=F, labCol=T, dendrogram=&quot;row&quot;, Colv=F, RowSideColors = Plot.Titration.Heatmap.dat$Color, col=magma(15, direction = -1), ColSideColors = brewer.pal(n = 9, name = &quot;Greys&quot;)[2:9], symbreaks = FALSE, main=&quot;920 downregulated genes&quot;, xlab=&quot;titration point&quot;, ylab=&quot;gene::treatment&quot;, key.title=&quot;normalized expression&quot;, key.xlab=&quot;Z-score&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#, breaks=seq(0,1,length.out=16)</code></pre>
+<p>In the plot above, rows represent a gene::drug pair and row side colors represent the treatment drug. Z-score normalized gene expression across the increasing doses (columns). Only 920 genes that were DE downregulated in the original experiment were included (FDR&lt;1%, and log2FC&lt;-1) and also expressed in this experiment (mean(log(cpm)) &gt; 1).</p>
+<p>Lastly, let’s pick a couple genes that distinguish the branaplam effect from the C2/C5 effect, and plot dose-response curves specifically for that.</p>
+<p>First let’s re-create the PCA plot from those DE genes</p>
+<pre class="r"><code>pca.results.DE.expression &lt;- ExpressedGeneCounts %&gt;%
+  cpm(log=T) %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  filter(gene %in% DE.genes) %&gt;%
+  column_to_rownames(&quot;gene&quot;) %&gt;%
+  as.matrix() %&gt;%
+  scale() %&gt;%
+  t() %&gt;%
+  prcomp()
+
+screeplot(pca.results.DE.expression)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>PC.dat &lt;- pca.results.DE.expression$x %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Sample&quot;) %&gt;%
+  select(Sample, PC1, PC2, PC3) %&gt;%
+  left_join(Samples, by=&quot;Sample&quot;)
+ggplot(PC.dat, aes(x=PC1, y=PC2, color=Color)) +
+  geom_point() +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA based on 920 DE genes&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(PC.dat, aes(x=PC2, y=PC3, color=Color)) +
+  geom_point() +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA based on 920 DE genes&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Let’s pick some genes with high loadings in PC2, and plot the dose response. The facet titles will be the gene, followed by the sign of the PC2 loading.</p>
+<pre class="r"><code>DE.GenesOrderedBy.PC2 &lt;- pca.results.DE.expression$rotation %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  select(gene, PC2) %&gt;%
+  arrange(desc(abs(PC2)))
+
+Genes.to.plot &lt;- DE.GenesOrderedBy.PC2 %&gt;%
+  slice(1:50)
+
+ExpressedGeneCounts %&gt;%
+  cpm(log=F) %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  filter(gene %in% Genes.to.plot$gene) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  select(-sample) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  inner_join(DE.GenesOrderedBy.PC2, by=&quot;gene&quot;) %&gt;%
+  mutate(gene = recode(gene, !!!ensembl_to_symbols)) %&gt;%
+  mutate(FacetLabel = paste(gene, sign(PC2), sep=&#39;\n&#39;)) %&gt;%
+  ggplot(aes(x=TitrationPoint, y=cpm, color=Color)) +
+  geom_line() +
+  scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+  scale_x_reverse() +
+  facet_wrap(~FacetLabel, scales = &quot;free_y&quot;) +
+  labs(title = &quot;dose response of top50 DE genes by PC2 loading&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-6-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>Let’s write out the list of genes by PC2 loading for Jingxin</p>
+<pre class="r"><code>DE.GenesOrderedBy.PC2 %&gt;%
+  mutate(gene = recode(gene, !!!ensembl_to_symbols)) %&gt;%
+  write_tsv(&quot;../code/scratch/DownregulatedGenesSortedByPC2Loading.tsv&quot;)</code></pre>
+<p>Let’s replot the heatmap but order the rows by treatment and then by gene loadings in PC2, so as to highlight how some genes have different effects in branaplam. Only plot the top30 genes by PC2 loadings.</p>
+<pre class="r"><code>Plot.Titration.Heatmap.dat.rearranged &lt;- pca.results.DE.expression$rotation %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  select(gene, PC2) %&gt;%
+  right_join(Plot.Titration.Heatmap.dat, by=&quot;gene&quot;) %&gt;%
+  mutate(gene = recode(gene, !!!ensembl_to_symbols)) %&gt;%
+  arrange(Treatment, desc(abs(PC2))) %&gt;%
+  group_by(Treatment) %&gt;%
+  slice(1:30) %&gt;%
+  # slice(tail(row_number(), 30)) %&gt;%
+  ungroup() %&gt;%
+  arrange(Treatment, PC2) %&gt;%
+  select(-gene, -PC2, everything())
+
+Plot.Titration.Heatmap.dat.rearranged %&gt;%
+  column_to_rownames(&quot;Rowname&quot;) %&gt;%
+  select(-gene) %&gt;%
+  select(1:8) %&gt;%
+  as.matrix() %&gt;%
+  t() %&gt;%
+  scale(scale=T, center=T) %&gt;%
+  t() %&gt;%
+  heatmap.2(trace=&quot;none&quot;, labCol=NULL, dendrogram=&quot;none&quot;, Colv=F, Rowv=F, RowSideColors = Plot.Titration.Heatmap.dat.rearranged$Color, col=magma(15, direction = -1), ColSideColors = brewer.pal(n = 9, name = &quot;Greys&quot;)[2:9], symbreaks = FALSE, labRow=Plot.Titration.Heatmap.dat.rearranged$gene, cexRow=0.25, offsetRow=0.1, main=&quot;top30 genes by PC2 loading&quot;, xlab=&quot;titration point&quot;, ylab=&quot;gene::treatment&quot;, key.title=&quot;normalized expression&quot;, key.xlab=&quot;Z-score&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#, breaks=seq(-30,30,length.out=16)</code></pre>
+<p>Let’s check out the dose-response for a couple genes of interest now:</p>
+<pre class="r"><code>GenesOfInterest &lt;- c(&quot;MAPT&quot;, &quot;SNCA&quot;, &quot;SMN2&quot;, &quot;HTT&quot;, &quot;GALC&quot;, &quot;FOXM1&quot;, &quot;STAT1&quot;, &quot;AKT3&quot;, &quot;PDGFRB&quot;)
+
+dat %&gt;%
+  cpm(log=F) %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  mutate(gene = recode(gene, !!!ensembl_to_symbols)) %&gt;%
+  filter(gene %in% GenesOfInterest) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  select(-sample) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  ggplot(aes(x=TitrationPoint, y=cpm, color=Color)) +
+  geom_line() +
+  scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+  scale_x_reverse() +
+  facet_wrap(~gene, scales = &quot;free_y&quot;) +
+  labs(title = &quot;dose response of genes of interest&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="splicing-quantification-qc" class="section level2">
+<h2>Splicing quantification QC</h2>
+<p>Now let’s also plot some dose response for previously identified differential splicing events. First read in the splice junction count table (created from leafcutter clustering, using only these titration experiment samples for clustering), and do some quick QC</p>
+<pre class="r"><code>counts &lt;- read.table(&quot;../code/SplicingAnalysis/leafcutter/clustering/autosomes_titrationseries/leafcutter_perind_numers.counts.gz&quot;, sep = &#39; &#39;,  header=T) %&gt;%
+  rownames_to_column(&quot;intron&quot;) %&gt;%
+  gather(key=&quot;Sample&quot;, value=&quot;Count&quot;, -intron)
+
+PSI.table &lt;- counts %&gt;%
+  mutate(Cluster = str_replace(intron, &quot;.+:(.+)$&quot;, &quot;\\1&quot;)) %&gt;%
+  group_by(Sample, Cluster) %&gt;%
+  mutate(ClusterSum = sum(Count)) %&gt;%
+  mutate(PSI = Count/ClusterSum * 100) %&gt;%
+  ungroup()
+
+PSI.table %&gt;%
+  select(intron, Sample, PSI) %&gt;%
+  spread(key = Sample, value = PSI) %&gt;%
+  column_to_rownames(&quot;intron&quot;) %&gt;%
+  drop_na() %&gt;%
+  cor(method=&quot;spearman&quot;) %&gt;%
+  heatmap.2(trace=&quot;none&quot;, ColSideColors=Samples$Color, RowSideColors = Samples$Color, labRow=Samples$Sample, labCol=Samples$Sample, col=magma(30, direction = -1), key.title=&quot;pearson corr&quot;, main=&quot;Correlation matrix from splicing&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok similar clustering pattern arises, with samples clustering primarily by titration point. Keep in mind this is all junctions from leafcutter count table, no additional filtering for well expressed or differentially spliced junctions.</p>
+<p>Similar to what I did with the expression, now let’s pick some of the previously differentially spliced introns, and plot the samples in PC space and also plot some dose-response curves…</p>
+<p>First, read in the previous differential splicing results…</p>
+<pre class="r"><code>cluster_sig_files &lt;- list.files(&quot;../code/SplicingAnalysis/leafcutter/differential_splicing&quot;, &quot;*_cluster_significance.txt&quot;, full.names = T)
+effect_sizes_files &lt;- list.files(&quot;../code/SplicingAnalysis/leafcutter/differential_splicing&quot;, &quot;*_effect_sizes.txt&quot;, full.names = T)
+treatments &lt;- str_replace(cluster_sig_files, &quot;.+/(.+?)_cluster_significance.txt&quot;, &quot;\\1&quot;)
+
+cluster.sig &lt;- map(cluster_sig_files, read_tsv) %&gt;%
+  set_names(cluster_sig_files) %&gt;%
+  bind_rows(.id=&quot;f&quot;) %&gt;%
+  mutate(treatment = str_replace(f, &quot;.+/(.+?)_cluster_significance.txt&quot;, &quot;\\1&quot;)) %&gt;%
+  select(-f)
+
+effect_sizes &lt;- map(effect_sizes_files, read_tsv) %&gt;%
+  set_names(effect_sizes_files) %&gt;%
+  bind_rows(.id=&quot;f&quot;) %&gt;%
+  mutate(treatment = str_replace(f, &quot;.+/(.+?)_effect_sizes.txt&quot;, &quot;\\1&quot;)) %&gt;%
+  select(-f) %&gt;%
+  unite(&quot;psi_treatment&quot;, treatments, sep=&quot; &quot;, na.rm=T) %&gt;%
+  mutate(psi_treatment = as.numeric(psi_treatment),
+         cluster = str_replace(intron, &quot;(.+?:).+:(.+?)&quot;, &quot;\\1\\2&quot;)) %&gt;%
+  mutate(deltapsi = deltapsi*-1,
+         logef = logef *-1)
+
+#Combine effect sizes and significance for all samples into single df
+leafcutter.ds &lt;- effect_sizes %&gt;%
+  left_join(cluster.sig, by=c(&quot;treatment&quot;, &quot;cluster&quot;))
+
+# read in some annotations about these splice sites
+SpliceTypeAnnotations &lt;- read_tsv(&quot;../code/SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.gz&quot;) %&gt;%
+  unite(Intron, chrom, start, end) %&gt;%
+  distinct(Intron, .keep_all = T) %&gt;%
+  select(Intron, strand, exons_skipped, anchor, gene_names, gene_ids, splice_site, strand) %&gt;%
+  mutate(IntronType = recode(anchor, A=&quot;Alt 5&#39;ss&quot;, D=&quot;Alt 3&#39;ss&quot;, DA=&quot;Annotated&quot;, N=&quot;New Intron&quot;, NDA=&quot;New Splice Site combination&quot;))
+
+head(SpliceTypeAnnotations)</code></pre>
+<pre><code># A tibble: 6 x 8
+  Intron strand exons_skipped anchor gene_names gene_ids splice_site
+  &lt;chr&gt;  &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;      
+1 chr1_… +                  1 DA     DDX11L1    ENSG000… GT-AG      
+2 chr1_… +                  6 N      &lt;NA&gt;       &lt;NA&gt;     GT-AG      
+3 chr1_… -                 21 N      &lt;NA&gt;       &lt;NA&gt;     GT-AG      
+4 chr1_… -                  0 N      &lt;NA&gt;       &lt;NA&gt;     GT-AG      
+5 chr1_… -                  0 N      &lt;NA&gt;       &lt;NA&gt;     GT-AG      
+6 chr1_… -                  0 N      &lt;NA&gt;       &lt;NA&gt;     GT-AG      
+# … with 1 more variable: IntronType &lt;chr&gt;</code></pre>
+<pre class="r"><code>FivePrimeSS &lt;- read_tsv(&quot;../code/SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz&quot;, col_names = c(&quot;Intron&quot;, &quot;DonorSeq&quot;, &quot;DonorScore&quot;)) %&gt;%
+  mutate(Intron = str_replace(Intron, &quot;(.+)_.+?::.+$&quot;, &quot;\\1&quot;))
+
+
+SpliceTypeAnnotations &lt;- SpliceTypeAnnotations %&gt;%
+  inner_join(FivePrimeSS, by=&quot;Intron&quot;)
+
+leafcutter.ds.annotated &lt;- leafcutter.ds %&gt;%
+  mutate(Intron=str_replace(intron, &quot;(.+?):(.+?):(.+?):.+&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  inner_join(SpliceTypeAnnotations, by=&quot;Intron&quot;) %&gt;%
+  mutate(UpstreamOfDonor2BaseSeq = substr(DonorSeq, 3, 4)) </code></pre>
+<p>Ok now pick some differentially spliced junctions to plot… Perhaps only consider introns that are significant, large effect size, and pass some minimum read count across this new dataset (say, at least 30 junction reads across the treatment titration).</p>
+<pre class="r"><code>DifferentiallySplicedIntrons &lt;- leafcutter.ds.annotated %&gt;%
+  filter(abs(logef) &gt; 2 &amp; abs(psi_treatment) &gt; 0.02 &amp; p.adjust &lt; 0.01) %&gt;%
+  distinct(Intron, .keep_all=T)
+
+PSI.table.filtered &lt;- PSI.table %&gt;%
+  mutate(Intron = str_replace(intron, &quot;^(.+?):(.+?):(.+?):clu_.+$&quot;, &quot;\\1_\\2_\\3&quot;)) %&gt;%
+  filter(Intron %in% DifferentiallySplicedIntrons$Intron) %&gt;%
+  mutate(Sample = str_replace(Sample, &quot;TitrationExp(.+?)\\.(.+?)$&quot;, &quot;\\1-\\2&quot;)) %&gt;%
+  left_join(Samples, by=&quot;Sample&quot;) %&gt;%
+  group_by(Intron, Treatment) %&gt;%
+  mutate(IntronSum = sum(Count)) %&gt;%
+  ungroup() %&gt;%
+  mutate(PassFilterInTreatment = IntronSum &gt;= 30) %&gt;%
+  group_by(Intron) %&gt;%
+  filter(any(PassFilterInTreatment)) %&gt;%
+  ungroup() %&gt;%
+  filter(!is.na(PSI))</code></pre>
+<p>After doing that filtering, how many introns are left in the dataset:</p>
+<pre class="r"><code>PSI.table.filtered %&gt;%
+  distinct(Intron) %&gt;% nrow()</code></pre>
+<pre><code>[1] 3387</code></pre>
+<p>Now let’s remake that correlation matrix heatmap using just these junctions… Also plot in PC space.</p>
+<pre class="r"><code>PSI.table.filtered.mat &lt;- PSI.table.filtered %&gt;%
+  select(Intron, PSI, Sample) %&gt;%
+  pivot_wider(names_from=&quot;Sample&quot;, values_from=&quot;PSI&quot;, id_cols=&quot;Intron&quot;, values_fill=0) %&gt;%
+  column_to_rownames(&quot;Intron&quot;) %&gt;% as.matrix()
+
+PSI.table.filtered.mat %&gt;%
+  cor(method=&quot;spearman&quot;) %&gt;%
+  heatmap.2(trace=&quot;none&quot;, ColSideColors=Samples$Color, RowSideColors = Samples$Color, labRow=Samples$Sample, labCol=Samples$Sample, col=magma(30, direction = -1), key.title=&quot;pearson corr&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pca.results.splicing &lt;- PSI.table.filtered.mat %&gt;%
+  scale() %&gt;%
+  t() %&gt;%
+  prcomp()
+
+PC.dat &lt;- pca.results.splicing$x %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Sample&quot;) %&gt;%
+  select(Sample, PC1, PC2, PC3) %&gt;%
+  left_join(Samples, by=&quot;Sample&quot;)
+ggplot(PC.dat, aes(x=PC1, y=PC2, color=Color)) +
+  geom_point() +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 3387 differentially spliced introns&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(PC.dat, aes(x=PC2, y=PC3, color=Color)) +
+  geom_point() +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 3387 differentially spliced introns&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-14-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Wow, that looks just like how the samples were in gene expression PC space. It’s really striking. I’m pretty sure there are no silly bugs though. So again, the within each treatment clearly go in the order of the dose given, but also it’s obvious that branaplam has distinct effects from the other two.</p>
+</div>
+<div id="splicing-dose-response-plots" class="section level2">
+<h2>Splicing dose-response plots</h2>
+<p>Let’s plot a few dose response curves… Just as before, to highlight differences between branaplam and the other two, let’s pick the introns with high loadings in PC2.</p>
+<pre class="r"><code>Introns.to.plot &lt;- pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Intron&quot;) %&gt;%
+  select(Intron, PC2) %&gt;%
+  arrange(desc(abs(PC2))) %&gt;%
+  slice(1:50)
+
+PSI.table.filtered.mat %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Intron&quot;) %&gt;%
+  inner_join(Introns.to.plot, by=&quot;Intron&quot;) %&gt;%
+  # mutate(gene = recode(gene, !!!ensembl_to_symbols)) %&gt;%
+  gather(&quot;sample&quot;, &quot;PSI&quot;, -Intron, -PC2) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  select(-sample) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  left_join(
+    (leafcutter.ds.annotated %&gt;%
+       select(Intron, gene_names,IntronType)),
+    by=&quot;Intron&quot;) %&gt;%
+  mutate(Facet_label = paste(gene_names,IntronType,Intron, sign(PC2), sep=&quot;\n&quot;)) %&gt;%
+  ggplot(aes(x=TitrationPoint, y=PSI, color=Color)) +
+  geom_line() +
+  scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+  scale_x_reverse() +
+  labs(title=&quot;Top50 differnentially spliced introns by PC2 loading&quot;) +
+  facet_wrap(~Facet_label, scales = &quot;free_y&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-15-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>The facet labels indicate the host gene,, the “type” of intron (annotated, cryptic 3’ss, etc), the intron coordinates, and the sign of PC2 loading (1 indicating more branaplam specific splicing positive effect (enhancement), -1 indicating branaplam specific splicing negative effect).</p>
+<p>Lastly, let’s plot the top 30 PC2 introns heatmap style</p>
+<pre class="r"><code>Plot.Titration.Heatmap.dat.rearranged &lt;- pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Intron&quot;) %&gt;%
+  select(Intron, PC2) %&gt;%
+  right_join(
+    (PSI.table.filtered.mat %&gt;%
+      as.data.frame() %&gt;%
+      rownames_to_column(&quot;Intron&quot;) %&gt;%
+      gather(&quot;sample&quot;, &quot;PSI&quot;, -Intron) %&gt;%
+      separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+      pivot_wider(values_from=&quot;PSI&quot;, names_from=&quot;TitrationPoint&quot;, id_cols=c(&quot;Intron&quot;, &quot;Treatment&quot;))
+       ),
+    by=&quot;Intron&quot;) %&gt;%
+  mutate(Rowname = paste(Intron, Treatment)) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  arrange(Treatment, desc(abs(PC2))) %&gt;%
+  group_by(Treatment) %&gt;%
+  slice(1:30) %&gt;%
+  filter(!Treatment == &quot;DMSO&quot;) %&gt;%
+  # slice(tail(row_number(), 30)) %&gt;%
+  ungroup() %&gt;%
+  arrange(Treatment, PC2) %&gt;%
+  select(-Intron, -PC2, -Treatment, -Color, everything())
+
+Plot.Titration.Heatmap.dat.rearranged %&gt;%
+  column_to_rownames(&quot;Rowname&quot;) %&gt;%
+  select(1:8) %&gt;%
+  as.matrix() %&gt;%
+  t() %&gt;%
+  scale(scale=T, center=T) %&gt;%
+  t() %&gt;%
+  heatmap.2(trace=&quot;none&quot;, labCol=NULL, dendrogram=&quot;none&quot;, Colv=F, Rowv=F, RowSideColors = Plot.Titration.Heatmap.dat.rearranged$Color, col=magma(15, direction = -1), ColSideColors = brewer.pal(n = 9, name = &quot;Greys&quot;)[2:9], symbreaks = FALSE, labRow=Plot.Titration.Heatmap.dat.rearranged$Intron, cexRow=0.25, offsetRow=0.1, main=&quot;top30 introns by PC2 loading&quot;, xlab=&quot;titration point&quot;, ylab=&quot;intron::treatment&quot;, key.title=&quot;Normalized PSI&quot;, key.xlab=&quot;Z-score&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>In addition to plotting the top introns by PC2 loading, let’s plot the dose-response for some 50ish randomly selected introns that passed my criteria (from the original experiment: abs(logef) &gt; 2 &amp; abs(psi_treatment) &gt; 0.02 &amp; p.adjust &lt; 0.01, as well as at least 30 counts across any treatment series in this experiment)</p>
+<pre class="r"><code>set.seed(0)
+PSI.table.filtered.mat %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Intron&quot;) %&gt;%
+  sample_n(50) %&gt;%
+  # mutate(gene = recode(gene, !!!ensembl_to_symbols)) %&gt;%
+  gather(&quot;sample&quot;, &quot;PSI&quot;, -Intron) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  select(-sample) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  left_join(
+    (leafcutter.ds.annotated %&gt;%
+       select(Intron, gene_names,IntronType)),
+    by=&quot;Intron&quot;) %&gt;%
+  mutate(Facet_label = paste(gene_names,IntronType,Intron, sep=&quot;\n&quot;)) %&gt;%
+  ggplot(aes(x=TitrationPoint, y=PSI, color=Color)) +
+  geom_line() +
+  scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+  scale_x_reverse() +
+  facet_wrap(~Facet_label, scales = &quot;free_y&quot;) +
+  labs(title=&quot;50 random differentially spliced introns&quot;) +
+  theme_bw() +
+  theme(strip.text.x = element_text(size = 5))</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-17-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>Neat even from this random sample (among differentially spliced genes) I can clearly see a nunmber of introns with effects different between branaplam and the other two… Like some introns where branaplam has a stronger effect, then other introns where the risdiplam/C2C5 has the stronger effect.</p>
+<p>Let’s focus on any differentially spliced introns that passed my previous critera hosted within genes of interest.</p>
+<pre class="r"><code>PSI.table.filtered.mat %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Intron&quot;) %&gt;%
+  # mutate(gene = recode(gene, !!!ensembl_to_symbols)) %&gt;%
+  gather(&quot;sample&quot;, &quot;PSI&quot;, -Intron) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  select(-sample) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  left_join(
+    (leafcutter.ds.annotated %&gt;%
+       select(Intron, gene_names,IntronType)),
+    by=&quot;Intron&quot;) %&gt;%
+  filter(gene_names %in% GenesOfInterest) %&gt;%
+  mutate(Facet_label = paste(gene_names,IntronType,Intron, sep=&quot;\n&quot;)) %&gt;%
+  ggplot(aes(x=TitrationPoint, y=PSI, color=Color)) +
+  geom_line() +
+  scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+  scale_x_reverse() +
+  facet_wrap(~Facet_label, scales = &quot;free_y&quot;) +
+  labs(title=&quot;differentially spliced introns within GenesOfInterest&quot;) +
+  theme_bw() +
+  theme(strip.text.x = element_text(size = 5))</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div id="get-list-of-branaplam-specific-genesintrons-for-jingxin" class="section level4">
+<h4>Get list of branaplam specific genes/introns for Jingxin</h4>
+<p>Here plot hopefully useful data for Jingxin. Presumably he wants to identify the genes/introns that could be useful for quickly assaying branaplam-specific effects. A good gene should be decently expressed, and have decently expressed alternative splice junctions, and have a clear dose-response effect. I’ll try to capture all that useful information into a single table to write out.</p>
+<p>First let’s do some data exploration by integrating the splicing effects and gene regulation.</p>
+<p>First I’ll combine the splicing count table and the expression count table, perform PCA on that, and get the top alt5’ss/alt3’ss introns by PC2 loading.</p>
+<pre class="r"><code>Combined.df &lt;- rbind(
+  PSI.table.filtered.mat %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Name&quot;) %&gt;%
+  mutate(Name = paste0(&quot;Intron;&quot;, Name)) %&gt;%
+  column_to_rownames(&quot;Name&quot;),
+  ExpressedGeneCounts %&gt;%
+  cpm(log=T) %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  filter(gene %in% DE.genes) %&gt;%
+  mutate(gene =  paste0(&quot;Gene;&quot;, gene)) %&gt;%
+  column_to_rownames(&quot;gene&quot;)
+)
+
+pca.results.combined &lt;- Combined.df %&gt;%
+  scale() %&gt;%
+  t() %&gt;%
+  prcomp()
+
+PC.dat &lt;- pca.results.combined$x %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;Sample&quot;) %&gt;%
+  select(Sample, PC1, PC2, PC3) %&gt;%
+  left_join(Samples, by=&quot;Sample&quot;)
+ggplot(PC.dat, aes(x=PC1, y=PC2, color=Color)) +
+  geom_point() +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 3387 differentially spliced introns\nand 920 DE genes&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>Combined.df.tidy &lt;- Combined.df %&gt;%
+  rownames_to_column(&quot;feature&quot;) %&gt;%
+  gather(&quot;sample&quot;, &quot;Quantification&quot;, -feature) %&gt;%
+  inner_join(
+  pca.results.combined$rotation %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;feature&quot;) %&gt;%
+  select(feature, PC2),
+  by=&quot;feature&quot;) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T) %&gt;%
+  separate(feature, into=c(&quot;IntronOrGene&quot;, &quot;feature&quot;), convert = T, sep=&quot;;&quot;) %&gt;%
+  mutate(Quantification = case_when(
+    IntronOrGene == &quot;Gene&quot; ~ 2**Quantification,
+    TRUE ~ Quantification
+  )) %&gt;%
+  mutate(feature = case_when(
+    IntronOrGene == &quot;Gene&quot; ~ recode(feature, !!!ensembl_to_symbols),
+    TRUE ~ feature
+  )) %&gt;%
+  left_join(
+    (leafcutter.ds.annotated %&gt;%
+       mutate(IsGAGT = UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+       select(Intron, gene_names,IntronType, IsGAGT) %&gt;%
+       distinct(Intron, .keep_all = T)),
+    by=c(&quot;feature&quot;=&quot;Intron&quot;)) %&gt;%
+  mutate(HostGene = case_when(
+    IntronOrGene == &quot;Gene&quot; ~ feature,
+    TRUE ~ gene_names
+  ))
+
+Combined.df.tidy %&gt;%
+  group_by(HostGene) %&gt;%
+  filter(
+    any(IntronType == &quot;Alt 3&#39;ss&quot;) &amp;
+    any(IntronType == &quot;Alt 5&#39;ss&quot;) &amp;
+    any(IntronOrGene == &quot;Gene&quot;)) %&gt;%
+  filter(IntronType == &quot;Alt 5&#39;ss&quot; | IntronOrGene==&quot;Gene&quot;) %&gt;%
+  group_by(IntronType,HostGene) %&gt;%
+  nest() %&gt;%
+  sample_n(1) %&gt;%
+  unnest() %&gt;%
+  distinct(feature, .keep_all = T) %&gt;%
+  select(IntronOrGene, PC2, HostGene) %&gt;%
+  pivot_wider(names_from=&quot;IntronOrGene&quot;, values_from=&quot;PC2&quot;, id_cols=c(&quot;HostGene&quot;)) %&gt;%
+  unnest() %&gt;%
+  ggplot(aes(x=Intron, y=Gene, color=HostGene %in% GenesOfInterest)) +
+  geom_text(aes(label=HostGene)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  theme_bw() +
+  labs(x=&quot;Alt 5&#39;ss PC2 loading&quot;, y=&quot;Host gene expression PC2 loading&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-19-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>There is a general negative correlation in PC2 loading for alt5’ss and host gene expression. This generally makes sense in that I expect the effect directions to be opposite - if an alt 5’ss goes up, I expect host gene expression to go down.</p>
+<pre class="r"><code>Combined.df.tidy %&gt;%
+  group_by(HostGene) %&gt;%
+  filter(
+    any(IntronType == &quot;Alt 3&#39;ss&quot;) &amp;
+    any(IntronType == &quot;Alt 5&#39;ss&quot;) &amp;
+    any(IntronOrGene == &quot;Gene&quot;)) %&gt;%
+  filter(IntronType == &quot;Annotated&quot; | IntronOrGene==&quot;Gene&quot;) %&gt;%
+  group_by(IntronType,HostGene) %&gt;%
+  nest() %&gt;%
+  sample_n(1) %&gt;%
+  unnest() %&gt;%
+  distinct(feature, .keep_all = T) %&gt;%
+  select(IntronOrGene, PC2, HostGene) %&gt;%
+  pivot_wider(names_from=&quot;IntronOrGene&quot;, values_from=&quot;PC2&quot;, id_cols=c(&quot;HostGene&quot;)) %&gt;%
+  unnest() %&gt;%
+  ggplot(aes(x=Intron, y=Gene, color=HostGene %in% GenesOfInterest)) +
+  geom_text(aes(label=HostGene)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  theme_bw() +
+  labs(x=&quot;Annotated intron PC2 loading&quot;, y=&quot;Host gene expression PC2 loading&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Now let’s plot dose response curves both splicing and expression for some of the strongest effects based on PC2 loading, for example PGM2, among a few others. Facet labels following this convention:</p>
+<ul>
+<li>HostGene</li>
+<li>Gene or Intron</li>
+<li>Type of intron</li>
+<li>featureName (gene_name for gene, intron coordinates for intron)</li>
+<li>TRUE/FALSE/NA; TRUE for GA|GT at 5’ss of an intron. FALSE for not GA|GT.</li>
+</ul>
+<pre class="r"><code>Combined.df.tidy %&gt;%
+  filter(HostGene %in% c(&quot;PGM2&quot;, &quot;STAT1&quot;, &quot;HTT&quot;, &quot;CDC40&quot;, &quot;ATF2&quot;)) %&gt;%
+  mutate(Facet_label = paste(HostGene, IntronOrGene, IntronType, feature, IsGAGT, sep=&#39;\n&#39;)) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  ggplot(aes(x=TitrationPoint, y=Quantification)) +
+    geom_rect(data=(. %&gt;% distinct(Facet_label, .keep_all = T)), xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, alpha=0.5, aes(fill=HostGene)) +
+    geom_line(aes(color=Color)) +
+    scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+    scale_x_reverse() +
+    facet_wrap(~Facet_label, scales = &quot;free_y&quot;) +
+    theme_bw() +
+    theme(strip.text.x = element_text(size = 5)) +
+    labs(y=&quot;quantification\n(CountsPerMillion for Gene)\n(PSI for Intron)&quot;, title=&quot;Expression and splicing of select genes&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok those look good. Let’s also pick the top 5, bottom 5, by PC2 loading of the host_gene expression, to check that they make sense:</p>
+<pre class="r"><code>Top20 &lt;- Combined.df.tidy %&gt;%
+  group_by(HostGene) %&gt;%
+  filter(
+    any(!(IntronType == &quot;Annotated&quot;) &amp; !(is.na(IntronType))) &amp;
+    any(IntronOrGene == &quot;Gene&quot;)) %&gt;%
+  ungroup() %&gt;%
+  filter(IntronOrGene == &quot;Gene&quot;) %&gt;%
+  distinct(HostGene, .keep_all = T) %&gt;%
+  top_n(20, PC2) %&gt;%
+  pull(HostGene)
+
+Bottom20 &lt;- Combined.df.tidy %&gt;%
+  group_by(HostGene) %&gt;%
+  filter(
+    any(!(IntronType == &quot;Annotated&quot;) &amp; !(is.na(IntronType))) &amp;
+    any(IntronOrGene == &quot;Gene&quot;)) %&gt;%
+  ungroup() %&gt;%
+  filter(IntronOrGene == &quot;Gene&quot;) %&gt;%
+  distinct(HostGene, .keep_all = T) %&gt;%
+  top_n(-20, PC2) %&gt;%
+  pull(HostGene)
+
+Middle20 &lt;- Combined.df.tidy %&gt;%
+  group_by(HostGene) %&gt;%
+  filter(
+    any(!(IntronType == &quot;Annotated&quot;) &amp; !(is.na(IntronType))) &amp;
+    any(IntronOrGene == &quot;Gene&quot;)) %&gt;%
+  ungroup() %&gt;%
+  filter(IntronOrGene == &quot;Gene&quot;) %&gt;%
+  distinct(HostGene, .keep_all = T) %&gt;%
+  top_n(-20, abs(PC2)) %&gt;%
+  pull(HostGene)
+
+Combined.df.tidy %&gt;%
+  filter(HostGene %in% Bottom20) %&gt;%
+  mutate(Facet_label = paste(HostGene, IntronOrGene, IntronType, feature, IsGAGT, sep=&#39;\n&#39;)) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  ggplot(aes(x=TitrationPoint, y=Quantification)) +
+    geom_rect(data=(. %&gt;% distinct(Facet_label, .keep_all = T)), xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, alpha=0.5, aes(fill=HostGene)) +
+    geom_line(aes(color=Color)) +
+    scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+    scale_x_reverse() +
+    facet_wrap(~Facet_label, scales = &quot;free_y&quot;) +
+    theme_bw() +
+    theme(strip.text.x = element_text(size = 5)) +
+    labs(y=&quot;quantification\n(CountsPerMillion for Gene)\n(PSI for Intron)&quot;, title=&quot;Expression and splicing of bottom20 PC2 effects by host gene&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-22-1.png" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>Combined.df.tidy %&gt;%
+  filter(HostGene %in% Top20) %&gt;%
+  mutate(Facet_label = paste(HostGene, IntronOrGene, IntronType, feature, IsGAGT, sep=&#39;\n&#39;)) %&gt;%
+  mutate(Color = case_when(
+    Treatment == &quot;Bran&quot; ~ &quot;blue&quot;,
+    Treatment == &quot;C2C5&quot; ~ &quot;red&quot;,
+    Treatment == &quot;Ris&quot; ~ &quot;green&quot;)) %&gt;%
+  ggplot(aes(x=TitrationPoint, y=Quantification)) +
+    geom_rect(data=(. %&gt;% distinct(Facet_label, .keep_all = T)), xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, alpha=0.5, aes(fill=HostGene)) +
+    geom_line(aes(color=Color)) +
+    scale_color_identity(labels=ColorsTreatments, guide=&quot;legend&quot;) +
+    scale_x_reverse() +
+    facet_wrap(~Facet_label, scales = &quot;free_y&quot;) +
+    theme_bw() +
+    theme(strip.text.x = element_text(size = 5)) +
+    labs(y=&quot;quantification\n(CountsPerMillion for Gene)\n(PSI for Intron)&quot;, title=&quot;Expression and splicing of top20 PC2 effects by host gene&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-22-2.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+<div id="write-out-results-in-table-form-for-jingxin" class="section level4">
+<h4>Write out results in table form for Jingxin</h4>
+<pre class="r"><code>Combined.df.tidy %&gt;%
+  filter(HostGene %in% c(Top20, Bottom20)) </code></pre>
+</div>
+</div>
+<div id="explore-5ss-of-branaplam-specific-effects" class="section level2">
+<h2>Explore 5’ss of branaplam specific effects</h2>
+<p>Since PC2 seems to do such a good job at distinguishing branaplam-specific effects, i may be able to use it to quickly learn something about the features of introns that make them more susceptible to branaplam than risdiplam/C2C5… Let’s go back to the list of previously identified differentially spliced introns, with the 5’ss sequence I annotated, and try to see if anything correlates with PC2 loadings (as a proxy for branaplam specific effects).</p>
+<p>Let’s start by manually classifying AG|GT 5’ss by other potential bulges based on sequence (the same ones I tested in my previous notebook) and see if the distribution of PC2 loadings at those introns is different for different 5’ss classes, only considering the introns that are significant by the previous critera from the previous analysis, as well as the ones that go up in treatment (as opposed to down). The reasoning for this is that there are a lot of introns that will go down, as a natural consequence of the GA|GT primary effect introns going up… I would rather focus on the sequence features of primary effect introns.</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(p.adjust&lt;0.01 &amp; logef&gt;0) %&gt;%
+  distinct(Intron, .keep_all = T) %&gt;%
+  inner_join(
+    pca.results.splicing$rotation %&gt;%
+    as.data.frame() %&gt;%
+    rownames_to_column(&quot;Intron&quot;) %&gt;%
+    select(Intron, PC2),
+    by=&quot;Intron&quot;
+  ) %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  select(intron, PC2, DonorSeq) %&gt;%
+    mutate(
+    `11_nnng|guUaag` = str_detect(DonorSeq, &quot;^\\w\\w\\wGGTTAAG&quot;),
+    `2_nngA|gunnnn` = str_detect(DonorSeq, &quot;^\\w\\wGAGT&quot;),
+    `3_nngA|guaagn` = str_detect(DonorSeq, &quot;^\\w\\wGAGTAAG&quot;),
+    `4_nagA|guaagn` = str_detect(DonorSeq, &quot;^\\wAGAGTAAG\\w&quot;),
+    `5_nGgA|guaagn` = str_detect(DonorSeq, &quot;^\\wGGAGTAAG\\w&quot;),
+    `6_nCgA|guaagn` = str_detect(DonorSeq, &quot;^\\wCGAGTAAG\\w&quot;),
+    `7_nUgA|guaagn` = str_detect(DonorSeq, &quot;^\\wTGAGTAAG\\w&quot;),
+    `7.2_nagC|guaagn` = str_detect(DonorSeq, &quot;^\\wGACGTAAG\\w&quot;),
+    `7.3_nagG|guaagn` = str_detect(DonorSeq, &quot;^\\wGAGGTAAG\\w&quot;),
+    `8_nngU|guaagn` = str_detect(DonorSeq, &quot;^\\w\\wGTGTAAG&quot;),
+    `9_nagU|guaagn` = str_detect(DonorSeq, &quot;^\\wAGTGTAAG&quot;),
+    `1_nnag|guaagn` = str_detect(DonorSeq, &quot;^\\w\\wAGGTAAG\\w&quot;),
+    `10_nnng|guVaag` = str_detect(DonorSeq, &quot;^\\w\\w\\wGGT[ACG]AAG&quot;),
+    `9.5_nnnn|guaaHg` = str_detect(DonorSeq, &quot;^\\w\\w\\w\\wGTAA[ACT]G&quot;)
+  ) %&gt;%
+  filter_at(vars(-c(&quot;intron&quot;, &quot;PC2&quot;, &quot;DonorSeq&quot;)), any_vars(. == T)) %&gt;%
+  gather(key=&quot;Pattern&quot;, value=&quot;IsMatch&quot;, -c(&quot;intron&quot;, &quot;PC2&quot;, &quot;DonorSeq&quot;)) %&gt;%
+  filter(IsMatch) %&gt;%
+  add_count(Pattern) %&gt;%
+  mutate(Pattern = paste0(Pattern, &quot;; n=&quot;, n)) %&gt;%
+  ggplot(aes(x=PC2, color=Pattern)) +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y=&quot;ecdf&quot;, x=&quot;PC2 loading&quot;, title=&quot;some 5&#39;ss sequences may confer branaplam specific effects&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Note that in GA|GT introns, where the A is bulged out such that the -2 G can basepair with U1, the preferred base pairing at -3 position would be an A in the pre-mRNA.</p>
+<p>Group5, 6, and 7 seem to all have more negative PC2 loadings, suggesting that an additional mismatch to U1 at -3 position of pre-mRNA might confer stronger splicing enhancement by risdiplam than branaplam.</p>
+<p>Let’s replot that but just focusing on the group that popped out and aggregating groups to highlight: AGA|GT 5’ss versus BGA|GT (where B just means not A, according to IUPAC code):</p>
+<pre class="r"><code>dat.to.plot &lt;- leafcutter.ds.annotated %&gt;%
+  filter(p.adjust&lt;0.01 &amp; logef&gt;0) %&gt;%
+  distinct(Intron, .keep_all = T) %&gt;%
+  inner_join(
+    pca.results.splicing$rotation %&gt;%
+    as.data.frame() %&gt;%
+    rownames_to_column(&quot;Intron&quot;) %&gt;%
+    select(Intron, PC2),
+    by=&quot;Intron&quot;
+  ) %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  select(intron, PC2, DonorSeq) %&gt;%
+    mutate(
+    `nBgA|gunnnn` = str_detect(DonorSeq, &quot;^\\w[GCT]GAGT&quot;),
+    `nagA|gunnnn` = str_detect(DonorSeq, &quot;^\\wAGAGT&quot;)
+  ) %&gt;%
+  filter_at(vars(-c(&quot;intron&quot;, &quot;PC2&quot;, &quot;DonorSeq&quot;)), any_vars(. == T)) %&gt;%
+  gather(key=&quot;Pattern&quot;, value=&quot;IsMatch&quot;, -c(&quot;intron&quot;, &quot;PC2&quot;, &quot;DonorSeq&quot;)) %&gt;%
+  filter(IsMatch) %&gt;%
+  add_count(Pattern) %&gt;%
+  mutate(Pattern = paste0(Pattern, &quot;; n=&quot;, n))
+ggplot(dat.to.plot, aes(x=PC2, color=Pattern)) +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y=&quot;ecdf&quot;, x=&quot;PC2 loading&quot;, title=&quot;paired -3 position in AGA|GT 5&#39;ss sequences may confer branaplam specific enhancement&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>For formality sake, let’s get a P value for this effect, even though this hypothesis likely going to be more carefully tested later eventually, rather than this very ad-hoc way of looking at PC2 loadings.</p>
+<pre class="r"><code>wilcox.test(PC2 ~ Pattern, data=dat.to.plot)</code></pre>
+<pre><code>
+    Wilcoxon rank sum test with continuity correction
+
+data:  PC2 by Pattern
+W = 24693, p-value &lt; 2.2e-16
+alternative hypothesis: true location shift is not equal to 0</code></pre>
+<p>My quick literature search I think I see that SMN2 affected 5’ss matches BgA|gu pattern (GGA|GU), and HTT affected 5’ss matches AGA|GU. That is consistent of with these results. These results are also consistent with <a href="https://www.nature.com/articles/s41467-021-27157-z">Bhattacharyya et al</a>’s observations which used similar molecules.</p>
+<blockquote>
+<p>Together, these data demonstrate that HTT-C2 and SMN-C3 represent two distinct classes of splicing modifiers that target 5′ ss with the noncanonical GA dinucleotide at position −2, −1 of the 5′ ss, with the distinction being a preference for adenosine at either −3 for HTT-selective molecules or −4 for SMN-selective molecules.</p>
+</blockquote>
+<p>Let’s exactly test their conclusion about NAGA|GT versus ANGA|GT with the same type of plots. But let’s also add BNGA|GT as a third class:</p>
+<pre class="r"><code>dat.to.plot &lt;- leafcutter.ds.annotated %&gt;%
+  filter(p.adjust&lt;0.01 &amp; logef&gt;0) %&gt;%
+  distinct(Intron, .keep_all = T) %&gt;%
+  inner_join(
+    pca.results.splicing$rotation %&gt;%
+    as.data.frame() %&gt;%
+    rownames_to_column(&quot;Intron&quot;) %&gt;%
+    select(Intron, PC2),
+    by=&quot;Intron&quot;
+  ) %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  select(intron, PC2, DonorSeq) %&gt;%
+    mutate(
+    `NAGA|GT` = str_detect(DonorSeq, &quot;^\\wAGAGT&quot;),
+    `NBGA|GT` = str_detect(DonorSeq, &quot;^\\w[CGT]GAGT&quot;),
+    `ABGA|GT` = str_detect(DonorSeq, &quot;^A[CGT]GAGT&quot;),
+    `BBGA|GT` = str_detect(DonorSeq, &quot;^[CGT][CGT]GAGT&quot;)
+  ) %&gt;%
+  filter_at(vars(-c(&quot;intron&quot;, &quot;PC2&quot;, &quot;DonorSeq&quot;)), any_vars(. == T)) %&gt;%
+  gather(key=&quot;Pattern&quot;, value=&quot;IsMatch&quot;, -c(&quot;intron&quot;, &quot;PC2&quot;, &quot;DonorSeq&quot;)) %&gt;%
+  filter(IsMatch) %&gt;%
+  add_count(Pattern) %&gt;%
+  mutate(Pattern = paste0(Pattern, &quot;; n=&quot;, n))
+ggplot(dat.to.plot, aes(x=PC2, color=Pattern)) +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y=&quot;ecdf&quot;, x=&quot;PC2 loading&quot;, title=&quot;paired -3 position in AGA|GT 5&#39;ss sequences may confer branaplam specific enhancement&quot;)</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so while I agree with Bhattacharyya et al that the paired A at -3 position confers branaplam specific splicing enhancement, I don’t think C2C5 or risdiplam have a preference for A (or any nucleotide) at the -4 position.</p>
+<p>Perhaps a simple more systematic way to do search for 5’ss sequence preferences is to systematically score each possible nucleotide at each position and by the difference in PC2 loading or some other metric…</p>
+<p>Here is a quick implementation of that idea… I’ll have to go back and think about how to maybe do it better later…</p>
+<p>For now, let’s make a plot where the height of the bars for each base at each position is the sum of the PC2 loadings for all introns that contain a base at that position. First let’s filter for GA|GT introns like above…</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(p.adjust&lt;0.01 &amp; logef&gt;0) %&gt;%
+  distinct(Intron, .keep_all = T) %&gt;%
+  inner_join(
+    pca.results.splicing$rotation %&gt;%
+    as.data.frame() %&gt;%
+    rownames_to_column(&quot;Intron&quot;) %&gt;%
+    select(Intron, PC2),
+    by=&quot;Intron&quot;
+  ) %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  select(intron, PC2, DonorSeq) %&gt;%
+  separate(DonorSeq, into=as.character(c(-4:-1, 1:7)), sep = 1:10) %&gt;%
+  gather(key=&quot;position&quot;, value=&quot;base&quot;, -PC2, -intron) %&gt;%
+  group_by(position, base) %&gt;%
+  summarise(PC2_Loadings_sum = mean(PC2)) %&gt;%
+  ungroup() %&gt;%
+  mutate(position = factor(position, levels = as.character(c(-4:-1, 1:7)))) %&gt;%
+  ggplot(aes(x=position, y=PC2_Loadings_sum, fill=base)) +
+  geom_col() +
+  theme_bw()</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>And plotting the same thing without the GA|GT filter, but do filter for things with positive effect direction (splicing is enhanced by treatment)</p>
+<pre class="r"><code>leafcutter.ds.annotated %&gt;%
+  filter(p.adjust&lt;0.01 &amp; logef&gt;0) %&gt;%
+  distinct(Intron, .keep_all = T) %&gt;%
+  inner_join(
+    pca.results.splicing$rotation %&gt;%
+    as.data.frame() %&gt;%
+    rownames_to_column(&quot;Intron&quot;) %&gt;%
+    select(Intron, PC2),
+    by=&quot;Intron&quot;
+  ) %&gt;%
+  select(intron, PC2, DonorSeq) %&gt;%
+  separate(DonorSeq, into=as.character(c(-4:-1, 1:7)), sep = 1:10) %&gt;%
+  gather(key=&quot;position&quot;, value=&quot;base&quot;, -PC2, -intron) %&gt;%
+  group_by(position, base) %&gt;%
+  summarise(PC2_Loadings_sum = mean(PC2)) %&gt;%
+  ungroup() %&gt;%
+  mutate(position = factor(position, levels = as.character(c(-4:-1, 1:7)))) %&gt;%
+  ggplot(aes(x=position, y=PC2_Loadings_sum, fill=base)) +
+  geom_col() +
+  theme_bw()</code></pre>
+<p><img src="figure/20220629_FirstGlanceTitrationSeries.Rmd/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Hmm… maybe this isn’t such a good way to do the analysis. While I do see the A at position -3 pop out with a positive effect, I also see it pop out with a strong negative effect in position -4. But based on the ecdf plots above where I compare PC2 loading distribution for introns that match ABGA|GT to BBGA|GT, I don’t see much of a difference, suggesting that when you control for the nucleotides at other positions, whether you have A or B at position -4 doesn’t make much of a difference. I think the problem with these plots is that they don’t control for sequences at other positions.</p>
+</div>
+<div id="formally-fitting-dose-response-model" class="section level2">
+<h2>Formally fitting dose response model</h2>
+<p>I’ll try fitting hill curve to dose-response data similar to <a href="https://towardsdatascience.com/drug-dose-response-data-analysis-5d7d336ad8e9">this link</a> using <code>drc</code> package… still on to-do list.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.1 (2019-07-05)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Scientific Linux 7.4 (Nitrogen)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.2.19-el7-x86_64/lib/libopenblas_haswellp-r0.2.19.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] viridis_0.5.1      viridisLite_0.3.0  gplots_3.0.1.1    
+ [4] RColorBrewer_1.1-2 edgeR_3.26.5       limma_3.40.6      
+ [7] forcats_0.4.0      stringr_1.4.0      dplyr_0.8.3       
+[10] purrr_0.3.4        readr_1.3.1        tidyr_1.1.0       
+[13] tibble_2.1.3       ggplot2_3.3.5      tidyverse_1.3.0   
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.5         locfit_1.5-9.1     lubridate_1.7.4   
+ [4] lattice_0.20-38    gtools_3.8.1       utf8_1.1.4        
+ [7] assertthat_0.2.1   rprojroot_2.0.2    digest_0.6.20     
+[10] R6_2.4.0           cellranger_1.1.0   backports_1.1.4   
+[13] reprex_0.3.0       evaluate_0.14      httr_1.4.1        
+[16] pillar_1.4.2       rlang_0.4.10       readxl_1.3.1      
+[19] rstudioapi_0.10    gdata_2.18.0       rmarkdown_1.13    
+[22] labeling_0.3       munsell_0.5.0      broom_0.5.2       
+[25] compiler_3.6.1     httpuv_1.5.1       modelr_0.1.8      
+[28] xfun_0.8           pkgconfig_2.0.2    htmltools_0.3.6   
+[31] tidyselect_1.1.0   gridExtra_2.3      workflowr_1.6.2   
+[34] fansi_0.4.0        crayon_1.3.4       dbplyr_1.4.2      
+[37] withr_2.4.1        later_0.8.0        bitops_1.0-6      
+[40] grid_3.6.1         nlme_3.1-140       jsonlite_1.6      
+[43] gtable_0.3.0       lifecycle_0.1.0    DBI_1.1.0         
+[46] git2r_0.26.1       magrittr_1.5       scales_1.1.0      
+[49] KernSmooth_2.23-15 cli_2.2.0          stringi_1.4.3     
+[52] farver_2.1.0       fs_1.3.1           promises_1.0.1    
+[55] xml2_1.3.2         ellipsis_0.2.0.1   generics_0.0.2    
+[58] vctrs_0.3.1        tools_3.6.1        glue_1.3.1        
+[61] hms_0.5.3          yaml_2.2.0         colorspace_1.4-1  
+[64] caTools_1.17.1.2   rvest_0.3.5        knitr_1.23        
+[67] haven_2.3.1       </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

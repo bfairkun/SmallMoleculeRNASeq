@@ -1,0 +1,133 @@
+---
+title: "CheckFragLength"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=F, message=F)
+```
+
+## Intro
+
+Gabi prepped chRNA-seq libs, and we sequenced them on the NextSeq to check for pooling ratios, fragment length, and other possible QC... Here I will explore frag lengths and chromosomal mapped reads...
+
+```{r}
+library(tidyverse)
+library(data.table)
+library(edgeR)
+library(gplots)
+library(RColorBrewer)
+
+Samples <- read_tsv("../data/chRNA_sampleLibraryKey.tsv") %>%
+  mutate(sample = paste0("chRNA_", `#`)) %>%
+  mutate(Treatment = case_when(
+    str_detect(X3, "DMSO") ~ "DMSO",
+    str_detect(X3, "C2-C5") ~ "C2C5",
+    str_detect(X3, "Risdi") ~ "Ris",
+    str_detect(X3, "Brana") ~ "Bran"
+  )) %>%
+  mutate(TitrationPoint = case_when(
+    str_detect(X3, "high") ~ 1,
+    str_detect(X3, "low") ~ 2
+  )) %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ rev(brewer.pal(n=3, name="Blues"))[TitrationPoint],
+    Treatment == "C2C5" ~ rev(brewer.pal(n=3, name="Reds"))[TitrationPoint],
+    Treatment == "Ris" ~ rev(brewer.pal(n=3, name="Greens"))[TitrationPoint],
+    TRUE ~ "gray"
+  ))
+
+FragLengthFiles <- Sys.glob("../code/FragLenths/*.test.txt.gz") %>%
+  setNames(nm=str_replace(., "../code/FragLenths/(.+?).1M.test.txt.gz", "\\1"))
+
+FragLengths <- lapply(FragLengthFiles, fread) %>%
+  bind_rows(.id="sample")
+
+FragLengths %>%
+  select(sample, FragLen = V1) %>%
+  group_by(sample) %>%
+  sample_n(50000) %>%
+  ungroup() %>%
+  mutate(ExpType = case_when(
+    str_detect(sample, "chRNA") ~ "InHouse_chRNA",
+    TRUE ~ "Jingxin_TitrationSeries"
+  )) %>%
+  ggplot(aes(x=FragLen, color=ExpType, group=sample)) +
+  stat_ecdf(size=0.5, alpha=0.5) +
+  coord_cartesian(xlim=c(0,300)) +
+  theme_bw() +
+  labs(y="ecdf", x="FragmentLength estimated from sequencing")
+
+```
+
+Read in gene counts
+
+```{r}
+dat <- read_tsv("../code/featureCounts/Counts.chRNA.txt", comment="#") %>%
+  rename_at(vars(-(1:6)), ~str_replace(.x, "Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam", "\\1")) %>%
+  dplyr::select(Geneid, everything(), -c(2:6)) %>%
+  column_to_rownames("Geneid") %>%
+  DGEList()
+
+
+mean.cpm <- dat %>%
+    cpm(log=T) %>%
+    apply(1, mean)
+
+ExpressedGenes.CPM <- dat[mean.cpm>2,] %>%
+  calcNormFactors() %>%
+  cpm(prior.count=0.1)
+
+
+pca.results.expression <- ExpressedGenes.CPM %>%
+  scale() %>%
+  t() %>%
+  prcomp()
+
+dim(ExpressedGenes.CPM)
+
+
+
+PC.dat <- pca.results.expression$x %>%
+  as.data.frame() %>%
+  rownames_to_column("sample") %>%
+  left_join(Samples, by="sample")
+ggplot(PC.dat, aes(x=PC1, y=PC2, label=X3, color=Color)) +
+  geom_text() +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA based on expressed genes")
+
+ggplot(PC.dat, aes(x=PC2, y=PC3, label=X3, color=Color)) +
+  geom_text() +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA based on expressed genes")
+  
+
+ExpressedGenes.CPM %>%
+  cor(method="spearman") %>%
+  heatmap.2(trace="none")
+```
+
+```{r}
+LibSize <- read_tsv("../output/QC/ReadCountsAndJunctionsPerSamples.tsv", col_names = c("fn", "chromasomal_reads"))
+
+LibSize %>%
+  mutate(sample = str_replace(fn, "Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam", "\\1")) %>%
+  left_join(Samples, by="sample") %>%
+  ggplot(aes(x=X3, y=chromasomal_reads/2, fill=Color)) +
+  geom_col() +
+  scale_fill_identity() +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1))
+
+LibSize %>%
+  mutate(sample = str_replace(fn, "Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam", "\\1")) %>%
+  left_join(Samples, by="sample") %>%
+  select(`#`,chromasomal_reads, X3) %>%
+  mutate(VolumeRelativeToHighest = signif(max(chromasomal_reads)/chromasomal_reads, 4)) %>%
+  write_tsv("../data/chRNA_repooling_ratios.tsv")
+
+```
+

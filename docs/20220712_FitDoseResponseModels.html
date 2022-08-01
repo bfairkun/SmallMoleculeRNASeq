@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>20220712_FitDoseResponseModel</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">small molecular splicing RNA-seq</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">20220712_FitDoseResponseModel</h1>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#intro">Intro</a></li>
+<li><a href="#results">Results</a></li>
+</ul>
+</div>
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-07-20
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>20211209_JingxinRNAseq/analysis/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed19900924code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(19900924)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed19900924code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(19900924)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreee6f410c311b9ed1d1a307ce295d59fe5c8028c3ctargetblanke6f410ca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/e6f410c311b9ed1d1a307ce295d59fe5c8028c3c" target="_blank">e6f410c</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreee6f410c311b9ed1d1a307ce295d59fe5c8028c3ctargetblanke6f410ca" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/e6f410c311b9ed1d1a307ce295d59fe5c8028c3c" target="_blank">e6f410c</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    ._.DS_Store
+    Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    code/.DS_Store
+    Ignored:    code/._.DS_Store
+    Ignored:    code/._DOCK7.pdf
+    Ignored:    code/._DOCK7_DMSO1.pdf
+    Ignored:    code/._DOCK7_SM2_1.pdf
+    Ignored:    code/._FKTN_DMSO_1.pdf
+    Ignored:    code/._FKTN_SM2_1.pdf
+    Ignored:    code/._MAPT.pdf
+    Ignored:    code/._PKD1_DMSO_1.pdf
+    Ignored:    code/._PKD1_SM2_1.pdf
+    Ignored:    code/.snakemake/
+    Ignored:    code/5ssSeqs.tab
+    Ignored:    code/Alignments/
+    Ignored:    code/ChemCLIP/
+    Ignored:    code/ClinVar/
+    Ignored:    code/DE_testing/
+    Ignored:    code/DE_tests.mat.counts.gz
+    Ignored:    code/DE_tests.txt.gz
+    Ignored:    code/Fastq/
+    Ignored:    code/FastqFastp/
+    Ignored:    code/Meme/
+    Ignored:    code/OMIM/
+    Ignored:    code/Session.vim
+    Ignored:    code/SplicingAnalysis/
+    Ignored:    code/featureCounts/
+    Ignored:    code/log
+    Ignored:    code/logs/
+    Ignored:    code/scratch/
+    Ignored:    data/._Hijikata_TableS1_41598_2017_8902_MOESM2_ESM.xls
+    Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
+    Ignored:    output/._PioritizedIntronTargets.pdf
+
+Untracked files:
+    Untracked:  analysis/20220707_TitrationSeries_DE_testing.Rmd
+    Untracked:  analysis/20220712_FitDoseResponseModels.Rmd
+
+Unstaged changes:
+    Modified:   analysis/20220629_FirstGlanceTitrationSeries.Rmd
+    Modified:   analysis/index.Rmd
+
+Staged changes:
+    Modified:   analysis/20211216_DifferentialSplicing.Rmd
+    New:        analysis/20220629_FirstGlanceTitrationSeries.Rmd
+    Modified:   analysis/index.Rmd
+    Modified:   code/Snakefile
+    New:        code/config/samples.titrationseries.tsv
+    New:        code/rules/ProcessTitrationSeries.smk
+    New:        code/rules/RNASeqProcessing.smk
+    Modified:   code/rules/common.smk
+    New:        code/rules/pangolin.smk
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>Here I will fit dose response curves using <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0146021">drc</a>.</p>
+<ul>
+<li>C2-C5-1: 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316 nM</li>
+<li>Branaplam: 3,160, 1000, 316, 100, 31.6, 10, 3.16, 1 nM.</li>
+<li>Risdiplam: 10,000, 3,160, 1000, 316, 100, 31.6, 10, 3.16 nM</li>
+</ul>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<p>First load in libraries</p>
+<pre class="r"><code>library(tidyverse)
+library(edgeR)
+library(RColorBrewer)
+library(gplots)
+library(viridis)
+library(broom)
+library(qvalue)
+library(drc)
+
+library(sandwich)
+library(lmtest)</code></pre>
+<p>…and read in data, and subset genes with mean expression <span class="math inline">\(log_2(CountPerMillion)&gt;1\)</span>.</p>
+<pre class="r"><code>dat &lt;- read_tsv(&quot;../code/featureCounts/Counts.titration_series.txt&quot;, comment=&quot;#&quot;) %&gt;%
+  rename_at(vars(-(1:6)), ~str_replace(.x, &quot;Alignments/STAR_Align/TitrationExp(.+?)/Aligned.sortedByCoord.out.bam&quot;, &quot;\\1&quot;)) %&gt;%
+  dplyr::select(Geneid, everything(), -c(2:6)) %&gt;%
+  column_to_rownames(&quot;Geneid&quot;) %&gt;%
+  DGEList()
+
+ColorsTreatments &lt;- c(&quot;blue&quot;=&quot;Bran&quot;, &quot;red&quot;=&quot;C2C5&quot;, &quot;green&quot;=&quot;Ris&quot;)
+
+mean.cpm &lt;- dat %&gt;%
+    cpm(log=T) %&gt;%
+    apply(1, mean)
+
+ExpressedGenes.CPM &lt;- dat[mean.cpm&gt;1,] %&gt;%
+  calcNormFactors() %&gt;%
+  cpm(prior.count=0.1)
+
+# Read in gene names. Note that ensembl_id to hgnc_symbol is not a 1-to-1 mapping
+geneNames &lt;- read_tsv(&quot;../data/Genes.list.txt&quot;) %&gt;%
+  mutate(hgnc_symbol = coalesce(hgnc_symbol,ensembl_gene_id)) %&gt;%
+  inner_join(data.frame(ensembl.full=rownames(ExpressedGenes.CPM)) %&gt;%
+               mutate(ensembl_gene_id = str_remove(ensembl.full, &quot;\\..+$&quot;)),
+             by = &quot;ensembl_gene_id&quot;
+             ) %&gt;%
+  dplyr::select(ensembl.full, hgnc_symbol)</code></pre>
+<p>Now I will tidy the data a little bit, adding dose information to each sample. For purposes of model fitting, I will add all three DMSO replicates to each titration series as <span class="math inline">\(dose=0\)</span>, which can be handled by the standard 4 parameter log-logistic model implemented in <code>drc</code>.</p>
+<pre class="r"><code>dat.long &lt;- ExpressedGenes.CPM %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  gather(&quot;sample&quot;, &quot;cpm&quot;, -gene) %&gt;%
+  separate(sample, into=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;), remove = F, convert = T)
+
+dat.DMSO &lt;- dat.long %&gt;%
+  filter(Treatment == &quot;DMSO&quot;) %&gt;%
+  mutate(dose.nM = 0) %&gt;%
+  bind_rows(., ., ., .id=&quot;Treatment&quot;) %&gt;%
+  mutate(Treatment = case_when(
+    Treatment == 1 ~ &quot;Bran&quot;,
+    Treatment == 2 ~ &quot;Ris&quot;,
+    Treatment == 3 ~ &quot;C2C5&quot;
+  ))
+
+
+Doses &lt;- data.frame(C2C5=c(1000, 316, 100, 31.6, 10, 3.16, 1, 0.316),
+           Bran=c(3160, 1000, 316, 100, 31.6, 10, 3.16, 1),
+           Ris=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16)) %&gt;%
+  mutate(TitrationPoint = 1:8) %&gt;%
+  gather(key=&quot;Treatment&quot;, value=&quot;dose.nM&quot;, -TitrationPoint)
+
+dat.tidy &lt;- dat.long %&gt;%
+  filter(!Treatment == &quot;DMSO&quot;) %&gt;%
+  inner_join(Doses, by=c(&quot;Treatment&quot;, &quot;TitrationPoint&quot;)) %&gt;%
+  bind_rows(dat.DMSO) %&gt;%
+  inner_join(geneNames, by=c(&quot;gene&quot;=&quot;ensembl.full&quot;))
+
+
+head(dat.tidy)</code></pre>
+<pre><code>               gene sample Treatment TitrationPoint        cpm dose.nM
+1 ENSG00000227232.5 Bran-1      Bran              1   6.725514    3160
+2 ENSG00000279457.4 Bran-1      Bran              1  11.998077    3160
+3 ENSG00000225972.1 Bran-1      Bran              1   9.661373    3160
+4 ENSG00000225630.1 Bran-1      Bran              1 363.612135    3160
+5 ENSG00000237973.1 Bran-1      Bran              1 449.156477    3160
+6 ENSG00000229344.1 Bran-1      Bran              1   4.972986    3160
+  hgnc_symbol
+1      WASH7P
+2      WASH9P
+3    MTND1P23
+4    MTND2P28
+5    MTCO1P12
+6    MTCO2P12</code></pre>
+<p>Now that the data is “tidy”, with one row for each treatment:dose:gene combination, I should be able to easily fit models for each treatment:gene group.</p>
+<p>Let’s pick one treatment:gene combination for an illustrative example, and fit the 4 parameter log-logistic model, constraining the upper and lower limit parameters to be position (since CPM cannot be negative).</p>
+<pre class="r"><code>fitted_curve &lt;- dat.tidy %&gt;%
+  filter(hgnc_symbol==&quot;STAT1&quot; &amp; Treatment == &quot;Ris&quot;) %&gt;%
+  drm(formula = cpm ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+      lowerl = c(NA, 0, 0, NA))
+
+plot(fitted_curve, type=&quot;all&quot;)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>summary(fitted_curve)</code></pre>
+<pre><code>
+Model fitted: Log-logistic (ED50 as parameter) (4 parms)
+
+Parameter estimates:
+
+                         Estimate Std. Error t-value   p-value    
+Steepness:(Intercept)     1.50491    0.20358  7.3923 0.0001504 ***
+LowerLimit:(Intercept)   28.16274   38.01078  0.7409 0.4828536    
+UpperLimit:(Intercept) 1345.21964   21.23941 63.3360 6.425e-11 ***
+ED50:(Intercept)        282.55139   27.47342 10.2845 1.778e-05 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error:
+
+ 47.58045 (7 degrees of freedom)</code></pre>
+<pre class="r"><code>glance(fitted_curve)</code></pre>
+<pre><code># A tibble: 1 × 4
+    AIC   BIC logLik    df.residual
+  &lt;dbl&gt; &lt;dbl&gt; &lt;logLik&gt;        &lt;int&gt;
+1  121.  123. -55.60905           7</code></pre>
+<p>According to the <code>drc</code> author’s <a href="https://storage.googleapis.com/plos-corpus-prod/10.1371/journal.pone.0146021/1/pone.0146021.s001.pdf?X-Goog-Algorithm=GOOG4-RSA-SHA256&amp;X-Goog-Credential=wombat-sa%40plos-prod.iam.gserviceaccount.com%2F20220712%2Fauto%2Fstorage%2Fgoog4_request&amp;X-Goog-Date=20220712T163957Z&amp;X-Goog-Expires=86400&amp;X-Goog-SignedHeaders=host&amp;X-Goog-Signature=43cf69778f63c847d3cfe6336fad0a7de493d2323aa4abdfeb96ebf2511ec7d086dcbdaba45c72e71004f9b06f9ec1789225f96fac3b0ed64d70052571ca48a07ee2783eb193aaea658dfca5285499ce8bcb7c74bd3d0924e24d419bbc683ee74a095619be0aab9b93557e7be5cb7a3f80042f3c95b36da7ad9b4212e53d7e284b5b94c10fb41960ef5f0ac69948c3ca3701b624861e3ca45493048a880b7f36028471441cbc3e1d3561f6ff98321698f8f635a06458bbd166c25e37f7f09365d980f5282c7493325396fc37c593b937036bb5c677ede6d326e337b77542b4ccf6646d1aba7342159df64ddbc39c603d0954bd3c7e5a227ddb5db1d55c42bb2f">Plos-one paper supplement</a>, more robust estimates of coefficeint standard errors can be obtained like this:</p>
+<pre class="r"><code>coeftest(fitted_curve, vcov = sandwich)</code></pre>
+<pre><code>
+t test of coefficients:
+
+                         Estimate Std. Error t value  Pr(&gt;|t|)    
+Steepness:(Intercept)     1.50491    0.13151 11.4431 8.741e-06 ***
+LowerLimit:(Intercept)   28.16274   11.61893  2.4239   0.04583 *  
+UpperLimit:(Intercept) 1345.21964   22.07443 60.9402 8.412e-11 ***
+ED50:(Intercept)        282.55139   16.32676 17.3060 5.287e-07 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>It’s not clear to me whether the response I should be fitting should be <span class="math inline">\(CPM\)</span> or <span class="math inline">\(log(CPM)\)</span> for gene expression level. Let’s repeat the process now modelling <span class="math inline">\(log(CPM)\)</span></p>
+<pre class="r"><code>fitted_curve &lt;- dat.tidy %&gt;%
+  filter(hgnc_symbol==&quot;STAT1&quot; &amp; Treatment == &quot;Ris&quot;) %&gt;%
+  drm(formula = log(cpm) ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+      lowerl = c())
+
+plot(fitted_curve, type=&quot;all&quot;)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>summary(fitted_curve)</code></pre>
+<pre><code>
+Model fitted: Log-logistic (ED50 as parameter) (4 parms)
+
+Parameter estimates:
+
+                         Estimate Std. Error t-value   p-value    
+Steepness:(Intercept)    1.446211   0.133727  10.815 1.274e-05 ***
+LowerLimit:(Intercept)   3.828167   0.090682  42.215 1.092e-09 ***
+UpperLimit:(Intercept)   7.205443   0.030250 238.196 6.143e-15 ***
+ED50:(Intercept)       730.890420  53.252969  13.725 2.570e-06 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error:
+
+ 0.0730794 (7 degrees of freedom)</code></pre>
+<pre class="r"><code>coeftest(fitted_curve, vcov = sandwich)</code></pre>
+<pre><code>
+t test of coefficients:
+
+                         Estimate Std. Error t value  Pr(&gt;|t|)    
+Steepness:(Intercept)    1.446211   0.141243  10.239 1.830e-05 ***
+LowerLimit:(Intercept)   3.828167   0.094068  40.696 1.410e-09 ***
+UpperLimit:(Intercept)   7.205443   0.016000 450.344 &lt; 2.2e-16 ***
+ED50:(Intercept)       730.890420  58.873919  12.415 5.061e-06 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>glance(fitted_curve)</code></pre>
+<pre><code># A tibble: 1 × 4
+    AIC   BIC logLik   df.residual
+  &lt;dbl&gt; &lt;dbl&gt; &lt;logLik&gt;       &lt;int&gt;
+1 -21.3 -19.3 15.65589           7</code></pre>
+<p>That also looks like a good fit. Just as a sanity check, let’s compare the AIC between this model, versus a linear model.</p>
+<pre class="r"><code># glance at some stats about the log-logistic model fit
+glance(fitted_curve)</code></pre>
+<pre><code># A tibble: 1 × 4
+    AIC   BIC logLik   df.residual
+  &lt;dbl&gt; &lt;dbl&gt; &lt;logLik&gt;       &lt;int&gt;
+1 -21.3 -19.3 15.65589           7</code></pre>
+<pre class="r"><code>#fit an linear model
+fitted_curve.lm &lt;- dat.tidy %&gt;%
+  filter(hgnc_symbol==&quot;STAT1&quot; &amp; Treatment == &quot;Ris&quot;) %&gt;%
+  lm(formula = log(cpm) ~ dose.nM,
+                    data = .)
+
+# glance at some stats about the log-logistic model fit
+glance(fitted_curve.lm)</code></pre>
+<pre><code># A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
+      &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1     0.693         0.659 0.760      20.3 0.00147     1  -11.5  29.0  30.2
+# … with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+<p>The log-logistic model is obviously a reasonable fit, and the AIC also shows this log-linear model is a better fit than the simple linear model.</p>
+<p>For now I will continue just modelling <span class="math inline">\(CPM\)</span> (as opposed to <span class="math inline">\(log(CPM)\)</span>) for simplicity, and at least attempt to fit a log-logistic model for each gene… I can think later about how to prune out the questionable model fits before subsequent analyses. One sort of reasonable way to prune out questionable models I think will be to simply to fit a linear model and only consider gene:treatment combinations where the log-linear fit model is obviously better than the simple linear model (<span class="math inline">\(\Delta AIC&gt;2\)</span>).</p>
+<p>Now let’s try to fit to all gene:treatment combinations…</p>
+<p>Actually, to save computation time, at first let’s just try fitting to 100 gene:treatment combinations, and peruse the results.</p>
+<pre class="r"><code>sample_n_of &lt;- function(data, size, ...) {
+  dots &lt;- quos(...)
+  
+  group_ids &lt;- data %&gt;% 
+    group_by(!!! dots) %&gt;% 
+    group_indices()
+  
+  sampled_groups &lt;- sample(unique(group_ids), size)
+  
+  data %&gt;% 
+    filter(group_ids %in% sampled_groups)
+}
+
+GenesOfInterest &lt;- c(&quot;MAPT&quot;, &quot;SNCA&quot;, &quot;SMN2&quot;, &quot;HTT&quot;, &quot;GALC&quot;, &quot;FOXM1&quot;, &quot;STAT1&quot;, &quot;AKT3&quot;, &quot;PDGFRB&quot;)
+
+# had to use possibly wrapper function to handle errors, like when drm fitting does not converge
+safe_drm &lt;- possibly(drm, otherwise=NA)
+
+
+set.seed(0)
+dat.fitted &lt;-
+  dat.tidy %&gt;%
+  sample_n_of(100, Treatment, gene) %&gt;%
+  group_by(Treatment, gene) %&gt;% 
+  # filter(hgnc_symbol==&quot;STAT1&quot;) %&gt;%
+  # filter(hgnc_symbol %in% GenesOfInterest) %&gt;%
+  nest(-Treatment, -gene) %&gt;%
+  mutate(model = map(data, ~safe_drm(formula = cpm ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))))) %&gt;%
+  # filter out the wrapper functions that returned list with NA
+  filter(!anyNA(model))</code></pre>
+<pre><code>Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [4]</code></pre>
+<pre class="r"><code>dat.fitted.summarised &lt;- dat.fitted %&gt;%
+  mutate(results = map(model, tidy)) %&gt;%
+  unnest(results) %&gt;%
+  mutate(summary = map(model, glance)) %&gt;%
+  unnest(summary)
+
+dat.fitted %&gt;%
+  mutate(resid = map(model, residuals)) %&gt;%
+  unnest(data, resid) %&gt;%
+  ggplot(aes(x=log(cpm), y=resid)) +
+  coord_cartesian(xlim=c(0,6), ylim=c(-20,20)) +
+  labs(title=&quot;Residuals as a function of CPM&quot;, caption=&quot;modelled CPM; not logCPM&quot;) +
+  geom_point() +
+  theme_bw()</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>So there is sort of unsurprisingly some heterskedastic errors… More reason to try modelling log(CPM)…</p>
+<p>Let’s also check the data for a gene where the model could not be fit: ENSG00000180773.15 with risdiplam.</p>
+<pre class="r"><code>dat.tidy %&gt;%
+  filter(gene == &quot;ENSG00000180773.15&quot;) %&gt;%
+  ggplot(aes(x=dose.nM, y=cpm, color=Treatment)) +
+  geom_point() +
+  geom_smooth(method=&quot;loess&quot;) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, I can kind of understand how this the model fitting might be weird for this data.</p>
+<p>Let’s try fitting model to logCPM now…</p>
+<pre class="r"><code>set.seed(0)
+dat.fitted &lt;-
+  dat.tidy %&gt;%
+  sample_n_of(100, Treatment, gene) %&gt;%
+  group_by(Treatment, gene) %&gt;% 
+  # filter(hgnc_symbol==&quot;STAT1&quot;) %&gt;%
+  # filter(hgnc_symbol %in% GenesOfInterest) %&gt;%
+  nest(-Treatment, -gene) %&gt;%
+  mutate(model = map(data, ~safe_drm(formula = log(cpm) ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))))) %&gt;%
+  # filter out the wrapper functions that returned list with NA
+  filter(!anyNA(model))</code></pre>
+<pre><code>Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [4]</code></pre>
+<pre class="r"><code>dat.fitted.summarised &lt;- dat.fitted %&gt;%
+  mutate(results = map(model, tidy)) %&gt;%
+  unnest(results) %&gt;%
+  mutate(summary = map(model, glance)) %&gt;%
+  unnest(summary)
+
+dat.fitted %&gt;%
+  mutate(resid = map(model, residuals)) %&gt;%
+  unnest(data, resid) %&gt;%
+  ggplot(aes(x=log(cpm), y=resid)) +
+  coord_cartesian(xlim=c(0,6), ylim=c(-1,1)) +
+  labs(title=&quot;Residuals as a function of CPM&quot;, caption=&quot;modelled CPM; not logCPM&quot;) +
+  geom_point() +
+  theme_bw()</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I think that is generally nicer… Let’s manually inspect dose response data points for genes of interest after log transforming the expression…</p>
+<pre class="r"><code>dat.tidy %&gt;%
+  filter(hgnc_symbol %in% GenesOfInterest) %&gt;%
+  ggplot(aes(x=dose.nM, y=log2(cpm), color=Treatment)) +
+  geom_point() +
+  geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))), se = FALSE) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~hgnc_symbol, scales=&quot;free_y&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Hmm, based on these genes I’m still not sure if log transforming the CPM makes more sense, given that the field-standard model for dose-response curves is a sigmoidal shape log-logistic model. When viewed on this log-scale is notable that the effects keep going in terms of fold change, even at high doses… Contrast this to the same data plotted not on log-scale:</p>
+<pre class="r"><code>dat.tidy %&gt;%
+  filter(hgnc_symbol %in% GenesOfInterest) %&gt;%
+  ggplot(aes(x=dose.nM, y=cpm, color=Treatment)) +
+  geom_point() +
+  geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))), se = FALSE) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~hgnc_symbol, scales=&quot;free_y&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I think whether to log-transform the data almost depends on what we will do with the downstream analsis. Because the true effects on splicing still continue at low doses, so we might care most about as accurately modeling all these effects… In contrast, if we care about finding the genes therapeutic target genes, an effective knockdown might be better ascertained without log transform. Let’s fit a model to all gene:treatment combinations now and use log-transformed CPM as response variable.</p>
+<p>Update: actually, this is a long computation for this notebook, let’s not evaluate this code block, and I’ll just use this notebook to prototype the model-fitting procedure before using a proper Rscript to fit models to all genes…</p>
+<pre class="r"><code>dat.fitted &lt;-
+  dat.tidy %&gt;%
+  group_by(Treatment, gene) %&gt;% 
+  nest(-Treatment, -gene) %&gt;%
+  mutate(model = map(data, ~safe_drm(formula = log2(cpm) ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))))) %&gt;%
+  # filter out the wrapper functions that returned list with NA
+  filter(!anyNA(model))</code></pre>
+<p>Let’s do some more careful comparisons between fit with log CPM versus CPM:</p>
+<pre class="r"><code>set.seed(0)
+dat.fitted &lt;-
+  dat.tidy %&gt;%
+  sample_n_of(100, Treatment, gene) %&gt;%
+  group_by(Treatment, gene) %&gt;% 
+  # filter(hgnc_symbol==&quot;STAT1&quot;) %&gt;%
+  # filter(hgnc_symbol %in% GenesOfInterest) %&gt;%
+  nest(-Treatment, -gene) %&gt;%
+  mutate(model.cpm.LL4 = map(data, ~safe_drm(formula = cpm ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))))) %&gt;%
+  mutate(model.log2cpm.LL4 = map(data, ~safe_drm(formula = log2(cpm) ~ dose.nM,
+                      data = .,
+                      fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))))) %&gt;%
+  # filter out the wrapper functions that returned list with NA
+  filter((!anyNA(model.cpm.LL4)) &amp; (!anyNA(model.log2cpm.LL4))) %&gt;%
+  ungroup()</code></pre>
+<pre><code>Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [4]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [4]</code></pre>
+<pre class="r"><code>dat.fitted.summarised &lt;- dat.fitted %&gt;%
+  gather(key=&quot;ModelName&quot;, value=&quot;model&quot;, model.cpm.LL4, model.log2cpm.LL4) %&gt;%
+  mutate(results = map(model, tidy)) %&gt;%
+  unnest(results) %&gt;%
+  mutate(summary = map(model, glance)) %&gt;%
+  unnest(summary)
+
+dat.fitted.summarised %&gt;%
+  # select(gene, Treatment, ModelName, estimate, term)
+  # spread(key=&quot;ModelName&quot;, value=&quot;estimate&quot;)
+  mutate(estimate = case_when(
+    (term %in% c(&quot;LowerLimit&quot;, &quot;UpperLimit&quot;)) &amp; (ModelName == &quot;model.log2cpm.LL4&quot;) ~ 2**estimate,
+    TRUE ~ estimate
+  )) %&gt;%
+  pivot_wider(names_from = &quot;ModelName&quot;, values_from=&quot;estimate&quot;, id_cols=c(&quot;gene&quot;, &quot;Treatment&quot;, &quot;term&quot;)) %&gt;%
+  ggplot(aes(x=model.cpm.LL4, y=model.log2cpm.LL4)) +
+    geom_point() +
+    scale_x_continuous(trans=&quot;log10&quot;) +
+    scale_y_continuous(trans=&quot;log10&quot;) +
+    facet_wrap(~term, scales=&quot;free&quot;) +
+    theme_bw() +
+    labs(title=&quot;Correlation of parameter point estimates with two models&quot;, caption=&quot;4 paramaeter log-logistic, modelling either logCPM or CPM\nLowerLimit and UpperLimit parameters converted to linear scale before plotting in log2CPM model&quot;)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so the actual parameter estimates are more or less identical whether I model CPM or logCPM. In theory, heterskedastic erros should bias the paramater estiamtes, but only their standard errors.</p>
+<p>Let’s compare AIC between the fit models versus simple linear regression.</p>
+<pre class="r"><code>mselect(fitted_curve, linreg=T)[&quot;Lin&quot;, &quot;IC&quot;]</code></pre>
+<pre><code>[1] 28.95856</code></pre>
+<pre class="r"><code>modelFit(fitted_curve)</code></pre>
+<pre><code>Lack-of-fit test
+
+          ModelDf      RSS Df F value p value
+ANOVA           2 0.000487                   
+DRC model       7 0.037384  5 30.2815  0.0323</code></pre>
+<pre class="r"><code>plot(fitted_curve)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>dat.fitted %&gt;%
+  gather(key=&quot;ModelName&quot;, value=&quot;model&quot;, model.cpm.LL4, model.log2cpm.LL4) %&gt;%
+  mutate(mselect.results = map(model, mselect, linreg=T)) %&gt;%
+  mutate(ModelFit = map(model, modelFit)) %&gt;%
+  rowwise() %&gt;%
+  mutate(DeltaAIC = mselect.results[&quot;LL.4&quot;, &quot;IC&quot;] - mselect.results[&quot;Lin&quot;, &quot;IC&quot;]) %&gt;%
+  rowwise() %&gt;%
+  mutate(Pval = ModelFit[&#39;DRC model&#39;, &#39;p value&#39;]) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=DeltaAIC, fill=ModelName)) +
+  geom_histogram() +
+  theme_bw() +
+  labs(x=&quot;Delta AIC with linear model&quot;, caption=&quot;More negative means better fit with LL.4 model&quot;)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-15-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Let’s plot the original dose response points and the models and those model fit summary stats:</p>
+<pre class="r"><code>set.seed(1)
+dat.fitted %&gt;%
+  gather(key=&quot;ModelName&quot;, value=&quot;model&quot;, model.cpm.LL4, model.log2cpm.LL4) %&gt;%
+  filter(ModelName == &quot;model.log2cpm.LL4&quot;) %&gt;%
+  mutate(mselect.results = map(model, mselect, linreg=T)) %&gt;%
+  mutate(ModelFit = map(model, modelFit)) %&gt;%
+  rowwise() %&gt;%
+  mutate(DeltaAIC = mselect.results[&quot;LL.4&quot;, &quot;IC&quot;] - mselect.results[&quot;Lin&quot;, &quot;IC&quot;]) %&gt;%
+  rowwise() %&gt;%
+  mutate(Pval = ModelFit[&#39;DRC model&#39;, &#39;p value&#39;]) %&gt;%
+  ungroup() %&gt;%
+  sample_n(20) %&gt;%
+  unnest(data) %&gt;%
+  ggplot(aes(x=dose.nM, y=cpm, color=Treatment)) +
+  geom_label(data = (
+    . %&gt;%
+      distinct(Treatment, gene, .keep_all = T) %&gt;%
+      group_by(gene) %&gt;%
+      mutate(vjust = 1 * row_number()) %&gt;%
+      ungroup()),
+    aes(label = paste0(&quot;DeltaAIC: &quot;,signif(DeltaAIC,2), &quot;\nP:&quot;, format.pval(Pval, digits = 2)), vjust=vjust),
+    x=-Inf, y=Inf, size=3, hjust=-0.1
+  ) +
+  geom_point() +
+  geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))), se = FALSE) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~hgnc_symbol, scales=&quot;free&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-16-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>So a lot of things have a negative AIC (roughly meaning the four parameter log logistic model is better fit than simple linear model). The P value is also a test of if a simple anova model is better fit than the drc model, wherin small P-values indicate anova model is better. This practice of looking at actual curves and then inspecting the summary stats about how quality of the model is good.</p>
+<p>Let me get some sense of the distribution of P values for this test</p>
+<pre class="r"><code>dat.fitted %&gt;%
+  gather(key=&quot;ModelName&quot;, value=&quot;model&quot;, model.cpm.LL4, model.log2cpm.LL4) %&gt;%
+  mutate(mselect.results = map(model, mselect, linreg=T)) %&gt;%
+  mutate(ModelFit = map(model, modelFit)) %&gt;%
+  rowwise() %&gt;%
+  mutate(DeltaAIC = mselect.results[&quot;LL.4&quot;, &quot;IC&quot;] - mselect.results[&quot;Lin&quot;, &quot;IC&quot;]) %&gt;%
+  rowwise() %&gt;%
+  mutate(Pval = ModelFit[&#39;DRC model&#39;, &#39;p value&#39;]) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=Pval)) +
+  geom_histogram(bins=20) +
+  facet_wrap(~ModelName)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok that test might be reasonably calibrated. Maybe that is the simplest way I should evaluate goodness of fit.</p>
+<p>Let’s also look at distribution of DeltaAIC</p>
+<pre class="r"><code>dat.fitted %&gt;%
+  gather(key=&quot;ModelName&quot;, value=&quot;model&quot;, model.cpm.LL4, model.log2cpm.LL4) %&gt;%
+  mutate(mselect.results = map(model, mselect, linreg=T)) %&gt;%
+  mutate(ModelFit = map(model, modelFit)) %&gt;%
+  rowwise() %&gt;%
+  mutate(DeltaAIC = mselect.results[&quot;LL.4&quot;, &quot;IC&quot;] - mselect.results[&quot;Lin&quot;, &quot;IC&quot;]) %&gt;%
+  rowwise() %&gt;%
+  mutate(Pval = ModelFit[&#39;DRC model&#39;, &#39;p value&#39;]) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=DeltaAIC)) +
+  geom_histogram(bins=20) +
+  facet_wrap(~ModelName)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Let’s look at the raw data and fits for different ranges of DeltaAIC. From the previous plots a very negative deltaAIC might be a reasonable way to filter for reasonable fits.</p>
+<p>Now I also want to inspect the standard errors of the parameter estimates. As before, I can either model logCPM as the response, or plain CPM and then use <code>coeftest(fitted_curve, vcov = sandwich)</code> to get more robust standard error estimates, instead of the biased standard errors (biased because of heterskedascity) output of drc.</p>
+<pre class="r"><code>coeftest(fitted_curve, vcov = sandwich)</code></pre>
+<pre><code>
+t test of coefficients:
+
+                         Estimate Std. Error t value  Pr(&gt;|t|)    
+Steepness:(Intercept)    1.446211   0.141243  10.239 1.830e-05 ***
+LowerLimit:(Intercept)   3.828167   0.094068  40.696 1.410e-09 ***
+UpperLimit:(Intercept)   7.205443   0.016000 450.344 &lt; 2.2e-16 ***
+ED50:(Intercept)       730.890420  58.873919  12.415 5.061e-06 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>dat.fitted %&gt;%
+  # head() %&gt;%
+  gather(key=&quot;ModelName&quot;, value=&quot;model&quot;, model.cpm.LL4, model.log2cpm.LL4) %&gt;%
+  mutate(results = map(model, tidy)) %&gt;%
+  mutate(results.robust = map(model, coeftest, vcov = sandwich)) %&gt;%
+  rowwise() %&gt;%
+  mutate(robust_estimate.Steepness = results.robust[1,1]) %&gt;%
+  mutate(robust_estimate.LowerLimit = results.robust[2,1]) %&gt;%
+  mutate(robust_estimate.UpperLimit = results.robust[3,1]) %&gt;%
+  mutate(robust_estimate.ED50 = results.robust[4,1]) %&gt;%
+  mutate(robust_se.Steepness = results.robust[1,2]) %&gt;%
+  mutate(robust_se.LowerLimit = results.robust[2,2]) %&gt;%
+  mutate(robust_se.UpperLimit = results.robust[3,2]) %&gt;%
+  mutate(robust_se.ED50 = results.robust[4,2]) %&gt;%
+  unnest(results) %&gt;%
+  pivot_longer(starts_with(&quot;robust_estimate&quot;), names_to = &quot;term2&quot;, names_prefix=&quot;robust_estimate.&quot;, values_to=&quot;robust.estimate&quot;) %&gt;%
+  filter(term==term2) %&gt;%
+  ggplot(aes(x=estimate, y=robust.estimate)) +
+    geom_point() +
+    scale_x_continuous(trans=&quot;log10&quot;) +
+    scale_y_continuous(trans=&quot;log10&quot;) +
+    facet_grid(rows=vars(ModelName), cols=vars(term)) +
+    theme_bw() +
+    labs(title=&quot;Correlation of parameter point estimates with two models and two estimate functions&quot;)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so clearly whether you use the standard drc output or the <code>coeftest(fitted_curve, vcov = sandwich)</code> (labelled as “robust estimate” above) you get the same number. Now check the same thing for standard error.</p>
+<pre class="r"><code>dat.fitted %&gt;%
+  # head() %&gt;%
+  gather(key=&quot;ModelName&quot;, value=&quot;model&quot;, model.cpm.LL4, model.log2cpm.LL4) %&gt;%
+  mutate(results = map(model, tidy)) %&gt;%
+  mutate(results.robust = map(model, coeftest, vcov = sandwich)) %&gt;%
+  rowwise() %&gt;%
+  mutate(robust_estimate.Steepness = results.robust[1,1]) %&gt;%
+  mutate(robust_estimate.LowerLimit = results.robust[2,1]) %&gt;%
+  mutate(robust_estimate.UpperLimit = results.robust[3,1]) %&gt;%
+  mutate(robust_estimate.ED50 = results.robust[4,1]) %&gt;%
+  mutate(robust_se.Steepness = results.robust[1,2]) %&gt;%
+  mutate(robust_se.LowerLimit = results.robust[2,2]) %&gt;%
+  mutate(robust_se.UpperLimit = results.robust[3,2]) %&gt;%
+  mutate(robust_se.ED50 = results.robust[4,2]) %&gt;%
+  unnest(results) %&gt;%
+  pivot_longer(starts_with(&quot;robust_se&quot;), names_to = &quot;term2&quot;, names_prefix=&quot;robust_se.&quot;, values_to=&quot;robust.se&quot;) %&gt;%
+  filter(term==term2) %&gt;%
+  ggplot(aes(x=std.error, y=robust.se)) +
+    geom_abline(color=&quot;red&quot;) +
+    geom_point() +
+    scale_x_continuous(trans=&quot;log10&quot;) +
+    scale_y_continuous(trans=&quot;log10&quot;) +
+    facet_grid(rows=vars(ModelName), cols=vars(term)) +
+    theme_bw() +
+    labs(title=&quot;Correlation of parameter point estimates with two models and two estimate functions&quot;)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>So the drc standard error can sometimes be upwardly biased, at least compared to the so called robust method. And this is true whether for both the logCPM and CPM models. I think I will just rely on the std error estimates directly from drc for simplicity, but I will use use the logCPM model.</p>
+<p>Also one thing I can do is fit models for all the small molecule titration series at once, and tell drc that all three fits should have the same lower value (DMSO control). That seems the most proper way to use the DMSO samples.</p>
+<pre class="r"><code>dat.fitted.FixSameLowerLimit &lt;- dat.tidy %&gt;%
+  # sample_n_of(100, Treatment, gene) %&gt;%
+  # group_by(Treatment, gene) %&gt;% 
+  # filter(hgnc_symbol==&quot;STAT1&quot;) %&gt;%
+  filter(hgnc_symbol %in% GenesOfInterest) %&gt;%
+  nest(data=-gene) %&gt;%
+  mutate(model = map(data, ~safe_drm(formula = cpm ~ dose.nM,
+                    curveid = Treatment,
+                    data = .,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(Treatment, 1, Treatment, Treatment)
+                    ))) %&gt;%
+  # filter out the wrapper functions that returned list with NA
+  filter(!anyNA(model))
+
+
+dat.tidy.test &lt;- dat.tidy %&gt;%
+  filter(hgnc_symbol==&quot;RRM2B&quot;)
+  # filter(hgnc_symbol==&quot;STAT1&quot;)
+
+
+
+
+fit &lt;- drm(formula = cpm ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(Treatment, 1, Treatment, Treatment))
+plot(fit)
+
+dat.tidy.test &lt;- dat.tidy %&gt;%
+  filter(gene == &quot;ENSG00000174574.16&quot; &amp; Treatment == &quot;Bran&quot;)
+fit &lt;- drm(formula = cpm ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(Treatment, Treatment, Treatment, Treatment))
+plot(fit)
+summary(fit)</code></pre>
+<p>Update:</p>
+<ul>
+<li>fitting models with the same lower limit (limit as dose approaches 0) is tricky because all the models are parameterised such that lower limit parameter is the defined as the the lower of the two limit parameters, so one would have to know ahead of time which parameter (the “LowerLimit” or the “UpperLimit” is the one that corresponds to limit as dose approaches 0).</li>
+</ul>
+<p>For now let’s fit things as I have been doing, and start comparing parameter estimates between treatments.</p>
+<pre class="r"><code>set.seed(0)
+dat.fitted &lt;-
+  dat.tidy %&gt;%
+  sample_n_of(100, gene) %&gt;%
+  group_by(Treatment, gene) %&gt;% 
+  # filter(hgnc_symbol==&quot;STAT1&quot;) %&gt;%
+  # filter(hgnc_symbol %in% GenesOfInterest) %&gt;%
+  nest(-Treatment, -gene) %&gt;%
+  mutate(model.cpm.LL4 = map(data, ~safe_drm(formula = cpm ~ dose.nM,
+                    data = .,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))))) %&gt;%
+  mutate(model.log2cpm.LL4 = map(data, ~safe_drm(formula = log2(cpm) ~ dose.nM,
+                      data = .,
+                      fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;))))) %&gt;%
+  # filter out the wrapper functions that returned list with NA
+  filter((!anyNA(model.cpm.LL4)) &amp; (!anyNA(model.log2cpm.LL4))) %&gt;%
+  ungroup()</code></pre>
+<pre><code>Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [4]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [1]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [4]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [1]</code></pre>
+<pre class="r"><code>dat.to.plot &lt;- dat.fitted %&gt;%
+  gather(key=&quot;ModelName&quot;, value=&quot;model&quot;, model.cpm.LL4, model.log2cpm.LL4) %&gt;%
+  filter(ModelName == &quot;model.log2cpm.LL4&quot;) %&gt;%
+  mutate(results = map(model, tidy)) %&gt;%
+  mutate(mselect.results = map(model, mselect, linreg=T)) %&gt;%
+  mutate(ModelFit = map(model, modelFit)) %&gt;%
+  rowwise() %&gt;%
+  mutate(DeltaAIC = mselect.results[&quot;LL.4&quot;, &quot;IC&quot;] - mselect.results[&quot;Lin&quot;, &quot;IC&quot;]) %&gt;%
+  rowwise() %&gt;%
+  mutate(Pval = ModelFit[&#39;DRC model&#39;, &#39;p value&#39;]) %&gt;%
+  unnest(results) %&gt;%
+  filter(Treatment %in% c(&quot;Ris&quot;, &quot;Bran&quot;)) %&gt;%
+  dplyr::select(Treatment, gene, estimate, std.error, Pval, DeltaAIC, term)
+  # spread(Treatment, estimate)
+  
+  
+
+dat.to.plot %&gt;%
+  pivot_wider(names_from=c(&quot;Treatment&quot;), values_from=c(&quot;estimate&quot;, &quot;std.error&quot;, &quot;Pval&quot;, &quot;DeltaAIC&quot;), id_cols=c(&quot;gene&quot;, &quot;term&quot;)) %&gt;%
+  drop_na() %&gt;%
+  ggplot(aes(x=DeltaAIC_Bran, DeltaAIC_Ris)) +
+  geom_point() +
+    theme_bw()</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>dat.to.plot %&gt;%
+  pivot_wider(names_from=c(&quot;Treatment&quot;), values_from=c(&quot;estimate&quot;, &quot;std.error&quot;, &quot;Pval&quot;, &quot;DeltaAIC&quot;), id_cols=c(&quot;gene&quot;, &quot;term&quot;)) %&gt;%
+  drop_na() %&gt;%
+  ggplot(aes(x=-log10(Pval_Bran), -log10(Pval_Ris))) +
+  geom_point() +
+    theme_bw()</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-23-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>dat.to.plot %&gt;%
+  pivot_wider(names_from=c(&quot;Treatment&quot;), values_from=c(&quot;estimate&quot;, &quot;std.error&quot;, &quot;Pval&quot;, &quot;DeltaAIC&quot;), id_cols=c(&quot;gene&quot;, &quot;term&quot;)) %&gt;%
+  drop_na() %&gt;%
+  ggplot(aes(x=-log10(Pval_Bran), y=DeltaAIC_Bran)) +
+  geom_point() +
+    theme_bw()</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-23-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>dat.to.plot %&gt;%
+  pivot_wider(names_from=c(&quot;Treatment&quot;), values_from=c(&quot;estimate&quot;, &quot;std.error&quot;, &quot;Pval&quot;, &quot;DeltaAIC&quot;), id_cols=c(&quot;gene&quot;, &quot;term&quot;)) %&gt;%
+  drop_na() %&gt;%
+  rowwise() %&gt;%
+  mutate(meanDeltaAIC = mean(DeltaAIC_Ris, DeltaAIC_Bran)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=estimate_Bran, y=estimate_Ris, color=meanDeltaAIC)) +
+  geom_abline() +
+  geom_errorbar(aes(xmin = estimate_Bran-std.error_Bran, xmax=estimate_Bran+std.error_Bran)) +
+  geom_errorbar(aes(ymin = estimate_Ris-std.error_Ris, ymax=estimate_Ris+std.error_Ris)) +
+  geom_point() +
+  scale_x_continuous(trans=&quot;log10&quot;) +
+  scale_y_continuous(trans=&quot;log10&quot;) +
+  facet_wrap(~term, scales=&quot;free&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-23-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Let’s check out some individual models for individual points on these plots… starting with this red point</p>
+<pre class="r"><code>PointsOfInterest &lt;- dat.to.plot %&gt;%
+  filter(term==&quot;ED50&quot; &amp; Treatment == &quot;Bran&quot; &amp; estimate &lt;5) %&gt;%
+  pull(gene)
+
+dat.to.plot %&gt;%
+  pivot_wider(names_from=c(&quot;Treatment&quot;), values_from=c(&quot;estimate&quot;, &quot;std.error&quot;, &quot;Pval&quot;, &quot;DeltaAIC&quot;), id_cols=c(&quot;gene&quot;, &quot;term&quot;)) %&gt;%
+  drop_na() %&gt;%
+  rowwise() %&gt;%
+  mutate(meanDeltaAIC = mean(DeltaAIC_Ris, DeltaAIC_Bran)) %&gt;%
+  ungroup() %&gt;%
+  mutate(IsPointOfInterest = gene %in% PointsOfInterest) %&gt;%
+  ggplot(aes(x=estimate_Bran, y=estimate_Ris, color=IsPointOfInterest)) +
+  geom_abline() +
+  geom_errorbar(aes(xmin = estimate_Bran-std.error_Bran, xmax=estimate_Bran+std.error_Bran)) +
+  geom_errorbar(aes(ymin = estimate_Ris-std.error_Ris, ymax=estimate_Ris+std.error_Ris)) +
+  geom_point() +
+  # geom_text(aes(label=gene), size=2) +
+  scale_x_continuous(trans=&quot;log10&quot;) +
+  scale_y_continuous(trans=&quot;log10&quot;) +
+  facet_wrap(~term, scales=&quot;free&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>dat.tidy.test &lt;- dat.tidy %&gt;%
+  filter(gene == &quot;ENSG00000160117.16&quot;)
+fit &lt;- drm(formula = log2(cpm) ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(Treatment, Treatment, Treatment, Treatment))
+plot(fit)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>summary(fit)</code></pre>
+<pre><code>
+Model fitted: Log-logistic (ED50 as parameter) (4 parms)
+
+Parameter estimates:
+
+                  Estimate Std. Error  t-value   p-value    
+Steepness:Bran    0.050718   0.471413   0.1076 0.9153451    
+Steepness:C2C5    1.517828   0.573221   2.6479 0.0150467 *  
+Steepness:Ris     2.648206   0.948493   2.7920 0.0109234 *  
+LowerLimit:Bran   3.948101   0.232945  16.9486 9.989e-14 ***
+LowerLimit:C2C5   2.605019   0.080378  32.4096 &lt; 2.2e-16 ***
+LowerLimit:Ris    2.732253   0.072514  37.6790 &lt; 2.2e-16 ***
+UpperLimit:Bran   3.808415   0.055072  69.1534 &lt; 2.2e-16 ***
+UpperLimit:C2C5   3.773050   0.045628  82.6912 &lt; 2.2e-16 ***
+UpperLimit:Ris    3.779937   0.037193 101.6307 &lt; 2.2e-16 ***
+ED50:Bran         0.059997   2.801106   0.0214 0.9831136    
+ED50:C2C5        41.666034   9.529184   4.3725 0.0002667 ***
+ED50:Ris        537.947942 103.762622   5.1844 3.883e-05 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error:
+
+ 0.09576291 (21 degrees of freedom)</code></pre>
+<pre class="r"><code>dat.tidy.test &lt;- dat.tidy %&gt;%
+  filter(gene == &quot;ENSG00000075239.14&quot;)
+fit &lt;- drm(formula = log2(cpm) ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(Treatment, Treatment, Treatment, Treatment))
+plot(fit)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-25-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>summary(fit)</code></pre>
+<pre><code>
+Model fitted: Log-logistic (ED50 as parameter) (4 parms)
+
+Parameter estimates:
+
+                 Estimate Std. Error  t-value p-value    
+Steepness:Bran   0.081277         NA       NA      NA    
+Steepness:C2C5   0.297441   0.500894   0.5938  0.5590    
+Steepness:Ris    0.500408   1.221937   0.4095  0.6863    
+LowerLimit:Bran  6.573052   0.014816 443.6547  &lt;2e-16 ***
+LowerLimit:C2C5  6.366048   0.170200  37.4034  &lt;2e-16 ***
+LowerLimit:Ris   6.447259   0.074544  86.4891  &lt;2e-16 ***
+UpperLimit:Bran  6.580825   0.026813 245.4363  &lt;2e-16 ***
+UpperLimit:C2C5  6.585943   0.053893 122.2048  &lt;2e-16 ***
+UpperLimit:Ris   6.588939   0.051593 127.7093  &lt;2e-16 ***
+ED50:Bran        3.228366         NA       NA      NA    
+ED50:C2C5        3.887193  23.120871   0.1681  0.8681    
+ED50:Ris         5.534319  21.279802   0.2601  0.7973    
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error:
+
+ 0.09086537 (21 degrees of freedom)</code></pre>
+<pre class="r"><code>dat.tidy.test &lt;- dat.tidy %&gt;%
+  filter(gene == &quot;ENSG00000136436.14&quot;)
+fit &lt;- drm(formula = log2(cpm) ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(Treatment, Treatment, Treatment, Treatment))
+plot(fit)</code></pre>
+<p><img src="figure/20220712_FitDoseResponseModels.Rmd/unnamed-chunk-25-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>summary(fit)</code></pre>
+<pre><code>
+Model fitted: Log-logistic (ED50 as parameter) (4 parms)
+
+Parameter estimates:
+
+                   Estimate  Std. Error  t-value   p-value    
+Steepness:Bran     1.416690    0.542319   2.6123   0.01627 *  
+Steepness:C2C5    -1.176207    1.031273  -1.1405   0.26690    
+Steepness:Ris     -3.540543          NA       NA        NA    
+LowerLimit:Bran    5.230006    0.068466  76.3883 &lt; 2.2e-16 ***
+LowerLimit:C2C5    6.204725    0.056185 110.4344 &lt; 2.2e-16 ***
+LowerLimit:Ris     6.169790    0.047715 129.3052 &lt; 2.2e-16 ***
+UpperLimit:Bran    6.241918    0.083875  74.4191 &lt; 2.2e-16 ***
+UpperLimit:C2C5    7.078879    0.568146  12.4596  3.63e-11 ***
+UpperLimit:Ris     6.576517          NA       NA        NA    
+ED50:Bran          4.379765    1.789508   2.4475   0.02327 *  
+ED50:C2C5        269.370620  408.653096   0.6592   0.51695    
+ED50:Ris        5068.662728          NA       NA        NA    
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error:
+
+ 0.1437782 (21 degrees of freedom)</code></pre>
+<p>Ok, lot’s of interseting things going on.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.1 (2019-07-05)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Scientific Linux 7.4 (Nitrogen)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.2.19-el7-x86_64/lib/libopenblas_haswellp-r0.2.19.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] lmtest_0.9-37      zoo_1.8-10         sandwich_3.0-2     drc_3.0-1         
+ [5] MASS_7.3-51.4      qvalue_2.16.0      broom_1.0.0        viridis_0.5.1     
+ [9] viridisLite_0.3.0  gplots_3.0.1.1     RColorBrewer_1.1-2 edgeR_3.26.5      
+[13] limma_3.40.6       forcats_0.4.0      stringr_1.4.0      dplyr_1.0.9       
+[17] purrr_0.3.4        readr_1.3.1        tidyr_1.2.0        tibble_3.1.7      
+[21] ggplot2_3.3.6      tidyverse_1.3.0   
+
+loaded via a namespace (and not attached):
+ [1] nlme_3.1-140       bitops_1.0-6       fs_1.3.1           lubridate_1.7.4   
+ [5] httr_1.4.1         rprojroot_2.0.2    tools_3.6.1        backports_1.4.1   
+ [9] utf8_1.1.4         R6_2.4.0           KernSmooth_2.23-15 mgcv_1.8-40       
+[13] DBI_1.1.0          colorspace_1.4-1   withr_2.4.1        tidyselect_1.1.2  
+[17] gridExtra_2.3      curl_3.3           compiler_3.6.1     git2r_0.26.1      
+[21] cli_3.3.0          rvest_0.3.5        xml2_1.3.2         labeling_0.3      
+[25] caTools_1.17.1.2   scales_1.1.0       mvtnorm_1.1-3      digest_0.6.20     
+[29] foreign_0.8-71     rmarkdown_1.13     rio_0.5.16         pkgconfig_2.0.2   
+[33] htmltools_0.3.6    plotrix_3.8-2      highr_0.9          dbplyr_1.4.2      
+[37] rlang_1.0.3        readxl_1.3.1       rstudioapi_0.10    farver_2.1.0      
+[41] generics_0.1.3     jsonlite_1.6       gtools_3.9.2.2     zip_2.0.3         
+[45] car_3.0-5          magrittr_1.5       Matrix_1.2-18      Rcpp_1.0.5        
+[49] munsell_0.5.0      fansi_0.4.0        abind_1.4-5        lifecycle_1.0.1   
+[53] multcomp_1.4-19    stringi_1.4.3      yaml_2.2.0         carData_3.0-5     
+[57] plyr_1.8.4         grid_3.6.1         gdata_2.18.0       promises_1.0.1    
+[61] crayon_1.3.4       lattice_0.20-38    haven_2.3.1        splines_3.6.1     
+[65] hms_0.5.3          locfit_1.5-9.1     knitr_1.39         pillar_1.7.0      
+[69] codetools_0.2-18   reshape2_1.4.3     reprex_0.3.0       glue_1.6.2        
+[73] evaluate_0.15      data.table_1.14.2  modelr_0.1.8       vctrs_0.4.1       
+[77] httpuv_1.5.1       cellranger_1.1.0   gtable_0.3.0       assertthat_0.2.1  
+[81] xfun_0.31          openxlsx_4.1.0.1   later_0.8.0        survival_2.44-1.1 
+[85] workflowr_1.6.2    TH.data_1.1-1      ellipsis_0.3.2    </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

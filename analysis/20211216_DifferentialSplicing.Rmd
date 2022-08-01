@@ -774,13 +774,7 @@ ToCor <- leafcutter.ds.annotated %>%
   distinct(name, cluster, .keep_all = T) %>%
   mutate(IntronType_name = toString(sort(c(IntronType.x,IntronType.y))))
 
-ToCor %>%
-  ggplot(aes(x=Effect.x, y=Effect.y)) +
-  geom_point(alpha=0.05) +
-  facet_wrap(~IntronType_name) +
-  ggtitle("DeltaPsi Correlation of within-cluster effect-sizes by intron-type") +
-  labs(caption="All significant GA|GT-containing clusters included") +
-  theme_classic()
+
 ```
 
 Woah... There is a lot going on and I think it is because the clusters with too many introns are hard to interpret. Let's consider just looking at clusters with a few introns.
@@ -812,6 +806,170 @@ ToCor %>%
 
 Ok, So I feel confident now that what usually happens is that when there is a cluster with a GA|GT intron, it gets increased as an alt 5'ss, concominant with an increase in alt 3'ss to create a new exon, and sometimes a new intron comes too... and all this happens at the expense of annotated introns.
 
+Let's check this another way. Out of all upregulated cryptic 5'ss, how many are in a cluster with an upregulated cryptic 3'ss within 500bp of the upregulated 5'ss.
+
+```{r}
+ToCor %>%
+  filter()
+
+```
+
+Check if upregulated 3'ss is as common as upregulated 5'ss
+
+```{r}
+leafcutter.ds.annotated %>%
+  group_by(cluster, treatment, p.adjust) %>%
+  filter(p.adjust < 0.01) %>%
+  # filter((any(IntronType=="Alt 3'ss" & sign(logef)==1)) | (any(IntronType=="Alt 5'ss" & sign(logef)==1)) ) %>%
+  filter(any("GA" %in% UpstreamOfDonor2BaseSeq)) %>%
+  ungroup() %>%
+  add_count(cluster, treatment, p.adjust) %>%
+  filter(n==2) %>%
+  # filter(treatment == "SM2") %>%
+  group_by(cluster, treatment, p.adjust, n) %>%
+  arrange(IntronType) %>%
+  summarise(ClusterConfiguration = paste(IntronType, collapse = ", ")) %>%
+  ungroup() %>%
+  count(treatment, n, ClusterConfiguration, name="NumClusters") %>%
+  ggplot(aes(y=NumClusters, x=ClusterConfiguration)) +
+  geom_col() +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  facet_wrap(~treatment) +
+  ggtitle("Sig clusters (n=2 introns) with GA|GT intron are usually cryptic 5'ss, as expected")
+
+
+leafcutter.ds.annotated %>%
+  group_by(cluster, treatment, p.adjust) %>%
+  filter(p.adjust < 0.01) %>%
+  filter((any(IntronType=="Alt 3'ss" & sign(logef)==1)) | (any(IntronType=="Alt 5'ss" & sign(logef)==1)) ) %>%
+  # filter(any("GA" %in% UpstreamOfDonor2BaseSeq)) %>%
+  ungroup() %>%
+  add_count(cluster, treatment, p.adjust) %>%
+  filter(n==2) %>%
+  # filter(treatment == "SM2") %>%
+  group_by(cluster, treatment, p.adjust, n) %>%
+  arrange(IntronType) %>%
+  summarise(ClusterConfiguration = paste(IntronType, collapse = ", ")) %>%
+  ungroup() %>%
+  count(treatment, n, ClusterConfiguration, name="NumClusters") %>%
+  ggplot(aes(y=NumClusters, x=ClusterConfiguration)) +
+  geom_col() +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  facet_wrap(~treatment) +
+  ggtitle("There are about as many upregulated cryptic 3'ss as upregulated cryptic 5'ss")
+
+  
+leafcutter.ds.annotated %>%
+  group_by(cluster, treatment, p.adjust) %>%
+  filter(p.adjust < 0.01) %>%
+  filter((any(IntronType=="Alt 3'ss" & sign(logef)==1)) | (any(IntronType=="Alt 5'ss" & sign(logef)==1)) ) %>%
+  filter(any("GA" %in% UpstreamOfDonor2BaseSeq)) %>%
+  ungroup() %>%
+  add_count(cluster, treatment, p.adjust) %>%
+  filter(n==2) %>%
+  # filter(treatment == "SM2") %>%
+  group_by(cluster, treatment, p.adjust, n) %>%
+  arrange(IntronType) %>%
+  summarise(ClusterConfiguration = paste(IntronType, collapse = ", ")) %>%
+  ungroup() %>%
+  count(treatment, n, ClusterConfiguration, name="NumClusters") %>%
+  ggplot(aes(y=NumClusters, x=ClusterConfiguration)) +
+  geom_col() +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  facet_wrap(~treatment)
+
+leafcutter.ds.annotated %>%
+  filter(treatment == "SM2") %>%
+  filter(p.adjust < 0.01) %>%
+  count(cluster) %>%
+  ggplot(aes(x=n)) +
+  stat_ecdf() +
+  ylab("Cumulative fraction clusters") +
+  xlab("Number introns in cluster") +
+  ggtitle("Significant introns (FDR<0.01) in clusters that can be hard to interpret") +
+  coord_cartesian(xlim=c(0,10)) +
+  theme_classic()
+  
+
+leafcutter.ds.annotated %>%
+  group_by(cluster, treatment, p.adjust) %>%
+  filter(p.adjust < 0.01) %>%
+  # filter((any(IntronType=="Alt 3'ss" & sign(logef)==1)) | (any(IntronType=="Alt 5'ss" & sign(logef)==1)) ) %>%
+  # filter(any("GA" %in% UpstreamOfDonor2BaseSeq)) %>%
+  ungroup() %>%
+  add_count(cluster, treatment, p.adjust) %>%
+  filter(n %in% c(2,3,4 )) %>%
+  filter(treatment == "SM2") %>%
+  group_by(cluster, treatment, p.adjust, n) %>%
+  arrange(IntronType) %>%
+  summarise(ClusterConfiguration = paste(IntronType, collapse = ", ")) %>%
+  ungroup() %>%
+  count(treatment, n, ClusterConfiguration, name="NumClusters") %>%
+  mutate(Clusterwise_AS_Type = case_when(
+        str_detect(ClusterConfiguration, "New Splice Site combination") & str_detect(ClusterConfiguration, "Alt 3'ss") ~ NA_character_,
+    str_detect(ClusterConfiguration, "New Splice Site combination") & str_detect(ClusterConfiguration, "Alt 5'ss") ~ NA_character_,
+    str_detect(ClusterConfiguration,"Alt 5'ss") & !str_detect(ClusterConfiguration,"Alt 3'ss") ~ "Alt 5'ss cluster",
+    str_detect(ClusterConfiguration, "Alt 3'ss") & !str_detect(ClusterConfiguration,"Alt 5'ss") ~ "Alt 3'ss cluster",
+    str_detect(ClusterConfiguration, "Alt 3'ss") & str_detect(ClusterConfiguration,"Alt 3'ss") ~ "Cryptic exon",
+    str_detect(ClusterConfiguration, "Annotated, Annotated, Annotation") ~ "Annotated cassette exon",
+    str_detect(ClusterConfiguration, "New Splice Site combination") ~ "Annotated cassette exon",
+    TRUE ~ NA_character_
+  )) %>%
+  ggplot(aes(y=NumClusters, x=ClusterConfiguration, fill=Clusterwise_AS_Type)) +
+  geom_col() +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  facet_wrap(~treatment) +
+  ggtitle("exon-skipping drives ~50% of significant clusters")
+```
+
+
+Are most cryptic 5'ss clusters with 2 introns at GA|GT introns
+
+```{r}
+leafcutter.ds.annotated %>%
+  group_by(cluster, treatment, p.adjust) %>%
+  filter(p.adjust < 0.01) %>%
+  filter((any(IntronType=="Alt 5'ss" & sign(logef)==1)) ) %>%
+  mutate(DoesClusterContainGAGT.Intron = any("GA" %in% UpstreamOfDonor2BaseSeq)) %>%
+  ungroup() %>%
+  add_count(cluster, treatment, p.adjust) %>%
+  filter(n==2) %>%
+  count(cluster, treatment, DoesClusterContainGAGT.Intron, name="NumClusters") %>%
+  # filter(treatment == "SM2") %>%
+  ggplot(aes(y=NumClusters, x=treatment, fill=DoesClusterContainGAGT.Intron)) +
+  geom_col() +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+Quick double check that the Gencode basic annotations that I have been working off are usually but not always 1 transcript per gene
+```{r, eval=F}
+
+#What is the gencode:
+transcripts <- read_tsv("/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Annotations/GTFTools_BasicAnnotations/gencode.v34.chromasomal.tss.bed", col_names = c("chr", "start", "end", "strand", "transcript", "gene")) %>%
+  distinct(transcript, gene)
+
+transcripts %>%
+  count(gene) %>%
+  pull(n) %>% median()
+
+transcripts %>%
+  count(gene) %>%
+  ggplot(aes(x=n)) +
+  coord_cartesian(xlim=c(0,10)) +
+  geom_bar()
+
+```
+
+Ok, yes,the slight majority of genes are a single transcript per gene in this annotation.
+
+
+### Checking effects of NNGA|GT introns
 
 Now let's look at more than jus the GA|GT. For example, filtering for GA|GT, let's make the same plot for the two nucleotides upstream (NNGA|GT)
 
@@ -2290,8 +2448,12 @@ DE_and_DS_OMIM_Map %>%
   
 DE_and_DS_OMIM_Map %>%
   distinct(treatment, Gene, MIM_phenotype, .keep_all = T) %>%
-  filter(treatment == "SM2" & ModeInheritence=="GainOfFunction" & IsDownregulate & IsCrypticSplicingSig &UpstreamOfDonor2BaseSeq == "GA" ) %>%
-  select(Gene, `Preferred Title; symbol`, UpstreamOfDonor2BaseSeq, psi_treatment, intron, logFC)
+  filter(treatment == "SM2") %>%
+  filter(ModeInheritence=="GainOfFunction" & IsDownregulate & IsCrypticSplicingSig) %>%
+  # filter(UpstreamOfDonor2BaseSeq == "GA" ) %>%
+  select(Gene, `Preferred Title; symbol`, UpstreamOfDonor2BaseSeq, psi_treatment, intron, logFC) %>%
+  select(Gene, `Preferred Title; symbol`)
+  # distinct(Gene, MIM_phenotype)
 
   # filter(UpstreamOfDonor2BaseSeq == "AG") %>%
   # filter(IntronType == "Alt 5'ss") %>%
