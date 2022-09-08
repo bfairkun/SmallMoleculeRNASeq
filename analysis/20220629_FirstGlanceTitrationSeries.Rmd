@@ -29,6 +29,7 @@ library(edgeR)
 library(RColorBrewer)
 library(gplots)
 library(viridis)
+library(magrittr)
 
 dat <- read_tsv("../code/featureCounts/Counts.titration_series.txt", comment="#") %>%
   dplyr::select(-ends_with("_1")) %>%
@@ -990,8 +991,8 @@ Here is a quick implementation of that idea... I'll have to go back and think ab
 For now, let's make a plot where the height of the bars for each base at each position is the sum of the PC2 loadings for all introns that contain a base at that position. First let's filter for GA|GT introns like above...
 
 ```{r}
-leafcutter.ds.annotated %>%
-  filter(p.adjust<0.01 & logef>0) %>%
+PerNucleotidePC2Effect <- leafcutter.ds.annotated %>%
+  filter(logef>0) %>%
   distinct(Intron, .keep_all = T) %>%
   inner_join(
     pca.results.splicing$rotation %>%
@@ -1009,8 +1010,9 @@ leafcutter.ds.annotated %>%
   ungroup() %>%
   mutate(position = factor(position, levels = as.character(c(-4:-1, 1:7)))) %>%
   ggplot(aes(x=position, y=PC2_Loadings_sum, fill=base)) +
-  geom_col() +
+  geom_col(position='dodge') +
   theme_bw()
+PerNucleotidePC2Effect
 ```
 
 And plotting the same thing without the GA|GT filter, but do filter for things with positive effect direction (splicing is enhanced by treatment)
@@ -1034,7 +1036,7 @@ leafcutter.ds.annotated %>%
   ungroup() %>%
   mutate(position = factor(position, levels = as.character(c(-4:-1, 1:7)))) %>%
   ggplot(aes(x=position, y=PC2_Loadings_sum, fill=base)) +
-  geom_col() +
+  geom_col(position="dodge") +
   theme_bw()
 ```
 
@@ -1044,4 +1046,306 @@ Hmm... maybe this isn't such a good way to do the analysis. While I do see the A
 
 I'll try fitting hill curve to dose-response data similar to [this link](https://towardsdatascience.com/drug-dose-response-data-analysis-5d7d336ad8e9) using `drc` package... still on to-do list.
 
+
+## Exploring ideas in Jingxin's email: "ATGA | GTAAGT" sequence as risdiplam specific:
+
+Email correspondance from Jingxin:
+
+> After the last meeting, we extracted all cryptic exons + 5’ ss (20 nt) sequences for the splicing modulation events that are either risdiplam/C2-C5-1-selective (10 sequences) or branaplam-selective (17 sequences). This is based on Ben’s PCA analysis with PC2 loading. We’ve checked all the associated curves. 
+Interestingly, MEME analysis showed that 10/10 risdiplam/C2-C5-1 selective splice sites have a conserved sequence ATGA | GTAAGT with <=1 nt tolerable mismatch. 
+https://meme-suite.org/meme//opal-jobs/appMEME_5.4.116593091869461440423053/meme.html
+This recognition site (10 nt) is quite long for a small molecule!
+Branaplam selective sequences do not have such conservation. A GA-rich sequence is found in the exon region but this is not absolutely required for all sequences. 
+https://meme-suite.org/meme//opal-jobs/appMEME_5.4.11659309262442-54252450/meme.html
+Plan: 
+1. Site-specific mutations in splicing assay should prove this hypothesis in experiments, i.e., elimination of the ATGA | GTAAGT should reduce the activity difference between branaplam and risdiplam/C2-C5-1. 
+2. I am also wondering if this is generalizable among all the small-molecule regulatable splicing events (~3000), i.e., search for ATGA | GTAAGT splice sites in all ~3000 splice sites and see if all of them have risdiplam being more active. 
+Please let me know your thoughts. Thanks!
+
+I should check across more introns for ATGA|GTAAGT as potentially risdiplam specific sequence... Also, Jingxin posted an excel of genes that were I think derived from a table I sent him... In any case, I want to peruse the dose response effect of all those genes on the list...
+
+
+For now I will plot the PC2 loading distribution of sets of introns based on their 5'ss sequence. According to Jingxin's email, I expect ATGA|GTAAGT to have strong negative loadings (risdiplam specific). These plots are utilizing all 3387 introns used in the splicing PCA analysis, and then subsetting intron groups by their 5' sequence: 
+
+
+```{r}
+dat.to.plot <- leafcutter.ds.annotated %>%
+  # filter(p.adjust<0.01) %>%
+  # filter(logef>0) %>%
+  distinct(Intron, .keep_all = T) %>%
+  inner_join(
+    pca.results.splicing$rotation %>%
+    as.data.frame() %>%
+    rownames_to_column("Intron") %>%
+    dplyr::select(Intron, PC2),
+    by="Intron"
+  ) %>%
+  filter(UpstreamOfDonor2BaseSeq == "GA") %>%
+  dplyr::select(intron, PC2, DonorSeq) %>%
+    mutate(
+    `ATGA|GTAAGT` = str_detect(DonorSeq, "^ATGAGTAAGT"),
+    `ATGA|GT` = str_detect(DonorSeq, "^ATGAGT"),
+    `NAGA|GT` = str_detect(DonorSeq, "^\\wAGAGT"),
+    `NBGA|GT` = str_detect(DonorSeq, "^\\w[CGT]GAGT"),
+    `ABGA|GT` = str_detect(DonorSeq, "^A[CGT]GAGT"),
+    `BBGA|GT` = str_detect(DonorSeq, "^[CGT][CGT]GAGT")
+  ) %>%
+  filter_at(vars(-c("intron", "PC2", "DonorSeq")), any_vars(. == T)) %>%
+  gather(key="Pattern", value="IsMatch", -c("intron", "PC2", "DonorSeq")) %>%
+  filter(IsMatch) %>%
+  add_count(Pattern) %>%
+  mutate(Pattern = paste0(Pattern, "; n=", n))
+ggplot(dat.to.plot, aes(x=PC2, color=Pattern)) +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y="ecdf", x="PC2 loading", title="PC2 effect of ATGA|GTAAGT")
+```
+
+
+Let's also check how common sequences are, conditioned on also GA|GT introns (based on all introns tested in the fibroblast data). "Tested" just means it passes some minimum level of junction read counts in some number of samples:
+
+```{r}
+leafcutter.ds.annotated %>%
+  distinct(intron, .keep_all=T) %>%
+  filter(UpstreamOfDonor2BaseSeq == "GA") %>%
+  select(DonorSeq) %>%
+  separate(DonorSeq, into=as.character(c(-4:-1, 1:7)), sep=1:10) %>%
+  gather(key="position", value="nucleotide") %>%
+  mutate(position = factor(position, levels=as.character(c(-4:-1, 1:7)))) %>%
+  ggplot(aes(x=position, fill=nucleotide)) + 
+  geom_bar(position="fill") +
+  theme_bw()
+```
+
+Ok, now, conditioned on GA|GT, let's check all -4,-3 dinucleotide pairs for PC2 effect distribution:
+
+```{r}
+leafcutter.ds.annotated %>%
+  # filter(p.adjust<0.01 & logef>0) %>%
+  distinct(Intron, .keep_all = T) %>%
+  inner_join(
+    pca.results.splicing$rotation %>%
+    as.data.frame() %>%
+    rownames_to_column("Intron") %>%
+    dplyr::select(Intron, PC2),
+    by="Intron"
+  ) %>%
+  filter(UpstreamOfDonor2BaseSeq == "GA") %>%
+  mutate(Minus4Minus3Bases = str_replace(DonorSeq, "^(\\w\\w).+$", "\\1")) %>%
+  nest(-Minus4Minus3Bases) %>%
+  mutate(P=map_dbl(data, ~wilcox.test(x=.$PC2, data = .)$p.value)) %>%  # get p value for wilcoxon test
+  unnest(data) %>%
+  add_count(Minus4Minus3Bases) %>%
+  mutate(Minus4Minus3Bases = factor(Minus4Minus3Bases,
+                           levels=(expand.grid(c("A", "C", "G", "T"),c("A", "C", "G", "T")) %>% unite(x, Var1, Var2, sep="") %>% pull(x)))) %>%
+ggplot(aes(x=PC2)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype="dashed") +
+  geom_text(x=-Inf, y=Inf, aes(label=paste0("P=", format.pval(P, 2), "\nn=", n)), data=(. %>% distinct(Minus4Minus3Bases,.keep_all=T)), hjust=0, vjust=1) +
+  facet_wrap(~Minus4Minus3Bases, drop=F) +
+  theme_bw() +
+  labs(y="CumulativeFrequency", title="PC2 loading of NNGA|GT introns") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+```
+
+Conclusion:
+
+I think this is actually consistent with my interpretation from above:
+
+>Ok, so while I agree with Bhattacharyya et al that the paired A at -3 position confers branaplam specific splicing enhancement, I don't think C2C5 or risdiplam have a preference for A (or any nucleotide) at the -4 position.
+
+But notice that most BGA|GT introns happen to also have an A at -4.
+
+Let me plot that for visual clarity:
+
+```{r}
+NucleotideFreqPlotFaceted <- leafcutter.ds.annotated %>%
+  distinct(intron, .keep_all=T) %>%
+  filter(UpstreamOfDonor2BaseSeq == "GA") %>%
+  select(DonorSeq) %>%
+  separate(DonorSeq, into=as.character(c(-4:-1, 1:7)), sep=1:10) %>%
+  mutate(MinusThreePos = if_else(`-3`=="A", "AGA|GT", "BGA|GT")) %>%
+  gather(key="position", value="nucleotide", -MinusThreePos) %>%
+  mutate(position = factor(position, levels=as.character(c(-4:-1, 1:7)))) %>%
+  ggplot(aes(x=position, fill=nucleotide)) + 
+  geom_bar(position="fill") +
+  facet_wrap(~MinusThreePos) +
+  theme_bw()
+NucleotideFreqPlotFaceted
+
+```
+
+
+Hmm, well its admittedly a subtle effect, but it is there: the conditioned on BGA|GT, the most common nucleotide at -4 is A, and the most common at -3 is T...
+
+Jingxin has some more questions via email:
+
+> Hi Ben, 
+Thanks for sharing the data! Very informative. Can you look at ANGA | GT vs BNGA | GT too? It looks like there should be some effects in risdiplam selectivity (attached figure, if you look at the left four subfigures). With this and NAGA | GT vs NBGA | GT analysis at the -3 position, the preference of the two compounds is clear to me.
+
+```{r}
+dat.to.plot <- leafcutter.ds.annotated %>%
+  # filter(p.adjust<0.01) %>%
+  # filter(logef>0) %>%
+  distinct(Intron, .keep_all = T) %>%
+  inner_join(
+    pca.results.splicing$rotation %>%
+    as.data.frame() %>%
+    rownames_to_column("Intron") %>%
+    dplyr::select(Intron, PC2),
+    by="Intron"
+  ) %>%
+  filter(UpstreamOfDonor2BaseSeq == "GA") %>%
+  dplyr::select(intron, PC2, DonorSeq) %>%
+    mutate(
+    `ANGA|GT` = str_detect(DonorSeq, "^A\\wGAGT"),
+    `BNGA|GT` = str_detect(DonorSeq, "^[TGC]\\wGAGT")
+  ) %>%
+  filter_at(vars(-c("intron", "PC2", "DonorSeq")), any_vars(. == T)) %>%
+  gather(key="Pattern", value="IsMatch", -c("intron", "PC2", "DonorSeq")) %>%
+  filter(IsMatch) %>%
+  add_count(Pattern) %>%
+  mutate(Pattern = paste0(Pattern, "; n=", n))
+ggplot(dat.to.plot, aes(x=PC2, color=Pattern)) +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y="ecdf", x="PC2 loading", title="PC2 effect of ANGA|GT vs BNGA|GT")
+```
+
+Ok, to Jingxin's point, there is an difference here. But my interpretation based on the plot where I faceted all 16 NNGA|GT dinucleotides, I think the effect here is driven by the fact that BNGA|GT introns are mostly BAGA|GT introns, whereas ANGA|GT introns are not mostly AAGA|GT introns, and it is the -3A nucleotide that really drives branaplam specific effects when other nucletodies are controlled for.
+
+
+Here is another excerpt from Jingxin:
+
+> I see your point: ATGA|GTAAGT is the most popular combination at the 5’ ss. My counter argument is that I don’t see this in the branaplam selective sequence data. Although ATGA | GTAAGT is the most common at each position, the combination of all positions may be not that common. Specifically, can you check (+4) GA|GTAA vs GA|GTAB, (+5) GA|GTAAG vs GA|GTAAH, (+4 to +6) GA|GTAAGT vs GA|GTA(not the exact combination of AGT), we probably should see some effect here.
+
+Jingxin is getting at that the ATGA|GTAAGT did show stronger PC2 loadings as a group than ATGA|GT. Though, there were only 15ish introns in that group so small sample size limits interpretation. But what Jingxin is getting at is that perhaps those +3 to +6 positions matter. Ok, let's plot all of the requested groups:
+
+```{r}
+dat.to.plot <- leafcutter.ds.annotated %>%
+  distinct(Intron, .keep_all = T) %>%
+  inner_join(
+    pca.results.splicing$rotation %>%
+    as.data.frame() %>%
+    rownames_to_column("Intron") %>%
+    dplyr::select(Intron, PC2),
+    by="Intron"
+  ) %>%
+  filter(UpstreamOfDonor2BaseSeq == "GA") %>%
+  dplyr::select(intron, PC2, DonorSeq) %>%
+    mutate(
+    `GA|GTAA` = str_detect(DonorSeq, "^\\w\\wGAGTAA"),
+    `GA|GTAB` = str_detect(DonorSeq, "^\\w\\wGAGTA[CGT]"),
+    `GA|GTAAG` = str_detect(DonorSeq, "^\\w\\wGAGTAAG"),
+    `GA|GTAAH` = str_detect(DonorSeq, "^\\w\\wGAGTAA[CTA]"),
+    `GA|GTAAGT` = str_detect(DonorSeq, "^\\w\\wGAGTAAGT"),
+    `GA|GTA(!AGT)` = str_detect(DonorSeq, "^\\w\\wGAGTA(?!AGT)"),
+    `GA|GTA` = str_detect(DonorSeq, "^\\w\\wGAGTA")
+  ) %>%
+  filter_at(vars(-c("intron", "PC2", "DonorSeq")), any_vars(. == T)) %>%
+  gather(key="Pattern", value="IsMatch", -c("intron", "PC2", "DonorSeq")) %>%
+  filter(IsMatch) %>%
+  add_count(Pattern) %>%
+  mutate(Pattern = paste0(Pattern, "; n=", n))
+ggplot(dat.to.plot, aes(x=PC2, color=Pattern)) +
+  geom_vline(xintercept = 0, linetype='dashed') +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y="ecdf", x="PC2 loading", title="PC2 effect of based on some +4 to +6 sequences")
+```
+
+
+Ok this is interesting. Maybe there is an effect between G versus not G at the +5 position. Note that this position base pairs with both U1 snRNA during initial spliceosome assembly, and also U6 snRNA during catalysis (See [this figure](https://www.ncbi.nlm.nih.gov/core/lw/2.0/html/tileshop_pmc/tileshop_pmc_inline.html?title=Click%20on%20image%20to%20zoom&p=PMC3&id=2719486_nihms84227f5.jpg)). I wonder if there be some kind of branaplam-specific bulge-repair mechanisms during those later steps of splicing? Really the a better analysis than what I have done would be to look for nucleotide enrichments or MEME to compare affected versus unaffected introns (and limit hits from things that appear just because they are common splice sites). In general it would be nice to do a more unbiased analysis rather than testing all these specific hypothesis. Something like what I did above with this plot:
+
+```{r}
+PerNucleotidePC2Effect +
+  labs(title="MeanPC2 effect based on all introns with N at position X")
+```
+
+For clarity, the way to read this plot is to look at the nucleotide at each position and height of the column is the average PC2 loading based on all introns with the given nucleotide at the given position. So you probably want to compare loading relative to other nucleotides at the same position. For example, C at position +4 sticks out from other nucleotides at position 4. Let's plot the distribution of PC2 loadings as I have been before for introns with or without C at position4:
+
+```{r}
+dat.to.plot <- leafcutter.ds.annotated %>%
+  distinct(Intron, .keep_all = T) %>%
+  inner_join(
+    pca.results.splicing$rotation %>%
+    as.data.frame() %>%
+    rownames_to_column("Intron") %>%
+    dplyr::select(Intron, PC2),
+    by="Intron"
+  ) %>%
+  filter(UpstreamOfDonor2BaseSeq == "GA") %>%
+  dplyr::select(intron, PC2, DonorSeq) %>%
+    mutate(
+    `GA|GNNC` = str_detect(DonorSeq, "^\\w\\w\\w\\w\\w\\w\\wC"),
+    `GA|GNND` = str_detect(DonorSeq, "^\\w\\w\\w\\w\\w\\w\\w[AGT]"),
+  ) %>%
+  filter_at(vars(-c("intron", "PC2", "DonorSeq")), any_vars(. == T)) %>%
+  gather(key="Pattern", value="IsMatch", -c("intron", "PC2", "DonorSeq")) %>%
+  filter(IsMatch) %>%
+  add_count(Pattern) %>%
+  mutate(Pattern = paste0(Pattern, "; n=", n))
+ggplot(dat.to.plot, aes(x=PC2, color=Pattern)) +
+  geom_vline(xintercept = 0, linetype='dashed') +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y="ecdf", x="PC2 loading", title="PC2 effect of based on some C at pos4")
+```
+
+The other obvious problem with the bar plot is that it doesn't take into account sample size. I should come up with a statistical test for this, and then I think it would be a much more useful analysis. That is on my to-do list...
+
+But again, the a different problem with the bar plot analysis is it doesn't really address that nucleotide frequencies are not independent. Experimentally it would be nice to have a reporter for using in some kind of MPRA where we could test all NNNN|GTNNNNNN substrates for different effects in different treatments.
+
+>  A minor question for the nucleotide count figure in your latest email, is the total count from the ~3000 drug sensitive splice sites (already enriched by Branaplam/risdiplam)?
+
+This comment is referring to this plot:
+
+```{r}
+NucleotideFreqPlotFaceted
+```
+
+This plot is based on all introns tested in the fibroblast data). "Tested" just means it passes some minimum level of junction read counts in some number of samples from the fibroblast data. It does not require that there is some significant splicing effect. Here are how many introns are in each group:
+
+```{r}
+#How many introns are in each of the facet sub-plot groups
+leafcutter.ds.annotated %>%
+  distinct(intron, .keep_all=T) %>%
+  filter(UpstreamOfDonor2BaseSeq == "GA") %>%
+  select(DonorSeq) %>%
+  separate(DonorSeq, into=as.character(c(-4:-1, 1:7)), sep=1:10) %>%
+  mutate(MinusThreePos = if_else(`-3`=="A", "AGA|GT", "BGA|GT"))  %>%
+  count(MinusThreePos)
+```
+
+
+Lastly, I wanted to check the dose response curves for all the genes in the excel:
+
+First let's read in the excel that Jingxin shared, then plot all the dose response data...
+
+```{r, fig.width=10, fig.height=10}
+Jingxin.excel <- readxl::read_excel("../data/Risdplam_Branaplam_specific_exons 5'ss.xlsx", skip = 1)
+
+dat %>%
+  cpm(log=F) %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  mutate(gene = recode(gene, !!!ensembl_to_symbols)) %>%
+  filter(gene %in% Jingxin.excel$`Gene name`) %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into=c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  dplyr::select(-sample) %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ "blue",
+    Treatment == "C2C5" ~ "red",
+    Treatment == "Ris" ~ "green")) %>%
+  ggplot(aes(x=TitrationPoint, y=cpm, color=Color)) +
+  geom_line() +
+  scale_color_identity(labels=ColorsTreatments, guide="legend") +
+  scale_x_reverse() +
+  facet_wrap(~gene, scales = "free_y") +
+  labs(title = "dose response of genes of interest") +
+  theme_bw()
+
+```
 

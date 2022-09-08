@@ -2458,13 +2458,88 @@ DE_and_DS_OMIM_Map %>%
   # filter(UpstreamOfDonor2BaseSeq == "AG") %>%
   # filter(IntronType == "Alt 5'ss") %>%
   # filter( sign(logef)==1)
+
+DE_and_DS_OMIM_Map %>%
+  distinct(treatment, Gene, MIM_phenotype, .keep_all = T) %>%
+  filter(treatment == "SM2") %>%
+  filter(ModeInheritence=="GainOfFunction" & IsDownregulate & IsCrypticSplicingSig) %>%
+  # filter(UpstreamOfDonor2BaseSeq == "GA" ) %>%
+  select(Gene, `Preferred Title; symbol`, UpstreamOfDonor2BaseSeq, psi_treatment, intron, logFC)  %>%
+  write_tsv("../output/FibroblastOMIM_GOF_Downregulated_AndCrypticSpliced_GeneList.tsv")
   
 
 ```
 
+Now let's write out some info to help me plot stuff in a useful way with my pygenometracks scripts. More specifically, write out a bash script which I will then run as follows in the next code chunk
 
-Let's 
+```{r, eval=F}
 
-TODO:
+genes.to.plot <- DE_and_DS_OMIM_Map %>%
+  distinct(treatment, Gene, MIM_phenotype, .keep_all = T) %>%
+  filter(treatment == "SM2") %>%
+  filter(ModeInheritence=="GainOfFunction" & IsDownregulate & IsCrypticSplicingSig)
 
-I downloaded the [OMIM](https://www.omim.org) dataset, which is somewhat overlapping from entries in ClinVar, but I notice the OMIM tables occasionally have more information in the form of relevant keywords (like "autosomal recessive") in the condition description. This might be more useful to prioritize the most promising candidates clinical targets. For example, for a condition that is inherited as autosomal dominant, it might be more feasible to treat by downregulateed the affected gene thru activation of cryptic splicing.
+# Method1 for selecting introns to plot sashimi
+leafcutter.ds.annotated %>%
+  distinct(intron, cluster) %>%
+  filter(cluster %in% genes.to.plot$cluster) %>%
+  separate(intron, into=c("chrom", "start", "stop", "cluster2"), sep=":", remove=F, convert=T) %>%
+  select(chrom, start, stop, intron) %>%
+  arrange(chrom, start, stop) %>%
+  write_tsv("../code/scratch/ToPlot.introns.bed")
+
+# Method2 for selecting introns to plot sashimi
+all.samples.5ss <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz", col_names = c("intron", "seq", "score")) %>%
+  mutate(intron = str_replace(intron, "^(.+?)::.+$", "\\1")) %>%
+  separate(intron, into=c("chrom", "start", "stop", "strand"), sep="_", convert=T, remove=F)
+
+all.samples.intron.annotations <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz")
+
+all.samples.PSI <- read_tsv("../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz")
+  
+all.samples.PSI %>%
+  select(1:6) %>%
+  inner_join(all.samples.5ss, by=c("#Chrom"="chrom", "start", "end"="stop", "strand")) %>%
+  inner_join(all.samples.intron.annotations, by=c("#Chrom"="chrom", "start", "end", "strand") ) %>%
+  filter(str_detect(seq, "^\\w{2}GAGT")) %>%
+  filter(gene_names %in% genes.to.plot$Gene) %>%
+  write_tsv("../code/scratch/ToPlot.introns.bed")
+
+# Method1 for plot boundaries
+cluster_boundaries <- leafcutter.ds.annotated %>%
+  distinct(intron, cluster) %>%
+  filter(cluster %in% genes.to.plot$cluster) %>%
+  separate(intron, into=c("chrom", "start", "stop", "cluster2"), sep=":", remove=F, convert=T) %>%
+  group_by(cluster, chrom) %>%
+  summarise(min = min(start) - 5000, max= max(stop)+5000)
+
+genes.to.plot %>%
+  left_join(cluster_boundaries, by="cluster") %>%
+  mutate(cmd = str_glue("python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile <(awk '$1 ~ /_u$/' bigwigs/BigwigList.groups.tsv ) --BigwigList bigwigs/BigwigList.tsv --Normalization WholeGenome --Region {chrom}:{min}-{max} --BigwigListType KeyFile --OutputPrefix scratch/ -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz  --FilterJuncsByBed scratch/ToPlot.introns.bed\npyGenomeTracks --tracks scratch/tracks.ini --out scratch/ForJingxin_{Gene}.png --region {chrom}:{min}-{max} --trackLabelFraction 0.15\n\n")) %>%
+  select(cmd) %>%
+  write.table("../code/testPlottingWithMyScript.ForJingxin.sh", quote=F, row.names = F, col.names = F)
+
+
+#Method2 for plot boundaries
+genes <- read_tsv("../code/scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz", col_names = c("chrom", "start", "stop", "name", "score", "strand", 1:7)) %>%
+  select(1:6)
+
+genes.to.plot %>%
+  left_join(genes, by=c("Gene"="name")) %>%
+  mutate(min=start-1000, max=stop+1000) %>%
+  mutate(cmd = str_glue("python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile <(awk '$1 ~ /_u$/' bigwigs/BigwigList.groups.tsv ) --BigwigList bigwigs/BigwigList.tsv --Normalization WholeGenome --Region {chrom}:{min}-{max} --BigwigListType KeyFile --OutputPrefix scratch/ -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz  --FilterJuncsByBed scratch/ToPlot.introns.bed\npyGenomeTracks --tracks scratch/tracks.ini --out scratch/ForJingxin_{Gene}.png --region {chrom}:{min}-{max} --trackLabelFraction 0.15\n\n")) %>%
+  select(cmd) %>%
+  write.table("../code/testPlottingWithMyScript.ForJingxin.sh", quote=F, row.names = F, col.names = F)
+
+  
+
+```
+
+Run script as follows
+
+```{bash, eval=F}
+conda activate GenometracksByGenotype
+cd ../code
+bash testPlottingWithMyScript.ForJingxin.sh
+```
+

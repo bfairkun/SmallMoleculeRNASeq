@@ -1,0 +1,314 @@
+---
+title: "IdentifyTargetsForVerification"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Intro
+
+Yang shared with me a message from Jingxin:
+
+> 1. We are now designing lots of splicing assays. Previously, Ben provided 9 genes that are related to pathogenic gain-of-function mutations. I believe the analysis is based on our previous fibroblast result. We will need the coordinates of the AS events in these 9 genes. I hope that this can be done before next Tuesday (our next order for DNAs).
+1 AKT3   MEGALENCEPHALY-POLYMICROGYRIA-POLYDACTYLY-HYDROCEPHALUS SYNDROME …
+2 ACVR1  FIBRODYSPLASIA OSSIFICANS PROGRESSIVA; FOP                        
+3 STAT1  IMMUNODEFICIENCY 31C; IMD31C                                      
+4 PDGFRB MYOFIBROMATOSIS, INFANTILE, 1; IMF1                               
+5 RNF170 ATAXIA, SENSORY, 1, AUTOSOMAL DOMINANT; SNAX1                     
+6 PTDSS1 LENZ-MAJEWSKI HYPEROSTOTIC DWARFISM; LMHD                         
+7 KITLG  HYPERPIGMENTATION WITH OR WITHOUT HYPOPIGMENTATION, FAMILIAL PROG…
+8 PIEZO1 DEHYDRATED HEREDITARY STOMATOCYTOSIS 1 WITH OR WITHOUT PSEUDOHYPE…
+9 SNTA1  LONG QT SYNDROME 12; LQT12 
+
+> 2. The most intriguing part of the dose-response (DR) study is the selectivity difference between risdiplam and branaplam. Due to the similarity between risdiplam and C2-C5-1, we can even leave C2-C5-1 out for simplicity. We need a list of more genes that are (a) risdiplam selective and (b) branaplam selective, with complete coordinates. The criteria I can think of are as follows:
+(1) Number of validated reads (leave the low-quality DR curves out).
+(2) EC50 difference. This can be defined by delta Psi at a certain concentration (or an average of a few concentrations).
+(3) Only consider exon inclusion in the presence of drugs.
+
+
+Let's start with point #1. Previously, based on the fibroblast RNA-seq data (cells treated with either A10, C2, CUOME, or SM2), I made a short list of genes that are OMIM genes annotated as gain-of-function or dominant-negative, which also in the RNA-seq are observed to be downregulated by treatment and also contain a detected significantly upregulated unannotated (cryptic 3'ss, or cryptic 5'ss) splice junction. It is not totally clear whether the significant detected upregulated junction is the causal mechanism for downregulation (eg like the poison exon in HTT), or whether the detected intron is a GA|GT intron, etc. To accomplish Jingxin's point number one, I will manually inspect that list of 10 genes, looking for the hypothesized causal splice junction that creates a NMD-target transcript. Here I will show my work on how I go about this:
+
+```{r}
+#load libraries
+library(tidyverse)
+library(edgeR)
+
+#Read in short list of genes
+genes.to.plot <- read_tsv("../output/FibroblastOMIM_GOF_Downregulated_AndCrypticSpliced_GeneList.tsv")
+knitr::kable(genes.to.plot)
+```
+
+First let's confirm a dose-dependent drug response for these genes.
+
+```{r}
+dat <- read_tsv("../code/featureCounts/Counts.titration_series.txt", comment="#") %>%
+  rename_at(vars(-(1:6)), ~str_replace(.x, "Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam", "\\1"))
+
+
+ExpressedGenes.rpkm <- dat %>%
+  dplyr::select(Geneid, everything(), -c(2:6)) %>%
+  column_to_rownames("Geneid") %>%
+  DGEList() %>%
+  calcNormFactors() %>%
+  rpkm(prior.count=0.1, gene.length = dat$Length)
+
+sample.list <- read_tsv("../code/bigwigs/BigwigList.tsv",
+                        col_names = c("SampleName", "bigwig", "group", "strand")) %>%
+  filter(strand==".") %>%
+  mutate(old.sample.name = str_replace(bigwig, "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw", "\\1")) %>%
+  separate(SampleName, into=c("treatment", "dose.nM", "cell.type", "libType", "rep"), convert=T, remove=F) %>%
+  left_join(
+    read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names = c("group", "color", "bed", "supergroup")),
+    by="group"
+  )
+
+gene_list <- read_tsv("../data/Genes.list.txt")
+
+ExpressedGenes.rpkm %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  mutate(gene=str_remove(gene, "\\..+$")) %>%
+  left_join(gene_list, by=c("gene"="ensembl_gene_id")) %>%
+  filter(hgnc_symbol %in% genes.to.plot$Gene) %>%
+  gather("sample", "rpkm", -gene, -hgnc_symbol) %>%
+  inner_join(sample.list, by=c("sample"="old.sample.name")) %>%
+  filter(!is.na(dose.nM)) %>%
+  ggplot(aes(x=dose.nM, y=rpkm, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~hgnc_symbol, scales = "free_y") +
+  theme_bw()
+  
+```
+
+
+Note that some of these don't even really have a dose-dependent response consistent with the fibroblast data from which this short list of genes was derived... For example, all of these genes were in part chosen because they went DOWN in the treatment samples in fibroblast data. In contrast, KITLG seems to go up. Other genes, like PDGFRB and RNF170 don't perhaps are consistent, but they are expressed so low in the LCL data that the dose-response effect is a bit questionable. In any case, for all of these, let's plot the raw coverage data and try to hone in on some causal introns, knowing that it may be impossible to identify for a lot of these genes.
+
+```{r}
+# Read in list of introns detected across all experiments that pass leafcutter's default clustering processing thresholds
+all.samples.5ss <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz", col_names = c("intron", "seq", "score")) %>%
+  mutate(intron = str_replace(intron, "^(.+?)::.+$", "\\1")) %>%
+  separate(intron, into=c("chrom", "start", "stop", "strand"), sep="_", convert=T, remove=F)
+
+all.samples.intron.annotations <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz")
+
+all.samples.PSI <- read_tsv("../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz")
+
+# Write out the splice junctions that are GA|GT introns. I will highlight these in shashimi plots for each of the 10 genes.  
+SpliceJunctionToHighlight <- all.samples.PSI %>%
+  select(1:6) %>%
+  inner_join(all.samples.5ss, by=c("#Chrom"="chrom", "start", "end"="stop", "strand")) %>%
+  inner_join(all.samples.intron.annotations, by=c("#Chrom"="chrom", "start", "end", "strand") ) %>%
+  filter(str_detect(seq, "^\\w{2}GAGT")) %>%
+  filter(gene_names %in% genes.to.plot$Gene)
+SpliceJunctionToHighlight %>%
+  write_tsv("../code/scratch/ToPlot.introns.bed")
+SpliceJunctionToHighlight %>% select(1:4, gene_names) %>%
+  knitr::kable()
+
+# Write out GA|GT splice sites, I will highlight these with a vertical bar
+SpliceJunctionToHighlight %>%
+  mutate(SpliceDonor = case_when(
+    strand == "+" ~ start,
+    strand == "-" ~ end
+  )) %>%
+  mutate(SpliceDonorEnd = SpliceDonor + 1) %>%
+  select(`#Chrom`, SpliceDonor, SpliceDonorEnd) %>%
+  write_tsv("../code/scratch/ToPlot.SpliceDonors.bed")
+
+# write out pygenometracks ini file for GA|GT splice sites track
+fileConn<-file("../code/scratch/ToPlot.SpliceDonors.ini")
+writeLines(c("[vlines]","type = vlines", "file = scratch/ToPlot.SpliceDonors.bed"), con=fileConn)
+close(fileConn)
+
+# Read in list of gene coordinates
+genes <- read_tsv("../code/scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz", col_names = c("chrom", "start", "stop", "name", "score", "strand", 1:7)) %>%
+  select(1:6)
+
+# Write out shell commands that use a helper script of mine for plotting the data nicely.
+genes.to.plot %>%
+  left_join(genes, by=c("Gene"="name")) %>%
+  mutate(min=start-1000, max=stop+1000) %>%
+  mutate(cmd = str_glue("python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile <(awk '$1 ~ /_u$/' bigwigs/BigwigList.groups.tsv ) --BigwigList bigwigs/BigwigList.tsv --Normalization WholeGenome --Region {chrom}:{min}-{max} --BigwigListType KeyFile --OutputPrefix scratch/ -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz  --FilterJuncsByBed scratch/ToPlot.introns.bed\npyGenomeTracks --tracks <(cat scratch/tracks.ini scratch/ToPlot.SpliceDonors.ini) --out ../docs/assets/ForJingxin_{Gene}.png --region {chrom}:{min}-{max} --trackLabelFraction 0.15\n\n")) %>%
+  select(cmd) %>%
+  write.table("../code/testPlottingWithMyScript.ForJingxin.sh", quote=F, row.names = F, col.names = F)
+```
+
+Note that for only 4/10 of these genes could we even reasonably detect any GA|GT splice junctions. For the other 6 genes, the exact mechanism of down-regulation by treatment may not be identifiable from our existing data.
+
+Let's plot the dose-response curves for all these GA|GT splice junctions:
+
+```{r}
+splicing.table <- read_tsv("../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz")
+
+splicing.table %>%
+  inner_join(all.samples.intron.annotations, by=c("#Chrom"="chrom", "start", "end", "strand")) %>%
+  inner_join(all.samples.5ss, by=c("#Chrom"="chrom", "start", "end"="stop", "strand")) %>%
+  filter(gene_names %in% genes.to.plot$Gene) %>%
+  mutate(IsGAGT = str_detect(seq, "^\\w{2}GAGT")) %>%
+  group_by(gid) %>%
+  filter(any(IsGAGT)) %>%
+  ungroup() %>%
+  filter(IsGAGT) %>%
+  mutate(facettitle = paste(junc, gene_names,IsGAGT, sep="\n")) %>%
+  select(-c(1:6)) %>%
+  gather("sample", "PSI", A10_NA_Fibroblast_polyA_1:Branaplam_31.6_LCL_chRNA_3) %>%
+  inner_join(sample.list, by=c("sample"="SampleName")) %>%
+  filter(!is.na(dose.nM)) %>%
+  filter(libType=="polyA" & cell.type=="LCL") %>%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~facettitle, scales = "free_y") +
+  theme_bw()
+
+```
+
+Perhaps the KITLG splice junction is not expressed enough to make an interpretable dose-response curves. But for RNF170, STAT1, and PIEZO1 at least there is one GA|GT junction that does indeed go up in dose-dependent manner... 
+
+Just out of curiosity, let's look across all junctions (including the non-GA|GT) quantified and look for dose-dependent responses. Here the facet titles are the intron coordinates, the host gene, then whether the intron is in an intron cluster with any GA|GT. So basically I am curious if I can find any reliable dose-dependent splicing responses in these genes that aren't due to any detectable GA|GT intron.
+
+```{r, fig.height=15, fig.width=30}
+splicing.table %>%
+  inner_join(all.samples.intron.annotations, by=c("#Chrom"="chrom", "start", "end", "strand")) %>%
+  inner_join(all.samples.5ss, by=c("#Chrom"="chrom", "start", "end"="stop", "strand")) %>%
+  filter(gene_names %in% genes.to.plot$Gene) %>%
+  mutate(IsGAGT = str_detect(seq, "^\\w{2}GAGT")) %>%
+  group_by(gid) %>%
+  mutate(ClusterContainsGAGT = any(IsGAGT)) %>%
+  ungroup() %>%
+  mutate(facettitle = paste(junc, gene_names,ClusterContainsGAGT, sep="\n")) %>%
+  select(-c(1:6)) %>%
+  gather("sample", "PSI", A10_NA_Fibroblast_polyA_1:Branaplam_31.6_LCL_chRNA_3) %>%
+  inner_join(sample.list, by=c("sample"="SampleName")) %>%
+  filter(!is.na(dose.nM)) %>%
+  filter(libType=="polyA" & cell.type=="LCL") %>%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~facettitle, scales = "free_y") +
+  theme_bw()
+```
+
+Out of these 150 or so dose-response curves, the most reliable looking ones are the ones in STAT1 and RNF170 which are involved in a GA|GT-containing splice cluster. So not so much evidence (at least from this limited sample) for direct effects at non GA|GT introns.
+
+In any case, for all 10 genes, let's plot the normalized read coverage across all our experiments, and specifically, for the 4 genes of interest, let's also zoom in on the GA|GT intron of interest...
+
+```{bash, eval=F}
+conda activate GenometracksByGenotype
+cd ../code
+bash testPlottingWithMyScript.ForJingxin.sh
+```
+
+Results in some of the following gene-wise plots... I'm just going to highlight the 4/10 here with any GA|GT introns...
+
+![KITLG](../docs/assets/ForJingxin_KITLG.png)
+![PIEZO1](../docs/assets/ForJingxin_PIEZO1.png)
+![RNF170](../docs/assets/ForJingxin_RNF170.png)
+![STAT1](../docs/assets/ForJingxin_STAT1.png)
+
+Let's zoom in a bit on the introns of interest...
+
+```{r}
+SpliceJunctionToHighlight %>% select(1:4, gene_names) %>%
+  distinct(gene_names, .keep_all=T) %>%
+  mutate(min=start-2000, max=end+2000) %>%
+  mutate(chrom=`#Chrom`) %>%
+  mutate(cmd = str_glue("python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile <(awk '$1 ~ /_u$/' bigwigs/BigwigList.groups.tsv ) --BigwigList bigwigs/BigwigList.tsv --Normalization WholeGenome --Region {chrom}:{min}-{max} --BigwigListType KeyFile --OutputPrefix scratch/ -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz\npyGenomeTracks --tracks <(cat scratch/tracks.ini scratch/ToPlot.SpliceDonors.ini) --out ../docs/assets/ForJingxin_{gene_names}_ZoomInOnIntron.png --region {chrom}:{min}-{max} --trackLabelFraction 0.15\n\n")) %>%
+  select(cmd) %>%
+  write.table("../code/testPlottingWithMyScript.ForJingxin2.sh", quote=F, row.names = F, col.names = F)
+```
+
+...After running that script to plot zoomed in sashimi plots, I get these four images:
+
+- Note that KITLG poison exon seems identifiable in the fibroblast data only, as it seems poorly covered/expressed in the LCL data. So though I can't see a dose-dependent response based on the LCL experiment, it is really obvious from the fibroblast data that I have the poison exon identified
+- The STAT1 poison example is also pretty clear, and note how much more splicing there is of the poison exon in terms of observed PSI upon treatment in the chomatin associated RNA-seq data versus the polyA RNA-seq titration series data (both in LCLs)
+- The PIEZO1 example is a bit confusing. The splice junction of interest does show a dose-dependent response, and it is a GA|GT splice junction, and similar to the STAT1 example, the GA|GT junction is much more spliced in the chRNA compared to the polyA-RNA, consistent with it being an NMD target. Note that this intron is a alt 5'ss (instead of associated with a poison cassette exon) and based on the converage tracks, this junction seems quite rare relative to the transcript expression.
+-RNF170 example also contains only one detected GA|GT junction but it is not associated with a novel cassette exon but rather an alt 5'ss within an exon. However, it is not clear that it is used an any appreciable rate that is could point to it being the causal mechanism for the dose-dependent gene response. However, the splicing for one GA|GT does indeed follow a dose-dependent pattern, so maybe it is right.
+
+
+Finally, let's write out these relevant junctions coordinates for Jingxin. First to hone in on the correct junction coordinates, let me replot all of the dose response curves for clusters that contain a GA|GT intron in these 4 genes...
+
+```{r}
+splicing.table %>%
+  inner_join(all.samples.intron.annotations, by=c("#Chrom"="chrom", "start", "end", "strand")) %>%
+  inner_join(all.samples.5ss, by=c("#Chrom"="chrom", "start", "end"="stop", "strand")) %>%
+  filter(gene_names %in% c("KITLG", "STAT1", "PIEZO1", "RNF170")) %>%
+  mutate(IsGAGT = str_detect(seq, "^\\w{2}GAGT")) %>%
+  group_by(gid) %>%
+  mutate(ClusterContainsGAGT = any(IsGAGT)) %>%
+  ungroup() %>%
+  filter(ClusterContainsGAGT) %>%
+  mutate(facettitle = paste(junc, gene_names,IsGAGT, sep="\n")) %>%
+  select(-c(1:6)) %>%
+  gather("sample", "PSI", A10_NA_Fibroblast_polyA_1:Branaplam_31.6_LCL_chRNA_3) %>%
+  inner_join(sample.list, by=c("sample"="SampleName")) %>%
+  filter(!is.na(dose.nM)) %>%
+  filter(libType=="polyA" & cell.type=="LCL") %>%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~facettitle, scales = "free_y") +
+  theme_bw() +
+  theme(strip.text.x = element_text(size = 7))
+
+
+
+```
+
+Based on manual inspection, let's replot, highlighting just the introns involved that Jingxin probably would want coordinates for:
+
+```{r}
+splicing.table %>%
+  inner_join(all.samples.intron.annotations, by=c("#Chrom"="chrom", "start", "end", "strand")) %>%
+  inner_join(all.samples.5ss, by=c("#Chrom"="chrom", "start", "end"="stop", "strand")) %>%
+  filter(gene_names %in% c("KITLG", "STAT1", "PIEZO1", "RNF170")) %>%
+  mutate(IsGAGT = str_detect(seq, "^\\w{2}GAGT")) %>%
+  group_by(gid) %>%
+  mutate(ClusterContainsGAGT = any(IsGAGT)) %>%
+  ungroup() %>%
+  filter(ClusterContainsGAGT) %>%
+  mutate(IntronType = recode(anchor, A="Alt 5'ss", D="Alt 3'ss", DA="Annotated", N="New Intron", NDA="New Splice Site combination")) %>%
+  select(-c("A10_NA_Fibroblast_polyA_1":"Branaplam_31.6_LCL_chRNA_3")) %>%
+  select(junc, gene_names, IsGAGT, IntronType)
+
+# Based on the dose response curves and which introns are GAGT and manual inspection, I will note these introns:
+JuncstionsToNote <- c("chr16:88720532:88720616:clu_30902_-", "chr16:88720532:88720660:clu_30902_-",
+                      "chr2:190977025:190978528:clu_5141_-", "chr2:190978606:190978856:clu_5141_-", "chr2:190977025:190978856:clu_5141_-",
+                      "chr8:42874006:42887802:clu_16606_-", "chr8:42874006:42887728:clu_16606_-",
+                      "chr12:88516490:88518195:clu_23943_-", "chr12:88518308:88518697:clu_23943_-", "chr12:88516490:88518697:clu_23943_-")
+
+splicing.table %>%
+  inner_join(all.samples.intron.annotations, by=c("#Chrom"="chrom", "start", "end", "strand")) %>%
+  inner_join(all.samples.5ss, by=c("#Chrom"="chrom", "start", "end"="stop", "strand")) %>%
+  filter(gene_names %in% c("KITLG", "STAT1", "PIEZO1", "RNF170")) %>%
+  mutate(IsGAGT = str_detect(seq, "^\\w{2}GAGT")) %>%
+  mutate(IntronType = recode(anchor, A="Alt 5'ss", D="Alt 3'ss", DA="Annotated", N="New Intron", NDA="New Splice Site combination")) %>%
+  mutate(facettitle = paste(junc, gene_names,IsGAGT, IntronType, sep="\n")) %>%
+  filter(junc %in% JuncstionsToNote) %>%
+  select(-c(1:6)) %>%
+  gather("sample", "PSI", A10_NA_Fibroblast_polyA_1:Branaplam_31.6_LCL_chRNA_3) %>%
+  inner_join(sample.list, by=c("sample"="SampleName")) %>%
+  filter(!is.na(dose.nM)) %>%
+  filter(libType=="polyA" & cell.type=="LCL") %>%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~facettitle, scales = "free_y") +
+  theme_bw() +
+  theme(strip.text.x = element_text(size = 5))
+
+splicing.table %>%
+  inner_join(all.samples.intron.annotations, by=c("#Chrom"="chrom", "start", "end", "strand")) %>%
+  inner_join(all.samples.5ss, by=c("#Chrom"="chrom", "start", "end"="stop", "strand")) %>%
+  filter(junc %in% JuncstionsToNote) %>%
+  mutate(IsGAGT = str_detect(seq, "^\\w{2}GAGT")) %>%
+  mutate(IntronType = recode(anchor, A="Alt 5'ss", D="Alt 3'ss", DA="Annotated", N="New Intron", NDA="New Splice Site combination")) %>%
+  select(-c("A10_NA_Fibroblast_polyA_1":"Branaplam_31.6_LCL_chRNA_3")) %>%
+  select(junc, gene_names, IsGAGT, IntronType) %>%
+  knitr::kable()
+```
+
+Ok, so I am done with point number1 in Jingxin's request. I will address point number 2 in a new notebook...

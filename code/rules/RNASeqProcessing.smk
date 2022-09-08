@@ -79,6 +79,7 @@ rule ExtractJuncs:
         cat {output.junc} > {output.junc_autosomes}
         """
 
+
 rule make_leafcutter_juncfile:
     input:
         expand ("SplicingAnalysis/leafcutter/juncfiles/autosomes/{sample}.junc",sample=samples.index),
@@ -98,6 +99,12 @@ rule make_leafcutter_juncfile:
                 if samplename not in  SamplesToRemove:
                     out.write(filepath + '\n')
 
+use rule make_leafcutter_juncfile as make_leafcutter_juncfile_all with:
+    input:
+        expand ("SplicingAnalysis/leafcutter/juncfiles/autosomes/{sample}.junc",sample=AllSamples),
+    output:
+        "SplicingAnalysis/leafcutter_all_samples/juncfilelist.txt"
+
 rule leafcutter_cluster:
     input:
         juncs = expand ("SplicingAnalysis/leafcutter/juncfiles/autosomes/{sample}.junc",sample=samples.index),
@@ -116,6 +123,22 @@ rule leafcutter_cluster:
         """
         python scripts/leafcutter_cluster_regtools_py3.py -j {input.juncfile_list} {params} &> {log}
         """
+
+
+use rule leafcutter_cluster as leafcutter_cluster_all with:
+    input:
+        juncs = expand ("SplicingAnalysis/leafcutter/juncfiles/autosomes/{sample}.junc",sample=AllSamples),
+        juncfile_list = "SplicingAnalysis/leafcutter_all_samples/juncfilelist.txt"
+    output:
+        "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind.counts.gz",
+        "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numers.counts.gz"
+    params:
+        "-r SplicingAnalysis/leafcutter_all_samples/"
+    log:
+        "logs/leafcutter_cluster_all.log"
+    output:
+        "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind.counts.gz",
+        "SplicingAnalysis/leafcutter_all_samples/autosomes/leafcutter_perind_numers.counts.gz"
 
 rule MakeGroupsFiles:
     output:
@@ -147,9 +170,43 @@ rule annotate_juncfiles:
         "../envs/regtools.yml"
     shell:
         """
-        cat {input.juncs} | bedtools sort -i - > {output.junc_file_concat}
+        cat {input.juncs} | sort | uniq | bedtools sort -i - > {output.junc_file_concat}
         (regtools junctions annotate {output.junc_file_concat} {input.fa} {input.basic_gtf} | gzip - > {output.basic} ) &> {log}
         (regtools junctions annotate {output.junc_file_concat} {input.fa} {input.Comprehensive_gtf} | gzip - > {output.comprehensive} ) &>> log
+        """
+
+rule collapse_juncfiles_allsamples:
+    """
+    In preparation for regtools annotate using a juncfile with just one line for each unique junction among all junctions discovered across all samples
+    """
+    input:
+        juncs = expand ("SplicingAnalysis/leafcutter/juncfiles/autosomes/{sample}.junc",sample=AllSamples),
+    output:
+        "SplicingAnalysis/FullSpliceSiteAnnotations/ALL_SAMPLES.junc"
+    conda:
+        "../envs/r_essentials.yml"
+    shell:
+        """
+        Rscript scripts/Collapse_Juncfiles.R
+        """
+
+rule annotate_juncfiles_allsamples:
+    input:
+        fa = "/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Fasta/GRCh38.primary_assembly.genome.fa",
+        Comprehensive_gtf = "/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Annotations/gencode.v34.chromasomal.annotation.gtf",
+        basic_gtf = "/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Annotations/gencode.v34.chromasomal.basic.annotation.gtf",
+        juncs = "SplicingAnalysis/FullSpliceSiteAnnotations/ALL_SAMPLES.junc"
+    output:
+        basic = "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz",
+        comprehensive = "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.comprehensive.bed.gz"
+    log:
+        "logs/annotate_juncfiles_allsamples.log"
+    conda:
+        "../envs/regtools.yml"
+    shell:
+        """
+        (regtools junctions annotate {input.juncs} {input.fa} {input.basic_gtf} | gzip - > {output.basic} ) &> {log}
+        (regtools junctions annotate {input.juncs} {input.fa} {input.Comprehensive_gtf} | gzip - > {output.comprehensive} ) &>> log
         """
 
 rule Get5ssSeqs:
@@ -166,6 +223,13 @@ rule Get5ssSeqs:
         zcat {input.basic} | awk -v OFS='\\t' -F'\\t' 'NR>1 {{print $1, $2, $3, $1"_"$2"_"$3"_"$6, ".", $6}}' | sort -u | awk -v OFS='\\t' -F'\\t'  '$6=="+" {{$2=$2-4; $3=$2+11; print $0}} $6=="-" {{$3=$3+3; $2=$3-11; print $0}}' | bedtools getfasta -tab -bed - -s -name -fi {input.fa} | grep -v 'N' > {output}
         """
 
+use rule Get5ssSeqs as Get5ssSeqs_allsamples with:
+    input:
+        basic = "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz",
+        fa = "/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Fasta/GRCh38.primary_assembly.genome.fa",
+    output:
+        temp("SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab")
+
 rule Score5ss:
     input:
         "SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.5ss.tab"
@@ -178,6 +242,15 @@ rule Score5ss:
         """
         python scripts/ScorePWM.py {input} {output.Tab} {output.WeblogoImg}
         """
+
+use rule Score5ss as Score5ss_allsamples with:
+    input:
+        "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab"
+    output:
+        Tab = "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz",
+        WeblogoImg = "../docs/assets/5ssPWM.allsamples..png"
+    conda:
+        "../envs/biopython.yml"
 
 rule leafcutter_ds:
     input:

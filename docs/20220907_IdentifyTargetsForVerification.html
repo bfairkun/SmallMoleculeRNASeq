@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>IdentifyTargetsForVerification</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">small molecular splicing RNA-seq</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">IdentifyTargetsForVerification</h1>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#intro">Intro</a></li>
+</ul>
+</div>
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-09-08
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 2
+</p>
+<p>
+<strong>Knit directory:</strong> <code>20211209_JingxinRNAseq/analysis/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed19900924code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(19900924)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed19900924code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(19900924)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+</p>
+</div>
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it difficult for you and others to run your code on a different machine. Change the absolute path(s) below to the suggested relative path(s) to make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw
+</td>
+<td style="text-align:left;">
+../code/bigwigs/unstranded/(.+?).bw
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreedb9a4f02945a058f7c991284a3c04d3f0b005ed5targetblankdb9a4f0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/db9a4f02945a058f7c991284a3c04d3f0b005ed5" target="_blank">db9a4f0</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreedb9a4f02945a058f7c991284a3c04d3f0b005ed5targetblankdb9a4f0a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/db9a4f02945a058f7c991284a3c04d3f0b005ed5" target="_blank">db9a4f0</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    ._.DS_Store
+    Ignored:    analysis/.RData
+    Ignored:    analysis/.Rhistory
+    Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    code/.DS_Store
+    Ignored:    code/._.DS_Store
+    Ignored:    code/._DOCK7.pdf
+    Ignored:    code/._DOCK7_DMSO1.pdf
+    Ignored:    code/._DOCK7_SM2_1.pdf
+    Ignored:    code/._FKTN_DMSO_1.pdf
+    Ignored:    code/._FKTN_SM2_1.pdf
+    Ignored:    code/._MAPT.pdf
+    Ignored:    code/._PKD1_DMSO_1.pdf
+    Ignored:    code/._PKD1_SM2_1.pdf
+    Ignored:    code/.snakemake/
+    Ignored:    code/5ssSeqs.tab
+    Ignored:    code/Alignments/
+    Ignored:    code/ChemCLIP/
+    Ignored:    code/ClinVar/
+    Ignored:    code/DE_testing/
+    Ignored:    code/DE_tests.mat.counts.gz
+    Ignored:    code/DE_tests.txt.gz
+    Ignored:    code/Fastq/
+    Ignored:    code/FastqFastp/
+    Ignored:    code/FragLenths/
+    Ignored:    code/Meme/
+    Ignored:    code/Multiqc/
+    Ignored:    code/OMIM/
+    Ignored:    code/OldBigWigs/
+    Ignored:    code/QC/
+    Ignored:    code/Session.vim
+    Ignored:    code/SplicingAnalysis/
+    Ignored:    code/TracksSession
+    Ignored:    code/bigwigs/
+    Ignored:    code/featureCounts/
+    Ignored:    code/geena/
+    Ignored:    code/igv_session.template.xml
+    Ignored:    code/igv_session.xml
+    Ignored:    code/log
+    Ignored:    code/logs/
+    Ignored:    code/scratch/
+    Ignored:    code/scripts/.DS_Store
+    Ignored:    code/test.txt.gz
+    Ignored:    code/testPlottingWithMyScript.ForJingxin.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin2.sh
+    Ignored:    code/testPlottingWithMyScript.sh
+    Ignored:    data/._Hijikata_TableS1_41598_2017_8902_MOESM2_ESM.xls
+    Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
+    Ignored:    output/._PioritizedIntronTargets.pdf
+
+Untracked files:
+    Untracked:  analysis/20220804_MakeBigwigListTsv.Rmd
+    Untracked:  analysis/20220809_geena.Rmd
+    Untracked:  analysis/20220822_Check_chRNA.Rmd
+    Untracked:  analysis/20220907_IdentifyTargetsForVerification.Rmd
+    Untracked:  code/scripts/Collapse_Juncfiles.R
+    Untracked:  data/Hijikata_Table2_combined.csv
+    Untracked:  data/Risdplam_Branaplam_specific_exons 5'ss.xlsx
+    Untracked:  output/FibroblastOMIM_GOF_Downregulated_AndCrypticSpliced_GeneList.tsv
+
+Unstaged changes:
+    Modified:   analysis/20211216_DifferentialSplicing.Rmd
+    Modified:   analysis/20220629_FirstGlanceTitrationSeries.Rmd
+    Modified:   analysis/20220712_FitDoseResponseModels.Rmd
+    Modified:   analysis/20220726_Check_chRNATestSeq.Rmd
+    Modified:   code/Snakefile
+    Modified:   code/config/config.yaml
+    Modified:   code/config/samples.chRNAPilotSequencing.tsv
+    Modified:   code/rules/Process_chRNA.smk
+    Modified:   code/rules/RNASeqProcessing.smk
+    Modified:   code/rules/common.smk
+    Modified:   code/scripts/GenometracksByGenotype
+    Modified:   output/QC/ReadCountsAndJunctionsPerSamples.tsv
+
+Staged changes:
+    Modified:   .gitmodules
+    New:        code/scripts/GenometracksByGenotype
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>Yang shared with me a message from Jingxin:</p>
+<blockquote>
+<ol style="list-style-type: decimal">
+<li>We are now designing lots of splicing assays. Previously, Ben provided 9 genes that are related to pathogenic gain-of-function mutations. I believe the analysis is based on our previous fibroblast result. We will need the coordinates of the AS events in these 9 genes. I hope that this can be done before next Tuesday (our next order for DNAs). 1 AKT3 MEGALENCEPHALY-POLYMICROGYRIA-POLYDACTYLY-HYDROCEPHALUS SYNDROME … 2 ACVR1 FIBRODYSPLASIA OSSIFICANS PROGRESSIVA; FOP<br />
+3 STAT1 IMMUNODEFICIENCY 31C; IMD31C<br />
+4 PDGFRB MYOFIBROMATOSIS, INFANTILE, 1; IMF1<br />
+5 RNF170 ATAXIA, SENSORY, 1, AUTOSOMAL DOMINANT; SNAX1<br />
+6 PTDSS1 LENZ-MAJEWSKI HYPEROSTOTIC DWARFISM; LMHD<br />
+7 KITLG HYPERPIGMENTATION WITH OR WITHOUT HYPOPIGMENTATION, FAMILIAL PROG… 8 PIEZO1 DEHYDRATED HEREDITARY STOMATOCYTOSIS 1 WITH OR WITHOUT PSEUDOHYPE… 9 SNTA1 LONG QT SYNDROME 12; LQT12</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2" style="list-style-type: decimal">
+<li>The most intriguing part of the dose-response (DR) study is the selectivity difference between risdiplam and branaplam. Due to the similarity between risdiplam and C2-C5-1, we can even leave C2-C5-1 out for simplicity. We need a list of more genes that are (a) risdiplam selective and (b) branaplam selective, with complete coordinates. The criteria I can think of are as follows:</li>
+</ol>
+<ol style="list-style-type: decimal">
+<li>Number of validated reads (leave the low-quality DR curves out).</li>
+<li>EC50 difference. This can be defined by delta Psi at a certain concentration (or an average of a few concentrations).</li>
+<li>Only consider exon inclusion in the presence of drugs.</li>
+</ol>
+</blockquote>
+<p>Let’s start with point #1. Previously, based on the fibroblast RNA-seq data (cells treated with either A10, C2, CUOME, or SM2), I made a short list of genes that are OMIM genes annotated as gain-of-function or dominant-negative, which also in the RNA-seq are observed to be downregulated by treatment and also contain a detected significantly upregulated unannotated (cryptic 3’ss, or cryptic 5’ss) splice junction. It is not totally clear whether the significant detected upregulated junction is the causal mechanism for downregulation (eg like the poison exon in HTT), or whether the detected intron is a GA|GT intron, etc. To accomplish Jingxin’s point number one, I will manually inspect that list of 10 genes, looking for the hypothesized causal splice junction that creates a NMD-target transcript. Here I will show my work on how I go about this:</p>
+<pre class="r"><code>#load libraries
+library(tidyverse)
+library(edgeR)
+
+#Read in short list of genes
+genes.to.plot &lt;- read_tsv(&quot;../output/FibroblastOMIM_GOF_Downregulated_AndCrypticSpliced_GeneList.tsv&quot;)
+knitr::kable(genes.to.plot)</code></pre>
+<table>
+<colgroup>
+<col width="3%" />
+<col width="51%" />
+<col width="12%" />
+<col width="7%" />
+<col width="18%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Gene</th>
+<th align="left">Preferred Title; symbol</th>
+<th align="left">UpstreamOfDonor2BaseSeq</th>
+<th align="right">psi_treatment</th>
+<th align="left">intron</th>
+<th align="right">logFC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AKT3</td>
+<td align="left">MEGALENCEPHALY-POLYMICROGYRIA-POLYDACTYLY-HYDROCEPHALUS SYNDROME 2; MPPH2</td>
+<td align="left">AG</td>
+<td align="right">0.0756435</td>
+<td align="left">chr1:243545028:243545510:clu_1364_-</td>
+<td align="right">-0.9947345</td>
+</tr>
+<tr class="even">
+<td align="left">ACVR1</td>
+<td align="left">FIBRODYSPLASIA OSSIFICANS PROGRESSIVA; FOP</td>
+<td align="left">AT</td>
+<td align="right">0.1008161</td>
+<td align="left">chr2:157774187:157774275:clu_3398_-</td>
+<td align="right">-1.4052270</td>
+</tr>
+<tr class="odd">
+<td align="left">STAT1</td>
+<td align="left">IMMUNODEFICIENCY 31C; IMD31C</td>
+<td align="left">AG</td>
+<td align="right">0.1767480</td>
+<td align="left">chr2:190974932:190975310:clu_3511_-</td>
+<td align="right">-3.7853949</td>
+</tr>
+<tr class="even">
+<td align="left">PDGFRB</td>
+<td align="left">MYOFIBROMATOSIS, INFANTILE, 1; IMF1</td>
+<td align="left">TG</td>
+<td align="right">0.0325590</td>
+<td align="left">chr5:150137053:150137400:clu_8376_-</td>
+<td align="right">-0.6589689</td>
+</tr>
+<tr class="odd">
+<td align="left">RNF170</td>
+<td align="left">ATAXIA, SENSORY, 1, AUTOSOMAL DOMINANT; SNAX1</td>
+<td align="left">GA</td>
+<td align="right">0.0265984</td>
+<td align="left">chr8:42874006:42887802:clu_11248_-</td>
+<td align="right">-0.7246948</td>
+</tr>
+<tr class="even">
+<td align="left">PTDSS1</td>
+<td align="left">LENZ-MAJEWSKI HYPEROSTOTIC DWARFISM; LMHD</td>
+<td align="left">AG</td>
+<td align="right">0.0862211</td>
+<td align="left">chr8:96331095:96331377:clu_11937_+</td>
+<td align="right">-0.9047179</td>
+</tr>
+<tr class="odd">
+<td align="left">KITLG</td>
+<td align="left">HYPERPIGMENTATION WITH OR WITHOUT HYPOPIGMENTATION, FAMILIAL PROGRESSIVE; FPHH</td>
+<td align="left">AG</td>
+<td align="right">0.1110230</td>
+<td align="left">chr12:88497181:88503848:clu_16317_-</td>
+<td align="right">-1.0638706</td>
+</tr>
+<tr class="even">
+<td align="left">PIEZO1</td>
+<td align="left">DEHYDRATED HEREDITARY STOMATOCYTOSIS 1 WITH OR WITHOUT PSEUDOHYPERKALEMIA AND/OR PERINATAL EDEMA; DHS1</td>
+<td align="left">GT</td>
+<td align="right">0.0130891</td>
+<td align="left">chr16:88716252:88716361:clu_21073_-</td>
+<td align="right">-1.0658404</td>
+</tr>
+<tr class="odd">
+<td align="left">SNTA1</td>
+<td align="left">LONG QT SYNDROME 12; LQT12</td>
+<td align="left">TG</td>
+<td align="right">0.0840857</td>
+<td align="left">chr20:33408888:33410103:clu_25106_-</td>
+<td align="right">-0.5575608</td>
+</tr>
+</tbody>
+</table>
+<p>First let’s confirm a dose-dependent drug response for these genes.</p>
+<pre class="r"><code>dat &lt;- read_tsv(&quot;../code/featureCounts/Counts.titration_series.txt&quot;, comment=&quot;#&quot;) %&gt;%
+  rename_at(vars(-(1:6)), ~str_replace(.x, &quot;Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam&quot;, &quot;\\1&quot;))
+
+
+ExpressedGenes.rpkm &lt;- dat %&gt;%
+  dplyr::select(Geneid, everything(), -c(2:6)) %&gt;%
+  column_to_rownames(&quot;Geneid&quot;) %&gt;%
+  DGEList() %&gt;%
+  calcNormFactors() %&gt;%
+  rpkm(prior.count=0.1, gene.length = dat$Length)
+
+sample.list &lt;- read_tsv(&quot;../code/bigwigs/BigwigList.tsv&quot;,
+                        col_names = c(&quot;SampleName&quot;, &quot;bigwig&quot;, &quot;group&quot;, &quot;strand&quot;)) %&gt;%
+  filter(strand==&quot;.&quot;) %&gt;%
+  mutate(old.sample.name = str_replace(bigwig, &quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw&quot;, &quot;\\1&quot;)) %&gt;%
+  separate(SampleName, into=c(&quot;treatment&quot;, &quot;dose.nM&quot;, &quot;cell.type&quot;, &quot;libType&quot;, &quot;rep&quot;), convert=T, remove=F) %&gt;%
+  left_join(
+    read_tsv(&quot;../code/bigwigs/BigwigList.groups.tsv&quot;, col_names = c(&quot;group&quot;, &quot;color&quot;, &quot;bed&quot;, &quot;supergroup&quot;)),
+    by=&quot;group&quot;
+  )
+
+gene_list &lt;- read_tsv(&quot;../data/Genes.list.txt&quot;)
+
+ExpressedGenes.rpkm %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;gene&quot;) %&gt;%
+  mutate(gene=str_remove(gene, &quot;\\..+$&quot;)) %&gt;%
+  left_join(gene_list, by=c(&quot;gene&quot;=&quot;ensembl_gene_id&quot;)) %&gt;%
+  filter(hgnc_symbol %in% genes.to.plot$Gene) %&gt;%
+  gather(&quot;sample&quot;, &quot;rpkm&quot;, -gene, -hgnc_symbol) %&gt;%
+  inner_join(sample.list, by=c(&quot;sample&quot;=&quot;old.sample.name&quot;)) %&gt;%
+  filter(!is.na(dose.nM)) %&gt;%
+  ggplot(aes(x=dose.nM, y=rpkm, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~hgnc_symbol, scales = &quot;free_y&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Note that some of these don’t even really have a dose-dependent response consistent with the fibroblast data from which this short list of genes was derived… For example, all of these genes were in part chosen because they went DOWN in the treatment samples in fibroblast data. In contrast, KITLG seems to go up. Other genes, like PDGFRB and RNF170 don’t perhaps are consistent, but they are expressed so low in the LCL data that the dose-response effect is a bit questionable. In any case, for all of these, let’s plot the raw coverage data and try to hone in on some causal introns, knowing that it may be impossible to identify for a lot of these genes.</p>
+<pre class="r"><code># Read in list of introns detected across all experiments that pass leafcutter&#39;s default clustering processing thresholds
+all.samples.5ss &lt;- read_tsv(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz&quot;, col_names = c(&quot;intron&quot;, &quot;seq&quot;, &quot;score&quot;)) %&gt;%
+  mutate(intron = str_replace(intron, &quot;^(.+?)::.+$&quot;, &quot;\\1&quot;)) %&gt;%
+  separate(intron, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;strand&quot;), sep=&quot;_&quot;, convert=T, remove=F)
+
+all.samples.intron.annotations &lt;- read_tsv(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz&quot;)
+
+all.samples.PSI &lt;- read_tsv(&quot;../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz&quot;)
+
+# Write out the splice junctions that are GA|GT introns. I will highlight these in shashimi plots for each of the 10 genes.  
+SpliceJunctionToHighlight &lt;- all.samples.PSI %&gt;%
+  select(1:6) %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;) ) %&gt;%
+  filter(str_detect(seq, &quot;^\\w{2}GAGT&quot;)) %&gt;%
+  filter(gene_names %in% genes.to.plot$Gene)
+SpliceJunctionToHighlight %&gt;%
+  write_tsv(&quot;../code/scratch/ToPlot.introns.bed&quot;)
+SpliceJunctionToHighlight %&gt;% select(1:4, gene_names) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">#Chrom</th>
+<th align="right">start</th>
+<th align="right">end</th>
+<th align="left">junc</th>
+<th align="left">gene_names</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">chr12</td>
+<td align="right">88516490</td>
+<td align="right">88518195</td>
+<td align="left">chr12:88516490:88518195:clu_23943_-</td>
+<td align="left">KITLG</td>
+</tr>
+<tr class="even">
+<td align="left">chr16</td>
+<td align="right">88720532</td>
+<td align="right">88720660</td>
+<td align="left">chr16:88720532:88720660:clu_30902_-</td>
+<td align="left">PIEZO1</td>
+</tr>
+<tr class="odd">
+<td align="left">chr2</td>
+<td align="right">190977025</td>
+<td align="right">190978528</td>
+<td align="left">chr2:190977025:190978528:clu_5141_-</td>
+<td align="left">STAT1</td>
+</tr>
+<tr class="even">
+<td align="left">chr2</td>
+<td align="right">191010004</td>
+<td align="right">191014018</td>
+<td align="left">chr2:191010004:191014018:clu_5142_-</td>
+<td align="left">STAT1</td>
+</tr>
+<tr class="odd">
+<td align="left">chr2</td>
+<td align="right">191013678</td>
+<td align="right">191014018</td>
+<td align="left">chr2:191013678:191014018:clu_5142_-</td>
+<td align="left">STAT1</td>
+</tr>
+<tr class="even">
+<td align="left">chr8</td>
+<td align="right">42874006</td>
+<td align="right">42887802</td>
+<td align="left">chr8:42874006:42887802:clu_16606_-</td>
+<td align="left">RNF170</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># Write out GA|GT splice sites, I will highlight these with a vertical bar
+SpliceJunctionToHighlight %&gt;%
+  mutate(SpliceDonor = case_when(
+    strand == &quot;+&quot; ~ start,
+    strand == &quot;-&quot; ~ end
+  )) %&gt;%
+  mutate(SpliceDonorEnd = SpliceDonor + 1) %&gt;%
+  select(`#Chrom`, SpliceDonor, SpliceDonorEnd) %&gt;%
+  write_tsv(&quot;../code/scratch/ToPlot.SpliceDonors.bed&quot;)
+
+# write out pygenometracks ini file for GA|GT splice sites track
+fileConn&lt;-file(&quot;../code/scratch/ToPlot.SpliceDonors.ini&quot;)
+writeLines(c(&quot;[vlines]&quot;,&quot;type = vlines&quot;, &quot;file = scratch/ToPlot.SpliceDonors.bed&quot;), con=fileConn)
+close(fileConn)
+
+# Read in list of gene coordinates
+genes &lt;- read_tsv(&quot;../code/scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz&quot;, col_names = c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;name&quot;, &quot;score&quot;, &quot;strand&quot;, 1:7)) %&gt;%
+  select(1:6)
+
+# Write out shell commands that use a helper script of mine for plotting the data nicely.
+genes.to.plot %&gt;%
+  left_join(genes, by=c(&quot;Gene&quot;=&quot;name&quot;)) %&gt;%
+  mutate(min=start-1000, max=stop+1000) %&gt;%
+  mutate(cmd = str_glue(&quot;python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile &lt;(awk &#39;$1 ~ /_u$/&#39; bigwigs/BigwigList.groups.tsv ) --BigwigList bigwigs/BigwigList.tsv --Normalization WholeGenome --Region {chrom}:{min}-{max} --BigwigListType KeyFile --OutputPrefix scratch/ -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz  --FilterJuncsByBed scratch/ToPlot.introns.bed\npyGenomeTracks --tracks &lt;(cat scratch/tracks.ini scratch/ToPlot.SpliceDonors.ini) --out ../docs/assets/ForJingxin_{Gene}.png --region {chrom}:{min}-{max} --trackLabelFraction 0.15\n\n&quot;)) %&gt;%
+  select(cmd) %&gt;%
+  write.table(&quot;../code/testPlottingWithMyScript.ForJingxin.sh&quot;, quote=F, row.names = F, col.names = F)</code></pre>
+<p>Note that for only 4/10 of these genes could we even reasonably detect any GA|GT splice junctions. For the other 6 genes, the exact mechanism of down-regulation by treatment may not be identifiable from our existing data.</p>
+<p>Let’s plot the dose-response curves for all these GA|GT splice junctions:</p>
+<pre class="r"><code>splicing.table &lt;- read_tsv(&quot;../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz&quot;)
+
+splicing.table %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  filter(gene_names %in% genes.to.plot$Gene) %&gt;%
+  mutate(IsGAGT = str_detect(seq, &quot;^\\w{2}GAGT&quot;)) %&gt;%
+  group_by(gid) %&gt;%
+  filter(any(IsGAGT)) %&gt;%
+  ungroup() %&gt;%
+  filter(IsGAGT) %&gt;%
+  mutate(facettitle = paste(junc, gene_names,IsGAGT, sep=&quot;\n&quot;)) %&gt;%
+  select(-c(1:6)) %&gt;%
+  gather(&quot;sample&quot;, &quot;PSI&quot;, A10_NA_Fibroblast_polyA_1:Branaplam_31.6_LCL_chRNA_3) %&gt;%
+  inner_join(sample.list, by=c(&quot;sample&quot;=&quot;SampleName&quot;)) %&gt;%
+  filter(!is.na(dose.nM)) %&gt;%
+  filter(libType==&quot;polyA&quot; &amp; cell.type==&quot;LCL&quot;) %&gt;%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~facettitle, scales = &quot;free_y&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Perhaps the KITLG splice junction is not expressed enough to make an interpretable dose-response curves. But for RNF170, STAT1, and PIEZO1 at least there is one GA|GT junction that does indeed go up in dose-dependent manner…</p>
+<p>Just out of curiosity, let’s look across all junctions (including the non-GA|GT) quantified and look for dose-dependent responses. Here the facet titles are the intron coordinates, the host gene, then whether the intron is in an intron cluster with any GA|GT. So basically I am curious if I can find any reliable dose-dependent splicing responses in these genes that aren’t due to any detectable GA|GT intron.</p>
+<pre class="r"><code>splicing.table %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  filter(gene_names %in% genes.to.plot$Gene) %&gt;%
+  mutate(IsGAGT = str_detect(seq, &quot;^\\w{2}GAGT&quot;)) %&gt;%
+  group_by(gid) %&gt;%
+  mutate(ClusterContainsGAGT = any(IsGAGT)) %&gt;%
+  ungroup() %&gt;%
+  mutate(facettitle = paste(junc, gene_names,ClusterContainsGAGT, sep=&quot;\n&quot;)) %&gt;%
+  select(-c(1:6)) %&gt;%
+  gather(&quot;sample&quot;, &quot;PSI&quot;, A10_NA_Fibroblast_polyA_1:Branaplam_31.6_LCL_chRNA_3) %&gt;%
+  inner_join(sample.list, by=c(&quot;sample&quot;=&quot;SampleName&quot;)) %&gt;%
+  filter(!is.na(dose.nM)) %&gt;%
+  filter(libType==&quot;polyA&quot; &amp; cell.type==&quot;LCL&quot;) %&gt;%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~facettitle, scales = &quot;free_y&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-5-1.png" width="2880" style="display: block; margin: auto;" /></p>
+<p>Out of these 150 or so dose-response curves, the most reliable looking ones are the ones in STAT1 and RNF170 which are involved in a GA|GT-containing splice cluster. So not so much evidence (at least from this limited sample) for direct effects at non GA|GT introns.</p>
+<p>In any case, for all 10 genes, let’s plot the normalized read coverage across all our experiments, and specifically, for the 4 genes of interest, let’s also zoom in on the GA|GT intron of interest…</p>
+<pre class="bash"><code>conda activate GenometracksByGenotype
+cd ../code
+bash testPlottingWithMyScript.ForJingxin.sh</code></pre>
+<p>Results in some of the following gene-wise plots… I’m just going to highlight the 4/10 here with any GA|GT introns…</p>
+<p><img src="../docs/assets/ForJingxin_KITLG.png" alt="KITLG" /> <img src="../docs/assets/ForJingxin_PIEZO1.png" alt="PIEZO1" /> <img src="../docs/assets/ForJingxin_RNF170.png" alt="RNF170" /> <img src="../docs/assets/ForJingxin_STAT1.png" alt="STAT1" /></p>
+<p>Let’s zoom in a bit on the introns of interest…</p>
+<pre class="r"><code>SpliceJunctionToHighlight %&gt;% select(1:4, gene_names) %&gt;%
+  distinct(gene_names, .keep_all=T) %&gt;%
+  mutate(min=start-2000, max=end+2000) %&gt;%
+  mutate(chrom=`#Chrom`) %&gt;%
+  mutate(cmd = str_glue(&quot;python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile &lt;(awk &#39;$1 ~ /_u$/&#39; bigwigs/BigwigList.groups.tsv ) --BigwigList bigwigs/BigwigList.tsv --Normalization WholeGenome --Region {chrom}:{min}-{max} --BigwigListType KeyFile --OutputPrefix scratch/ -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz\npyGenomeTracks --tracks &lt;(cat scratch/tracks.ini scratch/ToPlot.SpliceDonors.ini) --out ../docs/assets/ForJingxin_{gene_names}_ZoomInOnIntron.png --region {chrom}:{min}-{max} --trackLabelFraction 0.15\n\n&quot;)) %&gt;%
+  select(cmd) %&gt;%
+  write.table(&quot;../code/testPlottingWithMyScript.ForJingxin2.sh&quot;, quote=F, row.names = F, col.names = F)</code></pre>
+<p>…After running that script to plot zoomed in sashimi plots, I get these four images:</p>
+<ul>
+<li>Note that KITLG poison exon seems identifiable in the fibroblast data only, as it seems poorly covered/expressed in the LCL data. So though I can’t see a dose-dependent response based on the LCL experiment, it is really obvious from the fibroblast data that I have the poison exon identified</li>
+<li>The STAT1 poison example is also pretty clear, and note how much more splicing there is of the poison exon in terms of observed PSI upon treatment in the chomatin associated RNA-seq data versus the polyA RNA-seq titration series data (both in LCLs)</li>
+<li>The PIEZO1 example is a bit confusing. The splice junction of interest does show a dose-dependent response, and it is a GA|GT splice junction, and similar to the STAT1 example, the GA|GT junction is much more spliced in the chRNA compared to the polyA-RNA, consistent with it being an NMD target. Note that this intron is a alt 5’ss (instead of associated with a poison cassette exon) and based on the converage tracks, this junction seems quite rare relative to the transcript expression. -RNF170 example also contains only one detected GA|GT junction but it is not associated with a novel cassette exon but rather an alt 5’ss within an exon. However, it is not clear that it is used an any appreciable rate that is could point to it being the causal mechanism for the dose-dependent gene response. However, the splicing for one GA|GT does indeed follow a dose-dependent pattern, so maybe it is right.</li>
+</ul>
+<p>Finally, let’s write out these relevant junctions coordinates for Jingxin. First to hone in on the correct junction coordinates, let me replot all of the dose response curves for clusters that contain a GA|GT intron in these 4 genes…</p>
+<pre class="r"><code>splicing.table %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  filter(gene_names %in% c(&quot;KITLG&quot;, &quot;STAT1&quot;, &quot;PIEZO1&quot;, &quot;RNF170&quot;)) %&gt;%
+  mutate(IsGAGT = str_detect(seq, &quot;^\\w{2}GAGT&quot;)) %&gt;%
+  group_by(gid) %&gt;%
+  mutate(ClusterContainsGAGT = any(IsGAGT)) %&gt;%
+  ungroup() %&gt;%
+  filter(ClusterContainsGAGT) %&gt;%
+  mutate(facettitle = paste(junc, gene_names,IsGAGT, sep=&quot;\n&quot;)) %&gt;%
+  select(-c(1:6)) %&gt;%
+  gather(&quot;sample&quot;, &quot;PSI&quot;, A10_NA_Fibroblast_polyA_1:Branaplam_31.6_LCL_chRNA_3) %&gt;%
+  inner_join(sample.list, by=c(&quot;sample&quot;=&quot;SampleName&quot;)) %&gt;%
+  filter(!is.na(dose.nM)) %&gt;%
+  filter(libType==&quot;polyA&quot; &amp; cell.type==&quot;LCL&quot;) %&gt;%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~facettitle, scales = &quot;free_y&quot;) +
+  theme_bw() +
+  theme(strip.text.x = element_text(size = 7))</code></pre>
+<p><img src="figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Based on manual inspection, let’s replot, highlighting just the introns involved that Jingxin probably would want coordinates for:</p>
+<pre class="r"><code>splicing.table %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  filter(gene_names %in% c(&quot;KITLG&quot;, &quot;STAT1&quot;, &quot;PIEZO1&quot;, &quot;RNF170&quot;)) %&gt;%
+  mutate(IsGAGT = str_detect(seq, &quot;^\\w{2}GAGT&quot;)) %&gt;%
+  group_by(gid) %&gt;%
+  mutate(ClusterContainsGAGT = any(IsGAGT)) %&gt;%
+  ungroup() %&gt;%
+  filter(ClusterContainsGAGT) %&gt;%
+  mutate(IntronType = recode(anchor, A=&quot;Alt 5&#39;ss&quot;, D=&quot;Alt 3&#39;ss&quot;, DA=&quot;Annotated&quot;, N=&quot;New Intron&quot;, NDA=&quot;New Splice Site combination&quot;)) %&gt;%
+  select(-c(&quot;A10_NA_Fibroblast_polyA_1&quot;:&quot;Branaplam_31.6_LCL_chRNA_3&quot;)) %&gt;%
+  select(junc, gene_names, IsGAGT, IntronType)</code></pre>
+<pre><code># A tibble: 22 × 4
+   junc                                gene_names IsGAGT IntronType
+   &lt;chr&gt;                               &lt;chr&gt;      &lt;lgl&gt;  &lt;chr&gt;     
+ 1 chr12:88516490:88518149:clu_23943_- KITLG      FALSE  Alt 5&#39;ss  
+ 2 chr12:88516490:88518195:clu_23943_- KITLG      TRUE   Alt 5&#39;ss  
+ 3 chr12:88516490:88518697:clu_23943_- KITLG      FALSE  Annotated 
+ 4 chr12:88518308:88518697:clu_23943_- KITLG      FALSE  Alt 3&#39;ss  
+ 5 chr16:88720525:88720616:clu_30902_- PIEZO1     FALSE  Alt 3&#39;ss  
+ 6 chr16:88720532:88720616:clu_30902_- PIEZO1     FALSE  Annotated 
+ 7 chr16:88720532:88720660:clu_30902_- PIEZO1     TRUE   Alt 5&#39;ss  
+ 8 chr2:190977025:190978528:clu_5141_- STAT1      TRUE   Alt 5&#39;ss  
+ 9 chr2:190977025:190978856:clu_5141_- STAT1      FALSE  Annotated 
+10 chr2:190978606:190978856:clu_5141_- STAT1      FALSE  Alt 3&#39;ss  
+# … with 12 more rows</code></pre>
+<pre class="r"><code># Based on the dose response curves and which introns are GAGT and manual inspection, I will note these introns:
+JuncstionsToNote &lt;- c(&quot;chr16:88720532:88720616:clu_30902_-&quot;, &quot;chr16:88720532:88720660:clu_30902_-&quot;,
+                      &quot;chr2:190977025:190978528:clu_5141_-&quot;, &quot;chr2:190978606:190978856:clu_5141_-&quot;, &quot;chr2:190977025:190978856:clu_5141_-&quot;,
+                      &quot;chr8:42874006:42887802:clu_16606_-&quot;, &quot;chr8:42874006:42887728:clu_16606_-&quot;,
+                      &quot;chr12:88516490:88518195:clu_23943_-&quot;, &quot;chr12:88518308:88518697:clu_23943_-&quot;, &quot;chr12:88516490:88518697:clu_23943_-&quot;)
+
+splicing.table %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  filter(gene_names %in% c(&quot;KITLG&quot;, &quot;STAT1&quot;, &quot;PIEZO1&quot;, &quot;RNF170&quot;)) %&gt;%
+  mutate(IsGAGT = str_detect(seq, &quot;^\\w{2}GAGT&quot;)) %&gt;%
+  mutate(IntronType = recode(anchor, A=&quot;Alt 5&#39;ss&quot;, D=&quot;Alt 3&#39;ss&quot;, DA=&quot;Annotated&quot;, N=&quot;New Intron&quot;, NDA=&quot;New Splice Site combination&quot;)) %&gt;%
+  mutate(facettitle = paste(junc, gene_names,IsGAGT, IntronType, sep=&quot;\n&quot;)) %&gt;%
+  filter(junc %in% JuncstionsToNote) %&gt;%
+  select(-c(1:6)) %&gt;%
+  gather(&quot;sample&quot;, &quot;PSI&quot;, A10_NA_Fibroblast_polyA_1:Branaplam_31.6_LCL_chRNA_3) %&gt;%
+  inner_join(sample.list, by=c(&quot;sample&quot;=&quot;SampleName&quot;)) %&gt;%
+  filter(!is.na(dose.nM)) %&gt;%
+  filter(libType==&quot;polyA&quot; &amp; cell.type==&quot;LCL&quot;) %&gt;%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~facettitle, scales = &quot;free_y&quot;) +
+  theme_bw() +
+  theme(strip.text.x = element_text(size = 5))</code></pre>
+<p><img src="figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>splicing.table %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  filter(junc %in% JuncstionsToNote) %&gt;%
+  mutate(IsGAGT = str_detect(seq, &quot;^\\w{2}GAGT&quot;)) %&gt;%
+  mutate(IntronType = recode(anchor, A=&quot;Alt 5&#39;ss&quot;, D=&quot;Alt 3&#39;ss&quot;, DA=&quot;Annotated&quot;, N=&quot;New Intron&quot;, NDA=&quot;New Splice Site combination&quot;)) %&gt;%
+  select(-c(&quot;A10_NA_Fibroblast_polyA_1&quot;:&quot;Branaplam_31.6_LCL_chRNA_3&quot;)) %&gt;%
+  select(junc, gene_names, IsGAGT, IntronType) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">junc</th>
+<th align="left">gene_names</th>
+<th align="left">IsGAGT</th>
+<th align="left">IntronType</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">chr12:88516490:88518195:clu_23943_-</td>
+<td align="left">KITLG</td>
+<td align="left">TRUE</td>
+<td align="left">Alt 5’ss</td>
+</tr>
+<tr class="even">
+<td align="left">chr12:88516490:88518697:clu_23943_-</td>
+<td align="left">KITLG</td>
+<td align="left">FALSE</td>
+<td align="left">Annotated</td>
+</tr>
+<tr class="odd">
+<td align="left">chr12:88518308:88518697:clu_23943_-</td>
+<td align="left">KITLG</td>
+<td align="left">FALSE</td>
+<td align="left">Alt 3’ss</td>
+</tr>
+<tr class="even">
+<td align="left">chr16:88720532:88720616:clu_30902_-</td>
+<td align="left">PIEZO1</td>
+<td align="left">FALSE</td>
+<td align="left">Annotated</td>
+</tr>
+<tr class="odd">
+<td align="left">chr16:88720532:88720660:clu_30902_-</td>
+<td align="left">PIEZO1</td>
+<td align="left">TRUE</td>
+<td align="left">Alt 5’ss</td>
+</tr>
+<tr class="even">
+<td align="left">chr2:190977025:190978528:clu_5141_-</td>
+<td align="left">STAT1</td>
+<td align="left">TRUE</td>
+<td align="left">Alt 5’ss</td>
+</tr>
+<tr class="odd">
+<td align="left">chr2:190977025:190978856:clu_5141_-</td>
+<td align="left">STAT1</td>
+<td align="left">FALSE</td>
+<td align="left">Annotated</td>
+</tr>
+<tr class="even">
+<td align="left">chr2:190978606:190978856:clu_5141_-</td>
+<td align="left">STAT1</td>
+<td align="left">FALSE</td>
+<td align="left">Alt 3’ss</td>
+</tr>
+<tr class="odd">
+<td align="left">chr8:42874006:42887728:clu_16606_-</td>
+<td align="left">RNF170</td>
+<td align="left">FALSE</td>
+<td align="left">Annotated</td>
+</tr>
+<tr class="even">
+<td align="left">chr8:42874006:42887802:clu_16606_-</td>
+<td align="left">RNF170</td>
+<td align="left">TRUE</td>
+<td align="left">Alt 5’ss</td>
+</tr>
+</tbody>
+</table>
+<p>Ok, so I am done with point number1 in Jingxin’s request. I will address point number 2 in a new notebook…</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.1 (2019-07-05)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.2.19-el7-x86_64/lib/libopenblas_haswellp-r0.2.19.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8 LC_NUMERIC=C         LC_TIME=C           
+ [4] LC_COLLATE=C         LC_MONETARY=C        LC_MESSAGES=C       
+ [7] LC_PAPER=C           LC_NAME=C            LC_ADDRESS=C        
+[10] LC_TELEPHONE=C       LC_MEASUREMENT=C     LC_IDENTIFICATION=C 
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] edgeR_3.26.5    limma_3.40.6    forcats_0.4.0   stringr_1.4.0  
+ [5] dplyr_1.0.9     purrr_0.3.4     readr_1.3.1     tidyr_1.2.0    
+ [9] tibble_3.1.7    ggplot2_3.3.6   tidyverse_1.3.0
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.5       locfit_1.5-9.1   lubridate_1.7.4  lattice_0.20-38 
+ [5] assertthat_0.2.1 rprojroot_2.0.2  digest_0.6.20    utf8_1.1.4      
+ [9] R6_2.4.0         cellranger_1.1.0 backports_1.4.1  reprex_0.3.0    
+[13] evaluate_0.15    httr_1.4.1       highr_0.9        pillar_1.7.0    
+[17] rlang_1.0.3      readxl_1.3.1     rstudioapi_0.10  rmarkdown_1.13  
+[21] labeling_0.3     munsell_0.5.0    broom_1.0.0      compiler_3.6.1  
+[25] httpuv_1.5.1     modelr_0.1.8     xfun_0.31        pkgconfig_2.0.2 
+[29] htmltools_0.3.6  tidyselect_1.1.2 workflowr_1.6.2  fansi_0.4.0     
+[33] crayon_1.3.4     dbplyr_1.4.2     withr_2.4.1      later_0.8.0     
+[37] grid_3.6.1       jsonlite_1.6     gtable_0.3.0     lifecycle_1.0.1 
+[41] DBI_1.1.0        git2r_0.26.1     magrittr_1.5     scales_1.1.0    
+[45] cli_3.3.0        stringi_1.4.3    farver_2.1.0     fs_1.3.1        
+[49] promises_1.0.1   xml2_1.3.2       ellipsis_0.3.2   generics_0.1.3  
+[53] vctrs_0.4.1      tools_3.6.1      glue_1.6.2       hms_0.5.3       
+[57] yaml_2.2.0       colorspace_1.4-1 rvest_0.3.5      knitr_1.39      
+[61] haven_2.3.1     </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

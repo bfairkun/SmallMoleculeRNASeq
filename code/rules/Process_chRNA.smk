@@ -1,13 +1,15 @@
 
 rule GatherChRNAResults:
     input:
-        # expand("FastqFastp/{sample}.R1.fastq.gz", sample=chRNA_samples.index),
-        # expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam.bai",sample=chRNA_samples.index),
+        expand("FastqFastp/{sample}.R1.fastq.gz", sample=chRNA_samples.index),
+        expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam.bai",sample=chRNA_samples.index),
         expand("FragLenths/{sample}.1M.test.txt.gz", sample=pd.concat([titration_series_samples, chRNA_samples]).index),
         "Multiqc/multiqc_report.html",
         "featureCounts/Counts.chRNA.txt",
         "../output/QC/ReadCountsAndJunctionsPerSamples.tsv",
-        expand("QC/QualimapRnaseq/{sample}/rnaseq_qc_results.txt", sample=chRNA_samples.index)
+        expand("QC/QualimapRnaseq/{sample}/rnaseq_qc_results.txt", sample=chRNA_samples.index),
+        "featureCounts/Counts.chRNA.txt",
+        "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numers.counts.gz"
 
 use rule CopyAndMergeFastq as CopyAndMergeFastq_chRNA with:
     input:
@@ -21,8 +23,8 @@ use rule CopyAndMergeFastq as CopyAndMergeFastq_chRNA with:
 
 rule CountReadsPerSample:
     input:
-        bam = expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam",sample=chRNA_samples.index),
-        bai = expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam.bai",sample=chRNA_samples.index),
+        bam = expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam",sample=AllSamples),
+        bai = expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam.bai",sample=AllSamples),
     output:
         "../output/QC/ReadCountsAndJunctionsPerSamples.tsv"
     log:
@@ -98,7 +100,48 @@ rule sampleFragmentLengths:
         samtools view -s 0.1 {input} |  awk '$6 !~ "N" && $9>0 && $9 <1000 {{print $9}}' | shuf -n 1000000 | gzip - > {output}
         """
 
-# rule BamToBigwig:
+rule MakeBigwigs_NormalizedToEdgeRFeatureCounts:
+    """
+    Scale bigwig to base coverage per billion chromosomal reads
+    """
+    input:
+        fai = "/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Fasta/GRCh38.primary_assembly.genome.fa.fai",
+        bam = "Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam",
+        bai = "Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam.bai",
+        NormFactorsFile = "../output/QC/ReadCountsAndJunctionsPerSamples.tsv"
+    params:
+        GenomeCovArgs="-split",
+        bw_minus = "bw_minus=",
+        MKTEMP_ARGS = "-p " + config['scratch'],
+        SORT_ARGS="-T " + config['scratch'],
+        Region = "",
+        BamToBigwigScript = "/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/scripts/GenometracksByGenotype/BamToBigwig.sh"
+        # Region = ""
+    # wildcard_constraints:
+    #     Phenotype = "|".join(RNASeqPhenotypes)
+    shadow: "shallow"
+    output:
+        bw = "bigwigs/unstranded/{sample}.bw",
+        bw_minus = []
+    log:
+        "logs/MakeBigwigs_unstranded/{sample}.log"
+    resources:
+        mem = much_more_mem_after_first_attempt
+    shell:
+        """
+        ScaleFactor=$(bc <<< "scale=3;1000000000/$(grep '{input.bam}' {input.NormFactorsFile} | awk 'NR==1 {{print $2}}')")
+        {params.BamToBigwigScript} {input.fai} {input.bam} {output.bw}  GENOMECOV_ARGS="{params.GenomeCovArgs} -scale ${{ScaleFactor}}" REGION='{params.Region}' MKTEMP_ARGS="{params.MKTEMP_ARGS}" SORT_ARGS="{params.SORT_ARGS}" {params.bw_minus}"{output.bw_minus}" &> {log}
+        """
 
-# rule bamtobigiwg:
-#     input:
+use rule MakeBigwigs_NormalizedToEdgeRFeatureCounts as MakeBigwigs_NormalizedToEdgeRFeatureCounts_stranded with:
+    output:
+        bw = "bigwigs/stranded/{sample}.minus.bw",
+        bw_minus = "bigwigs/stranded/{sample}.plus.bw"
+    log:
+        "logs/MakeBigwigs_stranded/{sample}.log"
+
+rule GatherBigwigs:
+    input:
+        expand("bigwigs/unstranded/{sample}.bw", sample=AllSamples),
+        expand("bigwigs/stranded/{sample}.minus.bw", sample=AllNEBNextSamples),
+        expand("bigwigs/stranded/{sample}.plus.bw", sample=AllNEBNextSamples)

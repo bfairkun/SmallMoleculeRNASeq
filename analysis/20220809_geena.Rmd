@@ -1,0 +1,196 @@
+---
+title: "Splicing"
+output: html_document
+date: '2022-08-09'
+---
+
+## Looking at dominant-negative or toxic gain-of-function genes
+
+As suggested by Ben, here we are looking at Supplementary Table 2 from Hijikata et al. 2017 (https://www.nature.com/articles/s41598-017-08902-1).
+It may be useful to intersect these dominant-negative or toxic gain-of-function genes with our data. The molecules that we are evaluating often down-regulate genes through activation of cryptic splice site, and this down-regulation of dominant-negatives could be therapeutic.
+
+Read in count data for the dose-response experiment. Borrowed code from Ben's notebook (https://users.rcc.uchicago.edu/~bjf79/docs/20220629_FirstGlanceTitrationSeries.html). 
+
+```{r, message = FALSE, warning = FALSE}
+#if (!require("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#BiocManager::install("biomaRt")
+
+library(tidyverse)
+library(edgeR)
+library(RColorBrewer)
+library(gplots)
+library(viridis)
+library(magrittr)
+library(biomaRt)
+
+# Import data
+dat <- read_tsv("../code/featureCounts/Counts.titration_series.txt", comment = "#") %>%
+  dplyr::select(-ends_with("_1")) %>%
+  rename_at(vars(-(1:6)), ~str_replace(.x, "Alignments/STAR_Align/TitrationExp(.+?)/Aligned.sortedByCoord.out.bam", "\\1")) %>%
+  dplyr::select(Geneid, everything(), -c(2:6)) %>%
+  column_to_rownames("Geneid") %>%
+  DGEList()
+
+# Get sample names
+Samples <- dat$samples %>%
+  rownames_to_column("Sample") %>%
+  separate(Sample, into=c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  rowwise() %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ rev(brewer.pal(n=8, name="Blues"))[TitrationPoint],
+    Treatment == "C2C5" ~ rev(brewer.pal(n=8, name="Reds"))[TitrationPoint],
+    Treatment == "Ris" ~ rev(brewer.pal(n=8, name="Greens"))[TitrationPoint],
+    TRUE ~ "gray"
+  )) %>%
+  ungroup() %>%
+  dplyr::select(Sample, Treatment, TitrationPoint, lib.size, Color)
+```
+
+
+Import the supplementary table and use Ben's code to start looking at some of the genes. The supplementary table has 3 tabs on excel and I combined into one csv in order to import ("project2/yangili1/bjf79/20211209_JingxinRNAseq/data/Hijikata_Table2_combined.csv").
+
+```{r}
+# Import supplementary table 2that includes gene lists
+table2.genes <- read_csv("../data/Hijikata_Table2_combined.csv")
+
+# Convert to dataframe
+dat.df <- dat %>%
+  cpm(log = F) %>%
+  as.data.frame() %>%
+  rownames_to_column("ensembl.id") 
+
+# Convert ensembl ids to HGNC ids (gene names)
+mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
+
+# Remove the numbers after the period in order to convert
+# https://stackoverflow.com/questions/58874677/convert-ensembl-id-to-gene-name-using-biomart
+# in case it's gencode, this mostly works, if ensembl, will leave it alone
+gene_query <- sub("[.][0-9]*","", dat.df$ensembl.id)
+dat.df <- cbind(gene_query, dat.df)
+
+
+gene_IDs <- getBM(filters = "ensembl_gene_id", attributes = c("ensembl_gene_id", "hgnc_symbol"), values = gene_query, mart = mart)
+colnames(gene_IDs) <- c("gene_query", "gene")
+dat.df.genenames <- right_join(x = gene_IDs, y = dat.df, by = "gene_query") %>%
+  select(-gene_query, -ensembl.id)
+
+# Try looking at the first 3 genes from the table + 2 others Ben had previously plotted to make sure they look the same
+testGenes <- table2.genes$Gene[1:3]
+testGenes <<- c(testGenes, "ADI1", "KIF3B")
+
+
+# Make dataframe assigning colors to plot
+ColorsTreatments <- c("blue"="Bran", "red"="C2C5", "green"="Ris")
+df.to.plot <- dat.df.genenames %>% 
+  filter(gene %in% testGenes) %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into = c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  dplyr::select(-sample) %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ "blue",
+    Treatment == "C2C5" ~ "red",
+    Treatment == "Ris" ~ "green"))
+
+# Plot
+df.to.plot %>%
+  ggplot(aes(x=TitrationPoint, y = cpm, color = Color)) +
+  geom_line() +
+  scale_color_identity(labels = ColorsTreatments, guide = "legend") +
+  scale_x_reverse() +
+  facet_wrap(~gene, scales = "free_y") +
+  labs(title = "dose response of genes of interest") +
+  theme_bw()
+  
+```
+
+Start looking at more of the genes. In the paper, the mutations are categorized by their molecular mechanisms:
+HI = haploinsufficiency
+DN = dominant-negative
+GF = gain-of-function, including toxic gain-of-function and constitutive activation
+
+```{r}
+# Haploinsufficiency
+HI_genes <- table2.genes %>%
+  filter(Type == "HI")
+
+# Dominant-negative
+DN_genes <- table2.genes %>%
+  filter(Type == "DN")
+
+# Gain of function
+GF_genes <- table2.genes %>%
+  filter(Type == "GF")
+
+```
+
+
+Looking at haploinsufficiency genes
+
+```{r}
+# Make dataframe assigning colors to plot
+ColorsTreatments <- c("blue"="Bran", "red"="C2C5", "green"="Ris")
+df.to.plot_HI.1 <- dat.df.genenames %>% 
+  filter(gene %in% HI_genes$Gene[1:40]) %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into = c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  dplyr::select(-sample) %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ "blue",
+    Treatment == "C2C5" ~ "red",
+    Treatment == "Ris" ~ "green"))
+
+df.to.plot_HI.2 <- dat.df.genenames %>% 
+  filter(gene %in% HI_genes$Gene[41:81]) %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into = c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  dplyr::select(-sample) %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ "blue",
+    Treatment == "C2C5" ~ "red",
+    Treatment == "Ris" ~ "green"))
+
+df.to.plot_HI.3 <- dat.df.genenames %>% 
+  filter(gene %in% HI_genes$Gene[82:122]) %>%
+  gather("sample", "cpm", -gene) %>%
+  separate(sample, into = c("Treatment", "TitrationPoint"), remove = F, convert = T) %>%
+  dplyr::select(-sample) %>%
+  mutate(Color = case_when(
+    Treatment == "Bran" ~ "blue",
+    Treatment == "C2C5" ~ "red",
+    Treatment == "Ris" ~ "green"))
+
+
+# Plot
+df.to.plot_HI.1 %>%
+  ggplot(aes(x=TitrationPoint, y = cpm, color = Color)) +
+  geom_line() +
+  scale_color_identity(labels = ColorsTreatments, guide = "legend") +
+  scale_x_reverse() +
+  facet_wrap(~gene, scales = "free_y", ncol = 10) +
+  labs(title = "dose response of genes of interest") +
+  theme_bw()
+
+df.to.plot_HI.2 %>%
+  ggplot(aes(x=TitrationPoint, y = cpm, color = Color)) +
+  geom_line() +
+  scale_color_identity(labels = ColorsTreatments, guide = "legend") +
+  scale_x_reverse() +
+  facet_wrap(~gene, scales = "free_y", ncol = 10) +
+  labs(title = "dose response of genes of interest") +
+  theme_bw()
+
+df.to.plot_HI.3 %>%
+  ggplot(aes(x=TitrationPoint, y = cpm, color = Color)) +
+  geom_line() +
+  scale_color_identity(labels = ColorsTreatments, guide = "legend") +
+  scale_x_reverse() +
+  facet_wrap(~gene, scales = "free_y", ncol = 10) +
+  labs(title = "dose response of genes of interest") +
+  theme_bw()
+
+
+```
+
+
+

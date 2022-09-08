@@ -25,7 +25,8 @@ localrules:
     pangolin,
     SplitClinVarVcfByChrom,
     DE_testing,
-    GatherEditings
+    GatherEditings,
+    CopyAndMergeFastq_chRNA
 
 # Instead of using samples.tsv file, a quick/dirty way to apply rules over grob of existing files is this:
 # IDS, = glob_wildcards("Path/To/{MyFileNames}.bed.gz")
@@ -42,10 +43,15 @@ rule all:
         # expand("SplicingAnalysis/juncbedfiles/{sample}.bed.gz", sample=samples.index)
         "SplicingAnalysis/leafcutter/clustering_permissive/autosomes/leafcutter_perind.counts.gz",
         "SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz",
+        "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz",
         "../output/ClinVar.PangolinResults.tsv.gz",
-        'RE_Results/EditLevel/GatheredEditingLevels.bed'
+        rules.GatherChRNAResults.input
+
+        # expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam",sample=AllSamples),
+        # 'RE_Results/EditLevel/GatheredEditingLevels.bed'
 
         # expand("ClinVar/ByChrom/{chrom}.vcf", chrom=autosomes),
         # expand("ClinVar/ByChrom/{chrom}.pangolin.vcf", chrom=autosomes)
         # The first rule should define the default target files
         # Subsequent target rules can be specified below. They should start with all_*.
+

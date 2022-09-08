@@ -191,7 +191,7 @@ sample_n_of <- function(data, size, ...) {
     filter(group_ids %in% sampled_groups)
 }
 
-GenesOfInterest <- c("MAPT", "SNCA", "SMN2", "HTT", "GALC", "FOXM1", "STAT1", "AKT3", "PDGFRB")
+GenesOfInterest <- c("MAPT", "SNCA", "SMN2", "HTT", "GALC", "FOXM1", "STAT1", "AKT3", "PDGFRB", "SF3B3", "BECN1", "C12orf4", "PDXDC2")
 
 # had to use possibly wrapper function to handle errors, like when drm fitting does not converge
 safe_drm <- possibly(drm, otherwise=NA)
@@ -287,7 +287,7 @@ dat.tidy %>%
   ggplot(aes(x=dose.nM, y=log2(cpm), color=Treatment)) +
   geom_point() +
   geom_smooth(aes(group=Treatment), method = drm, method.args = list(fct = L.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"))), se = FALSE) +
-  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(0, 1, 10,100, 1000,10000), minor_breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
   facet_wrap(~hgnc_symbol, scales="free_y") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -738,5 +738,75 @@ summary(fit)
 ```
 
 
-Ok, lot's of interseting things going on.
+Ok, lot's of interseting things going on. That last one actually has opposite direction effects (at least by the best fit model, which may not even be a reasonable fit). Let's just see what happens when I try to set the lower limit to be the same for all three treatments.
 
+```{r}
+fit <- drm(formula = log2(cpm) ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    pmodels=data.frame(Treatment, 1, Treatment, Treatment))
+plot(fit)
+
+summary(fit)
+
+modelFit(fit)
+
+mselect(fit)
+
+
+
+```
+
+Ok, as I stated somewhere above, it looks like the way this is parameterized is that LowerLimit is always smaller than UpperLimit, and there is no easy way to fix the Limit that refers to limit as x approaches 0 as fixed between the treatments when you jointly fit the models as I did above. Furthermore, the model fit summary functions are not for each indivual model, but for all three models, probably since it is technically a single model with another term for treatment. That could be useful though, since I generally only want to evaluate models that fit well in all three treatments.
+
+ Let's manually look at the models from this kind of fitting process for some other genes:
+ 
+```{r}
+dat.tidy.test <- dat.tidy %>%
+  filter(gene == "ENSG00000160117.16")
+fit <- drm(formula = log2(cpm) ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    pmodels=data.frame(Treatment, Treatment, 1, Treatment))
+plot(fit)
+summary(fit)
+modelFit(fit)
+mselect(fit)
+
+dat.tidy.test <- dat.tidy %>%
+  filter(gene == "ENSG00000075239.14")
+fit <- drm(formula = log2(cpm) ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    pmodels=data.frame(Treatment, 1, Treatment, Treatment))
+plot(fit)
+summary(fit)
+modelFit(fit)
+mselect(fit)
+
+
+# STAT1
+
+GOI <- geneNames %>%
+  filter(hgnc_symbol == "STAT1") %>% pull(ensembl.full)
+dat.tidy.test <- dat.tidy %>%
+  filter(gene == GOI)
+fit <- drm(formula = log2(cpm) ~ dose.nM,
+                    curveid = Treatment,
+                    data = dat.tidy.test,
+                    fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+                    pmodels=data.frame(Treatment, Treatment, 1, Treatment))
+plot(fit)
+summary(fit)
+modelFit(fit)
+mselect(fit)
+```
+ 
+Here is a proposed procedure for model fitting:
+
+First, for each gene:treatment pair, calculate the spearman corrleation coefficient across the titration series to look for some nominally significant treatment in at least one of the treatments. Use the sign of the most significant spearman coefficient to determine whether the lower limit or upper limit should be fixed when I then jointly model logCPM across all three treatments as that standard 4 parameter model. Then, assess model fit using the summary stats output from things like `modelFit` and `mselect`.
+
+Then I can finally start comparing EC50s.

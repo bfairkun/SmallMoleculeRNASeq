@@ -8,7 +8,9 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+Welcome to my research website dealing with small molecule splicing stuff.
+
+## Links to relevant notebooks by description:
 
 [Splicing analysis notebook entry](20211216_DifferentialSplicing.html)
 
@@ -17,4 +19,16 @@ Welcome to my research website.
 [DE testing and fitting curves to dose-response data](20220707_TitrationSeries_DE_testing.html)
 
 [fitting curves to dose-response data bit more carefully](20220712_FitDoseResponseModels.html)
+
+## Full listing of all Rmarkdown notebooks by file name:
+
+```{r, results = 'asis'}
+library(tidyverse)
+rmds <- list.files(path = "../analysis/", pattern="^\\d+.+")
+rmd_htmls <- str_replace(rmds, "Rmd$", "html")
+for(i in rmd_htmls){
+  cat("[", i, "](", i,")\n\n", sep="")
+}
+```
+
 

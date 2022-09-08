@@ -115,16 +115,20 @@ LibSize <- read_tsv("../output/QC/ReadCountsAndJunctionsPerSamples.tsv", col_nam
 
 LibSize %>%
   mutate(sample = str_replace(fn, "Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam", "\\1")) %>%
-  left_join(Samples, by="sample") %>%
+  inner_join(Samples, by="sample") %>%
   ggplot(aes(x=X3, y=chromasomal_reads/2, fill=Color)) +
   geom_col() +
   scale_fill_identity() +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust=1))
 
+```
+
+
+```{r, eval=F}
 LibSize %>%
   mutate(sample = str_replace(fn, "Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam", "\\1")) %>%
-  left_join(Samples, by="sample") %>%
+  inner_join(Samples, by="sample") %>%
   select(`#`,chromasomal_reads, X3) %>%
   mutate(VolumeRelativeToHighest = signif(max(chromasomal_reads)/chromasomal_reads, 4)) %>%
   write_tsv("../data/chRNA_repooling_ratios.tsv")
