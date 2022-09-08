@@ -366,7 +366,7 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 </div>
 <div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
@@ -457,16 +457,16 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreedb9a4f02945a058f7c991284a3c04d3f0b005ed5targetblankdb9a4f0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/db9a4f02945a058f7c991284a3c04d3f0b005ed5" target="_blank">db9a4f0</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree0d59720620fd3a949578040a4634edcb76629a20targetblank0d59720a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/0d59720620fd3a949578040a4634edcb76629a20" target="_blank">0d59720</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreedb9a4f02945a058f7c991284a3c04d3f0b005ed5targetblankdb9a4f0a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree0d59720620fd3a949578040a4634edcb76629a20targetblank0d59720a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/db9a4f02945a058f7c991284a3c04d3f0b005ed5" target="_blank">db9a4f0</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/0d59720620fd3a949578040a4634edcb76629a20" target="_blank">0d59720</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -480,6 +480,7 @@ Ignored files:
     Ignored:    analysis/.RData
     Ignored:    analysis/.Rhistory
     Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    analysis/figure/
     Ignored:    code/.DS_Store
     Ignored:    code/._.DS_Store
     Ignored:    code/._DOCK7.pdf
@@ -517,7 +518,6 @@ Ignored files:
     Ignored:    code/log
     Ignored:    code/logs/
     Ignored:    code/scratch/
-    Ignored:    code/scripts/.DS_Store
     Ignored:    code/test.txt.gz
     Ignored:    code/testPlottingWithMyScript.ForJingxin.sh
     Ignored:    code/testPlottingWithMyScript.ForJingxin2.sh
@@ -526,33 +526,9 @@ Ignored files:
     Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
     Ignored:    output/._PioritizedIntronTargets.pdf
 
-Untracked files:
-    Untracked:  analysis/20220804_MakeBigwigListTsv.Rmd
-    Untracked:  analysis/20220809_geena.Rmd
-    Untracked:  analysis/20220822_Check_chRNA.Rmd
-    Untracked:  analysis/20220907_IdentifyTargetsForVerification.Rmd
-    Untracked:  code/scripts/Collapse_Juncfiles.R
-    Untracked:  data/Hijikata_Table2_combined.csv
-    Untracked:  data/Risdplam_Branaplam_specific_exons 5'ss.xlsx
-    Untracked:  output/FibroblastOMIM_GOF_Downregulated_AndCrypticSpliced_GeneList.tsv
-
 Unstaged changes:
-    Modified:   analysis/20211216_DifferentialSplicing.Rmd
-    Modified:   analysis/20220629_FirstGlanceTitrationSeries.Rmd
-    Modified:   analysis/20220712_FitDoseResponseModels.Rmd
-    Modified:   analysis/20220726_Check_chRNATestSeq.Rmd
-    Modified:   code/Snakefile
-    Modified:   code/config/config.yaml
-    Modified:   code/config/samples.chRNAPilotSequencing.tsv
-    Modified:   code/rules/Process_chRNA.smk
-    Modified:   code/rules/RNASeqProcessing.smk
-    Modified:   code/rules/common.smk
+    Modified:   analysis/20220907_IdentifyTargetsForVerification.Rmd
     Modified:   code/scripts/GenometracksByGenotype
-    Modified:   output/QC/ReadCountsAndJunctionsPerSamples.tsv
-
-Staged changes:
-    Modified:   .gitmodules
-    New:        code/scripts/GenometracksByGenotype
 
 </code></pre>
 <p>
@@ -565,9 +541,69 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/20220907_IdentifyTargetsForVerification.Rmd</code>) and HTML (<code>docs/20220907_IdentifyTargetsForVerification.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0d59720620fd3a949578040a4634edcb76629a20/analysis/20220907_IdentifyTargetsForVerification.Rmd" target="_blank">0d59720</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-08
+</td>
+<td>
+update site
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/0d59720620fd3a949578040a4634edcb76629a20/docs/20220907_IdentifyTargetsForVerification.html" target="_blank">0d59720</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-08
+</td>
+<td>
+update site
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -736,6 +772,43 @@ ExpressedGenes.rpkm %&gt;%
   facet_wrap(~hgnc_symbol, scales = &quot;free_y&quot;) +
   theme_bw()</code></pre>
 <p><img src="figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0d59720620fd3a949578040a4634edcb76629a20/docs/figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-2-1.png" target="_blank">0d59720</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Note that some of these don’t even really have a dose-dependent response consistent with the fibroblast data from which this short list of genes was derived… For example, all of these genes were in part chosen because they went DOWN in the treatment samples in fibroblast data. In contrast, KITLG seems to go up. Other genes, like PDGFRB and RNF170 don’t perhaps are consistent, but they are expressed so low in the LCL data that the dose-response effect is a bit questionable. In any case, for all of these, let’s plot the raw coverage data and try to hone in on some causal introns, knowing that it may be impossible to identify for a lot of these genes.</p>
 <pre class="r"><code># Read in list of introns detected across all experiments that pass leafcutter&#39;s default clustering processing thresholds
 all.samples.5ss &lt;- read_tsv(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz&quot;, col_names = c(&quot;intron&quot;, &quot;seq&quot;, &quot;score&quot;)) %&gt;%
@@ -863,6 +936,43 @@ splicing.table %&gt;%
   facet_wrap(~facettitle, scales = &quot;free_y&quot;) +
   theme_bw()</code></pre>
 <p><img src="figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0d59720620fd3a949578040a4634edcb76629a20/docs/figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-4-1.png" target="_blank">0d59720</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Perhaps the KITLG splice junction is not expressed enough to make an interpretable dose-response curves. But for RNF170, STAT1, and PIEZO1 at least there is one GA|GT junction that does indeed go up in dose-dependent manner…</p>
 <p>Just out of curiosity, let’s look across all junctions (including the non-GA|GT) quantified and look for dose-dependent responses. Here the facet titles are the intron coordinates, the host gene, then whether the intron is in an intron cluster with any GA|GT. So basically I am curious if I can find any reliable dose-dependent splicing responses in these genes that aren’t due to any detectable GA|GT intron.</p>
 <pre class="r"><code>splicing.table %&gt;%
@@ -885,13 +995,65 @@ splicing.table %&gt;%
   facet_wrap(~facettitle, scales = &quot;free_y&quot;) +
   theme_bw()</code></pre>
 <p><img src="figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-5-1.png" width="2880" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0d59720620fd3a949578040a4634edcb76629a20/docs/figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-5-1.png" target="_blank">0d59720</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Out of these 150 or so dose-response curves, the most reliable looking ones are the ones in STAT1 and RNF170 which are involved in a GA|GT-containing splice cluster. So not so much evidence (at least from this limited sample) for direct effects at non GA|GT introns.</p>
 <p>In any case, for all 10 genes, let’s plot the normalized read coverage across all our experiments, and specifically, for the 4 genes of interest, let’s also zoom in on the GA|GT intron of interest…</p>
 <pre class="bash"><code>conda activate GenometracksByGenotype
 cd ../code
 bash testPlottingWithMyScript.ForJingxin.sh</code></pre>
 <p>Results in some of the following gene-wise plots… I’m just going to highlight the 4/10 here with any GA|GT introns…</p>
-<p><img src="../docs/assets/ForJingxin_KITLG.png" alt="KITLG" /> <img src="../docs/assets/ForJingxin_PIEZO1.png" alt="PIEZO1" /> <img src="../docs/assets/ForJingxin_RNF170.png" alt="RNF170" /> <img src="../docs/assets/ForJingxin_STAT1.png" alt="STAT1" /></p>
+<div class="figure">
+<img src="assets/ForJingxin_KITLG.png" alt="KITLG" />
+<p class="caption">KITLG</p>
+</div>
+<div class="figure">
+<img src="assets/ForJingxin_PIEZO1.png" alt="PIEZO1" />
+<p class="caption">PIEZO1</p>
+</div>
+<div class="figure">
+<img src="assets/ForJingxin_RNF170.png" alt="RNF170" />
+<p class="caption">RNF170</p>
+</div>
+<div class="figure">
+<img src="assets/ForJingxin_STAT1.png" alt="STAT1" />
+<p class="caption">STAT1</p>
+</div>
 <p>Let’s zoom in a bit on the introns of interest…</p>
 <pre class="r"><code>SpliceJunctionToHighlight %&gt;% select(1:4, gene_names) %&gt;%
   distinct(gene_names, .keep_all=T) %&gt;%
@@ -901,6 +1063,22 @@ bash testPlottingWithMyScript.ForJingxin.sh</code></pre>
   select(cmd) %&gt;%
   write.table(&quot;../code/testPlottingWithMyScript.ForJingxin2.sh&quot;, quote=F, row.names = F, col.names = F)</code></pre>
 <p>…After running that script to plot zoomed in sashimi plots, I get these four images:</p>
+<div class="figure">
+<img src="assets/ForJingxin_KITLG_ZoomInOnIntron.png" alt="KITLG" />
+<p class="caption">KITLG</p>
+</div>
+<div class="figure">
+<img src="assets/ForJingxin_PIEZO1_ZoomInOnIntron.png" alt="PIEZO1" />
+<p class="caption">PIEZO1</p>
+</div>
+<div class="figure">
+<img src="assets/ForJingxin_RNF170_ZoomInOnIntron.png" alt="RNF170" />
+<p class="caption">RNF170</p>
+</div>
+<div class="figure">
+<img src="assets/ForJingxin_STAT1_ZoomInOnIntron.png" alt="STAT1" />
+<p class="caption">STAT1</p>
+</div>
 <ul>
 <li>Note that KITLG poison exon seems identifiable in the fibroblast data only, as it seems poorly covered/expressed in the LCL data. So though I can’t see a dose-dependent response based on the LCL experiment, it is really obvious from the fibroblast data that I have the poison exon identified</li>
 <li>The STAT1 poison example is also pretty clear, and note how much more splicing there is of the poison exon in terms of observed PSI upon treatment in the chomatin associated RNA-seq data versus the polyA RNA-seq titration series data (both in LCLs)</li>
@@ -929,6 +1107,43 @@ bash testPlottingWithMyScript.ForJingxin.sh</code></pre>
   theme_bw() +
   theme(strip.text.x = element_text(size = 7))</code></pre>
 <p><img src="figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0d59720620fd3a949578040a4634edcb76629a20/docs/figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-8-1.png" target="_blank">0d59720</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Based on manual inspection, let’s replot, highlighting just the introns involved that Jingxin probably would want coordinates for:</p>
 <pre class="r"><code>splicing.table %&gt;%
   inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;)) %&gt;%
@@ -982,6 +1197,43 @@ splicing.table %&gt;%
   theme_bw() +
   theme(strip.text.x = element_text(size = 5))</code></pre>
 <p><img src="figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0d59720620fd3a949578040a4634edcb76629a20/docs/figure/20220907_IdentifyTargetsForVerification.Rmd/unnamed-chunk-9-1.png" target="_blank">0d59720</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>splicing.table %&gt;%
   inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;)) %&gt;%
   inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
@@ -1098,18 +1350,18 @@ loaded via a namespace (and not attached):
  [5] assertthat_0.2.1 rprojroot_2.0.2  digest_0.6.20    utf8_1.1.4      
  [9] R6_2.4.0         cellranger_1.1.0 backports_1.4.1  reprex_0.3.0    
 [13] evaluate_0.15    httr_1.4.1       highr_0.9        pillar_1.7.0    
-[17] rlang_1.0.3      readxl_1.3.1     rstudioapi_0.10  rmarkdown_1.13  
-[21] labeling_0.3     munsell_0.5.0    broom_1.0.0      compiler_3.6.1  
-[25] httpuv_1.5.1     modelr_0.1.8     xfun_0.31        pkgconfig_2.0.2 
-[29] htmltools_0.3.6  tidyselect_1.1.2 workflowr_1.6.2  fansi_0.4.0     
-[33] crayon_1.3.4     dbplyr_1.4.2     withr_2.4.1      later_0.8.0     
-[37] grid_3.6.1       jsonlite_1.6     gtable_0.3.0     lifecycle_1.0.1 
-[41] DBI_1.1.0        git2r_0.26.1     magrittr_1.5     scales_1.1.0    
-[45] cli_3.3.0        stringi_1.4.3    farver_2.1.0     fs_1.3.1        
-[49] promises_1.0.1   xml2_1.3.2       ellipsis_0.3.2   generics_0.1.3  
-[53] vctrs_0.4.1      tools_3.6.1      glue_1.6.2       hms_0.5.3       
-[57] yaml_2.2.0       colorspace_1.4-1 rvest_0.3.5      knitr_1.39      
-[61] haven_2.3.1     </code></pre>
+[17] rlang_1.0.3      readxl_1.3.1     rstudioapi_0.10  whisker_0.3-2   
+[21] rmarkdown_1.13   labeling_0.3     munsell_0.5.0    broom_1.0.0     
+[25] compiler_3.6.1   httpuv_1.5.1     modelr_0.1.8     xfun_0.31       
+[29] pkgconfig_2.0.2  htmltools_0.3.6  tidyselect_1.1.2 workflowr_1.6.2 
+[33] fansi_0.4.0      crayon_1.3.4     dbplyr_1.4.2     withr_2.4.1     
+[37] later_0.8.0      grid_3.6.1       jsonlite_1.6     gtable_0.3.0    
+[41] lifecycle_1.0.1  DBI_1.1.0        git2r_0.26.1     magrittr_1.5    
+[45] scales_1.1.0     cli_3.3.0        stringi_1.4.3    farver_2.1.0    
+[49] fs_1.3.1         promises_1.0.1   xml2_1.3.2       ellipsis_0.3.2  
+[53] generics_0.1.3   vctrs_0.4.1      tools_3.6.1      glue_1.6.2      
+[57] hms_0.5.3        yaml_2.2.0       colorspace_1.4-1 rvest_0.3.5     
+[61] knitr_1.39       haven_2.3.1     </code></pre>
 </div>
 </div>
 

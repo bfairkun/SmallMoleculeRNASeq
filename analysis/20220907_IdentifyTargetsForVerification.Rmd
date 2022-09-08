@@ -204,10 +204,14 @@ bash testPlottingWithMyScript.ForJingxin.sh
 
 Results in some of the following gene-wise plots... I'm just going to highlight the 4/10 here with any GA|GT introns...
 
-![KITLG](../docs/assets/ForJingxin_KITLG.png)
-![PIEZO1](../docs/assets/ForJingxin_PIEZO1.png)
-![RNF170](../docs/assets/ForJingxin_RNF170.png)
-![STAT1](../docs/assets/ForJingxin_STAT1.png)
+![KITLG](assets/ForJingxin_KITLG.png)
+
+![PIEZO1](assets/ForJingxin_PIEZO1.png)
+
+![RNF170](assets/ForJingxin_RNF170.png)
+
+![STAT1](assets/ForJingxin_STAT1.png)
+
 
 Let's zoom in a bit on the introns of interest...
 
@@ -222,6 +226,14 @@ SpliceJunctionToHighlight %>% select(1:4, gene_names) %>%
 ```
 
 ...After running that script to plot zoomed in sashimi plots, I get these four images:
+
+![KITLG](assets/ForJingxin_KITLG_ZoomInOnIntron.png)
+
+![PIEZO1](assets/ForJingxin_PIEZO1_ZoomInOnIntron.png)
+
+![RNF170](assets/ForJingxin_RNF170_ZoomInOnIntron.png)
+
+![STAT1](assets/ForJingxin_STAT1_ZoomInOnIntron.png)
 
 - Note that KITLG poison exon seems identifiable in the fibroblast data only, as it seems poorly covered/expressed in the LCL data. So though I can't see a dose-dependent response based on the LCL experiment, it is really obvious from the fibroblast data that I have the poison exon identified
 - The STAT1 poison example is also pretty clear, and note how much more splicing there is of the poison exon in terms of observed PSI upon treatment in the chomatin associated RNA-seq data versus the polyA RNA-seq titration series data (both in LCLs)
