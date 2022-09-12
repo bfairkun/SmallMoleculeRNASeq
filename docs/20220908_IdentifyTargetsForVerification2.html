@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>20220908_IdentifyBranaplamSpecificJunctionsForTesting</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">small molecular splicing RNA-seq</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">20220908_IdentifyBranaplamSpecificJunctionsForTesting</h1>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#intro">Intro</a></li>
+<li><a href="#analysis">analysis</a><ul>
+<li><a href="#pca">PCA</a></li>
+<li><a href="#identifying-cassette-exons">Identifying cassette exons</a></li>
+<li><a href="#exploring-dose-response-curves-of-gagt-introns-involved-involved-in-cassette-exons">Exploring dose-response curves of GA|GT introns involved involved in cassette exons</a></li>
+</ul></li>
+<li><a href="#final-list-of-junction-coordinates">Final list of junction coordinates:</a></li>
+</ul>
+</div>
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-09-12
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 2
+</p>
+<p>
+<strong>Knit directory:</strong> <code>20211209_JingxinRNAseq/analysis/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed19900924code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(19900924)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed19900924code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(19900924)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+</p>
+</div>
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it difficult for you and others to run your code on a different machine. Change the absolute path(s) below to the suggested relative path(s) to make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw
+</td>
+<td style="text-align:left;">
+../code/bigwigs/unstranded/(.+?).bw
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree053fca14a7f51c73c0155cc4cbd0325693574c3ctargetblank053fca1a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/053fca14a7f51c73c0155cc4cbd0325693574c3c" target="_blank">053fca1</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree053fca14a7f51c73c0155cc4cbd0325693574c3ctargetblank053fca1a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/053fca14a7f51c73c0155cc4cbd0325693574c3c" target="_blank">053fca1</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    ._.DS_Store
+    Ignored:    analysis/.RData
+    Ignored:    analysis/.Rhistory
+    Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    analysis/figure/
+    Ignored:    code/.DS_Store
+    Ignored:    code/._.DS_Store
+    Ignored:    code/._DOCK7.pdf
+    Ignored:    code/._DOCK7_DMSO1.pdf
+    Ignored:    code/._DOCK7_SM2_1.pdf
+    Ignored:    code/._FKTN_DMSO_1.pdf
+    Ignored:    code/._FKTN_SM2_1.pdf
+    Ignored:    code/._MAPT.pdf
+    Ignored:    code/._PKD1_DMSO_1.pdf
+    Ignored:    code/._PKD1_SM2_1.pdf
+    Ignored:    code/.snakemake/
+    Ignored:    code/5ssSeqs.tab
+    Ignored:    code/Alignments/
+    Ignored:    code/ChemCLIP/
+    Ignored:    code/ClinVar/
+    Ignored:    code/DE_testing/
+    Ignored:    code/DE_tests.mat.counts.gz
+    Ignored:    code/DE_tests.txt.gz
+    Ignored:    code/Fastq/
+    Ignored:    code/FastqFastp/
+    Ignored:    code/FragLenths/
+    Ignored:    code/Meme/
+    Ignored:    code/Multiqc/
+    Ignored:    code/OMIM/
+    Ignored:    code/OldBigWigs/
+    Ignored:    code/QC/
+    Ignored:    code/Session.vim
+    Ignored:    code/SplicingAnalysis/
+    Ignored:    code/TracksSession
+    Ignored:    code/bigwigs/
+    Ignored:    code/featureCounts/
+    Ignored:    code/geena/
+    Ignored:    code/igv_session.template.xml
+    Ignored:    code/igv_session.xml
+    Ignored:    code/log
+    Ignored:    code/logs/
+    Ignored:    code/scratch/
+    Ignored:    code/test.txt.gz
+    Ignored:    code/testPlottingWithMyScript.ForJingxin.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin2.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin3.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin4.sh
+    Ignored:    code/testPlottingWithMyScript.sh
+    Ignored:    data/._Hijikata_TableS1_41598_2017_8902_MOESM2_ESM.xls
+    Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
+    Ignored:    output/._PioritizedIntronTargets.pdf
+
+Untracked files:
+    Untracked:  analysis/20220908_IdentifyTargetsForVerification2.Rmd
+
+Unstaged changes:
+    Modified:   analysis/20220804_MakeBigwigListTsv.Rmd
+    Modified:   code/scripts/GenometracksByGenotype
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>Yang shared with me a message from Jingxin:</p>
+<blockquote>
+<ol style="list-style-type: decimal">
+<li>We are now designing lots of splicing assays. Previously, Ben provided 9 genes that are related to pathogenic gain-of-function mutations. I believe the analysis is based on our previous fibroblast result. We will need the coordinates of the AS events in these 9 genes. I hope that this can be done before next Tuesday (our next order for DNAs). 1 AKT3 MEGALENCEPHALY-POLYMICROGYRIA-POLYDACTYLY-HYDROCEPHALUS SYNDROME … 2 ACVR1 FIBRODYSPLASIA OSSIFICANS PROGRESSIVA; FOP<br />
+3 STAT1 IMMUNODEFICIENCY 31C; IMD31C<br />
+4 PDGFRB MYOFIBROMATOSIS, INFANTILE, 1; IMF1<br />
+5 RNF170 ATAXIA, SENSORY, 1, AUTOSOMAL DOMINANT; SNAX1<br />
+6 PTDSS1 LENZ-MAJEWSKI HYPEROSTOTIC DWARFISM; LMHD<br />
+7 KITLG HYPERPIGMENTATION WITH OR WITHOUT HYPOPIGMENTATION, FAMILIAL PROG… 8 PIEZO1 DEHYDRATED HEREDITARY STOMATOCYTOSIS 1 WITH OR WITHOUT PSEUDOHYPE… 9 SNTA1 LONG QT SYNDROME 12; LQT12</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2" style="list-style-type: decimal">
+<li>The most intriguing part of the dose-response (DR) study is the selectivity difference between risdiplam and branaplam. Due to the similarity between risdiplam and C2-C5-1, we can even leave C2-C5-1 out for simplicity. We need a list of more genes that are (a) risdiplam selective and (b) branaplam selective, with complete coordinates. The criteria I can think of are as follows:</li>
+</ol>
+<ol style="list-style-type: decimal">
+<li>Number of validated reads (leave the low-quality DR curves out).</li>
+<li>EC50 difference. This can be defined by delta Psi at a certain concentration (or an average of a few concentrations).</li>
+<li>Only consider exon inclusion in the presence of drugs.</li>
+</ol>
+</blockquote>
+<p>Here I’ll address #2. Previously, based on the LCL dose-response data, I identified branaplam specific introns just by the loading of PC2 on a PCA analysis, as this PC seemed to distinguish branaplam-specific from C2C5/risdiplam-specific effects. I’ll do something similarly ad hoc, and incorporating some of Jingxin’s suggestions, to come up with a list of intron coordiantes worth cloning…</p>
+</div>
+<div id="analysis" class="section level2">
+<h2>analysis</h2>
+<pre class="r"><code>#load libraries
+library(tidyverse)
+library(edgeR)
+library(gplots)
+library(GenomicRanges)
+library(drc)
+library(broom)
+library(GGally)
+
+
+
+#Read in sample metadata
+sample.list &lt;- read_tsv(&quot;../code/bigwigs/BigwigList.tsv&quot;,
+                        col_names = c(&quot;SampleName&quot;, &quot;bigwig&quot;, &quot;group&quot;, &quot;strand&quot;)) %&gt;%
+  filter(strand==&quot;.&quot;) %&gt;%
+  mutate(old.sample.name = str_replace(bigwig, &quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw&quot;, &quot;\\1&quot;)) %&gt;%
+  separate(SampleName, into=c(&quot;treatment&quot;, &quot;dose.nM&quot;, &quot;cell.type&quot;, &quot;libType&quot;, &quot;rep&quot;), convert=T, remove=F, sep=&quot;_&quot;) %&gt;%
+  left_join(
+    read_tsv(&quot;../code/bigwigs/BigwigList.groups.tsv&quot;, col_names = c(&quot;group&quot;, &quot;color&quot;, &quot;bed&quot;, &quot;supergroup&quot;)),
+    by=&quot;group&quot;
+  )
+
+# Read in list of introns detected across all experiments that pass leafcutter&#39;s default clustering processing thresholds
+all.samples.5ss &lt;- read_tsv(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz&quot;, col_names = c(&quot;intron&quot;, &quot;seq&quot;, &quot;score&quot;)) %&gt;%
+  mutate(intron = str_replace(intron, &quot;^(.+?)::.+$&quot;, &quot;\\1&quot;)) %&gt;%
+  separate(intron, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;strand&quot;), sep=&quot;_&quot;, convert=T, remove=F)
+
+all.samples.intron.annotations &lt;- read_tsv(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz&quot;)
+
+all.samples.PSI &lt;- read_tsv(&quot;../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz&quot;)</code></pre>
+<div id="pca" class="section level3">
+<h3>PCA</h3>
+<p>Let’s subset the splice junction count table for junctions reasonably expressed junctions in the LCL data and are GA|GT introns, then recreate the PCA where I expect PC2 to separate branaplam vs risdiplma/C2C5 samples.</p>
+<p>First, out of curiosity, I will do this PCA with the chRNA LCL samples and the polyA dose-response LCL samples. I’ll color points by treatment and dose (purple=C2C5, blue=risdiplam, green=branaplam, LighterColors=LighterDoses)</p>
+<pre class="r"><code>splicing.gagt.df &lt;- all.samples.PSI %&gt;%
+  dplyr::select(-contains(&quot;fibroblast&quot;)) %&gt;%
+  drop_na() %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;) ) %&gt;%
+  filter(str_detect(seq, &quot;^\\w{2}GAGT&quot;))
+
+#Verify correlation coefficients are reasonable.
+#For splicing, perhaps average spearman &gt; 0.7 is reasoable.
+splicing.gagt.df %&gt;%
+  dplyr::select(junc, contains(&quot;LCL&quot;)) %&gt;%
+  column_to_rownames(&quot;junc&quot;) %&gt;% as.matrix() %&gt;% cor(method=&#39;spearman&#39;) %&gt;%
+  heatmap.2(trace=&#39;none&#39;)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pca.results.splicing &lt;- splicing.gagt.df %&gt;%
+  dplyr::select(junc, contains(&quot;LCL&quot;)) %&gt;%
+  column_to_rownames(&quot;junc&quot;) %&gt;% as.matrix() %&gt;%
+  scale() %&gt;%
+  t() %&gt;% prcomp()
+
+PC.dat &lt;- pca.results.splicing$x %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleName&quot;) %&gt;%
+  dplyr::select(SampleName, PC1, PC2, PC3) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;)
+ggplot(PC.dat, aes(x=PC1, y=PC2, color=color)) +
+  geom_point(aes(shape=libType)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 678 GA|GT spliced introns&quot;)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(PC.dat, aes(x=PC2, y=PC3, color=color)) +
+  geom_point(aes(shape=libType)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 678 GA|GT spliced introns&quot;)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, here the first 2 PCs are a mix of effects that correlate with RNA type (chRNA vs polyA), and dose. I think this in itself is sort of noteworthy, and could be thought of as consistent with chRNA bringing out stronger effects that might otherwise only be seen with higher doses. PC3 seems to separate branaplam versus risdiplam. The separation is still good enough, in my opinion, to use as an ad-hoc way to distinguish branaplam versus risdiplam/C2C5 effects.</p>
+<p>Let’s try redoing that PCA without the chRNA-seq data, just out of curiosity…</p>
+<pre class="r"><code>splicing.gagt.df &lt;- all.samples.PSI %&gt;%
+  dplyr::select(-contains(&quot;fibroblast&quot;)) %&gt;%
+  dplyr::select(-contains(&quot;chRNA&quot;)) %&gt;%
+  drop_na() %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;) ) %&gt;%
+  filter(str_detect(seq, &quot;^\\w{2}GAGT&quot;))
+
+#Verify correlation coefficients are reasonable.
+#For splicing, perhaps average spearman &gt; 0.7 is reasoable.
+splicing.gagt.df %&gt;%
+  dplyr::select(junc, contains(&quot;LCL&quot;)) %&gt;%
+  column_to_rownames(&quot;junc&quot;) %&gt;% as.matrix() %&gt;% cor(method=&#39;spearman&#39;) %&gt;%
+  heatmap.2(trace=&#39;none&#39;)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pca.results.splicing &lt;- splicing.gagt.df %&gt;%
+  dplyr::select(junc, contains(&quot;LCL&quot;)) %&gt;%
+  column_to_rownames(&quot;junc&quot;) %&gt;% as.matrix() %&gt;%
+  scale() %&gt;%
+  t() %&gt;% prcomp()
+
+PC.dat &lt;- pca.results.splicing$x %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleName&quot;) %&gt;%
+  dplyr::select(SampleName, PC1, PC2, PC3) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;)
+ggplot(PC.dat, aes(x=PC1, y=PC2, color=color)) +
+  geom_point(aes(shape=libType)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 3,479 GA|GT spliced introns&quot;)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(PC.dat, aes(x=PC2, y=PC3, color=color)) +
+  geom_point(aes(shape=libType)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 3,479 GA|GT spliced introns&quot;)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>In this PCA, I used more GA|GT introns, since my filtering for presence of within-cluster junctions across all samples does keeps more junctions if I limit samples to the polyA data. Here the dose correlates with PC1, and the branaplam-specific-effect with PC2.</p>
+<p>Let’s continue with this PCA results to quickly identify the branaplam-specific effects. Let’s further filter by a reliable dose-response effect with splicing that goes up with higher dose, and also filter specifically for cassette exons. Here is how I will go about that:</p>
+<ul>
+<li>first, identify the GA|GT introns that have an upstream intron with the splice acceptor within 500bp of the GA|GT splice donor (defining a cassette exon)</li>
+<li>Then do dose-response curve modelling and GA|GT introns with a good fit with a positive slope</li>
+<li>order the remaining list by PC2 loading.</li>
+<li>Manually inspect sashimi plots of the top hits on the list, and send coordinates to Jingxin</li>
+</ul>
+</div>
+<div id="identifying-cassette-exons" class="section level3">
+<h3>Identifying cassette exons</h3>
+<p>First step: identifying GA|GT introns that have a nearby upstream splice acceptor:</p>
+<pre class="r"><code>MaxCassetteExonLen &lt;- 300
+
+splicing.gagt.donors.granges &lt;- splicing.gagt.df %&gt;%
+  dplyr::select(chrom=`#Chrom`, intron.start=start, intron.end=end, strand) %&gt;%
+  mutate(start = case_when(
+    strand == &quot;+&quot; ~ intron.start,
+    strand == &quot;-&quot; ~ intron.end -2
+  )) %&gt;%
+  mutate(end = start +2) %&gt;%
+  dplyr::select(chrom, start, end, strand) %&gt;% 
+  distinct() %&gt;%
+  add_row(chrom=&quot;DUMMY&quot;, start=0, end=1, strand=&quot;+&quot;, .before=1) %&gt;%
+  makeGRangesFromDataFrame()
+
+splicing.acceptors.granges &lt;- all.samples.PSI %&gt;%
+  dplyr::select(1:6) %&gt;%
+  filter(gid %in% splicing.gagt.df$gid) %&gt;%
+  filter(!junc %in% splicing.gagt.df$junc) %&gt;%
+  dplyr::select(chrom=`#Chrom`, intron.start=start, intron.end=end, strand) %&gt;%
+  mutate(start = case_when(
+    strand == &quot;+&quot; ~ intron.end -2,
+    strand == &quot;-&quot; ~ intron.start -2
+  )) %&gt;%
+  mutate(end = start +2) %&gt;%
+  dplyr::select(chrom, start, end, strand) %&gt;% 
+  distinct() %&gt;%
+  makeGRangesFromDataFrame()
+
+PrecedingIndexes &lt;- GenomicRanges::follow(splicing.gagt.donors.granges, splicing.acceptors.granges, select=&quot;last&quot;) %&gt;%
+  replace_na(1)
+
+UpstreamAcceptors.df &lt;- cbind(
+  splicing.gagt.donors.granges %&gt;% as.data.frame() %&gt;%
+    dplyr::rename(chrom=1, start=2, end=3, width=4, strand=5),
+  splicing.acceptors.granges[PrecedingIndexes] %&gt;% as.data.frame() %&gt;%
+    dplyr::rename(chrom.preceding=1, start.preceding=2, end.preceding=3, width.preceding=4, strand.preceding=5)
+) %&gt;%
+  filter(as.character(chrom) == as.character(chrom.preceding)) %&gt;%
+  filter((strand==&quot;+&quot; &amp; start - end.preceding   &lt; MaxCassetteExonLen) | (strand==&quot;-&quot; &amp; start.preceding - end &lt; MaxCassetteExonLen)) %&gt;%
+  mutate(SpliceDonor = case_when(
+    strand == &quot;+&quot; ~ paste(chrom, start, strand, sep=&quot;.&quot;),
+    strand == &quot;-&quot; ~ paste(chrom, end, strand, sep=&quot;.&quot;)
+  )) %&gt;%
+  mutate(UpstreamSpliceAcceptor = case_when(
+    strand == &quot;+&quot; ~ paste(chrom, end.preceding, strand, sep=&quot;.&quot;),
+    strand == &quot;-&quot; ~ paste(chrom, start.preceding, strand, sep=&quot;.&quot;)
+  )) %&gt;%
+  dplyr::select(SpliceDonor, UpstreamSpliceAcceptor)
+
+splicing.gagt.cassette.exons &lt;- splicing.gagt.df %&gt;%
+  mutate(SpliceDonor = case_when(
+    strand == &quot;+&quot; ~ paste(`#Chrom`, start, strand, sep=&quot;.&quot;),
+    strand == &quot;-&quot; ~ paste(`#Chrom`, end, strand, sep=&quot;.&quot;)
+    )) %&gt;%
+  inner_join(UpstreamAcceptors.df, by=&quot;SpliceDonor&quot;) %&gt;%
+  mutate(IntronType = recode(anchor, A=&quot;Alt 5&#39;ss&quot;, D=&quot;Alt 3&#39;ss&quot;, DA=&quot;Annotated&quot;, N=&quot;New Intron&quot;, NDA=&quot;New Splice Site combination&quot;))</code></pre>
+<p>Now that I’ve filtered for GA|GT introns with a preceding splice accepter, let’s plot the fraction of each IntronType AS classification, and compare to all GA|GT introns, and to all juncs as well…</p>
+<pre class="r"><code>all.samples.PSI %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;) ) %&gt;%
+  dplyr::select(junc, anchor, seq) %&gt;%
+  mutate(IntronType = recode(anchor, A=&quot;Alt 5&#39;ss&quot;, D=&quot;Alt 3&#39;ss&quot;, DA=&quot;Annotated&quot;, N=&quot;New Intron&quot;, NDA=&quot;New Splice Site combination&quot;)) %&gt;%
+  mutate(Set = case_when(
+    junc %in% splicing.gagt.cassette.exons$junc ~ &quot;GA|GT in my cassette exon set&quot;,
+    str_detect(seq, &quot;^\\w{2}GAGT&quot;) ~ &quot;GA|GT not in my cassette exon set&quot;,
+    TRUE ~ &quot;Not GA|GT&quot;
+  )) %&gt;%
+  ggplot(aes(x=Set, fill=IntronType)) +
+  geom_bar(position=&quot;fill&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  labs(x=&quot;Fraction each AS type&quot;, title=&quot;My GA|GT intron set involved in\ncassette exons is mostly cryptic 5&#39;ss&quot;)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Now the second step… model fitting…</p>
+<p>But before model fitting, let’s get a feel for what the data looks like…</p>
+</div>
+<div id="exploring-dose-response-curves-of-gagt-introns-involved-involved-in-cassette-exons" class="section level3">
+<h3>Exploring dose-response curves of GA|GT introns involved involved in cassette exons</h3>
+<p>let’s first plot the dose response points for a random sample of introns…</p>
+<pre class="r"><code>splicing.gagt.cassette.exons %&gt;%
+  dplyr::select(junc, contains(&quot;LCL&quot;)) %&gt;%
+  sample_n(30) %&gt;%
+  gather(&quot;SampleName&quot;, &quot;PSI&quot;, -junc) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans=&quot;log10&quot;) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Reassuringly, most all dose-response slopes for GA|GT introns are positive. There a few that look too noisy to model, but maybe we can just model them all and filter those noisy ones after fitting the model…</p>
+<p>On second thought, before fitting models, let’s just see if plotting the top introns by PC2 loading already does a good job at filtering out the noisy introns…</p>
+<p>Here are the top 30 introns by PC2 loading</p>
+<pre class="r"><code>pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  dplyr::select(junc, PC2, contains(&quot;LCL&quot;)) %&gt;%
+  arrange(desc(PC2)) %&gt;%
+  head(30) %&gt;%
+  gather(&quot;SampleName&quot;, &quot;PSI&quot;, -junc, -PC2) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans=&quot;log10&quot;) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Bottom30 by PC2 loading…</p>
+<pre class="r"><code>pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  dplyr::select(junc, PC2, contains(&quot;LCL&quot;)) %&gt;%
+  arrange(PC2) %&gt;%
+  head(30) %&gt;%
+  gather(&quot;SampleName&quot;, &quot;PSI&quot;, -junc, -PC2) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_x_continuous(trans=&quot;log10&quot;) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Hmmm, I think it may still be worthwhile fitting a model as an additional critera…</p>
+<p>Before model fitting, let’s also do something simple: calculate the spearman correlation coefficient across dose and PSI for each intron:treatment combination… I expect the correlation to be generally positive since GA|GT introns increase with dosage… Will branaplam have more introns with positive coefficient?</p>
+<p>Small note on this analysis: I will include the DMSO data… There are 3 replicates of DMSO. I will randomly assign 1 DMSO sample for each titration series. I will actually do this on a per-junctino level, so it’s not like branaplam titration series is always paired with the same DMSO replicate… Rather, it will vary randomly by junction.</p>
+<pre class="r"><code>dmso.data &lt;- splicing.gagt.cassette.exons %&gt;%
+  dplyr::select(junc, contains(&quot;LCL&quot;)) %&gt;%
+  gather(&quot;SampleName&quot;, &quot;PSI&quot;, -junc) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  filter(treatment==&quot;DMSO&quot;) %&gt;%
+  arrange(junc, rep) %&gt;%
+  mutate(dose.nM = 0)
+dmso.data$treatment &lt;- replicate(nrow(dmso.data)/3, sample(c(&quot;Branaplam&quot;, &quot;Risdiplam&quot;, &quot;C2C5&quot;), 3)) %&gt;% as.vector()
+
+spearman.tests &lt;- splicing.gagt.cassette.exons %&gt;%
+  dplyr::select(junc, IntronType, contains(&quot;LCL&quot;)) %&gt;%
+  gather(&quot;SampleName&quot;, &quot;PSI&quot;, -junc, -IntronType) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  bind_rows(dmso.data) %&gt;%
+  filter(!treatment==&quot;DMSO&quot;) %&gt;%
+  nest(-treatment, -junc) %&gt;%
+  mutate(cor=map(data,~cor.test(.x$dose.nM, .x$PSI, method = &quot;sp&quot;))) %&gt;%
+  mutate(tidied = map(cor, tidy)) %&gt;% 
+  unnest(tidied, .drop = T)
+
+spearman.tests %&gt;%
+  unnest(data) %&gt;%
+  distinct(junc, treatment, .keep_all=T) %&gt;%
+  ggplot(aes(x=estimate, color=treatment)) +
+  stat_ecdf() +
+  theme_bw() +
+  labs(title=&quot;Distribution of dose vs PSI spearman correlation coef, by AS type&quot;, y=&quot;ecdf&quot;, x=&quot;spearmen coef&quot;, caption=&quot;Only GA|GT introns included&quot;) +
+  facet_wrap(~IntronType)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, from this it isn’t clear to me that branaplam or risdiplam effect a hugely different number of GA|GT introns genome-wide. It is also clear that the alt 5’ss and NewIntron (which contain a new splice site by definition) have the more positive spearman coef. Let’s plot the spearman coefficient results one additional way: as pairwise scatter plots, with each point being the correlation coefficient in two different treatments</p>
+<pre class="r"><code>Limits &lt;- 1
+
+diag_limitrange &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_density(...) + 
+    coord_cartesian(xlim=c(-Limits,Limits)) +
+    theme_bw()
+}
+
+upper_point &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_point(..., alpha=0.05) + 
+    scale_y_continuous(limits = c(-Limits, Limits)) +
+    scale_x_continuous(limits = c(-Limits, Limits)) +
+    geom_abline() +
+    theme_bw()
+}
+
+
+spearman.tests %&gt;%
+  dplyr::select(junc, treatment, estimate) %&gt;%
+  # group_by(junc) %&gt;%
+    # filter(any(estimate&gt;0.90)) %&gt;%
+  # ungroup() %&gt;%
+  pivot_wider(names_from = &quot;treatment&quot;, values_from=&quot;estimate&quot;) %&gt;%
+  ggpairs(
+    title=&quot;Spearman coef between dose and PSI&quot;,
+    columns = 2:4,
+    upper=list(continuous = wrap(&quot;cor&quot;, method = &quot;spearman&quot;, hjust=0.7)),
+    lower=list(continuous = upper_point),
+    diag=list(continuous = diag_limitrange))</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Again, it is not clear that branaplam affects any more introns genomewide than risdiplam, though again we see that C2C5 and risdiplam are more similar to each other than branaplam.</p>
+<p>Let’s see plot some random dose-response curves and see if the spearman correlation coefficient seems like a reliable enough proxy for a ‘trustable’ dose-respone curve… Let’s replot the top30 and bottom30 by PC2 loading and also label the spearman coefficient… For these, I will further filter only for the alt 5’ss introns from within my set of GA|GT introns with an upstream splice accepter. I figure these are more what Jingxin is looking for when he clones things… (The “newIntrons” might represent more complex splicing that would require more thought to find the appropriate coordinates to clone)</p>
+<pre class="r"><code>pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  filter(IntronType == &quot;Alt 5&#39;ss&quot;) %&gt;%
+  dplyr::select(junc, PC2, contains(&quot;LCL&quot;)) %&gt;%
+  arrange(desc(PC2)) %&gt;%
+  head(30) %&gt;%
+  gather(&quot;SampleName&quot;, &quot;PSI&quot;, -junc, -PC2) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  inner_join(spearman.tests, by=c(&quot;junc&quot;, &quot;treatment&quot;)) %&gt;%
+  ggplot(aes(color=treatment)) +
+  geom_label(
+    data = (. %&gt;%
+      distinct(junc, treatment, estimate) %&gt;%
+      group_by(junc) %&gt;%
+      mutate(vjust = row_number()) %&gt;%
+      ungroup()),
+    aes(vjust = vjust, label=signif(estimate,3)),
+    y=Inf, x=-Inf, size=2.5, hjust=-0.1, label.padding=unit(0.1, &quot;lines&quot;)
+  ) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans=&quot;log10&quot;) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  labs(title=&quot;Top30 GA|GT introns by PC2&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  filter(IntronType == &quot;Alt 5&#39;ss&quot;) %&gt;%
+  dplyr::select(junc, PC2, contains(&quot;LCL&quot;)) %&gt;%
+  arrange(PC2) %&gt;%
+  head(30) %&gt;%
+  gather(&quot;SampleName&quot;, &quot;PSI&quot;, -junc, -PC2) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  inner_join(spearman.tests, by=c(&quot;junc&quot;, &quot;treatment&quot;)) %&gt;%
+  ggplot(aes(color=treatment)) +
+  geom_label(
+    data = (. %&gt;%
+      distinct(junc, treatment, estimate) %&gt;%
+      group_by(junc) %&gt;%
+      mutate(vjust = row_number()) %&gt;%
+      ungroup()),
+    aes(vjust = vjust, label=signif(estimate,3)),
+    y=Inf, x=-Inf, size=2.5, hjust=-0.1, label.padding=unit(0.1, &quot;lines&quot;)
+  ) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans=&quot;log10&quot;) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  labs(title=&quot;Bottom30 GA|GT introns by PC2&quot;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I think that seems good enough. The spearman coefficient seems like a simple and effective-enough way to filter out the poor dose-responses. Let’s try filtering for a spearman coefficient &gt; 0.93 in at least one treatment… Then replot the top and bottom30.</p>
+<pre class="r"><code>pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  filter(IntronType == &quot;Alt 5&#39;ss&quot;) %&gt;%
+  dplyr::select(junc, PC2) %&gt;%
+  inner_join(spearman.tests, by=&quot;junc&quot;) %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(estimate&gt;0.90)) %&gt;%
+  ungroup() %&gt;%
+  arrange(desc(PC2), junc) %&gt;%
+  head(30*3) %&gt;%
+  unnest(data) %&gt;%
+  ggplot(aes(color=treatment)) +
+  geom_label(
+    data = (. %&gt;%
+      distinct(junc, treatment, estimate) %&gt;%
+      group_by(junc) %&gt;%
+      mutate(vjust = row_number()) %&gt;%
+      ungroup()),
+    aes(vjust = vjust, label=signif(estimate,3)),
+    y=Inf, x=-Inf, size=2.5, hjust=-0.1, label.padding=unit(0.1, &quot;lines&quot;)
+  ) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  labs(title=&quot;Top30 GA|GT introns by PC2&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  filter(IntronType == &quot;Alt 5&#39;ss&quot;) %&gt;%
+  dplyr::select(junc, PC2) %&gt;%
+  inner_join(spearman.tests, by=&quot;junc&quot;) %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(estimate&gt;0.90)) %&gt;%
+  ungroup() %&gt;%
+  arrange(PC2, junc) %&gt;%
+  head(30*3) %&gt;%
+  unnest(data) %&gt;%
+  ggplot(aes(color=treatment)) +
+  geom_label(
+    data = (. %&gt;%
+      distinct(junc, treatment, estimate) %&gt;%
+      group_by(junc) %&gt;%
+      mutate(vjust = row_number()) %&gt;%
+      ungroup()),
+    aes(vjust = vjust, label=signif(estimate,3)),
+    y=Inf, x=-Inf, size=2.5, hjust=-0.1, label.padding=unit(0.1, &quot;lines&quot;)
+  ) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  labs(title=&quot;Bottom30 GA|GT introns by PC2&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, that looks generally good.</p>
+<div id="check-the-delta-psi-of-the-gagt-intron-in-chrna" class="section level4">
+<h4>Check the delta PSI of the GA|GT intron in chRNA</h4>
+<p>Let’s also look at these junctions in chRNA, comparing the same dose in chRNA vs poly-RNA-seq. I expect trustworthy junctions of interest to generally have higher PSI in chRNA, if in fact these cause NMD.</p>
+<pre class="r"><code>chRNA.Mean.PSI &lt;- all.samples.PSI %&gt;%
+  dplyr::select(junc, contains(&quot;chRNA&quot;)) %&gt;%
+  gather(&quot;SampleName&quot;, &quot;PSI&quot;, -junc) %&gt;%
+  inner_join(
+    sample.list %&gt;%
+      filter(libType == &quot;chRNA&quot;) %&gt;%
+      group_by(treatment) %&gt;%
+      filter(dose.nM == max(dose.nM)) %&gt;%
+      ungroup(),
+    by=&quot;SampleName&quot;) %&gt;%
+  group_by(junc, treatment, dose.nM) %&gt;%
+  summarise(Avg_chRNA_PSI = mean(PSI))
+
+pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  dplyr::select(junc, PC2) %&gt;%
+  inner_join(spearman.tests, by=&quot;junc&quot;) %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(estimate&gt;0.90)) %&gt;%
+  ungroup() %&gt;%
+  unnest(data) %&gt;%
+  inner_join(chRNA.Mean.PSI, by=c(&quot;junc&quot;, &quot;treatment&quot;, &quot;dose.nM&quot;)) %&gt;%
+  ggplot(aes(x=Avg_chRNA_PSI - PSI, color=IntronType)) +
+  stat_ecdf()</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Even for the cryptic 5’ss subset, it is not clear that these junctions are more used (relative to the other introns in the leafcutter cluster) in chRNA.</p>
+<p>Let’s try model fitting though. I think the output (eg a EC50 parameter for each drug) will be generally useful.</p>
+</div>
+<div id="model-fitting" class="section level4">
+<h4>Model fitting</h4>
+<p>I will fit a standard log-logistic regression, with PSI as the response. This may not be perfect, as I’m not sure residuals will be perfectly normal, and PSI range is only [0-100], and those don’t necessarily fit the model assumptions… Nonetheless, it will be quick and easy for me to fit a model like that and it will still be helpful/useful. In fact, with the <code>drm</code> model fitting function, I can actually set limits on the the lower and upper limit paramters to be [0,100]. For simplicity, to to limit the likely parameter space of the model with our limited number of data points, I will jointly fit a model between all treatments for each junction, fixing the same upper and lower limit parameters to be the same across each treatment… I think I will also fix the same slope. I think given that the mechanisms underlying these small molecules is so similar, I think it this is reasonable, and will lower the complexity of the model to help prevent over-fitting. To demonstrate what I mean, look at the following model fits:</p>
+<p>Allowing all 4 parameters to vary freely:</p>
+<pre class="r"><code>data.to.fit &lt;- pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  dplyr::select(junc, PC2) %&gt;%
+  inner_join(spearman.tests, by=&quot;junc&quot;) %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(estimate&gt;0.90)) %&gt;%
+  ungroup() %&gt;%
+  arrange(desc(PC2), junc) %&gt;%
+  filter(row_number() &gt; max(row_number()) - 300 | row_number() &lt;= 300) %&gt;%
+  unnest(data) %&gt;%
+  filter(junc == &quot;chr22:35267514:35283962:clu_38658_+&quot;)
+
+fit &lt;-  data.to.fit %&gt;%
+  drm(formula = PSI ~ dose.nM,treatment,
+                    data = .,
+                    # curveid = treatment,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(treatment, treatment, treatment, treatment)
+                    )
+plot(fit)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>And now fixing the lowerLimit and UpperLimit parameter to be the same between treatments:</p>
+<pre class="r"><code>fit &lt;-  data.to.fit %&gt;%
+  drm(formula = PSI ~ dose.nM,treatment,
+                    data = .,
+                    # curveid = treatment,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(treatment, 1, 1, treatment)
+                    )
+plot(fit)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>And now fixing the lowerlLimit, the upperLimit, and the slope to be the same between treatments… That is, the models are all parellel, and only the EC50 parameter may vary between treatments…</p>
+<pre class="r"><code>fit &lt;-  data.to.fit %&gt;%
+  drm(formula = PSI ~ dose.nM,treatment,
+                    data = .,
+                    # curveid = treatment,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(1, 1, 1, treatment)
+                    )
+plot(fit)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>For sake of computational time, let’s just even attempt to fit a model to the top100 and bottom100 GA|GT introns by PC2 among those with a spearman coefficient &gt; 0.9 in at least one treatment, and among those that may be involved in cassette exons (nearby a upstream splice donor) and also cryptic 5’ss.</p>
+<div id="hackish-code-that-doesnt-work" class="section level5">
+<h5>Hackish code that doesn’t work</h5>
+<p>… For model fitting, this code doesn’t work but I want to document it because it could be a useful starting point for more carefully doing this stuff later.</p>
+<pre class="r"><code># had to use possibly wrapper function to handle errors, like when drm fitting does not converge
+safe_drm &lt;- safely(drm, otherwise=NA)
+possibly_drm &lt;- possibly(drm, otherwise=NA)
+quitely_drm &lt;- quietly(drm)
+
+
+
+model.results.df &lt;- pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  dplyr::select(junc, PC2) %&gt;%
+  inner_join(spearman.tests, by=&quot;junc&quot;) %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(estimate&gt;0.90)) %&gt;%
+  ungroup() %&gt;%
+  arrange(desc(PC2), junc) %&gt;%
+  filter(row_number() &gt; max(row_number()) - 300 | row_number() &lt;= 300) %&gt;%
+  unnest(data) %&gt;%
+  # filter(junc %in% c(&quot;chr22:35267514:35283962:clu_38658_+&quot;, &quot;chr10:68446413:68448247:clu_20590_-&quot;)) %&gt;%
+  # filter(junc %in% c(&quot;chr22:35267514:35283962:clu_38658_+&quot;)) %&gt;%
+  group_by(junc) %&gt;%
+  filter(all(!is.na(PSI))) %&gt;%
+  filter(all(!is.na(dose.nM))) %&gt;%
+  filter(all(!is.na(treatment))) %&gt;%
+  ungroup() %&gt;%
+  group_by(junc, treatment) %&gt;% 
+  nest(-junc) %&gt;%
+  mutate(model = map(data, ~drm(formula = PSI ~ dose.nM,treatment,
+                    data = .,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(treatment, 1, 1, treatment)
+                    )))
+
+  # filter out the wrapper functions that returned list with NA
+  # filter(!anyNA(model))
+
+model.results.df %&gt;%
+  mutate(results = map(model, tidy)) %&gt;%
+  unnest(results) %&gt;%
+  mutate(summary = map(model, glance)) %&gt;%
+  unnest(summary)
+
+fit &lt;- pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  dplyr::select(junc, PC2) %&gt;%
+  inner_join(spearman.tests, by=&quot;junc&quot;) %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(estimate&gt;0.90)) %&gt;%
+  ungroup() %&gt;%
+  arrange(desc(PC2), junc) %&gt;%
+  filter(row_number() &gt; max(row_number()) - 300 | row_number() &lt;= 300) %&gt;%
+  unnest(data) %&gt;%
+  filter(junc == &quot;chr22:35267514:35283962:clu_38658_+&quot;) %&gt;%
+  drm(formula = PSI ~ dose.nM,treatment,
+                    data = .,
+                    # curveid = treatment,
+                    fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                    pmodels=data.frame(treatment, 1, 1, treatment)
+                    )
+plot(fit)
+summary(fit)
+mselect(fit)
+
+
+model.dat.df &lt;- pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  dplyr::select(junc, PC2) %&gt;%
+  inner_join(spearman.tests, by=&quot;junc&quot;) %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(estimate&gt;0.90)) %&gt;%
+  ungroup() %&gt;%
+  arrange(desc(PC2), junc) %&gt;%
+  filter(row_number() &gt; max(row_number()) - 300 | row_number() &lt;= 300) %&gt;%
+  unnest(data) %&gt;%
+  # filter(junc %in% c(&quot;chr22:35267514:35283962:clu_38658_+&quot;, &quot;chr10:68446413:68448247:clu_20590_-&quot;)) %&gt;%
+  # filter(junc %in% c(&quot;chr22:35267514:35283962:clu_38658_+&quot;)) %&gt;%
+  group_by(junc) %&gt;%
+  filter(all(!is.na(PSI))) %&gt;%
+  filter(all(!is.na(dose.nM))) %&gt;%
+  filter(all(!is.na(treatment))) %&gt;%
+  ungroup() %&gt;%
+  group_by(junc, treatment) %&gt;% 
+  nest(-junc)
+model.dat.df$model &lt;- NA
+
+# for(i in 1:nrow(model.dat.df)) {
+for(i in 1:100) {
+  tryCatch(
+    expr = {
+      data &lt;- model.dat.df$data[i] %&gt;% as.data.frame()
+      fit &lt;- drm(formula = PSI ~ dose.nM,treatment,
+                  data = data,
+                  # curveid = treatment,
+                  fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                  pmodels=data.frame(treatment, 1, 1, treatment)
+                  )
+      df.out &lt;- fit$coefficients %&gt;%
+        as.data.frame() %&gt;%
+        rownames_to_column(&quot;param&quot;) %&gt;%
+        rename(`.` = &quot;estimate&quot;)
+      message(&quot;Successfully executed the log(x) call.&quot;)
+      # do stuff with row
+    },
+    error=function(e){cat(&quot;ERROR :&quot;,conditionMessage(e), &quot;\n&quot;)})
+}</code></pre>
+</div>
+<div id="hackish-code-that-does-work" class="section level5">
+<h5>Hackish code that does work</h5>
+<p>my hackish code to get results quick… most of the time the model fitting fails for various reasons, but i am just going to ignore those cases, and focus on the models that could be easily fit.</p>
+<pre class="r"><code>model.dat.df &lt;- pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  filter(IntronType == &quot;Alt 5&#39;ss&quot;) %&gt;%
+  dplyr::select(junc, PC2) %&gt;%
+  inner_join(spearman.tests, by=&quot;junc&quot;) %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(estimate&gt;0.90)) %&gt;%
+  ungroup() %&gt;%
+  arrange(desc(PC2), junc) %&gt;%
+  filter(row_number() &gt; max(row_number()) - 100 | row_number() &lt;= 100) %&gt;%
+  unnest(data) %&gt;%
+  # filter(junc %in% c(&quot;chr22:35267514:35283962:clu_38658_+&quot;, &quot;chr10:68446413:68448247:clu_20590_-&quot;)) %&gt;%
+  # filter(junc %in% c(&quot;chr22:35267514:35283962:clu_38658_+&quot;)) %&gt;%
+  group_by(junc) %&gt;%
+  filter(all(!is.na(PSI))) %&gt;%
+  filter(all(!is.na(dose.nM))) %&gt;%
+  filter(all(!is.na(treatment))) %&gt;%
+  ungroup() %&gt;%
+  group_by(junc, treatment) %&gt;% 
+  nest(-junc)
+model.dat.df$model &lt;- NA
+
+Results &lt;- list()
+# for(i in 1:nrow(model.dat.df)) {
+for(i in 1:nrow(model.dat.df)) {
+  tryCatch(
+    expr = {
+      junc &lt;- model.dat.df$junc[i]
+      data &lt;- model.dat.df$data[i] %&gt;% as.data.frame()
+      fit &lt;- drm(formula = PSI ~ dose.nM,treatment,
+                  data = data,
+                  # curveid = treatment,
+                  fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                  pmodels=data.frame(1, 1, 1, treatment)
+                  )
+      df.out &lt;- fit$coefficients %&gt;%
+        as.data.frame() %&gt;%
+        rownames_to_column(&quot;param&quot;) %&gt;%
+        rename(`.` = &quot;estimate&quot;)
+      message(&quot;Successfully fitted model.&quot;)
+      Results[[junc]] &lt;- df.out
+      # do stuff with row
+    },
+    error=function(e){
+      cat(&quot;ERROR :&quot;,conditionMessage(e), &quot;\n&quot;)
+      })
+}</code></pre>
+<pre><code>ERROR : 0 (non-NA) cases 
+ERROR : 0 (non-NA) cases 
+ERROR : 0 (non-NA) cases 
+ERROR : 0 (non-NA) cases 
+ERROR : 0 (non-NA) cases 
+ERROR : 0 (non-NA) cases 
+ERROR : 0 (non-NA) cases 
+ERROR : 0 (non-NA) cases 
+ERROR : 0 (non-NA) cases 
+ERROR : 0 (non-NA) cases </code></pre>
+<pre class="r"><code>ModelFits.Coefficients &lt;- bind_rows(Results, .id=&quot;junc&quot;)</code></pre>
+<p>Now let’s explore the results a bit…</p>
+<p>First by plotting the EC50 parameter estimate in context of the actual raw data.</p>
+<pre class="r"><code>pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  filter(IntronType == &quot;Alt 5&#39;ss&quot;) %&gt;%
+  dplyr::select(junc, PC2) %&gt;%
+  inner_join(spearman.tests, by=&quot;junc&quot;) %&gt;%
+  unnest(data) %&gt;%
+  inner_join(
+    ModelFits.Coefficients %&gt;%
+      separate(param, into=c(&quot;param&quot;, &quot;treatment&quot;), sep=&quot;:&quot;) %&gt;%
+      filter(param==&quot;ED50&quot;),
+    by=c(&quot;junc&quot;, &quot;treatment&quot;)) %&gt;%
+  ggplot(aes(color=treatment)) +
+  # geom_label(
+  #   data = (. %&gt;%
+  #     distinct(junc, treatment, estimate) %&gt;%
+  #     group_by(junc) %&gt;%
+  #     mutate(vjust = row_number()) %&gt;%
+  #     ungroup()),
+  #   aes(vjust = vjust, label=signif(estimate,3)),
+  #   y=Inf, x=-Inf, size=2.5, hjust=-0.1, label.padding=unit(0.1, &quot;lines&quot;)
+  # ) +
+  geom_vline(
+    data = (. %&gt;%
+      distinct(junc, treatment, estimate.y)),
+    aes(xintercept=estimate.y, color=treatment),
+    linetype=&#39;dashed&#39;) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  labs(title=&quot;All modeled introns, with EC50 estimate&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-19-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>Ok, I think the EC50 estimates from the model fit match a my visual interpretation of the data… Let’s check that the difference in EC50 between molecules (eg <span class="math inline">\(EC50_{branaplam}-EC50_{risdiplam}\)</span>) correlates with PC2.</p>
+<pre class="r"><code>ModelFits.Coefficients %&gt;%
+  separate(param, into=c(&quot;param&quot;, &quot;treatment&quot;), sep=&quot;:&quot;) %&gt;%
+  filter(param==&quot;ED50&quot;) %&gt;%
+  filter(treatment %in% c(&quot;Branaplam&quot;, &quot;Risdiplam&quot;)) %&gt;%
+  pivot_wider(names_from=&quot;treatment&quot;, values_from=&quot;estimate&quot;) %&gt;%
+  mutate(LogDifference.EC50 = log2(Branaplam/Risdiplam)) %&gt;%
+  inner_join(
+    pca.results.splicing$rotation %&gt;%
+    as.data.frame() %&gt;%
+    dplyr::select(PC2) %&gt;%
+    rownames_to_column(&quot;junc&quot;),
+    by=&quot;junc&quot;
+  ) %&gt;%
+  ggplot(aes(x=LogDifference.EC50, y=PC2)) +
+  geom_point() +
+  theme_bw() +
+  labs(x=&quot;log2(EC50.Branaplam/EC50.Risdiplam&quot;, y=&quot;PC2 loading&quot;, title=&quot;PC2 as a proxy for drug-specific response)&quot;)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, this demonstrates a subtle point I explained to Jingxin earlier. Because I center the PCA data, The PC2 loading might not reflect assyemtric effects… More specifically, here I just attempted to model and plot the top 100 and bottom 100 or so GA|GT novel cassette-exons by PC2 loading, while there is clearly a correlation between the differences in EC50 estimates, there are a lot of points with very negative PC2 loadings but the difference in EC50 is similar to those with the most positive PC2 loadings…</p>
+<p>So now, finally, let’s select all the points in the top-left (that seem to be branaplam-specific) and some of the ones in the bottom right that appear risdiplam specific (looking at the EC50 estimates to make this determination) and plot them for manual inspection of the coverage data before sending a list of coordinates to Jingxin…</p>
+<p>I somewhat arbitratly picked a threshold of a abs(log2 difference) &gt; 5 (red points) for this further investigation:</p>
+<pre class="r"><code>InterestingJuncstions &lt;- ModelFits.Coefficients %&gt;%
+  separate(param, into=c(&quot;param&quot;, &quot;treatment&quot;), sep=&quot;:&quot;) %&gt;%
+  filter(param==&quot;ED50&quot;) %&gt;%
+  filter(treatment %in% c(&quot;Branaplam&quot;, &quot;Risdiplam&quot;)) %&gt;%
+  pivot_wider(names_from=&quot;treatment&quot;, values_from=&quot;estimate&quot;) %&gt;%
+  mutate(LogDifference.EC50 = log2(Branaplam/Risdiplam)) %&gt;%
+  filter(abs(LogDifference.EC50) &gt; 5 ) %&gt;%
+  pull(junc)
+
+ModelFits.Coefficients %&gt;%
+  separate(param, into=c(&quot;param&quot;, &quot;treatment&quot;), sep=&quot;:&quot;) %&gt;%
+  filter(param==&quot;ED50&quot;) %&gt;%
+  filter(treatment %in% c(&quot;Branaplam&quot;, &quot;Risdiplam&quot;)) %&gt;%
+  pivot_wider(names_from=&quot;treatment&quot;, values_from=&quot;estimate&quot;) %&gt;%
+  mutate(LogDifference.EC50 = log2(Branaplam/Risdiplam)) %&gt;%
+  inner_join(
+    pca.results.splicing$rotation %&gt;%
+    as.data.frame() %&gt;%
+    dplyr::select(PC2) %&gt;%
+    rownames_to_column(&quot;junc&quot;),
+    by=&quot;junc&quot;
+  ) %&gt;%
+  mutate(JunctionToFollowUpOn = junc %in% InterestingJuncstions) %&gt;%
+  ggplot(aes(x=LogDifference.EC50, y=PC2, color=JunctionToFollowUpOn)) +
+  geom_point() +
+  theme_bw() +
+  labs(x=&quot;log2(EC50.Branaplam/EC50.Risdiplam&quot;, y=&quot;PC2 loading&quot;, title=&quot;PC2 as a proxy for drug-specific response)&quot;)</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pca.results.splicing$rotation %&gt;%
+  as.data.frame() %&gt;%
+  dplyr::select(PC2) %&gt;%
+  rownames_to_column(&quot;junc&quot;) %&gt;%
+  inner_join(splicing.gagt.cassette.exons) %&gt;%
+  filter(IntronType == &quot;Alt 5&#39;ss&quot;) %&gt;%
+  dplyr::select(junc, PC2) %&gt;%
+  inner_join(spearman.tests, by=&quot;junc&quot;) %&gt;%
+  unnest(data) %&gt;%
+  inner_join(
+    ModelFits.Coefficients %&gt;%
+      separate(param, into=c(&quot;param&quot;, &quot;treatment&quot;), sep=&quot;:&quot;) %&gt;%
+      filter(param==&quot;ED50&quot;),
+    by=c(&quot;junc&quot;, &quot;treatment&quot;)) %&gt;%
+  filter(junc %in% InterestingJuncstions) %&gt;%
+  ggplot(aes(color=treatment)) +
+  geom_vline(
+    data = (. %&gt;%
+      distinct(junc, treatment, estimate.y)),
+    aes(xintercept=estimate.y, color=treatment),
+    linetype=&#39;dashed&#39;) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  labs(title=&quot;Introns to follow up on, with EC50 estimate&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))</code></pre>
+<p><img src="figure/20220908_IdentifyTargetsForVerification2.Rmd/unnamed-chunk-21-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, those look good… Now let’s plot the intron coverage for those 22 introns with my helper script:</p>
+<pre class="r"><code>data.frame(junc=InterestingJuncstions) %&gt;%
+  separate(junc, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;cluster&quot;), sep=&quot;:&quot;, remove=F, convert=T) %&gt;%
+  inner_join(splicing.gagt.cassette.exons, by=c(&quot;junc&quot;, &quot;start&quot;, &quot;stop&quot;=&quot;end&quot;)) %&gt;%
+  dplyr::select(SpliceDonor) %&gt;%
+  separate(SpliceDonor, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;strand&quot;), sep=&quot;\\.&quot;, convert=T) %&gt;%
+  mutate(end = start + 1) %&gt;%
+  dplyr::select(chrom, start, end) %&gt;%
+  write_tsv(&quot;../code/scratch/ToPlot.SpliceDonors.bed&quot;)
+
+
+# write out pygenometracks ini file for GA|GT splice sites track
+fileConn&lt;-file(&quot;../code/scratch/ToPlot.SpliceDonors.ini&quot;)
+writeLines(c(&quot;[vlines]&quot;,&quot;type = vlines&quot;, &quot;file = scratch/ToPlot.SpliceDonors.bed&quot;), con=fileConn)
+close(fileConn)
+
+
+data.frame(junc=InterestingJuncstions) %&gt;%
+  separate(junc, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;cluster&quot;), sep=&quot;:&quot;, remove=F, convert=T) %&gt;%
+  inner_join(splicing.gagt.cassette.exons, by=c(&quot;junc&quot;, &quot;start&quot;, &quot;stop&quot;=&quot;end&quot;)) %&gt;%
+  dplyr::select(chrom, start, stop, junc, gene_names, SpliceDonor, UpstreamSpliceAcceptor) %&gt;%
+  mutate(min=start-4000, max=stop+4000) %&gt;%
+  mutate(cmd = str_glue(&quot;python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile &lt;(awk &#39;$1 ~ /_u$/&#39; bigwigs/BigwigList.groups.tsv ) --BigwigList bigwigs/BigwigList.tsv --Normalization WholeGenome --Region {chrom}:{min}-{max} --BigwigListType KeyFile --OutputPrefix scratch/ -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz\npyGenomeTracks --tracks &lt;(cat scratch/tracks.ini scratch/ToPlot.SpliceDonors.ini) --out ../code/scratch/MoleculeSpecificJunctionsForJingxin_{chrom}_{start}_{stop}_ZoomInOnIntron.png --region {chrom}:{min}-{max} --trackLabelFraction 0.15\n\n&quot;)) %&gt;%
+  dplyr::select(cmd) %&gt;%
+  write.table(&quot;../code/testPlottingWithMyScript.ForJingxin3.sh&quot;, quote=F, row.names = F, col.names = F)</code></pre>
+</div>
+</div>
+<div id="visual-inspection-of-candidates" class="section level4">
+<h4>Visual inspection of candidates</h4>
+<p>After visually plotting the shortlist of 22 introns (mostly branaplam-specific introns, but some risdiplam-specific ones too), they mostly all look good, with a clear cassette exon as intended with a clear dose-response effect that seems different between treatments.</p>
+<p>Here is one example risdiplam-specific example:</p>
+<div class="figure">
+<img src="../docs/assets/MoleculeSpecificJunctionsForJingxin_chr15_78892477_78893539_ZoomInOnIntron.png" alt="risdiplam-specific-example" />
+<p class="caption">risdiplam-specific-example</p>
+</div>
+<p>And here is a branaplam-specific-example: <img src="../docs/assets/MoleculeSpecificJunctionsForJingxin_chr6_170543730_170544321_ZoomInOnIntron.png" alt="branaplam-specific-example" /></p>
+<p>After manually inspecting all 22 examples, I feel confident about reporting most all of them to Jingxin EXCEPT the following:</p>
+<ul>
+<li>chr8:78936466:78937592:clu_17538_+ (is it really specific?)</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="final-list-of-junction-coordinates" class="section level2">
+<h2>Final list of junction coordinates:</h2>
+<p>In addition to the GA|GT intron coordinates, let me get coordinates for the upstream intron that is involved in the cassette exon inclusion… Also, I will plot each of these to share with Jingxin:</p>
+<pre class="r"><code>dat.for.jingxin &lt;- data.frame(junc=InterestingJuncstions) %&gt;%
+  separate(junc, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;cluster&quot;), sep=&quot;:&quot;, remove=F, convert=T) %&gt;%
+  inner_join(splicing.gagt.cassette.exons, by=c(&quot;junc&quot;, &quot;start&quot;, &quot;stop&quot;=&quot;end&quot;)) %&gt;%
+  dplyr::select(chrom, start, stop, junc, gene_names, SpliceDonor, UpstreamSpliceAcceptor) %&gt;%
+  filter(!junc == &quot;chr8:78936466:78937592:clu_17538_+&quot;)
+
+#Get upstream intron that uses upstream splice acceptor. Select most splice junction with that acceptor
+UpstreamIntrons &lt;- all.samples.PSI %&gt;%
+  mutate(Splice.Acceptor = case_when(
+    strand == &quot;+&quot; ~ paste(`#Chrom`, end, strand, sep=&quot;.&quot;),
+    strand == &quot;-&quot; ~ paste(`#Chrom`, start-2, strand, sep=&quot;.&quot;)
+  )) %&gt;%
+  filter(Splice.Acceptor %in% dat.for.jingxin$UpstreamSpliceAcceptor) %&gt;%
+  dplyr::select(junc, Splice.Acceptor, contains(&quot;LCL&quot;)) %&gt;%
+  gather(&quot;Sample&quot;, &quot;PSI&quot;, -junc, -Splice.Acceptor) %&gt;%
+  group_by(junc, Splice.Acceptor) %&gt;%
+  summarise(MeanPSI = mean(PSI, na.rm=T)) %&gt;%
+  group_by(Splice.Acceptor) %&gt;%
+  filter(MeanPSI == max(MeanPSI)) %&gt;%
+  dplyr::select(UpstreamIntron_junc = junc, Splice.Acceptor)
+
+dat.for.jingxin %&gt;%
+  inner_join(UpstreamIntrons, by=c(&quot;UpstreamSpliceAcceptor&quot;=&quot;Splice.Acceptor&quot;)) %&gt;%
+  dplyr::select(junc, UpstreamIntron_junc) %&gt;%
+  gather(&quot;Intron&quot;, &quot;junction&quot;) %&gt;%
+  separate(junction, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;cluster&quot;), sep=&quot;:&quot;, remove=F, convert=T) %&gt;%
+  dplyr::select(chrom, start, stop) %&gt;%
+  write_tsv(&quot;../code/scratch/ToPlot.CassetteExonIntrons.bed&quot;)
+  
+data.frame(junc=InterestingJuncstions) %&gt;%
+  separate(junc, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;cluster&quot;), sep=&quot;:&quot;, remove=F, convert=T) %&gt;%
+  inner_join(splicing.gagt.cassette.exons, by=c(&quot;junc&quot;, &quot;start&quot;, &quot;stop&quot;=&quot;end&quot;)) %&gt;%
+  dplyr::select(chrom, start, stop, junc, gene_names, SpliceDonor, UpstreamSpliceAcceptor) %&gt;%
+  filter(!junc == &quot;chr8:78936466:78937592:clu_17538_+&quot;) %&gt;%
+  mutate(min=start-4000, max=stop+4000) %&gt;%
+  mutate(cmd = str_glue(&quot;python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile &lt;(awk &#39;$1 ~ /_u$/&#39; bigwigs/BigwigList.groups.tsv ) --BigwigList bigwigs/BigwigList.tsv --Normalization WholeGenome --Region {chrom}:{min}-{max} --BigwigListType KeyFile --OutputPrefix scratch/ -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz --FilterJuncsByBed scratch/ToPlot.CassetteExonIntrons.bed\npyGenomeTracks --tracks &lt;(cat scratch/tracks.ini scratch/ToPlot.SpliceDonors.ini) --out ../code/scratch/MoleculeSpecificJunctionsForJingxin_{chrom}_{start}_{stop}_ZoomInOnIntron.png --region {chrom}:{min}-{max} --trackLabelFraction 0.15\n\n&quot;)) %&gt;%
+  dplyr::select(cmd) %&gt;%
+  write.table(&quot;../code/testPlottingWithMyScript.ForJingxin4.sh&quot;, quote=F, row.names = F, col.names = F)
+
+coordinates.for.Jingxin &lt;- ModelFits.Coefficients %&gt;%
+  separate(param, into=c(&quot;param&quot;, &quot;treatment&quot;), sep=&quot;:&quot;) %&gt;%
+  filter(param==&quot;ED50&quot;) %&gt;%
+  filter(treatment %in% c(&quot;Branaplam&quot;, &quot;Risdiplam&quot;)) %&gt;%
+  pivot_wider(names_from=&quot;treatment&quot;, values_from=&quot;estimate&quot;, names_prefix=&quot;ED50.&quot;) %&gt;%
+  dplyr::select(-param) %&gt;%
+  inner_join(
+    pca.results.splicing$rotation %&gt;%
+    as.data.frame() %&gt;%
+    dplyr::select(PC2) %&gt;%
+    rownames_to_column(&quot;junc&quot;),
+    by=&quot;junc&quot;
+  ) %&gt;%
+  inner_join(
+    dat.for.jingxin %&gt;%
+    inner_join(UpstreamIntrons, by=c(&quot;UpstreamSpliceAcceptor&quot;=&quot;Splice.Acceptor&quot;)) %&gt;%
+    dplyr::select(junc, UpstreamIntron_junc),
+    by=&quot;junc&quot;
+  )</code></pre>
+<p>A final table for Jinxgin… The junc column is the coordinates of the GA|GT intron that is downstream of a cassette exon. The UpstreamIntron_junc is the coordinates for the intron that is upstream of the cassette exon. PC2, E50.Branaplam, and ED50.Risdiplam columns can be used to determine whether the intron is a branaplam or risdiplam specific intron. (Positive value for PC2 is branaplam-specific, negative value is risdiplam specific)</p>
+<pre class="r"><code>coordinates.for.Jingxin %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<colgroup>
+<col width="31%" />
+<col width="13%" />
+<col width="13%" />
+<col width="10%" />
+<col width="31%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">junc</th>
+<th align="right">ED50.Branaplam</th>
+<th align="right">ED50.Risdiplam</th>
+<th align="right">PC2</th>
+<th align="left">UpstreamIntron_junc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">chr22:35267514:35283962:clu_38658_+</td>
+<td align="right">1.849326e+02</td>
+<td align="right">1.266322e+04</td>
+<td align="right">0.0716840</td>
+<td align="left">chr22:35265603:35267368:clu_38658_+</td>
+</tr>
+<tr class="even">
+<td align="left">chr17:30183823:30184615:clu_32603_+</td>
+<td align="right">6.114292e+02</td>
+<td align="right">3.419374e+04</td>
+<td align="right">0.0626867</td>
+<td align="left">chr17:30181016:30183786:clu_32603_+</td>
+</tr>
+<tr class="odd">
+<td align="left">chr2:64108379:64112563:clu_4503_-</td>
+<td align="right">2.854982e+02</td>
+<td align="right">1.526872e+04</td>
+<td align="right">0.0575727</td>
+<td align="left">chr2:64112672:64144081:clu_4503_-</td>
+</tr>
+<tr class="even">
+<td align="left">chr11:33864817:33866992:clu_21326_-</td>
+<td align="right">3.778691e+02</td>
+<td align="right">2.867140e+04</td>
+<td align="right">0.0540024</td>
+<td align="left">chr11:33867062:33869346:clu_21326_-</td>
+</tr>
+<tr class="odd">
+<td align="left">chr5:66051538:66053406:clu_11009_+</td>
+<td align="right">1.249907e+02</td>
+<td align="right">6.765793e+03</td>
+<td align="right">0.0532961</td>
+<td align="left">chr5:66050966:66051462:clu_11009_+</td>
+</tr>
+<tr class="even">
+<td align="left">chr9:125964198:125965831:clu_19202_+</td>
+<td align="right">2.909430e+02</td>
+<td align="right">1.072317e+04</td>
+<td align="right">0.0492261</td>
+<td align="left">chr9:125963101:125964112:clu_19202_+</td>
+</tr>
+<tr class="odd">
+<td align="left">chr5:66158230:66158809:clu_11012_+</td>
+<td align="right">9.114283e+03</td>
+<td align="right">1.124296e+06</td>
+<td align="right">0.0423121</td>
+<td align="left">chr5:66153596:66158137:clu_11012_+</td>
+</tr>
+<tr class="even">
+<td align="left">chr6:170543730:170544321:clu_14498_-</td>
+<td align="right">4.699538e+02</td>
+<td align="right">1.835148e+04</td>
+<td align="right">0.0418259</td>
+<td align="left">chr6:170544366:170546103:clu_14498_-</td>
+</tr>
+<tr class="odd">
+<td align="left">chr7:6331235:6347587:clu_14603_-</td>
+<td align="right">1.278253e+03</td>
+<td align="right">5.352122e+04</td>
+<td align="right">0.0414021</td>
+<td align="left">chr7:6347688:6348573:clu_14603_-</td>
+</tr>
+<tr class="even">
+<td align="left">chr16:70544249:70544438:clu_29930_+</td>
+<td align="right">1.687528e+02</td>
+<td align="right">6.457723e+03</td>
+<td align="right">0.0406110</td>
+<td align="left">chr16:70541834:70544169:clu_29930_+</td>
+</tr>
+<tr class="odd">
+<td align="left">chr11:46696156:46697021:clu_21372_-</td>
+<td align="right">6.429295e+01</td>
+<td align="right">3.818470e+03</td>
+<td align="right">0.0396063</td>
+<td align="left">chr11:46697069:46700551:clu_21372_-</td>
+</tr>
+<tr class="even">
+<td align="left">chr7:24892621:24898513:clu_14672_-</td>
+<td align="right">1.020153e+03</td>
+<td align="right">5.370671e+04</td>
+<td align="right">0.0382957</td>
+<td align="left">chr7:24898721:24979886:clu_14672_-</td>
+</tr>
+<tr class="odd">
+<td align="left">chr5:77708347:77774185:clu_11981_-</td>
+<td align="right">8.268344e+01</td>
+<td align="right">8.177769e+03</td>
+<td align="right">0.0382780</td>
+<td align="left">chr5:77774217:77776205:clu_11981_-</td>
+</tr>
+<tr class="even">
+<td align="left">chr20:44979965:44981829:clu_37255_+</td>
+<td align="right">1.296382e+03</td>
+<td align="right">6.614126e+04</td>
+<td align="right">0.0379764</td>
+<td align="left">chr20:44978571:44979882:clu_37255_+</td>
+</tr>
+<tr class="odd">
+<td align="left">chr1:89063253:89064701:clu_961_-</td>
+<td align="right">3.759634e+02</td>
+<td align="right">1.290460e+04</td>
+<td align="right">0.0331346</td>
+<td align="left">chr1:89064767:89065160:clu_961_-</td>
+</tr>
+<tr class="even">
+<td align="left">chr1:92876430:92907900:clu_992_-</td>
+<td align="right">1.276133e+02</td>
+<td align="right">5.546185e+03</td>
+<td align="right">0.0317005</td>
+<td align="left">chr1:92908072:92961376:clu_992_-</td>
+</tr>
+<tr class="odd">
+<td align="left">chr5:60904873:60915186:clu_11901_-</td>
+<td align="right">6.251732e+04</td>
+<td align="right">1.138005e+03</td>
+<td align="right">-0.0436302</td>
+<td align="left">chr5:60915286:60918265:clu_11901_-</td>
+</tr>
+<tr class="even">
+<td align="left">chr22:40313865:40315283:clu_38757_+</td>
+<td align="right">1.409466e+05</td>
+<td align="right">2.990168e+03</td>
+<td align="right">-0.0457782</td>
+<td align="left">chr22:40312997:40313767:clu_38757_+</td>
+</tr>
+<tr class="odd">
+<td align="left">chr15:78892477:78893539:clu_28125_+</td>
+<td align="right">7.232880e+04</td>
+<td align="right">1.346701e+03</td>
+<td align="right">-0.0495066</td>
+<td align="left">chr15:78892313:78892445:clu_28125_+</td>
+</tr>
+<tr class="even">
+<td align="left">chr9:135484289:135484449:clu_19406_+</td>
+<td align="right">3.615744e+04</td>
+<td align="right">1.780200e+02</td>
+<td align="right">-0.0617951</td>
+<td align="left">chr9:135484082:135484225:clu_19406_+</td>
+</tr>
+<tr class="odd">
+<td align="left">chr14:24974850:24987886:clu_26455_-</td>
+<td align="right">2.341491e+00</td>
+<td align="right">9.481943e+01</td>
+<td align="right">-0.0633113</td>
+<td align="left">chr14:24987972:25049878:clu_26455_-</td>
+</tr>
+<tr class="even">
+<td align="left">chr1:100877903:100878394:clu_1036_-</td>
+<td align="right">2.165152e+04</td>
+<td align="right">5.074846e+02</td>
+<td align="right">-0.0761694</td>
+<td align="left">chr1:100878447:100888753:clu_1036_-</td>
+</tr>
+</tbody>
+</table>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.1 (2019-07-05)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.2.19-el7-x86_64/lib/libopenblas_haswellp-r0.2.19.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8 LC_NUMERIC=C         LC_TIME=C           
+ [4] LC_COLLATE=C         LC_MONETARY=C        LC_MESSAGES=C       
+ [7] LC_PAPER=C           LC_NAME=C            LC_ADDRESS=C        
+[10] LC_TELEPHONE=C       LC_MEASUREMENT=C     LC_IDENTIFICATION=C 
+
+attached base packages:
+[1] parallel  stats4    stats     graphics  grDevices utils     datasets 
+[8] methods   base     
+
+other attached packages:
+ [1] GGally_1.4.0         broom_1.0.0          drc_3.0-1           
+ [4] MASS_7.3-51.4        GenomicRanges_1.36.1 GenomeInfoDb_1.20.0 
+ [7] IRanges_2.18.1       S4Vectors_0.22.1     BiocGenerics_0.30.0 
+[10] gplots_3.0.1.1       edgeR_3.26.5         limma_3.40.6        
+[13] forcats_0.4.0        stringr_1.4.0        dplyr_1.0.9         
+[16] purrr_0.3.4          readr_1.3.1          tidyr_1.2.0         
+[19] tibble_3.1.7         ggplot2_3.3.6        tidyverse_1.3.0     
+
+loaded via a namespace (and not attached):
+ [1] TH.data_1.1-1          colorspace_1.4-1       ellipsis_0.3.2        
+ [4] rio_0.5.16             rprojroot_2.0.2        XVector_0.24.0        
+ [7] fs_1.5.2               rstudioapi_0.14        farver_2.1.0          
+[10] fansi_0.4.0            mvtnorm_1.1-3          lubridate_1.7.4       
+[13] xml2_1.3.2             codetools_0.2-18       splines_3.6.1         
+[16] knitr_1.39             jsonlite_1.6           workflowr_1.6.2       
+[19] dbplyr_1.4.2           compiler_3.6.1         httr_1.4.4            
+[22] backports_1.4.1        assertthat_0.2.1       Matrix_1.2-18         
+[25] fastmap_1.1.0          cli_3.3.0              later_0.8.0           
+[28] htmltools_0.5.3        tools_3.6.1            gtable_0.3.0          
+[31] glue_1.6.2             GenomeInfoDbData_1.2.1 Rcpp_1.0.5            
+[34] carData_3.0-5          cellranger_1.1.0       vctrs_0.4.1           
+[37] gdata_2.18.0           xfun_0.31              openxlsx_4.1.0.1      
+[40] rvest_0.3.5            lifecycle_1.0.1        gtools_3.9.2.2        
+[43] zlibbioc_1.30.0        zoo_1.8-10             scales_1.1.0          
+[46] hms_0.5.3              promises_1.0.1         sandwich_3.0-2        
+[49] RColorBrewer_1.1-2     yaml_2.2.0             curl_3.3              
+[52] reshape_0.8.8          stringi_1.4.3          highr_0.9             
+[55] plotrix_3.8-2          caTools_1.17.1.2       zip_2.2.1             
+[58] rlang_1.0.5            pkgconfig_2.0.2        bitops_1.0-6          
+[61] evaluate_0.15          lattice_0.20-38        labeling_0.3          
+[64] tidyselect_1.1.2       plyr_1.8.4             magrittr_1.5          
+[67] R6_2.4.0               generics_0.1.3         multcomp_1.4-19       
+[70] DBI_1.1.0              pillar_1.7.0           haven_2.3.1           
+[73] foreign_0.8-71         withr_2.5.0            survival_2.44-1.1     
+[76] abind_1.4-5            RCurl_1.98-1.1         modelr_0.1.8          
+[79] crayon_1.3.4           car_3.0-5              KernSmooth_2.23-15    
+[82] utf8_1.1.4             rmarkdown_1.13         locfit_1.5-9.1        
+[85] grid_3.6.1             readxl_1.3.1           data.table_1.14.2     
+[88] git2r_0.26.1           reprex_0.3.0           digest_0.6.20         
+[91] httpuv_1.5.1           munsell_0.5.0         </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

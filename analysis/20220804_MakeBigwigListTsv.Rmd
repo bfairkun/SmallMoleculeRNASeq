@@ -175,7 +175,8 @@ bigwigs.df %>%
   arrange(CellType, LibType, Treatment, dose.nM) %>%
   ungroup() %>%
   mutate(BedgzFile = (paste0(usethis::proj_path(), "/code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz"))) %>%
-  arrange(LibType, CellType, LibType, Treatment, dose.nM, Group_label) %>%
+  mutate(IsDMSO = Treatment == "DMSO") %>%
+  arrange(LibType, CellType, desc(IsDMSO), Treatment, dose.nM, Group_label) %>%
   select(Group_label, Color, BedgzFile) %>%
   mutate(Supergroup = case_when(
     str_detect(Group_label, "_LCL_") ~ str_replace(Group_label, "^(.+?)_.+?_(.+?_.+)$", "\\1_\\2"),
