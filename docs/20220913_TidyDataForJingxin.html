@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Tidy LCL data for Jingxin</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">small molecular splicing RNA-seq</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Tidy LCL data for Jingxin</h1>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#tidying-other-data-for-jingxin">Tidying other data for Jingxin</a></li>
+<li><a href="#overview-of-files-accessible-with-my-globus-link">Overview of files accessible with my globus link</a></li>
+<li><a href="#reading-in-data-and-tidying">reading in data, and tidying</a><ul>
+<li><a href="#identifying-cassette-exons">Identifying cassette exons</a></li>
+<li><a href="#prepping-data-for-model-fitting">Prepping data for model fitting:</a></li>
+<li><a href="#filtering-by-spearman-correlation-coef">Filtering by spearman correlation coef</a></li>
+<li><a href="#model-fitting">Model-fitting</a></li>
+<li><a href="#ec50-estimate-data-exploration">EC50 estimate data exploration</a></li>
+</ul></li>
+</ul>
+</div>
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-09-13
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 2
+</p>
+<p>
+<strong>Knit directory:</strong> <code>20211209_JingxinRNAseq/analysis/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed19900924code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(19900924)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed19900924code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(19900924)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+</p>
+</div>
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it difficult for you and others to run your code on a different machine. Change the absolute path(s) below to the suggested relative path(s) to make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw
+</td>
+<td style="text-align:left;">
+../code/bigwigs/unstranded/(.+?).bw
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreeb2a3c34c9237c53696332969b8e0a3f0f1732dc4targetblankb2a3c34a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/b2a3c34c9237c53696332969b8e0a3f0f1732dc4" target="_blank">b2a3c34</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreeb2a3c34c9237c53696332969b8e0a3f0f1732dc4targetblankb2a3c34a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/b2a3c34c9237c53696332969b8e0a3f0f1732dc4" target="_blank">b2a3c34</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    ._.DS_Store
+    Ignored:    analysis/.RData
+    Ignored:    analysis/.Rhistory
+    Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    code/.DS_Store
+    Ignored:    code/._.DS_Store
+    Ignored:    code/._DOCK7.pdf
+    Ignored:    code/._DOCK7_DMSO1.pdf
+    Ignored:    code/._DOCK7_SM2_1.pdf
+    Ignored:    code/._FKTN_DMSO_1.pdf
+    Ignored:    code/._FKTN_SM2_1.pdf
+    Ignored:    code/._MAPT.pdf
+    Ignored:    code/._PKD1_DMSO_1.pdf
+    Ignored:    code/._PKD1_SM2_1.pdf
+    Ignored:    code/.snakemake/
+    Ignored:    code/5ssSeqs.tab
+    Ignored:    code/Alignments/
+    Ignored:    code/ChemCLIP/
+    Ignored:    code/ClinVar/
+    Ignored:    code/DE_testing/
+    Ignored:    code/DE_tests.mat.counts.gz
+    Ignored:    code/DE_tests.txt.gz
+    Ignored:    code/Fastq/
+    Ignored:    code/FastqFastp/
+    Ignored:    code/FragLenths/
+    Ignored:    code/Meme/
+    Ignored:    code/Multiqc/
+    Ignored:    code/OMIM/
+    Ignored:    code/OldBigWigs/
+    Ignored:    code/QC/
+    Ignored:    code/Session.vim
+    Ignored:    code/SplicingAnalysis/
+    Ignored:    code/TracksSession
+    Ignored:    code/bigwigs/
+    Ignored:    code/featureCounts/
+    Ignored:    code/geena/
+    Ignored:    code/igv_session.template.xml
+    Ignored:    code/igv_session.xml
+    Ignored:    code/log
+    Ignored:    code/logs/
+    Ignored:    code/rules/.RNASeqProcessing.smk.swp
+    Ignored:    code/scratch/
+    Ignored:    code/test.txt.gz
+    Ignored:    code/testPlottingWithMyScript.ForJingxin.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin2.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin3.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin4.sh
+    Ignored:    code/testPlottingWithMyScript.sh
+    Ignored:    data/._Hijikata_TableS1_41598_2017_8902_MOESM2_ESM.xls
+    Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
+    Ignored:    output/._PioritizedIntronTargets.pdf
+
+Untracked files:
+    Untracked:  analysis/20220913_TidyDataForJingxin.Rmd
+    Untracked:  output/EC50Estimtes.FromPSI.txt.gz
+    Untracked:  output/PSI.ForGAGTIntrons.tidy.txt.gz
+
+Unstaged changes:
+    Modified:   analysis/20220804_MakeBigwigListTsv.Rmd
+    Modified:   analysis/20220908_IdentifyTargetsForVerification2.Rmd
+    Modified:   code/scripts/GenometracksByGenotype
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="tidying-other-data-for-jingxin" class="section level2">
+<h2>Tidying other data for Jingxin</h2>
+<p>An email correspondance from Jingxin</p>
+<blockquote>
+<p>Hi Ben, Thanks for the work! Very good! I would like to clarify that there are two separate research aims here. (1) For cloning, we need to select important genes and the splice site coordinates, such as the 10 genes you identified from the fibroblast data. The selectivity in chemical scaffolds is somewhat less important because either branaplam or risdiplam should be ok for drug development. (2) For the mechanistic study, we won’t clone every gene; in contrast, we will play the number game and need as many sequences of differentially spliced splice site/introns/exons as possible. For example, you point out that my previous analysis may be biased by the natural abundance of some 5’ ss sequences. We need more data to disprove or prove the hypothesis. We will start from these 21 introns now, but the number is still on the low end. Do you think there are not too many genes beyond these 21 introns? I thought there should be ~ 100 of genes with good sequencing quality. To me, an 8-fold difference is quite large already. Do you think we can generate a lot more “hits” by reducing this filter and keeping the rest? I also want you to know that you are not alone. If you have a list of coordinates we can manually go through the list of the genes - just let me know what we can help.</p>
+</blockquote>
+<p>… to which I replied:</p>
+<blockquote>
+<p>Hi Jingxin, Yeah, I also was assuming that you were looking for some disease-relevant splice junctions and also branaplam-specific or risdiplam-specific splice junctions for purposes of validation in minigenes. But yes I agree that in order to maximize power to discover the mechanisms of specificity, it will be advantageous to include as many splice sites as possible in our analyses. There are certainly more risdiplam-specific or branaplam specific splice junctions than the 21 I shared with you. So I can share a bigger list with you. I don’t think it would take up too much of my time, and I wouldn’t want to be a limiting factor if you all are anxious to explore the data. So here is what I propose I do - I think this is a reasonable compromise between my time and giving you more from this data, from which you can further explore your own ideas: I will fit a model to estimate EC50 for all GA|GT splice junctions that are reasonably present in the LCL data. The model-fitting process is something that I am still perfecting, so I think the EC50 estimates I can share with you quickly (ie today or tomorrow) might be slightly different than the final EC50 estimates that I would ideally want to use in a final analysis for publication - but for now, using the model-fitting process I used in my notebook link I shared, I think that the EC50 estimates are good enough to be useful for some downstream exploratory analyses. I’ll share you a table with raw splice junction counts for each sample and other metadata (eg 5’ss sequence, intron coordinates, AS intron type, etc) for each intron I’ll share a globus link so you can download bam files or bigwig files for easily browsing the raw aligned RNA-seq data in IGV genome browser. Globus is a service to make it easy to transfer large data files. I think you will need to make sure you (or Junxing or whoever wants to download the data) has an account that you can log into first (<a href="https://crc.ku.edu/hpc/storage/globus" class="uri">https://crc.ku.edu/hpc/storage/globus</a>), then I can share a link to your account email for you to download these large files. I have been looking at this raw coverage data for each of the 21 splice events I shared with you, but I was only that careful because I thought you were cloning these things which I know can be a lot of work, and I wanted to be 100% sure the splicing event you were cloning was a simple/interpretable cassette exon. For downstream analyses to uncover mechanisms, it may not be necessary to be so careful, but nonetheless I figure browsing the raw coverage files can be very useful and worth sharing. How does that all sound.</p>
+</blockquote>
+<p>So in here I will do that data tidying, including modelling and estimating EC50 for all GA|GT introns. As in my previous notebook, I will fit a 4-parameter model jointly with all three treatments, fixing the same upper and lower limit parameters, as well as the same slope parameter, and only allowing the EC50 parameter to vary. <a href="https://rstats4ag.org/dose-response-curves.html">This</a> is a tutorial I found useful to understand details about fitting these models with <code>drc</code> package. I will use PSI as the response. In some sense, this may be unideal, and using the log-transformed junction excision ratio with a small pseudocount might be better for the future, to keep errors more normally distributed and reasonable heterskedasticity. But PSI is easily interpretable and also, from my experience fitting these models to gene expression with logCPM versus CPM, I think these various possibly transforms of the response variable won’t bias or make much difference to the EC50 parameter estimate - it’s really the standard error that is sensitive to these things. So for simplicity, interpretabiliy, and so I can quickly copy/paste some code, I will keep using PSI as the response variable.</p>
+<p>Before I get to modelling, let me first give you a quick tour of useful files that will be accessible to those with a globus link, as many of these files are not tracked to this repository on github because of file size constraints for uploading to github…</p>
+</div>
+<div id="overview-of-files-accessible-with-my-globus-link" class="section level2">
+<h2>Overview of files accessible with my globus link</h2>
+<ul>
+<li><code>code/SplicingAnalysis/leafcutter_all_samples/JuncCounts.table.bed.gz</code>: this file is a intron by sample matrix of splice junction read counts in each sample. This could be useful for calculating an intron excision ratio, or PSI, or counting how common a particular splice junction is. Not that the file is tabix indexed for use with <code>tabix</code> from <code>samtools</code>. So for example, to quickly jump to a particular locus from the command line:</li>
+</ul>
+<pre class="bash"><code>tabix -h code/SplicingAnalysis/leafcutter_all_samples/JuncCounts.table.bed.gz chr1:10000-11000</code></pre>
+<p>Or you could of course just read in the whole file with python, R, excel, or whatever. The 5th column is the leafcutter cluster ID of the intron. See Figure1 of <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5742080/">leafcutter paper</a> for a description of what that means…</p>
+<ul>
+<li><p><code>code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz</code> is basically the same file but the numbers for each cell are an intron-centric version of PSI, calculated as <span class="math inline">\(\frac{JunctionCount}{\sum_{n = 1}^{n}JunctionCount}\)</span> for all <span class="math inline">\(n\)</span> Junctions within a cluster for each sample.</p></li>
+<li><p><code>code/Alignments/STAR_Align/*/Aligned.sortedByCoord.out.bam</code> are the bam files for each sample</p></li>
+<li><p><code>code/bigwigs/unstranded/*.bw</code> are bigwig coverage files for each sample. These are a quicker, more memory efficient way of browsing coverage data in genome browsers like IGV, but they only contain information on per-base coverage in each sample, not individual reads or splice junctions.</p></li>
+<li><p><code>code/bigwigs/stranded/*.bw</code> are similarly bigwig coverage files but for samples that used a stranded library prep protocol (eg all the LCL data), there is a separate plus strand file and a minus strand file for reads mapping to each strand.</p></li>
+<li><p><code>code/bigwigs/BigwigList.tsv</code> is a file that implicitly contains a mapping of the sample names used to name files in the bigwig and bam folders, to their respective metadata, as the first column is systematically named as [treatment]<em>[nanomolar.dose]</em>[cell.line]<em>[RNA.type]</em>[replicate.number], and the second column contains a filepath <code>/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/*.bw</code> where <code>*</code> is the sample name used to name files in the bigwig and bamfile folders</p></li>
+<li><p><code>code/code/SplicingAnalysis/FullSpliceSiteAnnotations/</code> is a folder that contains some useful splice site annotations for all detected junctions across any experiment. Note that the PSI and junctionCount count tables listed above are just a subset of intron detected across the experiments (filtered by the default leafcutter settings for minimum junction detection when assigning cluster IDs to introns), whereas the files in here contain a line for every splice junction identified with at least one read count in any sample across the fibroblast and LCL experiments. The <code>code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.comprehensive.bed.gz</code> file is the output of <a href="https://regtools.readthedocs.io/en/latest/commands/junctions-annotate/">regtools annotate</a> using <a href="https://www.gencodegenes.org/pages/faq.html">Gencode comprehensive gtf annotations</a>, whereas <code>code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz</code> uses Gencode basic annotations. The <code>code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz</code> file contains the 5’ss sequence for each intron, and a score for the strength of the 5’ss based on a <a href="https://en.wikipedia.org/wiki/Position_weight_matrix">position weight matrix</a> using all identified 5’ss, that is - the higher the score, the more a 5’ss resemebles the consensus sequence.</p></li>
+<li><p><code>code/featureCounts/Counts*.txt</code> contains gene-level count matrices for each set of experiments</p></li>
+<li><p><code>data/Hijikata*</code> contains publicly availables supplemental table from <a href="https://www.nature.com/articles/s41598-017-08902-1">Hijikata et al</a> from which I used the GainOfFunction and DominantNegative classifications for OMIM genes.</p></li>
+</ul>
+<p>There may be other useful files in <code>code</code> or <code>data</code> so you are free to browse files and ask questions, but I think I covered most files that might be useful.</p>
+</div>
+<div id="reading-in-data-and-tidying" class="section level2">
+<h2>reading in data, and tidying</h2>
+<p>Here in this R session I will read in some of the files above, and fit some models to GA|GT introns to estimate EC50 and write out to share results with Jingxin in a useful format.</p>
+<pre class="r"><code>library(tidyverse)
+library(GenomicRanges)
+library(drc)
+library(broom)
+library(GGally)
+
+#Read in sample metadata
+sample.list &lt;- read_tsv(&quot;../code/bigwigs/BigwigList.tsv&quot;,
+                        col_names = c(&quot;SampleName&quot;, &quot;bigwig&quot;, &quot;group&quot;, &quot;strand&quot;)) %&gt;%
+  filter(strand==&quot;.&quot;) %&gt;%
+  mutate(old.sample.name = str_replace(bigwig, &quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw&quot;, &quot;\\1&quot;)) %&gt;%
+  separate(SampleName, into=c(&quot;treatment&quot;, &quot;dose.nM&quot;, &quot;cell.type&quot;, &quot;libType&quot;, &quot;rep&quot;), convert=T, remove=F, sep=&quot;_&quot;) %&gt;%
+  left_join(
+    read_tsv(&quot;../code/bigwigs/BigwigList.groups.tsv&quot;, col_names = c(&quot;group&quot;, &quot;color&quot;, &quot;bed&quot;, &quot;supergroup&quot;)),
+    by=&quot;group&quot;
+  )
+
+# Read in list of introns detected across all experiments that pass leafcutter&#39;s default clustering processing thresholds
+all.samples.PSI &lt;- read_tsv(&quot;../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz&quot;)
+
+all.samples.5ss &lt;- read_tsv(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz&quot;, col_names = c(&quot;intron&quot;, &quot;seq&quot;, &quot;score&quot;)) %&gt;%
+  mutate(intron = str_replace(intron, &quot;^(.+?)::.+$&quot;, &quot;\\1&quot;)) %&gt;%
+  separate(intron, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;strand&quot;), sep=&quot;_&quot;, convert=T, remove=F)
+
+all.samples.intron.annotations &lt;- read_tsv(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz&quot;)</code></pre>
+<p>Now that I’ve read in some files, let’s merge some tables, and filter for GA|GT introns, and select only the PSI estimates from the LCL titration series data, since this is the data I will later use to estimate EC50…</p>
+<pre class="r"><code>splicing.gagt.df &lt;- all.samples.PSI %&gt;%
+  dplyr::select(-contains(&quot;fibroblast&quot;)) %&gt;%
+  dplyr::select(-contains(&quot;chRNA&quot;)) %&gt;%
+  drop_na() %&gt;%
+  inner_join(all.samples.5ss, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;=&quot;stop&quot;, &quot;strand&quot;)) %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;#Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;strand&quot;) ) %&gt;%
+  filter(str_detect(seq, &quot;^\\w{2}GAGT&quot;))
+
+#How many GAGT introns are there in this dataframe
+nrow(splicing.gagt.df)</code></pre>
+<pre><code>[1] 3479</code></pre>
+<pre class="r"><code>#Preview the dataframe
+splicing.gagt.df %&gt;% head() %&gt;% knitr::kable()</code></pre>
+<table>
+<colgroup>
+<col width="0%" />
+<col width="0%" />
+<col width="0%" />
+<col width="2%" />
+<col width="1%" />
+<col width="0%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="1%" />
+<col width="2%" />
+<col width="1%" />
+<col width="2%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="0%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="2%" />
+<col width="3%" />
+<col width="6%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">#Chrom</th>
+<th align="right">start</th>
+<th align="right">end</th>
+<th align="left">junc</th>
+<th align="left">gid</th>
+<th align="left">strand</th>
+<th align="right">Branaplam_3160_LCL_polyA_1</th>
+<th align="right">Branaplam_1000_LCL_polyA_1</th>
+<th align="right">Branaplam_316_LCL_polyA_1</th>
+<th align="right">Branaplam_100_LCL_polyA_1</th>
+<th align="right">Branaplam_31.6_LCL_polyA_1</th>
+<th align="right">Branaplam_10_LCL_polyA_1</th>
+<th align="right">Branaplam_3.16_LCL_polyA_1</th>
+<th align="right">Branaplam_1_LCL_polyA_1</th>
+<th align="right">C2C5_1000_LCL_polyA_1</th>
+<th align="right">C2C5_316_LCL_polyA_1</th>
+<th align="right">C2C5_100_LCL_polyA_1</th>
+<th align="right">C2C5_31.6_LCL_polyA_1</th>
+<th align="right">C2C5_10_LCL_polyA_1</th>
+<th align="right">C2C5_3.16_LCL_polyA_1</th>
+<th align="right">C2C5_1_LCL_polyA_1</th>
+<th align="right">C2C5_0.316_LCL_polyA_1</th>
+<th align="right">DMSO_NA_LCL_polyA_1</th>
+<th align="right">DMSO_NA_LCL_polyA_2</th>
+<th align="right">DMSO_NA_LCL_polyA_3</th>
+<th align="right">Risdiplam_10000_LCL_polyA_1</th>
+<th align="right">Risdiplam_3160_LCL_polyA_1</th>
+<th align="right">Risdiplam_1000_LCL_polyA_1</th>
+<th align="right">Risdiplam_316_LCL_polyA_1</th>
+<th align="right">Risdiplam_100_LCL_polyA_1</th>
+<th align="right">Risdiplam_31.6_LCL_polyA_1</th>
+<th align="right">Risdiplam_10_LCL_polyA_1</th>
+<th align="right">Risdiplam_3.16_LCL_polyA_1</th>
+<th align="left">intron</th>
+<th align="left">seq</th>
+<th align="right">score.x</th>
+<th align="left">name</th>
+<th align="right">score.y</th>
+<th align="left">splice_site</th>
+<th align="right">acceptors_skipped</th>
+<th align="right">exons_skipped</th>
+<th align="right">donors_skipped</th>
+<th align="left">anchor</th>
+<th align="right">known_donor</th>
+<th align="right">known_acceptor</th>
+<th align="right">known_junction</th>
+<th align="left">gene_names</th>
+<th align="left">gene_ids</th>
+<th align="left">transcripts</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">chr1</td>
+<td align="right">729955</td>
+<td align="right">732013</td>
+<td align="left">chr1:729955:732013:clu_17_-</td>
+<td align="left">chr1_clu_17_-</td>
+<td align="left">-</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">75.0</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.00</td>
+<td align="right">0.0</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">44.00</td>
+<td align="right">25</td>
+<td align="right">0</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">43.00</td>
+<td align="right">3.80</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">50</td>
+<td align="right">12.00</td>
+<td align="right">0.00</td>
+<td align="right">0.0</td>
+<td align="left">chr1_729955_732013_-</td>
+<td align="left">GTGAGTAAGCA</td>
+<td align="right">3.759273</td>
+<td align="left">JUNC00000082</td>
+<td align="right">1</td>
+<td align="left">GT-AG</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">N</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">chr1</td>
+<td align="right">768613</td>
+<td align="right">769497</td>
+<td align="left">chr1:768613:769497:clu_20_-</td>
+<td align="left">chr1_clu_20_-</td>
+<td align="left">-</td>
+<td align="right">81.00</td>
+<td align="right">61.00</td>
+<td align="right">0.00</td>
+<td align="right">30.0</td>
+<td align="right">27.00</td>
+<td align="right">43.00</td>
+<td align="right">0.0</td>
+<td align="right">17.0</td>
+<td align="right">36.00</td>
+<td align="right">40.0</td>
+<td align="right">11.00</td>
+<td align="right">31.00</td>
+<td align="right">29</td>
+<td align="right">75.00</td>
+<td align="right">83.00</td>
+<td align="right">54</td>
+<td align="right">10</td>
+<td align="right">25.0</td>
+<td align="right">30.0</td>
+<td align="right">26.00</td>
+<td align="right">16.00</td>
+<td align="right">7.10</td>
+<td align="right">39.00</td>
+<td align="right">31</td>
+<td align="right">50.00</td>
+<td align="right">43.00</td>
+<td align="right">31.0</td>
+<td align="left">chr1_768613_769497_-</td>
+<td align="left">CCGAGTGAGTA</td>
+<td align="right">5.959036</td>
+<td align="left">JUNC00000102</td>
+<td align="right">5</td>
+<td align="left">GT-AG</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">DA</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">AL669831.1,AL669831.3</td>
+<td align="left">ENSG00000228327.3,ENSG00000230021.10</td>
+<td align="left">ENST00000428504.2,ENST00000506640.2,ENST00000634337.2</td>
+</tr>
+<tr class="odd">
+<td align="left">chr1</td>
+<td align="right">1203968</td>
+<td align="right">1204055</td>
+<td align="left">chr1:1203968:1204055:clu_38_-</td>
+<td align="left">chr1_clu_38_-</td>
+<td align="left">-</td>
+<td align="right">50.00</td>
+<td align="right">30.00</td>
+<td align="right">15.00</td>
+<td align="right">11.0</td>
+<td align="right">11.00</td>
+<td align="right">11.00</td>
+<td align="right">8.2</td>
+<td align="right">2.3</td>
+<td align="right">33.00</td>
+<td align="right">19.0</td>
+<td align="right">25.00</td>
+<td align="right">4.10</td>
+<td align="right">17</td>
+<td align="right">8.80</td>
+<td align="right">20.00</td>
+<td align="right">12</td>
+<td align="right">15</td>
+<td align="right">6.6</td>
+<td align="right">9.4</td>
+<td align="right">33.00</td>
+<td align="right">26.00</td>
+<td align="right">24.00</td>
+<td align="right">14.00</td>
+<td align="right">11</td>
+<td align="right">27.00</td>
+<td align="right">17.00</td>
+<td align="right">6.1</td>
+<td align="left">chr1_1203968_1204055_-</td>
+<td align="left">AGGAGTCAGTG</td>
+<td align="right">4.211913</td>
+<td align="left">JUNC00000404</td>
+<td align="right">1</td>
+<td align="left">GT-AG</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="left">DA</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">TNFRSF18</td>
+<td align="left">ENSG00000186891.14</td>
+<td align="left">ENST00000379265.5,ENST00000379268.7,ENST00000486728.5</td>
+</tr>
+<tr class="even">
+<td align="left">chr1</td>
+<td align="right">1204168</td>
+<td align="right">1204399</td>
+<td align="left">chr1:1204168:1204399:clu_39_-</td>
+<td align="left">chr1_clu_39_-</td>
+<td align="left">-</td>
+<td align="right">0.18</td>
+<td align="right">1.20</td>
+<td align="right">0.22</td>
+<td align="right">1.1</td>
+<td align="right">0.74</td>
+<td align="right">0.23</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.71</td>
+<td align="right">1.2</td>
+<td align="right">0.33</td>
+<td align="right">0.46</td>
+<td align="right">0</td>
+<td align="right">0.43</td>
+<td align="right">0.44</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.0</td>
+<td align="right">2.4</td>
+<td align="right">1.90</td>
+<td align="right">1.40</td>
+<td align="right">0.95</td>
+<td align="right">0.41</td>
+<td align="right">0</td>
+<td align="right">0.82</td>
+<td align="right">1.70</td>
+<td align="right">0.0</td>
+<td align="left">chr1_1204168_1204399_-</td>
+<td align="left">CAGAGTGAGTC</td>
+<td align="right">5.187441</td>
+<td align="left">JUNC00000435</td>
+<td align="right">3</td>
+<td align="left">GT-AG</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">D</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">TNFRSF18</td>
+<td align="left">ENSG00000186891.14</td>
+<td align="left">ENST00000328596.10,ENST00000379265.5,ENST00000379268.7,ENST00000486728.5</td>
+</tr>
+<tr class="odd">
+<td align="left">chr1</td>
+<td align="right">1204236</td>
+<td align="right">1204399</td>
+<td align="left">chr1:1204236:1204399:clu_39_-</td>
+<td align="left">chr1_clu_39_-</td>
+<td align="left">-</td>
+<td align="right">40.00</td>
+<td align="right">34.00</td>
+<td align="right">36.00</td>
+<td align="right">35.0</td>
+<td align="right">39.00</td>
+<td align="right">34.00</td>
+<td align="right">31.0</td>
+<td align="right">39.0</td>
+<td align="right">38.00</td>
+<td align="right">38.0</td>
+<td align="right">39.00</td>
+<td align="right">40.00</td>
+<td align="right">32</td>
+<td align="right">36.00</td>
+<td align="right">39.00</td>
+<td align="right">38</td>
+<td align="right">42</td>
+<td align="right">43.0</td>
+<td align="right">33.0</td>
+<td align="right">36.00</td>
+<td align="right">33.00</td>
+<td align="right">38.00</td>
+<td align="right">35.00</td>
+<td align="right">42</td>
+<td align="right">27.00</td>
+<td align="right">33.00</td>
+<td align="right">33.0</td>
+<td align="left">chr1_1204236_1204399_-</td>
+<td align="left">CAGAGTGAGTC</td>
+<td align="right">5.187441</td>
+<td align="left">JUNC00000405</td>
+<td align="right">2</td>
+<td align="left">GT-AG</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">DA</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">TNFRSF18</td>
+<td align="left">ENSG00000186891.14</td>
+<td align="left">ENST00000328596.10,ENST00000379265.5,ENST00000379268.7,ENST00000486728.5</td>
+</tr>
+<tr class="even">
+<td align="left">chr1</td>
+<td align="right">1300068</td>
+<td align="right">1300154</td>
+<td align="left">chr1:1300068:1300154:clu_49_-</td>
+<td align="left">chr1_clu_49_-</td>
+<td align="left">-</td>
+<td align="right">0.28</td>
+<td align="right">0.53</td>
+<td align="right">0.00</td>
+<td align="right">0.0</td>
+<td align="right">0.51</td>
+<td align="right">0.00</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.17</td>
+<td align="right">0.0</td>
+<td align="right">0.60</td>
+<td align="right">0.90</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">0.56</td>
+<td align="right">0.44</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0</td>
+<td align="right">0.29</td>
+<td align="right">0.62</td>
+<td align="right">0.0</td>
+<td align="left">chr1_1300068_1300154_-</td>
+<td align="left">GTGAGTGCGTG</td>
+<td align="right">3.012494</td>
+<td align="left">JUNC00000518</td>
+<td align="right">1</td>
+<td align="left">GT-AG</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">A</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">ACAP3</td>
+<td align="left">ENSG00000131584.19</td>
+<td align="left">ENST00000353662.4,ENST00000354700.10</td>
+</tr>
+</tbody>
+</table>
+<p>Let’s recreate that PCA that shows that PC2 seperates branaplam-treated samples from risdiplam/C2C5 samples:</p>
+<pre class="r"><code>pca.results.splicing &lt;- splicing.gagt.df %&gt;%
+  dplyr::select(junc, contains(&quot;LCL&quot;)) %&gt;%
+  column_to_rownames(&quot;junc&quot;) %&gt;% as.matrix() %&gt;%
+  scale() %&gt;%
+  t() %&gt;% prcomp()
+
+PC.dat &lt;- pca.results.splicing$x %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleName&quot;) %&gt;%
+  dplyr::select(SampleName, PC1, PC2, PC3) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;)
+ggplot(PC.dat, aes(x=PC1, y=PC2, color=color)) +
+  geom_point(aes(shape=libType)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 3,479 GA|GT spliced introns&quot;)</code></pre>
+<p><img src="figure/20220913_TidyDataForJingxin.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div id="identifying-cassette-exons" class="section level3">
+<h3>Identifying cassette exons</h3>
+<p>identifying GA|GT introns that have a nearby upstream splice acceptor:</p>
+<pre class="r"><code>MaxCassetteExonLen &lt;- 300
+
+splicing.gagt.donors.granges &lt;- splicing.gagt.df %&gt;%
+  dplyr::select(chrom=`#Chrom`, intron.start=start, intron.end=end, strand) %&gt;%
+  mutate(start = case_when(
+    strand == &quot;+&quot; ~ intron.start,
+    strand == &quot;-&quot; ~ intron.end -2
+  )) %&gt;%
+  mutate(end = start +2) %&gt;%
+  dplyr::select(chrom, start, end, strand) %&gt;% 
+  distinct() %&gt;%
+  add_row(chrom=&quot;DUMMY&quot;, start=0, end=1, strand=&quot;+&quot;, .before=1) %&gt;%
+  makeGRangesFromDataFrame()
+
+splicing.acceptors.granges &lt;- all.samples.PSI %&gt;%
+  dplyr::select(1:6) %&gt;%
+  filter(gid %in% splicing.gagt.df$gid) %&gt;%
+  filter(!junc %in% splicing.gagt.df$junc) %&gt;%
+  dplyr::select(chrom=`#Chrom`, intron.start=start, intron.end=end, strand) %&gt;%
+  mutate(start = case_when(
+    strand == &quot;+&quot; ~ intron.end -2,
+    strand == &quot;-&quot; ~ intron.start -2
+  )) %&gt;%
+  mutate(end = start +2) %&gt;%
+  dplyr::select(chrom, start, end, strand) %&gt;% 
+  distinct() %&gt;%
+  makeGRangesFromDataFrame()
+
+PrecedingIndexes &lt;- GenomicRanges::follow(splicing.gagt.donors.granges, splicing.acceptors.granges, select=&quot;last&quot;) %&gt;%
+  replace_na(1)
+
+UpstreamAcceptors.df &lt;- cbind(
+  splicing.gagt.donors.granges %&gt;% as.data.frame() %&gt;%
+    dplyr::rename(chrom=1, start=2, end=3, width=4, strand=5),
+  splicing.acceptors.granges[PrecedingIndexes] %&gt;% as.data.frame() %&gt;%
+    dplyr::rename(chrom.preceding=1, start.preceding=2, end.preceding=3, width.preceding=4, strand.preceding=5)
+) %&gt;%
+  filter(as.character(chrom) == as.character(chrom.preceding)) %&gt;%
+  filter((strand==&quot;+&quot; &amp; start - end.preceding   &lt; MaxCassetteExonLen) | (strand==&quot;-&quot; &amp; start.preceding - end &lt; MaxCassetteExonLen)) %&gt;%
+  mutate(SpliceDonor = case_when(
+    strand == &quot;+&quot; ~ paste(chrom, start, strand, sep=&quot;.&quot;),
+    strand == &quot;-&quot; ~ paste(chrom, end, strand, sep=&quot;.&quot;)
+  )) %&gt;%
+  mutate(UpstreamSpliceAcceptor = case_when(
+    strand == &quot;+&quot; ~ paste(chrom, end.preceding, strand, sep=&quot;.&quot;),
+    strand == &quot;-&quot; ~ paste(chrom, start.preceding, strand, sep=&quot;.&quot;)
+  )) %&gt;%
+  dplyr::select(SpliceDonor, UpstreamSpliceAcceptor)
+
+# Add the UpstreamSpliceAcceptor column to the splicing.gagt.df. NA indicates there is no upstream splice acceptor
+splicing.gagt.df &lt;- splicing.gagt.df %&gt;%
+  mutate(SpliceDonor = case_when(
+    strand == &quot;+&quot; ~ paste(`#Chrom`, start, strand, sep=&quot;.&quot;),
+    strand == &quot;-&quot; ~ paste(`#Chrom`, end, strand, sep=&quot;.&quot;)
+    )) %&gt;%
+  left_join(UpstreamAcceptors.df, by=&quot;SpliceDonor&quot;) %&gt;%
+  mutate(IntronType = recode(anchor, A=&quot;Alt 5&#39;ss&quot;, D=&quot;Alt 3&#39;ss&quot;, DA=&quot;Annotated&quot;, N=&quot;New Intron&quot;, NDA=&quot;New Splice Site combination&quot;))</code></pre>
+<p>So I added a new column called UpstreamSpliceAcceptor that has the coordinates of the nearest upstream 3’ss within 300bp. I have found that this is a good way to filter for the GA|GT introns involved in cassette exon inclusion. If this column has NA, it is unlikely this intron is involved in exon inclusion. Probably, if i wanted to filter for the introns with the highest confidence for being involved in new cassette exons, I would filter for Alt 5’ss with an UpstreamSpliceAcceptor:</p>
+<pre class="r"><code>splicing.gagt.df %&gt;%
+  filter(IntronType == &quot;Alt 5&#39;ss&quot; &amp; !is.na(UpstreamSpliceAcceptor))</code></pre>
+<pre><code># A tibble: 1,033 × 52
+   `#Chrom`    start    end junc  gid   strand Branaplam_3160_… Branaplam_1000_…
+   &lt;chr&gt;       &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;             &lt;dbl&gt;            &lt;dbl&gt;
+ 1 chr1      1300068 1.30e6 chr1… chr1… -                  0.28             0.53
+ 2 chr1      1390865 1.39e6 chr1… chr1… -                  7.9              1.2 
+ 3 chr1      8015692 8.02e6 chr1… chr1… -                  4.4             16   
+ 4 chr1      8365974 8.40e6 chr1… chr1… -                 49               48   
+ 5 chr1      9714131 9.72e6 chr1… chr1… +                 33               24   
+ 6 chr1      9773394 9.81e6 chr1… chr1… -                  1.4              0   
+ 7 chr1     10178166 1.02e7 chr1… chr1… +                  8.6              0.47
+ 8 chr1     11243300 1.12e7 chr1… chr1… -                  9.7              6.1 
+ 9 chr1     11952068 1.20e7 chr1… chr1… +                  8.5              3   
+10 chr1     11981853 1.20e7 chr1… chr1… +                 26               21   
+# … with 1,023 more rows, and 44 more variables:
+#   Branaplam_316_LCL_polyA_1 &lt;dbl&gt;, Branaplam_100_LCL_polyA_1 &lt;dbl&gt;,
+#   Branaplam_31.6_LCL_polyA_1 &lt;dbl&gt;, Branaplam_10_LCL_polyA_1 &lt;dbl&gt;,
+#   Branaplam_3.16_LCL_polyA_1 &lt;dbl&gt;, Branaplam_1_LCL_polyA_1 &lt;dbl&gt;,
+#   C2C5_1000_LCL_polyA_1 &lt;dbl&gt;, C2C5_316_LCL_polyA_1 &lt;dbl&gt;,
+#   C2C5_100_LCL_polyA_1 &lt;dbl&gt;, C2C5_31.6_LCL_polyA_1 &lt;dbl&gt;,
+#   C2C5_10_LCL_polyA_1 &lt;dbl&gt;, C2C5_3.16_LCL_polyA_1 &lt;dbl&gt;, …</code></pre>
+</div>
+<div id="prepping-data-for-model-fitting" class="section level3">
+<h3>Prepping data for model fitting:</h3>
+<p>As before, I will include the DMSO data for model-fitting… The <code>drc</code> package is designed to handle data with <code>dose=0</code>, so I will code the DMSO samples as treated with dose=0. There are 3 replicates of DMSO. I will randomly assign 1 DMSO sample for each titration series. I will actually do this on a per-junctino level, so it’s not like branaplam titration series is always paired with the same DMSO replicate… Rather, it will vary randomly by junction.</p>
+<pre class="r"><code>dmso.data &lt;- splicing.gagt.df %&gt;%
+  dplyr::select(junc, contains(&quot;LCL&quot;)) %&gt;%
+  gather(&quot;SampleName&quot;, &quot;PSI&quot;, -junc) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  filter(treatment==&quot;DMSO&quot;) %&gt;%
+  arrange(junc, rep) %&gt;%
+  mutate(dose.nM = 0)
+dmso.data$treatment &lt;- replicate(nrow(dmso.data)/3, sample(c(&quot;Branaplam&quot;, &quot;Risdiplam&quot;, &quot;C2C5&quot;), 3)) %&gt;% as.vector()
+
+# Tidy the splicing.gagt.df dataframe
+splicing.gagt.df.tidy &lt;- splicing.gagt.df %&gt;%
+  dplyr::select(junc, contains(&quot;LCL&quot;)) %&gt;%
+  gather(&quot;SampleName&quot;, &quot;PSI&quot;, contains(&quot;LCL&quot;)) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  filter(!treatment==&quot;DMSO&quot;) %&gt;%
+  bind_rows(dmso.data) %&gt;%
+  inner_join(
+    splicing.gagt.df %&gt;%
+        dplyr::select(1:6, seq, Donor.score=score.x, gene_names, gene_ids, SpliceDonor, UpstreamSpliceAcceptor, IntronType),
+    by=&quot;junc&quot;
+  )</code></pre>
+<p>Now the data is really tidy for plotting the raw data for a dose-response curve with ggplot2 functions:</p>
+<pre class="r"><code>splicing.gagt.df.tidy %&gt;%
+  filter(junc %in% c(&quot;chr22:35267514:35283962:clu_38658_+&quot;, &quot;chr17:30183823:30184615:clu_32603_+&quot;)) %&gt;%
+  ggplot(aes(color=treatment)) +
+    geom_line(aes(x=dose.nM, y=PSI)) +
+    scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+    facet_wrap(~junc, scales = &quot;free_y&quot;) +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1))  </code></pre>
+<p><img src="figure/20220913_TidyDataForJingxin.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Note that the x-axis I’m plotting the actual nanomolar dosage, and since the genome-wide effective conentration of these drugs are a bit different, it might be more interpretable to plot them using their within-treatment ranked dosage:</p>
+<pre class="r"><code>splicing.gagt.df.tidy %&gt;%
+  filter(junc %in% c(&quot;chr22:35267514:35283962:clu_38658_+&quot;, &quot;chr17:30183823:30184615:clu_32603_+&quot;)) %&gt;%
+  group_by(treatment) %&gt;%
+  mutate(DosageRank = dense_rank(dose.nM)) %&gt;%
+  ggplot(aes(color=treatment)) +
+    geom_line(aes(x=DosageRank, y=PSI)) +
+    facet_wrap(~junc, scales = &quot;free_y&quot;) +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3)) </code></pre>
+<p><img src="figure/20220913_TidyDataForJingxin.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>In any case, when I do the model fitting, I think it will be more appropriate/useful to use the actual nanomolar dosage as the explanatory variable, so the units of the EC50 are easily interpretable. Keep that in mind when interpreting my EC50 estimate results.</p>
+</div>
+<div id="filtering-by-spearman-correlation-coef" class="section level3">
+<h3>Filtering by spearman correlation coef</h3>
+<p>As before, I think a reasonable way to pre-filter introns that have a reasonable dose-response curve is to filter for introns that have a spearman correlation coef of at least &lt;0.9 across doses in at least one treatment dose-response series. Let’s still do that filter:</p>
+<pre class="r"><code># Add spearman correlation ceof column
+splicing.gagt.df.tidy &lt;- splicing.gagt.df.tidy %&gt;%
+  nest(-treatment, -junc) %&gt;%
+  mutate(cor=map(data,~cor.test(.x$dose.nM, .x$PSI, method = &quot;sp&quot;))) %&gt;%
+  mutate(tidied = map(cor, tidy)) %&gt;% 
+  unnest(tidied, .drop = T) %&gt;%
+  dplyr::select(junc:data, spearman=estimate) %&gt;%
+  unnest(data)
+
+# filter the data for model fitting
+model.dat.df &lt;- splicing.gagt.df.tidy %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(spearman &gt; 0.9)) %&gt;%
+  ungroup() %&gt;%
+  group_by(junc, treatment) %&gt;% 
+  nest(-junc)</code></pre>
+</div>
+<div id="model-fitting" class="section level3">
+<h3>Model-fitting</h3>
+<p>this is basically the hackish code i used before. I kept trying to use <code>broom</code> functions to fit things, but I kept running into errors that I don’t feel like figuring out, and the following code seems to get the job done, with a tryCatch statement to print out errors that might occur in the first 100 introns. so you will see, some things error because convergence failed (likely data dosen’t even resemeble a nice dose-response curve), whereas some things error because “0 (non-NA) cases” which is confusing because i previously showed that error pops up even when there are no NAs in my data, but rather when PSI is exactly 0 for a lot of data points… In any case, when those errors pop up, I will just exclude those introns from the modelling results.</p>
+<pre class="r"><code>Results &lt;- list()
+for(i in 1:nrow(model.dat.df)) {
+  tryCatch(
+    expr = {
+      junc &lt;- model.dat.df$junc[i]
+      data &lt;- model.dat.df$data[i] %&gt;% as.data.frame()
+      fit &lt;- drm(formula = PSI ~ dose.nM,treatment,
+                  data = data,
+                  # curveid = treatment,
+                  fct = LL.4(names=c(&quot;Steepness&quot;, &quot;LowerLimit&quot;, &quot;UpperLimit&quot;, &quot;ED50&quot;)),
+                  pmodels=data.frame(1, 1, 1, treatment)
+                  )
+      df.out &lt;- fit$coefficients %&gt;%
+        as.data.frame() %&gt;%
+        rownames_to_column(&quot;param&quot;) %&gt;%
+        rename(`.` = &quot;estimate&quot;)
+      message(&quot;Successfully fitted model.&quot;)
+      Results[[junc]] &lt;- df.out
+      # do stuff with row
+    },
+    error=function(e){
+      if (i &lt; 100){
+        cat(&quot;ERROR :&quot;,conditionMessage(e), junc, &quot;\n&quot;)
+      }
+      })
+}</code></pre>
+<pre><code>Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [5]
+ERROR : Convergence failed chr1:12066023:12084464:clu_2210_+ 
+ERROR : 0 (non-NA) cases chr1:41028726:41033593:clu_638_- 
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [4]
+ERROR : Convergence failed chr1:182874291:182874854:clu_3655_+ 
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [6]
+ERROR : Convergence failed chr1:203228562:203273376:clu_1714_- 
+ERROR : 0 (non-NA) cases chr10:68446413:68448247:clu_20590_- 
+ERROR : 0 (non-NA) cases chr10:124414432:124416736:clu_21009_- 
+ERROR : 0 (non-NA) cases chr10:131934767:131934894:clu_20222_+ 
+ERROR : 0 (non-NA) cases chr11:33867062:33869346:clu_21326_- 
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [6]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [6]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [4]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [5]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite value supplied by optim
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [4]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [5]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [5]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [6]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite value supplied by optim
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [5]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [1]
+Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+  non-finite finite-difference value [6]</code></pre>
+<pre class="r"><code>ModelFits.Coefficients &lt;- bind_rows(Results, .id=&quot;junc&quot;) %&gt;%
+  separate(param, into=c(&quot;param&quot;, &quot;treatment&quot;), sep=&quot;:&quot;) %&gt;%
+  pivot_wider(names_from=c(&quot;param&quot;, &quot;treatment&quot;), values_from=&quot;estimate&quot;) %&gt;%
+  dplyr::rename(&quot;LowerLimit&quot; =`LowerLimit_(Intercept)`, &quot;UpperLimit&quot; =`UpperLimit_(Intercept)`, &quot;Steepness&quot; =`Steepness_(Intercept)`)</code></pre>
+<p>Now let’s do some merging of the data into a useful format for sharing with Jingxin, some quick exploration, and write out to a file for sharing:</p>
+</div>
+<div id="ec50-estimate-data-exploration" class="section level3">
+<h3>EC50 estimate data exploration</h3>
+<p>How many errors were thrown, compared to how many introns I attempted to model:</p>
+<pre class="r"><code>#Number introns with results; no error
+nrow(ModelFits.Coefficients)</code></pre>
+<pre><code>[1] 598</code></pre>
+<pre class="r"><code>#Number introns attempted to model
+nrow(model.dat.df)</code></pre>
+<pre><code>[1] 653</code></pre>
+<p>Ok, so most things fit succesfully.</p>
+<p>First let’s look at the distribution of the steepness parameter estimates. The way the model parameterized is such that a negative steepness parameter corresponds to a positive dose-response relationship (increase doses means increasing the expected response). So I expect these to be largely negative, since I only modelled GA|GT introns which I expect to have positive slope dose-response relationships. Keep in mind I kept this parameter fixed across treatments for simpler models with less degrees of freedom.</p>
+<pre class="r"><code>ModelFits.Coefficients %&gt;%
+  ggplot(aes(x=Steepness)) +
+  stat_ecdf()</code></pre>
+<p><img src="figure/20220913_TidyDataForJingxin.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Now let’s plot a random sample of dose-response curves, with the EC50 parameter estimates as vertical lines:</p>
+<pre class="r"><code>sample_n_of &lt;- function(data, size, ...) {
+  dots &lt;- quos(...)
+  
+  group_ids &lt;- data %&gt;% 
+    group_by(!!! dots) %&gt;% 
+    group_indices()
+  
+  sampled_groups &lt;- sample(unique(group_ids), size)
+  
+  data %&gt;% 
+    filter(group_ids %in% sampled_groups)
+}
+
+set.seed(0)
+model.dat.df %&gt;%
+  unnest(data) %&gt;%
+  ungroup() %&gt;%
+  sample_n_of(10, junc) %&gt;%
+  inner_join(
+    bind_rows(Results, .id=&quot;junc&quot;) %&gt;%
+      separate(param, into=c(&quot;param&quot;, &quot;treatment&quot;), sep=&quot;:&quot;) %&gt;%
+      filter(param==&quot;ED50&quot;),
+    by=c(&quot;junc&quot;, &quot;treatment&quot;)) %&gt;%
+ggplot(aes(color=treatment)) +
+  geom_vline(
+    data = (. %&gt;%
+      distinct(junc, treatment, estimate)),
+    aes(xintercept=estimate, color=treatment),
+    linetype=&#39;dashed&#39;) +
+  geom_label(
+    data = (. %&gt;%
+      distinct(junc, treatment, estimate) %&gt;%
+      group_by(junc) %&gt;%
+      mutate(vjust = row_number()) %&gt;%
+      ungroup()),
+    aes(vjust = vjust, label=signif(estimate,3)),
+    y=Inf, x=-Inf, size=2.5, hjust=-0.1, label.padding=unit(0.1, &quot;lines&quot;)
+  ) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  labs(title=&quot;All modeled introns, with EC50 estimate&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))</code></pre>
+<p><img src="figure/20220913_TidyDataForJingxin.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I think the EC50 estimates are actually pretty reasonable, given the limitations of the noisy data.</p>
+<p>Now let’s plot scatter plots of the EC50 estimates across conditions</p>
+<pre class="r"><code>diag_limitrange &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_density(...) + 
+    scale_x_continuous(trans=&quot;log10&quot;) +
+    theme_bw()
+}
+
+upper_point &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_point(..., alpha=0.05) + 
+    scale_y_continuous(trans=&quot;log10&quot;) +
+    scale_x_continuous(trans=&quot;log10&quot;) +
+    geom_abline() +
+    theme_bw()
+}
+
+ModelFits.Coefficients %&gt;%
+  dplyr::select(junc, contains(&quot;ED&quot;)) %&gt;%
+    ggpairs(
+    title=&quot;ED50 across treatments&quot;,
+    columns = 2:4,
+    upper=list(continuous = wrap(&quot;cor&quot;, method = &quot;spearman&quot;, hjust=0.7)),
+    lower=list(continuous = upper_point),
+    diag=list(continuous = diag_limitrange))</code></pre>
+<p><img src="figure/20220913_TidyDataForJingxin.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so keep in mind the offset from the diagonal is somewhat expected, as the ED50 units are in nanomolar and these drugs have different genome-wide effective concentrations. And as expected, the C2C5 looks a lot like risdiplam.</p>
+<p>Lastly, since I previously used PC2 loading as a proxy for molecule specific effects, let’s look at how that correlates with the difference in EC50 between risdiplam and branaplam.</p>
+<pre class="r"><code>ModelFits.Coefficients %&gt;%
+  mutate(ED50.Ratio = ED50_Branaplam/ED50_Risdiplam) %&gt;%
+  inner_join(
+    pca.results.splicing$rotation %&gt;%
+    as.data.frame() %&gt;%
+    dplyr::select(PC2) %&gt;%
+    rownames_to_column(&quot;junc&quot;),
+    by=&quot;junc&quot;
+  ) %&gt;%
+  ggplot(aes(x=ED50.Ratio, y=PC2)) +
+  geom_point() +
+  scale_x_continuous(trans=&quot;log10&quot;, breaks=10**c(-3:3), limits=c(10**-3, 10**3)) +
+  theme_bw() +
+  labs(x=&quot;log2(EC50.Branaplam/EC50.Risdiplam&quot;, y=&quot;PC2 loading&quot;, title=&quot;PC2 as a proxy for drug-specific response&quot;)</code></pre>
+<p><img src="figure/20220913_TidyDataForJingxin.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Next let’s plot dose response curves for the top20 juncs by difference in EC50. Before seeing these plots, I’m not sure whether I should expect to be outliers with really questionable dose response curves (keep in mind, the standard errors for these parameter estimates I expect to be biased and I didn’t even report them), or whether they are really believable results</p>
+<pre class="r"><code>ModelFits.Coefficients %&gt;%
+  mutate(ED50.Ratio = ED50_Branaplam/ED50_Risdiplam) %&gt;%
+  arrange(ED50.Ratio) %&gt;%
+  head(20) %&gt;%
+  inner_join(splicing.gagt.df.tidy, by=&quot;junc&quot;) %&gt;%
+ggplot(aes(color=treatment)) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  labs(title=&quot;Top20 GA|GT introns by ED50 ratio&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))</code></pre>
+<p><img src="figure/20220913_TidyDataForJingxin.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ModelFits.Coefficients %&gt;%
+  mutate(ED50.Ratio = ED50_Branaplam/ED50_Risdiplam) %&gt;%
+  arrange(ED50.Ratio) %&gt;%
+  tail(20) %&gt;%
+  inner_join(splicing.gagt.df.tidy, by=&quot;junc&quot;) %&gt;%
+ggplot(aes(color=treatment)) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  labs(title=&quot;Bottom20 GA|GT introns by ED50 ratio&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))</code></pre>
+<p><img src="figure/20220913_TidyDataForJingxin.Rmd/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Hmm, by in large the results are as expected, but you should certainly look at the dose response curve yourself before really believing any particular junction. In the future I will fix this with more careful modelling, and filtering, and estimates of standard error. But for now this I think this will do.</p>
+<p>Now I will write out the results in a useful way for sharing with Jingxin.</p>
+<pre class="r"><code># Data to recreate dose-response data plots
+splicing.gagt.df.tidy %&gt;%
+  dplyr::select(junc, SampleName, old.sample.name, treatment, dose.nM, cell.type, PSI) %&gt;%
+  write_tsv(&quot;../output/PSI.ForGAGTIntrons.tidy.txt.gz&quot;)
+
+
+
+# Data with intron-level metadata and EC50 estimates
+splicing.gagt.df.tidy %&gt;% distinct(junc, .keep_all=T) %&gt;%
+  dplyr::select(junc, `#Chrom`:IntronType) %&gt;%
+  left_join(ModelFits.Coefficients, by=&quot;junc&quot;) %&gt;%
+  left_join(
+    splicing.gagt.df.tidy %&gt;%
+      dplyr::select(junc, treatment,spearman) %&gt;%
+      distinct() %&gt;%
+      pivot_wider(names_from=&quot;treatment&quot;, values_from=&quot;spearman&quot;, names_prefix=&quot;spearman.coef.&quot;),
+    by=&quot;junc&quot;
+  ) %&gt;%
+  write_tsv(&quot;../output/EC50Estimtes.FromPSI.txt.gz&quot;)</code></pre>
+<ul>
+<li><p>So I put the output files here in <code>output/EC50Estimtes.FromPSI.txt.gz</code> and <code>output/PSI.ForGAGTIntrons.tidy.txt.gz</code>. They should also be tracked on github <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/master/output">here</a></p></li>
+<li><p>Email me if it is anything is unclear =)</p></li>
+</ul>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.1 (2019-07-05)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.2.19-el7-x86_64/lib/libopenblas_haswellp-r0.2.19.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8 LC_NUMERIC=C         LC_TIME=C           
+ [4] LC_COLLATE=C         LC_MONETARY=C        LC_MESSAGES=C       
+ [7] LC_PAPER=C           LC_NAME=C            LC_ADDRESS=C        
+[10] LC_TELEPHONE=C       LC_MEASUREMENT=C     LC_IDENTIFICATION=C 
+
+attached base packages:
+[1] parallel  stats4    stats     graphics  grDevices utils     datasets 
+[8] methods   base     
+
+other attached packages:
+ [1] GGally_1.4.0         broom_1.0.0          drc_3.0-1           
+ [4] MASS_7.3-51.4        GenomicRanges_1.36.1 GenomeInfoDb_1.20.0 
+ [7] IRanges_2.18.1       S4Vectors_0.22.1     BiocGenerics_0.30.0 
+[10] forcats_0.4.0        stringr_1.4.0        dplyr_1.0.9         
+[13] purrr_0.3.4          readr_1.3.1          tidyr_1.2.0         
+[16] tibble_3.1.7         ggplot2_3.3.6        tidyverse_1.3.0     
+
+loaded via a namespace (and not attached):
+ [1] bitops_1.0-6           fs_1.5.2               lubridate_1.7.4       
+ [4] RColorBrewer_1.1-2     httr_1.4.4             rprojroot_2.0.2       
+ [7] tools_3.6.1            backports_1.4.1        utf8_1.1.4            
+[10] R6_2.4.0               DBI_1.1.0              colorspace_1.4-1      
+[13] withr_2.5.0            tidyselect_1.1.2       curl_3.3              
+[16] compiler_3.6.1         git2r_0.26.1           cli_3.3.0             
+[19] rvest_0.3.5            xml2_1.3.2             sandwich_3.0-2        
+[22] labeling_0.3           scales_1.1.0           mvtnorm_1.1-3         
+[25] digest_0.6.20          foreign_0.8-71         rmarkdown_1.13        
+[28] rio_0.5.16             XVector_0.24.0         pkgconfig_2.0.2       
+[31] htmltools_0.5.3        plotrix_3.8-2          dbplyr_1.4.2          
+[34] fastmap_1.1.0          highr_0.9              rlang_1.0.5           
+[37] readxl_1.3.1           rstudioapi_0.14        farver_2.1.0          
+[40] generics_0.1.3         zoo_1.8-10             jsonlite_1.6          
+[43] gtools_3.9.2.2         zip_2.2.1              car_3.0-5             
+[46] RCurl_1.98-1.1         magrittr_1.5           GenomeInfoDbData_1.2.1
+[49] Matrix_1.2-18          Rcpp_1.0.5             munsell_0.5.0         
+[52] fansi_0.4.0            abind_1.4-5            lifecycle_1.0.1       
+[55] multcomp_1.4-19        stringi_1.4.3          yaml_2.2.0            
+[58] carData_3.0-5          zlibbioc_1.30.0        plyr_1.8.4            
+[61] grid_3.6.1             promises_1.0.1         crayon_1.3.4          
+[64] lattice_0.20-38        splines_3.6.1          haven_2.3.1           
+[67] hms_0.5.3              knitr_1.39             pillar_1.7.0          
+[70] codetools_0.2-18       reprex_0.3.0           glue_1.6.2            
+[73] evaluate_0.15          data.table_1.14.2      modelr_0.1.8          
+[76] vctrs_0.4.1            httpuv_1.5.1           cellranger_1.1.0      
+[79] gtable_0.3.0           reshape_0.8.8          assertthat_0.2.1      
+[82] xfun_0.31              openxlsx_4.1.0.1       later_0.8.0           
+[85] survival_2.44-1.1      workflowr_1.6.2        TH.data_1.1-1         
+[88] ellipsis_0.3.2        </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

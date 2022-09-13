@@ -817,7 +817,7 @@ for(i in 1:nrow(model.dat.df)) {
       # do stuff with row
     },
     error=function(e){
-      cat("ERROR :",conditionMessage(e), "\n")
+      cat("ERROR :",conditionMessage(e), junc, "\n")
       })
 }
 
@@ -827,7 +827,44 @@ ModelFits.Coefficients <- bind_rows(Results, .id="junc")
 
 Now let's explore the results a bit...
 
-First by plotting the EC50 parameter estimate in context of the actual raw data.
+Firstly, I noted that a lot of models I attempted to fit threw an error. Is there something obviously different about the data between the models that threw an error versus those that did not? Let's check the dose response data for all the ones that threw an error:
+
+
+```{r}
+
+juncs.with.error <- c("chr10:68446413:68448247:clu_20590_-",
+"chr2:111880849:111881314:clu_4841_-",
+"chr4:101083263:101091695:clu_10451_-",
+"chr11:126410766:126413505:clu_23284_+",
+"chr7:149248857:149250159:clu_16319_+",
+"chr4:186195406:186196003:clu_10026_+",
+"chr3:130935718:130937428:clu_7659_+",
+"chr5:119172515:119175261:clu_11291_+",
+"chr15:76862533:76880182:clu_28900_-",
+"chr4:47563354:47563581:clu_9522_+")
+
+model.dat.df %>%
+  unnest(data) %>%
+  filter(junc %in% juncs.with.error) %>%
+ggplot(aes(color=treatment)) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = "free_y") +
+  labs(title="All introns that threw error") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))
+
+#Are there missing data points?
+model.dat.df %>%
+  unnest(data) %>%
+  count(junc)
+
+```
+
+So it seems the models that did not fit (except for one, puzzingliy), all have 27 data points as expected (9 for each treatment), but that there are lots of 0's for PSI. This might be fixed by adding pseudocounts or something, and I guess I can actually accept this low rate of failure for low read counts anyway.
+
+
+Now for the models that did fit, let's plot the EC50 parameter estimate in context of the actual raw data.
 
 ```{r, fig.height=10, fig.width=10}
 
@@ -992,11 +1029,11 @@ After visually plotting the shortlist of 22 introns (mostly branaplam-specific i
 
 Here is one example risdiplam-specific example:
 
-![risdiplam-specific-example](../docs/assets/MoleculeSpecificJunctionsForJingxin_chr15_78892477_78893539_ZoomInOnIntron.png)
+![risdiplam-specific-example](assets/MoleculeSpecificJunctionsForJingxin_chr15_78892477_78893539_ZoomInOnIntron.png)
 
 
 And here is a branaplam-specific-example:
-![branaplam-specific-example](../docs/assets/MoleculeSpecificJunctionsForJingxin_chr6_170543730_170544321_ZoomInOnIntron.png)
+![branaplam-specific-example](assets/MoleculeSpecificJunctionsForJingxin_chr6_170543730_170544321_ZoomInOnIntron.png)
 
 After manually inspecting all 22 examples, I feel confident about reporting most all of them to Jingxin EXCEPT the following:
 
@@ -1076,5 +1113,4 @@ A final table for Jinxgin... The junc column is the coordinates of the GA|GT int
 coordinates.for.Jingxin %>%
   knitr::kable()
 ```
-
 

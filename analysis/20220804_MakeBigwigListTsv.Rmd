@@ -47,7 +47,7 @@ chRNA.seq.experiment <- read_tsv("../data/chRNA_sampleLibraryKey.tsv") %>%
   mutate(LibType = "chRNA") %>%
   mutate(SampleID = paste(Treatment, dose.nM, CellType, LibType, Replicate, sep = "_")) %>%
   mutate(Group_label = paste(Treatment, dose.nM, CellType, LibType, sep = "_")) %>%
-  select(OldSampleID, Group_label, SampleID)
+  dplyr::select(OldSampleID, Group_label, SampleID)
 
 
 
@@ -68,14 +68,14 @@ TitrationExp <- data.frame(C2C5=c(1000, 316, 100, 31.6, 10, 3.16, 1, 0.316),
     TRUE ~ 1
   )) %>%
   mutate(SampleID =  paste(Treatment, dose.nM, CellType, LibType, Replicate,sep = "_")) %>%
-  select(OldSampleID, Group_label, SampleID)
+  dplyr::select(OldSampleID, Group_label, SampleID)
 
 FibroblastExp <- read_tsv("../code/config/samples.tsv") %>%
   separate(sample, into=c("Treatment", "Replicate"), sep="-", remove=F) %>%
   mutate(LibType = "polyA", CellType="Fibroblast", dose.nM = NA_real_) %>%
   mutate(SampleID =  paste(Treatment, dose.nM, CellType, LibType, Replicate,sep = "_")) %>%
   mutate(Group_label = paste(Treatment, dose.nM, CellType, LibType, sep = "_")) %>%
-  select(OldSampleID=sample, Group_label, SampleID)
+  dplyr::select(OldSampleID=sample, Group_label, SampleID)
 
 AllSamples <- bind_rows(chRNA.seq.experiment, TitrationExp, FibroblastExp)
 ```
@@ -96,7 +96,7 @@ ClusterMax.mat <- Count.Table.mat %>%
     group_by(cluster) %>%
     mutate(across(where(is.numeric), sum)) %>%
     ungroup() %>%
-    select(junc, everything(), -cluster) %>%
+    dplyr::select(junc, everything(), -cluster) %>%
     column_to_rownames("junc") %>%
     as.matrix()
 
@@ -122,22 +122,38 @@ bigwigs.df <- data.frame(BigwigFilepath = c(StrandedBigwigList, UnstrandedBigwig
 
 
 ColNameKey <- bigwigs.df %>%
-      select(SampleID, OldSampleID) %>%
+      dplyr::select(SampleID, OldSampleID) %>%
       mutate(OldSampleID = str_replace_all(OldSampleID, "-", ".")) %>%
   distinct(SampleID, .keep_all=T) %>%
   deframe()
 
 length(ColNameKey)
 
+#Write out PSI table
 PSI.df %>%
   rownames_to_column("junc") %>%
-  rename(!!!ColNameKey) %>%
+  dplyr::rename(!!!ColNameKey) %>%
   separate(junc, into=c("#Chrom", "start", "end", "cluster"), convert=T, remove=F, sep=":") %>%
   mutate(gid = paste(`#Chrom`, cluster, sep="_" )) %>%
   mutate(strand = str_extract(cluster, "[+-]")) %>%
-  select(`#Chrom`, start, end, junc, gid, strand, everything(), -cluster) %>%
+  dplyr::select(`#Chrom`, start, end, junc, gid, strand, everything(), -cluster) %>%
   arrange(`#Chrom`, start, end) %>%
   write_tsv("../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed")
+
+#Also write out junction count table
+Count.Table.mat %>%
+  as.data.frame() %>%
+  rownames_to_column("junc") %>%
+  dplyr::rename(!!!ColNameKey) %>%
+  separate(junc, into=c("#Chrom", "start", "end", "cluster"), convert=T, remove=F, sep=":") %>%
+  mutate(gid = paste(`#Chrom`, cluster, sep="_" )) %>%
+  mutate(strand = str_extract(cluster, "[+-]")) %>%
+  dplyr::select(`#Chrom`, start, end, junc, gid, strand, everything(), -cluster) %>%
+  arrange(`#Chrom`, start, end) %>%
+  write_tsv("../code/SplicingAnalysis/leafcutter_all_samples/JuncCounts.table.bed")
+
+
+
 
 ```
 
@@ -153,7 +169,7 @@ Now let's write out the bigwig list and groups files.
 
 ```{r}
 bigwigs.df %>%
-  select(SampleID, BigwigFilepath, Group_label, Strand ) %>%
+  dplyr::select(SampleID, BigwigFilepath, Group_label, Strand ) %>%
   write_tsv("../code/bigwigs/BigwigList.tsv", col_names = F)
 
 bigwigs.df %>%
@@ -177,7 +193,7 @@ bigwigs.df %>%
   mutate(BedgzFile = (paste0(usethis::proj_path(), "/code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz"))) %>%
   mutate(IsDMSO = Treatment == "DMSO") %>%
   arrange(LibType, CellType, desc(IsDMSO), Treatment, dose.nM, Group_label) %>%
-  select(Group_label, Color, BedgzFile) %>%
+  dplyr::select(Group_label, Color, BedgzFile) %>%
   mutate(Supergroup = case_when(
     str_detect(Group_label, "_LCL_") ~ str_replace(Group_label, "^(.+?)_.+?_(.+?_.+)$", "\\1_\\2"),
     TRUE ~ Group_label
