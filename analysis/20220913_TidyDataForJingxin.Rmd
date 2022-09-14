@@ -68,6 +68,7 @@ library(GenomicRanges)
 library(drc)
 library(broom)
 library(GGally)
+library(qvalue)
 
 #Read in sample metadata
 sample.list <- read_tsv("../code/bigwigs/BigwigList.tsv",
@@ -295,6 +296,7 @@ this is basically the hackish code i used before. I kept trying to use `broom` f
 ```{r, error=F, warning=F}
 
 Results <- list()
+Results.RatiosAndIntervals <- list()
 for(i in 1:nrow(model.dat.df)) {
   tryCatch(
     expr = {
@@ -312,7 +314,8 @@ for(i in 1:nrow(model.dat.df)) {
         rename(`.` = "estimate")
       message("Successfully fitted model.")
       Results[[junc]] <- df.out
-      # do stuff with row
+      Results.RatiosAndIntervals[[junc]] <- EDcomp(fit, c(50,50,50), display=F) %>% as.data.frame() %>%
+        mutate(df = fit$df.residual)
     },
     error=function(e){
       if (i < 100){
@@ -320,6 +323,7 @@ for(i in 1:nrow(model.dat.df)) {
       }
       })
 }
+
 
 ModelFits.Coefficients <- bind_rows(Results, .id="junc") %>%
   separate(param, into=c("param", "treatment"), sep=":") %>%
@@ -334,6 +338,11 @@ Now let's do some merging of the data into a useful format for sharing with Jing
 How many errors were thrown, compared to how many introns I attempted to model:
 
 ```{r}
+ModelFits.Coefficients <- bind_rows(Results, .id="junc") %>%
+  separate(param, into=c("param", "treatment"), sep=":") %>%
+  pivot_wider(names_from=c("param", "treatment"), values_from="estimate") %>%
+  dplyr::rename("LowerLimit" =`LowerLimit_(Intercept)`, "UpperLimit" =`UpperLimit_(Intercept)`, "Steepness" =`Steepness_(Intercept)`)
+
 #Number introns with results; no error
 nrow(ModelFits.Coefficients)
 
@@ -348,10 +357,12 @@ First let's look at the distribution of the steepness parameter estimates. The w
 ```{r}
 ModelFits.Coefficients %>%
   ggplot(aes(x=Steepness)) +
-  stat_ecdf()
+  stat_ecdf() +
+  theme_bw() +
+  labs(y="ecdf", x="Steepness parameter estimate")
 ```
 
-Now let's plot a random sample of dose-response curves, with the EC50 parameter estimates as vertical lines:
+Hmm, I notice some extreme negative values for perhaps 10-15% of introns. I kind of suspect these may be mostly the really questionable model fits... Let's plot the raw dose-response data for a random sample these introns with steepness estimates < -10, compared to a random sample of the introns with steepness estimates >-5
 
 ```{r}
 sample_n_of <- function(data, size, ...) {
@@ -367,6 +378,39 @@ sample_n_of <- function(data, size, ...) {
     filter(group_ids %in% sampled_groups)
 }
 
+set.seed(0)
+ModelFits.Coefficients %>%
+  filter(Steepness < -10) %>%
+  inner_join(splicing.gagt.df.tidy, by="junc") %>%
+  sample_n_of(20, junc) %>%
+  ggplot(aes(color=treatment)) +
+    geom_line(aes(x=dose.nM, y=PSI)) +
+    scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+    facet_wrap(~junc, scales = "free_y") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, size=3)) +
+  labs(title="20 introns with steepness < -5")
+
+ModelFits.Coefficients %>%
+  filter(Steepness > -5) %>%
+  inner_join(splicing.gagt.df.tidy, by="junc") %>%
+  sample_n_of(20, junc) %>%
+  ggplot(aes(color=treatment)) +
+    geom_line(aes(x=dose.nM, y=PSI)) +
+    scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+    facet_wrap(~junc, scales = "free_y") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, size=3)) +
+  labs(title="20 introns with steepness > 5")
+
+```
+
+Hmmm, it's not totally clear that steepness parameter estimates distinguishes the curves that my intuition would classify as "good" versus "bad".
+
+
+Now let's plot a random sample of dose-response curves, with the EC50 parameter estimates as vertical lines:
+
+```{r}
 set.seed(0)
 model.dat.df %>%
   unnest(data) %>%
@@ -395,7 +439,7 @@ ggplot(aes(color=treatment)) +
   geom_line(aes(x=dose.nM, y=PSI)) +
   scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
   facet_wrap(~junc, scales = "free_y") +
-  labs(title="All modeled introns, with EC50 estimate") +
+  labs(title="10 random modelled introns, with EC50 estimate") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))
 ```
@@ -410,14 +454,15 @@ diag_limitrange <- function(data, mapping, ...) {
   ggplot(data = data, mapping = mapping, ...) + 
     geom_density(...) + 
     scale_x_continuous(trans="log10") +
+    coord_cartesian(xlim = c(1, 1E7)) +
     theme_bw()
 }
 
 upper_point <- function(data, mapping, ...) { 
   ggplot(data = data, mapping = mapping, ...) + 
     geom_point(..., alpha=0.05) + 
-    scale_y_continuous(trans="log10") +
-    scale_x_continuous(trans="log10") +
+    scale_y_continuous(trans="log10", limits=c(1, 1E7)) +
+    scale_x_continuous(trans="log10", limits=c(1, 1E7)) +
     geom_abline() +
     theme_bw()
 }
@@ -431,15 +476,92 @@ ModelFits.Coefficients %>%
     lower=list(continuous = upper_point),
     diag=list(continuous = diag_limitrange))
 
+
 ```
 
 Ok, so keep in mind the offset from the diagonal is somewhat expected, as the ED50 units are in nanomolar and these drugs have different genome-wide effective concentrations. And as expected, the C2C5 looks a lot like risdiplam.
 
+Let's calculate the genome-wide median EC50 ratios for each treatment pair, which should more or less be able to fit a line to the bulk of the data:
+
+```{r}
+GenomewideMedians <- 
+  Results.RatiosAndIntervals %>% bind_rows(.id="junc") %>%
+  rownames_to_column("Comparison") %>%
+  mutate(Comparison = str_replace(Comparison, "(^.+?)\\.50\\.50.+$", "\\1")) %>%
+  distinct() %>%
+  group_by(Comparison) %>%
+  summarise(MedianRatio = median(Estimate))
+
+GenomewideMedians
+
+ModelFits.Coefficients %>%
+  ggplot(aes(x=ED50_C2C5, y=ED50_Risdiplam)) +
+  geom_abline() +
+  geom_abline(intercept=log10(1/0.1032519), color='red') +
+  geom_point() +
+  scale_x_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_y_continuous(trans='log10', limits = c(1, 1E7)) +
+  theme_bw()
+```
+I think I want to come up with a statistical test, to test whether each point is different from the genomewide median EC50 ratio, as represented by the red line.
+
+```{r}
+Results.Ratios.TestResults <- Results.RatiosAndIntervals %>% bind_rows(.id="junc") %>%
+  rownames_to_column("Comparison") %>%
+  mutate(Comparison = str_replace(Comparison, "(^.+?)\\.50\\.50.+$", "\\1")) %>%
+  distinct() %>%
+  dplyr::select(1:4, df) %>%
+  left_join(GenomewideMedians, by="Comparison") %>%
+  mutate(P=pt(abs((Estimate-MedianRatio)/`Std. Error`), lower.tail=F, df=df)*2)
+
+ggplot(Results.Ratios.TestResults, aes(x=P)) +
+  geom_histogram() +
+  facet_wrap(~Comparison) +
+  theme_bw() +
+  labs(title="P-val distribution of EC50 Ratio test\nH0: Ratio=GenomewideMedian")
+```
+
+Ok those P value distributions look pretty good, and the test might be reasonably calibrated. Let's just move forward with estimating FDR for each test with qvalue method:
+
+```{r}
+Results.Ratios.TestResults <- Results.Ratios.TestResults %>%
+  group_by(Comparison) %>%
+  mutate(q = qvalue(P)$qvalues)
+```
+
+Ok, now let's recreate a plot similar to a previous one, with a comparison of risdiplam vs branaplam EC50 but now color points by the FDR for the test of difference from genomewide median.
+
+```{r}
+#How many introns FDR<1%
+Results.Ratios.TestResults %>%
+  filter(Comparison == "Branaplam.Risdiplam") %>%
+  filter(q < 0.01) %>%
+  mutate(Sign = sign(log(Estimate))) %>%
+  count(Sign)
+
+ModelFits.Coefficients %>%
+  inner_join(
+    Results.Ratios.TestResults %>%
+      filter(Comparison == "Branaplam.Risdiplam"),
+    by="junc"
+  ) %>%
+  ggplot(aes(x=ED50_Branaplam, y=ED50_Risdiplam, color=q)) +
+  geom_abline() +
+  geom_abline(intercept=log10(1/0.1244260), color='red') +
+  geom_point() +
+  scale_x_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_y_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_color_viridis_b(trans='log10', direction=-1, limits=c(1E-10, 1)) +
+  theme_bw() +
+  labs(title="296 branaplam-specific and 46 risdiplam-specific introns", color="FDR", caption="Test for difference EC50 ratio different from red-line genomewide median")
+```
+
+
 Lastly, since I previously used PC2 loading as a proxy for molecule specific effects, let's look at how that correlates with the difference in EC50 between risdiplam and branaplam.
 
 ```{r}
-ModelFits.Coefficients %>%
-  mutate(ED50.Ratio = ED50_Branaplam/ED50_Risdiplam) %>%
+Results.Ratios.TestResults %>%
+  filter(Comparison == "Branaplam.Risdiplam") %>%
   inner_join(
     pca.results.splicing$rotation %>%
     as.data.frame() %>%
@@ -447,15 +569,17 @@ ModelFits.Coefficients %>%
     rownames_to_column("junc"),
     by="junc"
   ) %>%
-  ggplot(aes(x=ED50.Ratio, y=PC2)) +
+  ggplot(aes(x=Estimate, y=PC2, color=q)) +
   geom_point() +
+  geom_vline(xintercept = 0.1244260, color='red') +
   scale_x_continuous(trans="log10", breaks=10**c(-3:3), limits=c(10**-3, 10**3)) +
+  scale_color_viridis_b(trans='log10', direction=-1, limits=c(1E-10, 1)) +
   theme_bw() +
-  labs(x="log2(EC50.Branaplam/EC50.Risdiplam", y="PC2 loading", title="PC2 as a proxy for drug-specific response")
+  labs(x="EC50.Branaplam/EC50.Risdiplam", y="PC2 loading", title="PC2 as a proxy for drug-specific response", color="FDR", caption="Test for difference EC50 ratio different from red-line genomewide median")
 ```
 
 
-Next let's plot dose response curves for the top20 juncs by difference in EC50. Before seeing these plots, I'm not sure whether I should expect to be outliers with really questionable dose response curves (keep in mind, the standard errors for these parameter estimates I expect to be biased and I didn't even report them), or whether they are really believable results
+Next let's plot dose response curves for the top20 juncs by branaplam vs risdiplam EC50 ratio point estimate. Before seeing these plots, I'm not sure whether I should expect to be outliers with really questionable dose response curves, or whether they are really believable results.
 
 ```{r}
 ModelFits.Coefficients %>%
@@ -486,7 +610,48 @@ ggplot(aes(color=treatment)) +
   
 ```
 
-Hmm, by in large the results are as expected, but you should certainly look at the dose response curve yourself before really believing any particular junction. In the future I will fix this with more careful modelling, and filtering, and estimates of standard error. But for now this I think this will do.
+Hmm, by in large the results are as expected, but you should certainly look at the dose response curve yourself before really believing any particular junction.
+
+Let's try plotting a random sample among FDR<1% for the comparison test, and also some with FDR>10% in all comparisons
+
+```{r}
+
+IntronsToPlot <- Results.Ratios.TestResults %>%
+  filter(q<0.01) %>%
+  pull(junc) %>% unique()
+
+splicing.gagt.df.tidy %>%
+  filter(junc %in% IntronsToPlot) %>%
+  sample_n_of(20, junc) %>%
+ggplot(aes(color=treatment)) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = "free_y") +
+  labs(title="20 random GA|GT introns with FDR<1% in test") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))
+
+IntronsToPlot <- Results.Ratios.TestResults %>%
+  filter(q<0.1) %>%
+  pull(junc) %>% unique()
+
+splicing.gagt.df.tidy %>%
+  filter(!junc %in% IntronsToPlot) %>%
+  sample_n_of(20, junc) %>%
+ggplot(aes(color=treatment)) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = "free_y") +
+  labs(title="20 random GA|GT introns with FDR>10% in all tests") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))
+```
+
+Ok, I actually very much like how that test results can be used to filter out the EC50 ratio estimates that I have low confidence in because of lousy/noisy dose-response curves.
+
+
+I think this will do.
+
 
 Now I will write out the results in a useful way for sharing with Jingxin.
 
@@ -495,7 +660,6 @@ Now I will write out the results in a useful way for sharing with Jingxin.
 splicing.gagt.df.tidy %>%
   dplyr::select(junc, SampleName, old.sample.name, treatment, dose.nM, cell.type, PSI) %>%
   write_tsv("../output/PSI.ForGAGTIntrons.tidy.txt.gz")
-
 
 
 # Data with intron-level metadata and EC50 estimates
@@ -509,11 +673,21 @@ splicing.gagt.df.tidy %>% distinct(junc, .keep_all=T) %>%
       pivot_wider(names_from="treatment", values_from="spearman", names_prefix="spearman.coef."),
     by="junc"
   ) %>%
+  left_join(
+    Results.Ratios.TestResults %>%
+  dplyr::select(junc, Comparison, EC.Ratio.Test.Estimate=Estimate, EC.Ratio.Test.Estimate.P=P, EC.Ratio.Test.Estimate.FDR=q) %>%
+  pivot_wider(names_from = Comparison, values_from=c("EC.Ratio.Test.Estimate", "EC.Ratio.Test.Estimate.P", "EC.Ratio.Test.Estimate.FDR")),
+  by="junc"
+  ) %>%
   write_tsv("../output/EC50Estimtes.FromPSI.txt.gz")
 
 ```
+
+
 
 - So I put the output files here in
 `output/EC50Estimtes.FromPSI.txt.gz` and `output/PSI.ForGAGTIntrons.tidy.txt.gz`. They should also be tracked on github [here](https://github.com/bfairkun/SmallMoleculeRNASeq/tree/master/output)
 
 - Email me if it is anything is unclear =)
+
+
