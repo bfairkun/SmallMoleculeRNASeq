@@ -526,7 +526,8 @@ Ok those P value distributions look pretty good, and the test might be reasonabl
 ```{r}
 Results.Ratios.TestResults <- Results.Ratios.TestResults %>%
   group_by(Comparison) %>%
-  mutate(q = qvalue(P)$qvalues)
+  mutate(q = qvalue(P)$qvalues) %>%
+  mutate(ECRatio_ComparedToGenomewideMedian = Estimate/MedianRatio)
 ```
 
 Ok, now let's recreate a plot similar to a previous one, with a comparison of risdiplam vs branaplam EC50 but now color points by the FDR for the test of difference from genomewide median.
@@ -536,7 +537,7 @@ Ok, now let's recreate a plot similar to a previous one, with a comparison of ri
 Results.Ratios.TestResults %>%
   filter(Comparison == "Branaplam.Risdiplam") %>%
   filter(q < 0.01) %>%
-  mutate(Sign = sign(log(Estimate))) %>%
+  mutate(Sign = if_else(Estimate > MedianRatio, "Risdiplam-specific", "Branaplam-specific")) %>%
   count(Sign)
 
 ModelFits.Coefficients %>%
@@ -553,7 +554,17 @@ ModelFits.Coefficients %>%
   scale_y_continuous(trans='log10', limits = c(1, 1E7)) +
   scale_color_viridis_b(trans='log10', direction=-1, limits=c(1E-10, 1)) +
   theme_bw() +
-  labs(title="296 branaplam-specific and 46 risdiplam-specific introns", color="FDR", caption="Test for difference EC50 ratio different from red-line genomewide median")
+  labs(title="217 branaplam-specific and 125 risdiplam-specific introns", color="FDR", caption="Test for difference EC50 ratio different from red-line genomewide median")
+
+Results.Ratios.TestResults %>%
+  filter(Comparison == "Branaplam.Risdiplam") %>%
+  mutate(q2 = pmax(q, 1E-5)) %>%
+  ggplot(aes(x=ECRatio_ComparedToGenomewideMedian, y=-log10(q))) +
+  geom_point() +
+  scale_x_continuous(trans='log10', limits=c(0.001, 1000)) +
+  scale_y_continuous(limits=c(0,50)) +
+  theme_bw() +
+  labs(title="VolcanoPlot", x="Branaplam vs Risdiplam\nEC50.Ratio/median(EC50.Ratio)")
 ```
 
 
@@ -675,8 +686,8 @@ splicing.gagt.df.tidy %>% distinct(junc, .keep_all=T) %>%
   ) %>%
   left_join(
     Results.Ratios.TestResults %>%
-  dplyr::select(junc, Comparison, EC.Ratio.Test.Estimate=Estimate, EC.Ratio.Test.Estimate.P=P, EC.Ratio.Test.Estimate.FDR=q) %>%
-  pivot_wider(names_from = Comparison, values_from=c("EC.Ratio.Test.Estimate", "EC.Ratio.Test.Estimate.P", "EC.Ratio.Test.Estimate.FDR")),
+  dplyr::select(junc, Comparison, EC.Ratio.Test.Estimate=Estimate, ECRatio.ComparedToGenomewideMedian=ECRatio_ComparedToGenomewideMedian, EC.Ratio.Test.Estimate.P=P, EC.Ratio.Test.Estimate.FDR=q) %>%
+  pivot_wider(names_from = Comparison, values_from=c("EC.Ratio.Test.Estimate", "ECRatio.ComparedToGenomewideMedian","EC.Ratio.Test.Estimate.P", "EC.Ratio.Test.Estimate.FDR")),
   by="junc"
   ) %>%
   write_tsv("../output/EC50Estimtes.FromPSI.txt.gz")
