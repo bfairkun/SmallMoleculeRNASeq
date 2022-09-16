@@ -344,6 +344,62 @@ rule MorePermissiveLeafcutterClustering:
         python scripts/leafcutter_cluster_regtools_py3.py -m 5 -j {input.juncfile_list} -r SplicingAnalysis/leafcutter/clustering_permissive/autosomes/ &> {log}
         """
 
+rule spliceq:
+    input:
+        bam = "Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam",
+        gtf = "/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Annotations/gencode.v34.chromasomal.annotation.gtf.ensembl",
+    output:
+        "SplicingAnalysis/SpliceQ/ByChrom/{chrom}/{sample}.txt"
+    conda:
+        "../envs/spliceq.yaml"
+    log:
+        "logs/spliceq/{sample}.{chrom}.log"
+    shell:
+        """
+        SPLICE-q.py -b {input.bam} -g {input.gtf} -o {output} -p 1  -c 0 -i -x {wildcards.chrom}
+        """
+
+rule GatherSpliceq:
+    input:
+        expand("SplicingAnalysis/SpliceQ/ByChrom/{chrom}/{{sample}}.txt", chrom=range(1,23))
+    output:
+        "SplicingAnalysis/SpliceQ/Merged/{sample}.txt.gz"
+    shell:
+        """
+        awk 'NR==1 || FNR>1' {input} | gzip - > {output}
+        """
+
+rule MergeSpliceQ_Quantifications:
+    input:
+        expand("SplicingAnalysis/SpliceQ/Merged/{sample}.txt.gz", sample=AllSamples),
+    output:
+        "SplicingAnalysis/SpliceQ/MergedTable.txt.gz"
+    conda:
+        "../envs/r_essentials.yml"
+    shell:
+        """
+        Rsript 
+        """
+
+rule TidyDoseResponseData:
+    input:
+        "bigwigs/BigwigList.tsv",
+        "bigwigs/BigwigList.groups.tsv",
+        "SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz",
+        "featureCounts/Counts.titration_series.txt",
+        "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz",
+        "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz",
+    output:
+        "DoseResponseData/LCL/TidySplicingDoseData.txt.gz",
+        "DoseResponseData/LCL/TidyExpressionDoseData.txt.gz",
+    log:
+        "logs/TidyDoseResponseData.log"
+    conda:
+        "../envs/r_essentials.yml"
+    shell:
+        """
+        Rscript scripts/TidyAndSpearmanCorTitrationData.R &> {log}
+        """
 
 ## Check how ClinVar splice site annotations relate to splice sites:
 # zcat ClinVar/PangolinResults.tsv.gz | grep 'splice_donor' | awk -v OFS='\t' '{print "chr"$1, $2, $2+1}' | sort -u | bedtools sort -i - | bedtools closest -a - -b <( bedtools flank -g /project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Fasta/GRCh38.primary_assembly.genome.fa.fai  -i <(zcat SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.gz | awk -v OFS='\t' 'NR>1 {print $1,$2,$3,".",".",$6}' ) -l 1 -r 0 | sort -u | bedtools sort -i -  ) -D b | less -S

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>CompareFibroblastToLCL_DE</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">small molecular splicing RNA-seq</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">CompareFibroblastToLCL_DE</h1>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#intro">Intro</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+</div>
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-09-16
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>20211209_JingxinRNAseq/analysis/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed19900924code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(19900924)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed19900924code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(19900924)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree54184499b7dd1fe4c52a60f9084da418db37705dtargetblank5418449a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/54184499b7dd1fe4c52a60f9084da418db37705d" target="_blank">5418449</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree54184499b7dd1fe4c52a60f9084da418db37705dtargetblank5418449a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/54184499b7dd1fe4c52a60f9084da418db37705d" target="_blank">5418449</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    ._.DS_Store
+    Ignored:    analysis/.RData
+    Ignored:    analysis/.Rhistory
+    Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    code/.DS_Store
+    Ignored:    code/._.DS_Store
+    Ignored:    code/._DOCK7.pdf
+    Ignored:    code/._DOCK7_DMSO1.pdf
+    Ignored:    code/._DOCK7_SM2_1.pdf
+    Ignored:    code/._FKTN_DMSO_1.pdf
+    Ignored:    code/._FKTN_SM2_1.pdf
+    Ignored:    code/._MAPT.pdf
+    Ignored:    code/._PKD1_DMSO_1.pdf
+    Ignored:    code/._PKD1_SM2_1.pdf
+    Ignored:    code/.snakemake/
+    Ignored:    code/5ssSeqs.tab
+    Ignored:    code/Alignments/
+    Ignored:    code/ChemCLIP/
+    Ignored:    code/ClinVar/
+    Ignored:    code/DE_testing/
+    Ignored:    code/DE_tests.mat.counts.gz
+    Ignored:    code/DE_tests.txt.gz
+    Ignored:    code/DoseResponseData/
+    Ignored:    code/Fastq/
+    Ignored:    code/FastqFastp/
+    Ignored:    code/FragLenths/
+    Ignored:    code/Meme/
+    Ignored:    code/Multiqc/
+    Ignored:    code/OMIM/
+    Ignored:    code/OldBigWigs/
+    Ignored:    code/QC/
+    Ignored:    code/Session.vim
+    Ignored:    code/SplicingAnalysis/
+    Ignored:    code/TracksSession
+    Ignored:    code/bigwigs/
+    Ignored:    code/featureCounts/
+    Ignored:    code/geena/
+    Ignored:    code/igv_session.template.xml
+    Ignored:    code/igv_session.xml
+    Ignored:    code/log
+    Ignored:    code/logs/
+    Ignored:    code/scratch/
+    Ignored:    code/scripts/.TidyAndSpearmanCorTitrationData.R.swp
+    Ignored:    code/test.txt.gz
+    Ignored:    code/testPlottingWithMyScript.ForJingxin.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin2.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin3.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin4.sh
+    Ignored:    code/testPlottingWithMyScript.sh
+    Ignored:    data/._Hijikata_TableS1_41598_2017_8902_MOESM2_ESM.xls
+    Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
+    Ignored:    output/._PioritizedIntronTargets.pdf
+
+Untracked files:
+    Untracked:  analysis/20220915_ExploreDoseResponseCryptic3ss.Rmd
+    Untracked:  analysis/20220915_ExploreSpliceQOutput.Rmd
+    Untracked:  analysis/20220916_CompareDE_LCL_Fibroblast.Rmd
+    Untracked:  code/envs/spliceq.yaml
+    Untracked:  code/scripts/MergeSpliceQ.Tables.R
+    Untracked:  code/scripts/TidyAndSpearmanCorTitrationData.R
+
+Unstaged changes:
+    Modified:   code/Snakefile
+    Modified:   code/rules/RNASeqProcessing.smk
+    Modified:   code/scripts/GenometracksByGenotype
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>I previously performed DE analysis in small molecule treated fibroblasts, and calculated correlation coefficients across dose-response data in LCLs… How do the measured effects between these two cell types compare. At the gene level? At the splicing level?</p>
+<p>At the splicing level I strongly hypothesize signs of effects to be concordant. After all, the known mechanism for these molecules are by modifying U1:5’ss interaction, and since U1 is a ubiquitous factor in splicing (as opposed to say cell-type specific splice factors), I expect that an 5’ss that is enhanced in one cell type will similarly be enhanced in another. though because of cell-type-sepcific expressed genes, some introns just won’t be captured/measured well in all cell types. And to some degree, there may be some cell-type specific factors that determine which cryptic splice sites have activation potential, again meaning that not all introns will be captured efficiently in different cell types, but the sign of effects (that we can measure) should be very concordant.</p>
+<p>As for gene expression, I am a bit less sure how concordant things will be… When small molecule induces a poison exon in a gene that downregulates expression in one cell type, are there other down-regulating (poison) or up-regulating induced exons that trump the first effect because of their stronger inclusion level?</p>
+<p>Let’s read in the data… starting with gene expression data</p>
+<pre class="r"><code>library(tidyverse)
+
+DE.fibroblast.dat &lt;- read_tsv(&quot;../code/DE_testing/Results.txt.gz&quot;) %&gt;%
+  separate(Geneid, into=c(&quot;EnsemblID&quot;, &quot;GeneSymbol&quot;), sep = &quot;_&quot;)
+
+Expression.LCL.dat &lt;- read_tsv(&quot;../code/DoseResponseData/LCL/TidyExpressionDoseData.txt.gz&quot;)</code></pre>
+<p>Note that the small molecules used in the fibroblast data aren’t exactly the same as in the LCL dose response series. From looking at a number of branaplam-specific and rsidiplam-specific splice events (determined as such in LCLs) in the fibroblast data, I can tell that SM2 is most like branaplam. For now, let’s keep our comparisons between cell types to comparing these two similar molecules.</p>
+<p>First I’ll compare significant DE genes (in fibroblast) to the spearman correlation coef in LCLs across the dose response series, limiting to genes that are reasonable expressed.</p>
+<pre class="r"><code>GenesExpressedInLCLs &lt;- Expression.LCL.dat %&gt;%
+  group_by(Geneid) %&gt;%
+  filter(max(CPM) &gt; 1) %&gt;%
+  pull(Geneid) %&gt;% unique()
+
+DE.fibroblast.dat %&gt;%
+  filter(treatment == &quot;SM2&quot;) %&gt;%
+  inner_join(
+    Expression.LCL.dat %&gt;%
+      filter(treatment == &quot;Branaplam&quot;) %&gt;%
+      distinct(Geneid, treatment, .keep_all=T),
+    by=c(&quot;EnsemblID&quot;=&quot;Geneid&quot;)
+  ) %&gt;%
+  filter(FDR &lt; 0.01) %&gt;%
+  filter(EnsemblID %in% GenesExpressedInLCLs) %&gt;%
+  ggplot(aes(x=logFC, y=spearman)) +
+  geom_point(alpha=0.1) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220916_CompareDE_LCL_Fibroblast.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, there is clearly some positive correlation. That’s reassuring somewhat. It’s pretty busy with low effect things that are hard to interpret in this messy plot. Let’s replot, just focusing on larger effect sizes, say greater than 2 fold change:</p>
+<pre class="r"><code>DE.fibroblast.dat %&gt;%
+  filter(treatment == &quot;SM2&quot;) %&gt;%
+  inner_join(
+    Expression.LCL.dat %&gt;%
+      filter(treatment == &quot;Branaplam&quot;) %&gt;%
+      distinct(Geneid, treatment, .keep_all=T),
+    by=c(&quot;EnsemblID&quot;=&quot;Geneid&quot;)
+  ) %&gt;%
+  filter(FDR &lt; 0.01) %&gt;%
+  filter(abs(logFC)&gt;1) %&gt;%
+  filter(EnsemblID %in% GenesExpressedInLCLs) %&gt;%
+  ggplot(aes(x=logFC, y=spearman)) +
+  geom_point(alpha=0.1) +
+  theme_bw()</code></pre>
+<p><img src="figure/20220916_CompareDE_LCL_Fibroblast.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, maybe to get a better intuition, let’s calculate the number of concordant sign changes versus nonconcorant.</p>
+<pre class="r"><code>DE.fibroblast.dat %&gt;%
+  filter(treatment == &quot;SM2&quot;) %&gt;%
+  inner_join(
+    Expression.LCL.dat %&gt;%
+      filter(treatment == &quot;Branaplam&quot;) %&gt;%
+      distinct(Geneid, treatment, .keep_all=T),
+    by=c(&quot;EnsemblID&quot;=&quot;Geneid&quot;)
+  ) %&gt;%
+  filter(FDR &lt; 0.01) %&gt;%
+  filter(abs(logFC)&gt;1) %&gt;%
+  mutate(Concordant = sign(logFC)==sign(spearman)) %&gt;%
+  count(Concordant)</code></pre>
+<pre><code># A tibble: 3 × 2
+  Concordant     n
+  &lt;lgl&gt;      &lt;int&gt;
+1 FALSE        585
+2 TRUE        2138
+3 NA           118</code></pre>
+<p>Ok, about 80% concordant signs. that’s pretty good I’d say.</p>
+<p>Let’s also limit to abs(spearman)&gt;0.9, which I have been using as a quick way to filter for genes/introns even worth modelling.</p>
+<pre class="r"><code>DE.fibroblast.dat %&gt;%
+  filter(treatment == &quot;SM2&quot;) %&gt;%
+  inner_join(
+    Expression.LCL.dat %&gt;%
+      filter(treatment == &quot;Branaplam&quot;) %&gt;%
+      distinct(Geneid, treatment, .keep_all=T),
+    by=c(&quot;EnsemblID&quot;=&quot;Geneid&quot;)
+  ) %&gt;%
+  filter(FDR &lt; 0.01) %&gt;%
+  filter(abs(logFC)&gt;1) %&gt;%
+  filter(abs(spearman)&gt;0.9) %&gt;%
+  mutate(Concordant = sign(logFC)==sign(spearman)) %&gt;%
+  count(Concordant)</code></pre>
+<pre><code># A tibble: 2 × 2
+  Concordant     n
+  &lt;lgl&gt;      &lt;int&gt;
+1 FALSE         30
+2 TRUE         509</code></pre>
+<p>Ok, close to about 90% concordance.</p>
+<p>Let’s do some of the same type of analysis for splicing of introns.</p>
+<p>First, to read in the fibroblast leafcutter differential splicing results…</p>
+<pre class="r"><code>cluster_sig_files &lt;- list.files(&quot;../code/SplicingAnalysis/leafcutter/differential_splicing&quot;, &quot;*_cluster_significance.txt&quot;, full.names = T)
+effect_sizes_files &lt;- list.files(&quot;../code/SplicingAnalysis/leafcutter/differential_splicing&quot;, &quot;*_effect_sizes.txt&quot;, full.names = T)
+treatments &lt;- str_replace(cluster_sig_files, &quot;.+/(.+?)_cluster_significance.txt&quot;, &quot;\\1&quot;)
+
+cluster.sig &lt;- map(cluster_sig_files, read_tsv) %&gt;%
+  set_names(cluster_sig_files) %&gt;%
+  bind_rows(.id=&quot;f&quot;) %&gt;%
+  mutate(treatment = str_replace(f, &quot;.+/(.+?)_cluster_significance.txt&quot;, &quot;\\1&quot;)) %&gt;%
+  dplyr::select(-f)
+
+effect_sizes &lt;- map(effect_sizes_files, read_tsv) %&gt;%
+  set_names(effect_sizes_files) %&gt;%
+  bind_rows(.id=&quot;f&quot;) %&gt;%
+  mutate(treatment = str_replace(f, &quot;.+/(.+?)_effect_sizes.txt&quot;, &quot;\\1&quot;)) %&gt;%
+  dplyr::select(-f) %&gt;%
+  unite(&quot;psi_treatment&quot;, treatments, sep=&quot; &quot;, na.rm=T) %&gt;%
+  mutate(psi_treatment = as.numeric(psi_treatment),
+         cluster = str_replace(intron, &quot;(.+?:).+:(.+?)&quot;, &quot;\\1\\2&quot;))
+
+#Switch sign, so that positive means increase in treatment
+effect_sizes &lt;- effect_sizes %&gt;%
+  mutate(deltapsi = deltapsi*-1,
+         logef = logef *-1)
+
+#Combine effect sizes and significance for all samples into single df
+leafcutter.ds &lt;- effect_sizes %&gt;%
+  left_join(cluster.sig, by=c(&quot;treatment&quot;, &quot;cluster&quot;))</code></pre>
+<p>Now read in the LCL dose by intronPSI spearman correlation coefficients</p>
+<pre class="r"><code>Splicing.LCL.dat &lt;- read_tsv(&quot;../code/DoseResponseData/LCL/TidySplicingDoseData.txt.gz&quot;)
+
+dat.to.plot &lt;- Splicing.LCL.dat %&gt;%
+  filter(treatment == &quot;Branaplam&quot;) %&gt;%
+  group_by(junc) %&gt;%
+  filter(max(PSI) &gt; 10) %&gt;%
+  ungroup() %&gt;%
+  distinct(junc, treatment, .keep_all=T) %&gt;%
+  inner_join(
+    leafcutter.ds %&gt;%
+      filter(treatment == &quot;SM2&quot;) %&gt;%
+      separate(intron, into=c(&quot;#Chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;FibroblastCluster&quot;), convert=T, sep=&quot;:&quot;),
+    by=c(&quot;#Chrom&quot;, &quot;start&quot;, &quot;end&quot;)
+  ) %&gt;%
+  filter(p.adjust &lt; 0.01)
+dat.to.plot %&gt;%
+  mutate(Concordant = sign(deltapsi)==sign(spearman)) %&gt;%
+  count(Concordant)</code></pre>
+<pre><code># A tibble: 3 × 2
+  Concordant     n
+  &lt;lgl&gt;      &lt;int&gt;
+1 FALSE       2863
+2 TRUE        9585
+3 NA            35</code></pre>
+<pre class="r"><code>ggplot(dat.to.plot, aes(x=deltapsi, y=spearman)) +
+  geom_point(alpha=0.1) +
+  theme_bw() +
+  labs(caption=&quot;Filtering for fibroblast FDR&lt;1%&quot;,
+       x=&quot;deltapsi in fibroblast&quot;, y=&#39;spearman coef in LCL dose response series&#39;)</code></pre>
+<p><img src="figure/20220916_CompareDE_LCL_Fibroblast.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>dat.to.plot &lt;- Splicing.LCL.dat %&gt;%
+  filter(treatment == &quot;Branaplam&quot;) %&gt;%
+  group_by(junc) %&gt;%
+  filter(max(PSI) &gt; 10) %&gt;%
+  ungroup() %&gt;%
+  distinct(junc, treatment, .keep_all=T) %&gt;%
+  inner_join(
+    leafcutter.ds %&gt;%
+      filter(treatment == &quot;SM2&quot;) %&gt;%
+      separate(intron, into=c(&quot;#Chrom&quot;, &quot;start&quot;, &quot;end&quot;, &quot;FibroblastCluster&quot;), convert=T, sep=&quot;:&quot;),
+    by=c(&quot;#Chrom&quot;, &quot;start&quot;, &quot;end&quot;)
+  ) %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  filter(abs(deltapsi)&gt;0.1)
+dat.to.plot %&gt;%
+  mutate(Concordant = sign(deltapsi)==sign(spearman)) %&gt;%
+  count(Concordant)</code></pre>
+<pre><code># A tibble: 3 × 2
+  Concordant     n
+  &lt;lgl&gt;      &lt;int&gt;
+1 FALSE        331
+2 TRUE        3657
+3 NA             5</code></pre>
+<pre class="r"><code>ggplot(dat.to.plot, aes(x=deltapsi, y=spearman)) +
+  geom_point(alpha=0.1) +
+  theme_bw() +
+  labs(caption=&quot;Filtering for fibroblast deltaPSI&gt;10% and FDR&lt;1%&quot;,
+       x=&quot;deltapsi in fibroblast&quot;, y=&#39;spearman coef in LCL dose response series&#39;)</code></pre>
+<p><img src="figure/20220916_CompareDE_LCL_Fibroblast.Rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>I think it is fair to for the most part that a detected change in one cell type will not change sign in a different cell type. So to me, the point of assaying different cell types is more to gain power in cell-type-specific genes and introns, moreso than to measure cell-type specific effects. There may be some cell-type specific effect sizes, but it seems that sign switching is quite rare, at both the intron- and gene-level.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.1 (2019-07-05)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.2.19-el7-x86_64/lib/libopenblas_haswellp-r0.2.19.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8 LC_NUMERIC=C         LC_TIME=C           
+ [4] LC_COLLATE=C         LC_MONETARY=C        LC_MESSAGES=C       
+ [7] LC_PAPER=C           LC_NAME=C            LC_ADDRESS=C        
+[10] LC_TELEPHONE=C       LC_MEASUREMENT=C     LC_IDENTIFICATION=C 
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] forcats_0.4.0   stringr_1.4.0   dplyr_1.0.9     purrr_0.3.4    
+[5] readr_1.3.1     tidyr_1.2.0     tibble_3.1.7    ggplot2_3.3.6  
+[9] tidyverse_1.3.0
+
+loaded via a namespace (and not attached):
+ [1] tidyselect_1.1.2 xfun_0.31        haven_2.3.1      colorspace_1.4-1
+ [5] vctrs_0.4.1      generics_0.1.3   htmltools_0.5.3  yaml_2.2.0      
+ [9] utf8_1.1.4       rlang_1.0.5      later_0.8.0      pillar_1.7.0    
+[13] withr_2.5.0      glue_1.6.2       DBI_1.1.0        dbplyr_1.4.2    
+[17] readxl_1.3.1     modelr_0.1.8     lifecycle_1.0.1  cellranger_1.1.0
+[21] munsell_0.5.0    gtable_0.3.0     workflowr_1.6.2  rvest_0.3.5     
+[25] evaluate_0.15    labeling_0.3     knitr_1.39       fastmap_1.1.0   
+[29] httpuv_1.5.1     fansi_0.4.0      highr_0.9        broom_1.0.0     
+[33] Rcpp_1.0.5       promises_1.0.1   backports_1.4.1  scales_1.1.0    
+[37] jsonlite_1.6     farver_2.1.0     fs_1.5.2         hms_0.5.3       
+[41] digest_0.6.20    stringi_1.4.3    rprojroot_2.0.2  grid_3.6.1      
+[45] cli_3.3.0        tools_3.6.1      magrittr_1.5     crayon_1.3.4    
+[49] pkgconfig_2.0.2  ellipsis_0.3.2   xml2_1.3.2       reprex_0.3.0    
+[53] lubridate_1.7.4  assertthat_0.2.1 rmarkdown_1.13   httr_1.4.4      
+[57] rstudioapi_0.14  R6_2.4.0         git2r_0.26.1     compiler_3.6.1  </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

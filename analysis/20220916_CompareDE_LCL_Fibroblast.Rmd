@@ -1,0 +1,206 @@
+---
+title: "CompareFibroblastToLCL_DE"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Intro
+
+I previously performed DE analysis in small molecule treated fibroblasts, and calculated correlation coefficients across dose-response data in LCLs... How do the measured effects between these two cell types compare. At the gene level? At the splicing level?
+
+
+At the splicing level I strongly hypothesize signs of effects to be concordant. After all, the known mechanism for these molecules are by modifying U1:5'ss interaction, and since U1 is a ubiquitous factor in splicing (as opposed to say cell-type specific splice factors), I expect that an 5'ss that is enhanced in one cell type will similarly be enhanced in another. though because of cell-type-sepcific expressed genes, some introns just won't be captured/measured well in all cell types. And to some degree, there may be some cell-type specific factors that determine which cryptic splice sites have activation potential, again meaning that not all introns will be captured efficiently in different cell types, but the sign of effects (that we can measure) should be very concordant.
+
+As for gene expression, I am a bit less sure how concordant things will be... When small molecule induces a poison exon in a gene that downregulates expression in one cell type, are there other down-regulating (poison) or up-regulating induced exons that trump the first effect because of their stronger inclusion level?
+
+Let's read in the data... starting with gene expression data
+
+
+```{r}
+library(tidyverse)
+
+DE.fibroblast.dat <- read_tsv("../code/DE_testing/Results.txt.gz") %>%
+  separate(Geneid, into=c("EnsemblID", "GeneSymbol"), sep = "_")
+
+Expression.LCL.dat <- read_tsv("../code/DoseResponseData/LCL/TidyExpressionDoseData.txt.gz")
+```
+
+Note that the small molecules used in the fibroblast data aren't exactly the same as in the LCL dose response series. From looking at a number of branaplam-specific and rsidiplam-specific splice events (determined as such in LCLs) in the fibroblast data, I can tell that SM2 is most like branaplam. For now, let's keep our comparisons between cell types to comparing these two similar molecules.
+
+First I'll compare significant DE genes (in fibroblast) to the spearman correlation coef in LCLs across the dose response series, limiting to genes that are reasonable expressed.
+
+```{r}
+
+GenesExpressedInLCLs <- Expression.LCL.dat %>%
+  group_by(Geneid) %>%
+  filter(max(CPM) > 1) %>%
+  pull(Geneid) %>% unique()
+
+DE.fibroblast.dat %>%
+  filter(treatment == "SM2") %>%
+  inner_join(
+    Expression.LCL.dat %>%
+      filter(treatment == "Branaplam") %>%
+      distinct(Geneid, treatment, .keep_all=T),
+    by=c("EnsemblID"="Geneid")
+  ) %>%
+  filter(FDR < 0.01) %>%
+  filter(EnsemblID %in% GenesExpressedInLCLs) %>%
+  ggplot(aes(x=logFC, y=spearman)) +
+  geom_point(alpha=0.1) +
+  theme_bw()
+  
+
+```
+
+Ok, there is clearly some positive correlation. That's reassuring somewhat. It's pretty busy with low effect things that are hard to interpret in this messy plot. Let's replot, just focusing on larger effect sizes, say greater than 2 fold change:
+
+```{r}
+DE.fibroblast.dat %>%
+  filter(treatment == "SM2") %>%
+  inner_join(
+    Expression.LCL.dat %>%
+      filter(treatment == "Branaplam") %>%
+      distinct(Geneid, treatment, .keep_all=T),
+    by=c("EnsemblID"="Geneid")
+  ) %>%
+  filter(FDR < 0.01) %>%
+  filter(abs(logFC)>1) %>%
+  filter(EnsemblID %in% GenesExpressedInLCLs) %>%
+  ggplot(aes(x=logFC, y=spearman)) +
+  geom_point(alpha=0.1) +
+  theme_bw()
+```
+
+Ok, maybe to get a  better intuition, let's calculate the number of concordant sign changes versus nonconcorant.
+
+```{r}
+DE.fibroblast.dat %>%
+  filter(treatment == "SM2") %>%
+  inner_join(
+    Expression.LCL.dat %>%
+      filter(treatment == "Branaplam") %>%
+      distinct(Geneid, treatment, .keep_all=T),
+    by=c("EnsemblID"="Geneid")
+  ) %>%
+  filter(FDR < 0.01) %>%
+  filter(abs(logFC)>1) %>%
+  mutate(Concordant = sign(logFC)==sign(spearman)) %>%
+  count(Concordant)
+```
+
+Ok, about 80% concordant signs. that's pretty good I'd say.
+
+Let's also limit to abs(spearman)>0.9, which I have been using as a quick way to filter for genes/introns even worth modelling.
+
+```{r}
+DE.fibroblast.dat %>%
+  filter(treatment == "SM2") %>%
+  inner_join(
+    Expression.LCL.dat %>%
+      filter(treatment == "Branaplam") %>%
+      distinct(Geneid, treatment, .keep_all=T),
+    by=c("EnsemblID"="Geneid")
+  ) %>%
+  filter(FDR < 0.01) %>%
+  filter(abs(logFC)>1) %>%
+  filter(abs(spearman)>0.9) %>%
+  mutate(Concordant = sign(logFC)==sign(spearman)) %>%
+  count(Concordant)
+```
+
+Ok, close to about 90% concordance.
+
+Let's do some of the same type of analysis for splicing of introns.
+
+
+First, to read in the fibroblast leafcutter differential splicing results...
+```{r}
+cluster_sig_files <- list.files("../code/SplicingAnalysis/leafcutter/differential_splicing", "*_cluster_significance.txt", full.names = T)
+effect_sizes_files <- list.files("../code/SplicingAnalysis/leafcutter/differential_splicing", "*_effect_sizes.txt", full.names = T)
+treatments <- str_replace(cluster_sig_files, ".+/(.+?)_cluster_significance.txt", "\\1")
+
+cluster.sig <- map(cluster_sig_files, read_tsv) %>%
+  set_names(cluster_sig_files) %>%
+  bind_rows(.id="f") %>%
+  mutate(treatment = str_replace(f, ".+/(.+?)_cluster_significance.txt", "\\1")) %>%
+  dplyr::select(-f)
+
+effect_sizes <- map(effect_sizes_files, read_tsv) %>%
+  set_names(effect_sizes_files) %>%
+  bind_rows(.id="f") %>%
+  mutate(treatment = str_replace(f, ".+/(.+?)_effect_sizes.txt", "\\1")) %>%
+  dplyr::select(-f) %>%
+  unite("psi_treatment", treatments, sep=" ", na.rm=T) %>%
+  mutate(psi_treatment = as.numeric(psi_treatment),
+         cluster = str_replace(intron, "(.+?:).+:(.+?)", "\\1\\2"))
+
+#Switch sign, so that positive means increase in treatment
+effect_sizes <- effect_sizes %>%
+  mutate(deltapsi = deltapsi*-1,
+         logef = logef *-1)
+
+#Combine effect sizes and significance for all samples into single df
+leafcutter.ds <- effect_sizes %>%
+  left_join(cluster.sig, by=c("treatment", "cluster"))
+```
+
+Now read in the LCL dose by intronPSI spearman correlation coefficients
+
+```{r}
+Splicing.LCL.dat <- read_tsv("../code/DoseResponseData/LCL/TidySplicingDoseData.txt.gz")
+
+dat.to.plot <- Splicing.LCL.dat %>%
+  filter(treatment == "Branaplam") %>%
+  group_by(junc) %>%
+  filter(max(PSI) > 10) %>%
+  ungroup() %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  inner_join(
+    leafcutter.ds %>%
+      filter(treatment == "SM2") %>%
+      separate(intron, into=c("#Chrom", "start", "end", "FibroblastCluster"), convert=T, sep=":"),
+    by=c("#Chrom", "start", "end")
+  ) %>%
+  filter(p.adjust < 0.01)
+dat.to.plot %>%
+  mutate(Concordant = sign(deltapsi)==sign(spearman)) %>%
+  count(Concordant)
+ggplot(dat.to.plot, aes(x=deltapsi, y=spearman)) +
+  geom_point(alpha=0.1) +
+  theme_bw() +
+  labs(caption="Filtering for fibroblast FDR<1%",
+       x="deltapsi in fibroblast", y='spearman coef in LCL dose response series')
+
+
+dat.to.plot <- Splicing.LCL.dat %>%
+  filter(treatment == "Branaplam") %>%
+  group_by(junc) %>%
+  filter(max(PSI) > 10) %>%
+  ungroup() %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  inner_join(
+    leafcutter.ds %>%
+      filter(treatment == "SM2") %>%
+      separate(intron, into=c("#Chrom", "start", "end", "FibroblastCluster"), convert=T, sep=":"),
+    by=c("#Chrom", "start", "end")
+  ) %>%
+  filter(p.adjust < 0.01) %>%
+  filter(abs(deltapsi)>0.1)
+dat.to.plot %>%
+  mutate(Concordant = sign(deltapsi)==sign(spearman)) %>%
+  count(Concordant)
+ggplot(dat.to.plot, aes(x=deltapsi, y=spearman)) +
+  geom_point(alpha=0.1) +
+  theme_bw() +
+  labs(caption="Filtering for fibroblast deltaPSI>10% and FDR<1%",
+       x="deltapsi in fibroblast", y='spearman coef in LCL dose response series')
+```
+
+## Conclusion
+
+I think it is fair to for the most part that a detected change in one cell type will not change sign in a different cell type. So to me, the point of assaying different cell types is more to gain power in cell-type-specific genes and introns, moreso than to measure cell-type specific effects. There may be some cell-type specific effect sizes, but it seems that sign switching is quite rare, at both the intron- and gene-level.

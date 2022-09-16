@@ -1,0 +1,50 @@
+---
+title: "ExploreSpliceQOutput"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Intro:
+
+I am using [Splice-Q](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04282-6) script to quantify intron retention. It has two metrics: the IER (based on relative coverage of an intron versus its flanking exons), and SE (based on exon-exon junction reads and exon-intron junction reads).
+
+
+Ran SPLICE-q in normal mode:
+
+`SPLICE-q.py -b Alignments/STAR_Align/chRNA_1/Aligned.sortedByCoord.out.bam -g /project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Annotations/gencode.v34.chromasomal.basic.annotation.gtf  -o scratch/spliceqtest.txt -p2 -c 0 -x 22`
+
+
+Ran in `-i` mode to output IER instead of SE.
+
+`SPLICE-q.py -b Alignments/STAR_Align/chRNA_1/Aligned.sortedByCoord.out.bam -g /project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Annotations/gencode.v34.chromasomal.basic.annotation.gtf  -o scratch/spliceqtest2.txt -p2 -c 0 -i -x 22`
+
+Here I will compare the output based on a quick run I did on one sample chr22, to make sure I understand the output:
+
+```{r}
+library(tidyverse)
+
+SE <- read_tsv("../code/scratch/spliceqtest.txt")
+IER <- read_tsv("../code/scratch/spliceqtest2.txt")
+
+nrow(SE)
+nrow(IER)
+
+Merged.dat <- cbind(IER, dplyr::select(SE, score))
+
+ggplot(Merged.dat, aes(x=IER, y=score)) +
+  geom_point(alpha=0.5) +
+  theme_bw() +
+  labs(y="SE")
+
+Merged.dat %>%
+  mutate(ScoreCalculatedByMe = (sj5_cov_split + sj3_cov_split)/(sj5_cov_nonsplit+sj5_cov_split+sj3_cov_nonsplit+sj3_cov_split)) %>%
+  ggplot(aes(x=score, y=ScoreCalculatedByMe)) +
+  geom_point()
+```
+
+## Conclusion:
+
+SE and IER are generally measuring the same thing, though as the paper states, the IER in theory might be 'better' in the sense that it utilizes completely intronic reads and so there may be less sampling noise. However, this requires the assumption of no internal exons which can mess the unspliced counting. Also, the SE can be directly calculated from the output of the `-i` IER mode. So there is no point in running the non `-i` mode. I will run SPLICE-q to quantify intron retention in all samples.
