@@ -39,6 +39,7 @@ ggplot(Merged.dat, aes(x=IER, y=score)) +
   theme_bw() +
   labs(y="SE")
 
+
 Merged.dat %>%
   mutate(ScoreCalculatedByMe = (sj5_cov_split + sj3_cov_split)/(sj5_cov_nonsplit+sj5_cov_split+sj3_cov_nonsplit+sj3_cov_split)) %>%
   ggplot(aes(x=score, y=ScoreCalculatedByMe)) +

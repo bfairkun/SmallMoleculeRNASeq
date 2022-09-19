@@ -5,7 +5,7 @@
 # @file        : MergeSpliceQ.Tables
 # @created     : Thursday Sep 15, 2022 13:52:20 CDT
 #
-# @description : 
+# @description :
 ######################################################################
 
 #Use hard coded arguments in interactive R session, else use command line args
@@ -25,14 +25,14 @@ dat.in <- lapply(setNames(input.fn, input.fn), read_tsv) %>%
     bind_rows(.id="fn")
 
 dat.in %>%
-    distinct(fn, chr, IStart, IEnd, strand, transcript_ID)
-    # count(fn)
+distinct(fn, chr, IStart, IEnd, strand, transcript_ID) %>%
+count(fn)
 
-dat.in %>%
-    distinct(fn, chr, IStart, IEnd, strand, exon5_cov, exon3_cov)
-
-dat.in %>% 
-    head() %>%
-    rowwise() %>% 
-    mutate(sumrange = sum(c_across(exon5_cov:exon3_cov), na.rm = T)) %>%
-    filter(sumrange >= 10)
+dat.wide <- dat.in %>%
+  unite(Intron, chr, IStart, IEnd, strand) %>%
+  mutate(SE.perrow = (sj5_cov_split + sj3_cov_split)/(sj5_cov_nonsplit+sj5_cov_split+sj3_cov_nonsplit+sj3_cov_split)) %>%
+  group_by(fn, Intron) %>%
+  summarise(SE = median(SE.perrow),
+            IER=median(IER)) %>%
+  ungroup() %>%
+  pivot_wider(names_from = "fn", values_from=c("SE", "IER"), id_cols="Intron", id_expand=T)
