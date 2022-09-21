@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>20220919_chRNA_IntronRetention</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">small molecular splicing RNA-seq</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">20220919_chRNA_IntronRetention</h1>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#intro">Intro</a><ul>
+<li><a href="#effect-sizes-in-chrna-versus-polya">effect sizes in chRNA versus polyA</a></li>
+<li><a href="#host-intron-inclusion-of-drug-induced-introns">Host intron inclusion of drug-induced introns</a></li>
+</ul></li>
+</ul>
+</div>
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-09-21
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 2
+</p>
+<p>
+<strong>Knit directory:</strong> <code>20211209_JingxinRNAseq/analysis/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed19900924code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(19900924)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed19900924code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(19900924)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+</p>
+</div>
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Using absolute paths to the files within your workflowr project makes it difficult for you and others to run your code on a different machine. Change the absolute path(s) below to the suggested relative path(s) to make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw
+</td>
+<td style="text-align:left;">
+../code/bigwigs/unstranded/(.+?).bw
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree22476105f2a7d2618d3f38a3e01a91a0df15b8e2targetblank2247610a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/22476105f2a7d2618d3f38a3e01a91a0df15b8e2" target="_blank">2247610</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree22476105f2a7d2618d3f38a3e01a91a0df15b8e2targetblank2247610a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/22476105f2a7d2618d3f38a3e01a91a0df15b8e2" target="_blank">2247610</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    ._.DS_Store
+    Ignored:    analysis/.RData
+    Ignored:    analysis/.Rhistory
+    Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    code/.DS_Store
+    Ignored:    code/._.DS_Store
+    Ignored:    code/._DOCK7.pdf
+    Ignored:    code/._DOCK7_DMSO1.pdf
+    Ignored:    code/._DOCK7_SM2_1.pdf
+    Ignored:    code/._FKTN_DMSO_1.pdf
+    Ignored:    code/._FKTN_SM2_1.pdf
+    Ignored:    code/._MAPT.pdf
+    Ignored:    code/._PKD1_DMSO_1.pdf
+    Ignored:    code/._PKD1_SM2_1.pdf
+    Ignored:    code/.snakemake/
+    Ignored:    code/1KG_HighCoverageCalls.samplelist.txt
+    Ignored:    code/5ssSeqs.tab
+    Ignored:    code/Alignments/
+    Ignored:    code/ChemCLIP/
+    Ignored:    code/ClinVar/
+    Ignored:    code/DE_testing/
+    Ignored:    code/DE_tests.mat.counts.gz
+    Ignored:    code/DE_tests.txt.gz
+    Ignored:    code/DoseResponseData/
+    Ignored:    code/Fastq/
+    Ignored:    code/FastqFastp/
+    Ignored:    code/FragLenths/
+    Ignored:    code/Meme/
+    Ignored:    code/Multiqc/
+    Ignored:    code/OMIM/
+    Ignored:    code/OldBigWigs/
+    Ignored:    code/QC/
+    Ignored:    code/Session.vim
+    Ignored:    code/SplicingAnalysis/
+    Ignored:    code/TracksSession
+    Ignored:    code/bigwigs/
+    Ignored:    code/featureCounts/
+    Ignored:    code/geena/
+    Ignored:    code/igv_session.template.xml
+    Ignored:    code/igv_session.xml
+    Ignored:    code/log
+    Ignored:    code/logs/
+    Ignored:    code/rules/.RNASeqProcessing.smk.swp
+    Ignored:    code/scratch/
+    Ignored:    code/test.txt.gz
+    Ignored:    code/testPlottingWithMyScript.ForJingxin.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin2.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin3.sh
+    Ignored:    code/testPlottingWithMyScript.ForJingxin4.sh
+    Ignored:    code/testPlottingWithMyScript.sh
+    Ignored:    data/._Hijikata_TableS1_41598_2017_8902_MOESM2_ESM.xls
+    Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
+    Ignored:    output/._PioritizedIntronTargets.pdf
+
+Untracked files:
+    Untracked:  analysis/20220919_chRNA_IntronRetention.Rmd
+
+Unstaged changes:
+    Modified:   analysis/20220913_TidyDataForJingxin.Rmd
+    Modified:   analysis/20220915_ExploreSpliceQOutput.Rmd
+    Modified:   code/Snakefile
+    Modified:   code/rules/RNASeqProcessing.smk
+    Modified:   code/scripts/GenometracksByGenotype
+    Modified:   code/scripts/MergeSpliceQ.Tables.R
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>I have quantified intron retention with splice-q package for each sample. I want to investigate the hypothesis that some of the introns affected by small molecules have unique signatures as measured by intron retention or splicing in chRNA dataset. In particular, from looking at the HTT locus below, I notice a few things:</p>
+<ol style="list-style-type: decimal">
+<li>The drug-induced exon is in a host-intron with a bit more intron retention compared to the surrounding introns in untreated (DMSO) samples. Perhaps introns with slower splicing are a bit predisposed to new drug-induced splicing.</li>
+<li>The drug induced exon is spliced-in at a higher rate (relative to the skipping event) in the chRNA, presumably since NMD quickly degrades the exon-included isoform post-transcriptionally.</li>
+<li>The intron upstream of the drug-induced exon seems to be spliced more efficiently in treated samples, relative to the downstream intron which actually contains the target 5’ GA|GT splice site (black line in screenshot) that interacts with the small molecule. This is reminiscent of early exon definition experiments wherein strengthening a downstream 5’ss enhances splicing of the upstream intron.</li>
+</ol>
+<div class="figure">
+<img src="../docs/assets/ScreenShot_HTT.png" alt="IGVScreenshot" />
+<p class="caption">IGVScreenshot</p>
+</div>
+<p>In this notebook, I will explore whether these observations are representative of drug-induced exons genomewide. First, read in the data…</p>
+<pre class="r"><code>library(tidyverse)
+library(gplots)
+
+#Read in sample metadata
+sample.list &lt;- read_tsv(&quot;../code/bigwigs/BigwigList.tsv&quot;,
+                        col_names = c(&quot;SampleName&quot;, &quot;bigwig&quot;, &quot;group&quot;, &quot;strand&quot;)) %&gt;%
+  filter(strand==&quot;.&quot;) %&gt;%
+  mutate(old.sample.name = str_replace(bigwig, &quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw&quot;, &quot;\\1&quot;)) %&gt;%
+  separate(SampleName, into=c(&quot;treatment&quot;, &quot;dose.nM&quot;, &quot;cell.type&quot;, &quot;libType&quot;, &quot;rep&quot;), convert=T, remove=F, sep=&quot;_&quot;) %&gt;%
+  left_join(
+    read_tsv(&quot;../code/bigwigs/BigwigList.groups.tsv&quot;, col_names = c(&quot;group&quot;, &quot;color&quot;, &quot;bed&quot;, &quot;supergroup&quot;)),
+    by=&quot;group&quot;
+  )
+
+SampleNameConversionKey &lt;- sample.list %&gt;%
+  dplyr::select(SampleName, old.sample.name) %&gt;%
+  deframe()
+
+GA.GT.Introns &lt;- read_tsv(&quot;../output/EC50Estimtes.FromPSI.txt.gz&quot;)
+
+read.SpliceQ.Table &lt;- function(fn){
+  read_tsv(fn) %&gt;%
+  rename_at(vars(-Intron), ~str_replace(.x, &quot;.+?Merged/(.+?)\\.txt\\.gz&quot;, &quot;\\1&quot;)) %&gt;%
+  rename(!!!SampleNameConversionKey) %&gt;%
+  separate(Intron, into=c(&quot;Chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;strand&quot;), convert=T, sep=&quot;_&quot;) %&gt;%
+  mutate(stop = stop+1) %&gt;%
+  mutate(Chrom=paste0(&quot;chr&quot;, Chrom)) %&gt;%
+  dplyr::select(Chrom:strand, everything())
+}
+
+SpliceQ.IER &lt;- read.SpliceQ.Table(&quot;../code/SplicingAnalysis/SpliceQ/MergedTable.IER.txt.gz&quot;)
+SpliceQ.SE &lt;- read.SpliceQ.Table(&quot;../code/SplicingAnalysis/SpliceQ/MergedTable.SE.txt.gz&quot;)
+  
+
+all.samples.PSI &lt;- read_tsv(&quot;../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz&quot;)
+
+all.samples.5ss &lt;- read_tsv(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz&quot;, col_names = c(&quot;intron&quot;, &quot;seq&quot;, &quot;score&quot;)) %&gt;%
+  mutate(intron = str_replace(intron, &quot;^(.+?)::.+$&quot;, &quot;\\1&quot;)) %&gt;%
+  separate(intron, into=c(&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;, &quot;strand&quot;), sep=&quot;_&quot;, convert=T, remove=F)
+
+all.samples.intron.annotations &lt;- read_tsv(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz&quot;)</code></pre>
+<div id="effect-sizes-in-chrna-versus-polya" class="section level3">
+<h3>effect sizes in chRNA versus polyA</h3>
+<p>Let’s check the first hypothesis… that chRNA will generally show larger effect sizes between ratio of included versus skipped reads.</p>
+<pre class="r"><code>GA.GT.Introns.DrugInducedCassetteExons &lt;- GA.GT.Introns %&gt;%
+  filter(!is.na(Steepness)) %&gt;%
+  filter(UpperLimit &gt; LowerLimit) %&gt;%
+  filter(!is.na(UpstreamSpliceAcceptor)) %&gt;%
+  dplyr::rename(strand=strand.y)
+
+
+chRNA.Comparison.Samples &lt;- sample.list %&gt;%
+  filter(cell.type==&quot;LCL&quot;) %&gt;%
+  group_by(dose.nM, treatment) %&gt;%
+  filter(any(libType==&quot;chRNA&quot;))
+
+
+IntronsToQuantifyInDrugInducedCassetteExons &lt;- all.samples.PSI %&gt;%
+  filter(gid %in% GA.GT.Introns$gid) %&gt;%
+  mutate(SpliceAcceptor = case_when(
+    strand == &quot;+&quot; ~ paste(`#Chrom`, end, strand, sep=&quot;.&quot;),
+    strand == &quot;-&quot; ~ paste(`#Chrom`, start-2, strand, sep=&quot;.&quot;)
+  )) %&gt;%
+  select(1:6, SpliceAcceptor, contains(&quot;LCL&quot;)) %&gt;%
+  gather(key=&quot;Sample&quot;, value=&quot;PSI&quot;, contains(&quot;LCL&quot;)) %&gt;%
+  group_by(junc, gid, strand, SpliceAcceptor) %&gt;%
+  drop_na() %&gt;%
+  summarise(mean=mean(PSI, na.rm = F)) %&gt;%
+  group_by(SpliceAcceptor) %&gt;%
+  filter(mean == max(mean)) %&gt;%
+  ungroup() %&gt;%
+  dplyr::select(UpstreamJunc = junc, SpliceAcceptor) %&gt;%
+  inner_join(GA.GT.Introns.DrugInducedCassetteExons, by=c(&quot;SpliceAcceptor&quot;=&quot;UpstreamSpliceAcceptor&quot;)) %&gt;%
+  rename(DownstreamJunc = junc) %&gt;%
+  mutate(SkippingJunc = case_when(
+    strand == &quot;+&quot; ~ str_replace(paste(UpstreamJunc, DownstreamJunc), &quot;^(chr.+?):(.+?):(.+?):(clu.+?) (chr.+?):(.+?):(.+?):clu.+$&quot;, &quot;\\1:\\2:\\7:\\4&quot;),
+    strand == &quot;-&quot; ~ str_replace(paste(UpstreamJunc, DownstreamJunc), &quot;^(chr.+?):(.+?):(.+?):(clu.+?) (chr.+?):(.+?):(.+?):clu.+$&quot;, &quot;\\1:\\6:\\3:\\4&quot;)
+  )) %&gt;%
+  dplyr::select(UpstreamJunc,DownstreamJunc, SkippingJunc ) %&gt;%
+  gather(key=&quot;IntronType&quot;, value=&quot;junc&quot;) %&gt;%
+  distinct(.keep_all = T) %&gt;%
+  mutate(gid = str_replace(junc, &quot;.+?:(clu.+$)&quot;, &quot;\\1&quot;)) %&gt;%
+  add_count(gid) %&gt;%
+  filter(n==3)
+
+chRNA.Comparison.PSI.Inclusion.tidy &lt;- IntronsToQuantifyInDrugInducedCassetteExons %&gt;%
+  dplyr::select(-n, -gid) %&gt;%
+  inner_join(
+    all.samples.PSI %&gt;%
+      select(1:6, chRNA.Comparison.Samples$SampleName),
+    by=&quot;junc&quot;
+  ) %&gt;%
+  gather(&quot;Sample&quot;, &quot;PSI&quot;, contains(&quot;LCL&quot;)) %&gt;%
+  pivot_wider(names_from = &quot;IntronType&quot;, values_from=&quot;PSI&quot;, id_cols=c(&quot;gid&quot;, &quot;Sample&quot;)) %&gt;%
+  unnest() %&gt;%
+  mutate(InclusionPSI=UpstreamJunc+DownstreamJunc) %&gt;%
+  separate(Sample, into=c(&quot;treatment&quot;, &quot;dose.nM&quot;, &quot;cell.type&quot;, &quot;libType&quot;, &quot;rep&quot;), sep=&quot;_&quot;, convert=T) %&gt;%
+  group_by(&quot;treatment&quot;, &quot;dose.nM&quot;) %&gt;%
+  filter(any(libType == &quot;chRNA&quot;)) %&gt;%
+  ungroup() %&gt;%
+  group_by(gid, treatment, dose.nM, cell.type, libType) %&gt;%
+  summarise_at(vars(UpstreamJunc:InclusionPSI), mean, na.rm=T) %&gt;%
+  mutate(TreatedOrControl = if_else(treatment==&quot;DMSO&quot;, &quot;Control&quot;, &quot;Treatment&quot;)) %&gt;%
+  ungroup()
+
+
+inner_join(
+    chRNA.Comparison.PSI.Inclusion.tidy %&gt;%
+      filter(TreatedOrControl == &quot;Treatment&quot;) %&gt;%
+      dplyr::select(-TreatedOrControl),
+    chRNA.Comparison.PSI.Inclusion.tidy %&gt;%
+      filter(TreatedOrControl == &quot;Control&quot;) %&gt;%
+      dplyr::select(-TreatedOrControl, -treatment, -dose.nM),
+    by=c(&quot;gid&quot;, &quot;cell.type&quot;, &quot;libType&quot;),
+    suffix=c(&quot;.treatment&quot;, &quot;.control&quot;)) %&gt;%
+  inner_join(
+  sample.list %&gt;%
+    filter(cell.type==&quot;LCL&quot;) %&gt;%
+    distinct(treatment, dose.nM, color)) %&gt;%
+ggplot(aes(x=InclusionPSI.treatment-InclusionPSI.control, color=color)) +
+  stat_ecdf(aes(linetype=libType)) +
+  scale_color_identity() +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  labs(title=&quot;Comparing DeltaPSI in drug-induced exons (treatment - DMSO)&quot;, y=&quot;ecdf&quot;,
+       caption=&quot;Darker color is higher dose\nPSI_treatment-PSIcontrol&quot;)</code></pre>
+<p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>inner_join(
+    chRNA.Comparison.PSI.Inclusion.tidy %&gt;%
+      filter(TreatedOrControl == &quot;Treatment&quot;) %&gt;%
+      dplyr::select(-TreatedOrControl),
+    chRNA.Comparison.PSI.Inclusion.tidy %&gt;%
+      filter(TreatedOrControl == &quot;Control&quot;) %&gt;%
+      dplyr::select(-TreatedOrControl, -treatment, -dose.nM),
+    by=c(&quot;gid&quot;, &quot;cell.type&quot;, &quot;libType&quot;),
+    suffix=c(&quot;.treatment&quot;, &quot;.control&quot;)) %&gt;%
+  inner_join(
+  sample.list %&gt;%
+    filter(cell.type==&quot;LCL&quot;) %&gt;%
+    distinct(treatment, dose.nM, color)) %&gt;%
+ggplot(aes(x=InclusionPSI.treatment/InclusionPSI.control, color=color)) +
+  stat_ecdf(aes(linetype=libType)) +
+  scale_color_identity() +
+  scale_x_continuous(trans=&quot;log2&quot;) +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  labs(title=&quot;Comparing DeltaPSI in drug-induced exons (treatment / DMSO)&quot;, y=&quot;ecdf&quot;,
+       caption=&quot;Darker color is higher dose\nPSI_treatment/PSIcontrol&quot;)</code></pre>
+<p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so while we can see these exons have a generally positive deltaPSI (as expected, by design of how i filtered the data), and the deltaPSI is more positive at higher dose, it doesn’t seem that the deltaPSI is any bigger in chRNA. And how you choose to the process the data makes all the difference (Difference in PSI, versus Ratio).</p>
+<pre class="r"><code>inner_join(
+    chRNA.Comparison.PSI.Inclusion.tidy %&gt;%
+      filter(TreatedOrControl == &quot;Treatment&quot;) %&gt;%
+      dplyr::select(-TreatedOrControl),
+    chRNA.Comparison.PSI.Inclusion.tidy %&gt;%
+      filter(TreatedOrControl == &quot;Control&quot;) %&gt;%
+      dplyr::select(-TreatedOrControl, -treatment, -dose.nM),
+    by=c(&quot;gid&quot;, &quot;cell.type&quot;, &quot;libType&quot;),
+    suffix=c(&quot;.treatment&quot;, &quot;.control&quot;)) %&gt;%
+  inner_join(
+  sample.list %&gt;%
+    filter(cell.type==&quot;LCL&quot;) %&gt;%
+    distinct(treatment, dose.nM, color)) %&gt;%
+ggplot(aes(x=(InclusionPSI.treatment/SkippingJunc.treatment)/(InclusionPSI.control/SkippingJunc.control), color=color)) +
+  stat_ecdf(aes(linetype=libType)) +
+  scale_color_identity() +
+  scale_x_continuous(trans=&quot;log2&quot;) +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  labs(title=&quot;Comparing DeltaPSI in drug-induced exons (treatment / DMSO)&quot;, y=&quot;ecdf&quot;,
+       caption=&quot;Darker color is higher dose\nPSI_treatment/PSIcontrol&quot;)</code></pre>
+<p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>AddPsuedocount &lt;- function(x){
+  return(x+0.01)
+}
+
+dat.to.plot &lt;- inner_join(
+    chRNA.Comparison.PSI.Inclusion.tidy %&gt;%
+      filter(TreatedOrControl == &quot;Treatment&quot;) %&gt;%
+      dplyr::select(-TreatedOrControl),
+    chRNA.Comparison.PSI.Inclusion.tidy %&gt;%
+      filter(TreatedOrControl == &quot;Control&quot;) %&gt;%
+      dplyr::select(-TreatedOrControl, -treatment, -dose.nM),
+    by=c(&quot;gid&quot;, &quot;cell.type&quot;, &quot;libType&quot;),
+    suffix=c(&quot;.treatment&quot;, &quot;.control&quot;)) %&gt;%
+  inner_join(
+  sample.list %&gt;%
+    filter(cell.type==&quot;LCL&quot;) %&gt;%
+    distinct(treatment, dose.nM, color)) %&gt;%
+  #Add pseudocount to PSI
+  mutate_at(vars(UpstreamJunc.treatment:InclusionPSI.control), AddPsuedocount) %&gt;%
+  mutate(SkippingToInclusionRatio = (InclusionPSI.treatment/SkippingJunc.treatment)/(InclusionPSI.control/SkippingJunc.control)) %&gt;%
+  dplyr::select(-(UpstreamJunc.treatment:InclusionPSI.control)) %&gt;%
+  pivot_wider(names_from=&quot;libType&quot;, values_from=&quot;SkippingToInclusionRatio&quot;)
+
+ggplot(dat.to.plot, aes(x=(chRNA/polyA), color=color)) +
+  geom_vline(xintercept=1) +
+  stat_ecdf() +
+  scale_color_identity() +
+  scale_x_continuous(trans=&quot;log10&quot;) +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  labs(title=&quot;effect sizes don&#39;t appear stronger in chRNA&quot;, y=&quot;ecdf&quot;,
+       x=&quot;DrugInducedSkippingRatio_chRNA/DrugInducedSkippingRatio_polyA&quot;,
+       caption=&quot;DrugInducedSkippingRatio = (PSI_included_treatment/PSI_skip_treatment)/(PSI_included_control/PSI_skip_control)&quot;)</code></pre>
+<p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>And to verify that I did the analysis reasonably, let’s look at the HTT skipping event, where I know (from manually inspecting the screenshot at the top with the sashimi plots of the raw PSI) that chRNA should have a higher DrugInducedSkipping Ratio in branaplam</p>
+<pre class="r"><code>GA.GT.Introns.DrugInducedCassetteExons %&gt;%
+  filter(gene_names == &quot;HTT&quot;)</code></pre>
+<pre><code># A tibble: 1 × 34
+  junc          `#Chrom`  start    end gid   strand seq   Donor.score gene_names
+  &lt;chr&gt;         &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;     
+1 chr4:3213736… chr4     3.21e6 3.21e6 chr4… +      CAGA…        5.53 HTT       
+# … with 25 more variables: gene_ids &lt;chr&gt;, SpliceDonor &lt;chr&gt;,
+#   UpstreamSpliceAcceptor &lt;chr&gt;, IntronType &lt;chr&gt;, Steepness &lt;dbl&gt;,
+#   LowerLimit &lt;dbl&gt;, UpperLimit &lt;dbl&gt;, ED50_Branaplam &lt;dbl&gt;, ED50_C2C5 &lt;dbl&gt;,
+#   ED50_Risdiplam &lt;dbl&gt;, spearman.coef.Branaplam &lt;dbl&gt;,
+#   spearman.coef.C2C5 &lt;dbl&gt;, spearman.coef.Risdiplam &lt;dbl&gt;,
+#   EC.Ratio.Test.Estimate_Branaplam.C2C5 &lt;dbl&gt;,
+#   EC.Ratio.Test.Estimate_Branaplam.Risdiplam &lt;dbl&gt;, …</code></pre>
+<pre class="r"><code>dat.to.plot %&gt;%
+  filter(gid==&quot;chr4_clu_9322_+&quot;)</code></pre>
+<pre><code># A tibble: 6 × 7
+  gid             treatment dose.nM cell.type color       chRNA        polyA
+  &lt;chr&gt;           &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;       &lt;dbl&gt;        &lt;dbl&gt;
+1 chr4_clu_9322_+ Branaplam    31.6 LCL       #A1D99B    63164.     2118.   
+2 chr4_clu_9322_+ Branaplam  1000   LCL       #238B45 86351968. 12502500.   
+3 chr4_clu_9322_+ C2C5         10   LCL       #BCBDDC      164.        0.125
+4 chr4_clu_9322_+ C2C5        316   LCL       #6A51A3   153728.     2500.   
+5 chr4_clu_9322_+ Risdiplam   100   LCL       #9ECAE1     6395.       96.9  
+6 chr4_clu_9322_+ Risdiplam  3160   LCL       #2171B5 96352968.    78659.   </code></pre>
+<p>…as expected. Overall I don’t think drug-induced exons are actually that more apparent in chRNA. Later I will peruse a large handful of sashimi plots to make verify. Now let’s move on to looking at the natural splicing rate of introns that host the drug-induced exons…</p>
+</div>
+<div id="host-intron-inclusion-of-drug-induced-introns" class="section level3">
+<h3>Host intron inclusion of drug-induced introns</h3>
+<p>First let’s look at the correlation matrix based on IntronExcisionRatio and SpliceEfficiency metrics (see <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04282-6">SpliceQ</a> paper) for the GA|GT introns that I previously fit dose-response curves to… Since</p>
+<pre class="r"><code>GA.GT.Introns.DrugInducedCassetteExons</code></pre>
+<pre><code># A tibble: 454 × 34
+   junc         `#Chrom`  start    end gid   strand seq   Donor.score gene_names
+   &lt;chr&gt;        &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;     
+ 1 chr1:120396… chr1     1.20e6 1.20e6 chr1… -      AGGA…        4.21 TNFRSF18  
+ 2 chr1:836597… chr1     8.37e6 8.40e6 chr1… -      AAGA…        5.57 RERE      
+ 3 chr1:971413… chr1     9.71e6 9.72e6 chr1… +      AGGA…        4.27 PIK3CD    
+ 4 chr1:119818… chr1     1.20e7 1.20e7 chr1… +      ATGA…        3.40 MFN2      
+ 5 chr1:120660… chr1     1.21e7 1.21e7 chr1… +      GAGA…        1.60 &lt;NA&gt;      
+ 6 chr1:154268… chr1     1.54e7 1.54e7 chr1… +      CAGA…        4.22 EFHD2     
+ 7 chr1:238632… chr1     2.39e7 2.39e7 chr1… -      AGGA…        3.08 FUCA1     
+ 8 chr1:238756… chr1     2.39e7 2.39e7 chr1… -      AAGA…        4.84 CNR2      
+ 9 chr1:281725… chr1     2.82e7 2.82e7 chr1… -      AGGA…        5.37 &lt;NA&gt;      
+10 chr1:292069… chr1     2.92e7 2.92e7 chr1… -      CAGA…        4.60 MECR      
+# … with 444 more rows, and 25 more variables: gene_ids &lt;chr&gt;,
+#   SpliceDonor &lt;chr&gt;, UpstreamSpliceAcceptor &lt;chr&gt;, IntronType &lt;chr&gt;,
+#   Steepness &lt;dbl&gt;, LowerLimit &lt;dbl&gt;, UpperLimit &lt;dbl&gt;, ED50_Branaplam &lt;dbl&gt;,
+#   ED50_C2C5 &lt;dbl&gt;, ED50_Risdiplam &lt;dbl&gt;, spearman.coef.Branaplam &lt;dbl&gt;,
+#   spearman.coef.C2C5 &lt;dbl&gt;, spearman.coef.Risdiplam &lt;dbl&gt;,
+#   EC.Ratio.Test.Estimate_Branaplam.C2C5 &lt;dbl&gt;,
+#   EC.Ratio.Test.Estimate_Branaplam.Risdiplam &lt;dbl&gt;, …</code></pre>
+<pre class="r"><code>chRNA.Comparison.PSI.Inclusion.tidy</code></pre>
+<pre><code># A tibble: 5,474 × 10
+   gid           treatment dose.nM cell.type libType UpstreamJunc DownstreamJunc
+   &lt;chr&gt;         &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt;          &lt;dbl&gt;
+ 1 chr10_clu_19… Branaplam    31.6 LCL       chRNA            0              0  
+ 2 chr10_clu_19… Branaplam    31.6 LCL       polyA            0              3.5
+ 3 chr10_clu_19… Branaplam  1000   LCL       chRNA            0              0  
+ 4 chr10_clu_19… Branaplam  1000   LCL       polyA           16              7.8
+ 5 chr10_clu_19… C2C5         10   LCL       chRNA           25              0  
+ 6 chr10_clu_19… C2C5         10   LCL       polyA            4.7            0  
+ 7 chr10_clu_19… C2C5        316   LCL       chRNA           22              0  
+ 8 chr10_clu_19… C2C5        316   LCL       polyA            7.9           13  
+ 9 chr10_clu_19… DMSO         NA   LCL       chRNA            0              0  
+10 chr10_clu_19… DMSO         NA   LCL       polyA            0              0  
+# … with 5,464 more rows, and 3 more variables: SkippingJunc &lt;dbl&gt;,
+#   InclusionPSI &lt;dbl&gt;, TreatedOrControl &lt;chr&gt;</code></pre>
+<pre class="r"><code>HostIntronsToQuantifyInDrugInducedCassetteExons &lt;- IntronsToQuantifyInDrugInducedCassetteExons %&gt;%
+  pivot_wider(names_from=&quot;IntronType&quot;, values_from=&quot;junc&quot;) %&gt;%
+  separate(SkippingJunc, into=c(&quot;Chrom&quot;, &quot;start&quot;,&quot;stop&quot;,&quot;cluster&quot;), sep=&quot;:&quot;, convert=T) %&gt;%
+  mutate(strand = str_extract(cluster, &quot;[+-]&quot;))
+
+SpliceQ.IER %&gt;%
+  dplyr::select(1:4, matches(&quot;DMSO_NA_LCL_chRNA_.+&quot;)) %&gt;%
+  gather(&quot;Sample&quot;, &quot;IER&quot;, contains(&quot;DMSO&quot;)) %&gt;%
+  group_by(Chrom, start, stop, strand) %&gt;%
+  summarise(IER.mean=mean(IER)) %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;=&quot;end&quot;, &quot;strand&quot;)) %&gt;%
+  left_join(HostIntronsToQuantifyInDrugInducedCassetteExons) %&gt;%
+  group_by(gene_ids) %&gt;%
+  filter(any(!is.na(UpstreamJunc))) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=IER.mean)) +
+  stat_ecdf() +
+  geom_vline(
+    data = . %&gt;% filter(!is.na(UpstreamJunc)),
+    aes(xintercept=IER.mean)
+  ) +
+  facet_wrap(~gene_names) +
+  theme_bw() +
+  labs(y=&quot;ecdf&quot;, x=&quot;IntronExcisionRatio&quot;, title=&quot;IER distribution of host introns, compared to other introns in host gene&quot;)</code></pre>
+<p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-6-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>Hmmm, It’s not obvious if there is a trend… I was hypothesizing that introns hosting the cassette exon would have have lower intron excision ratios, indicating less efficient splicing. Let’s plot this a few different ways:</p>
+<pre class="r"><code>SpliceQ.IER %&gt;%
+  dplyr::select(1:4, matches(&quot;DMSO_NA_LCL_chRNA_.+&quot;)) %&gt;%
+  gather(&quot;Sample&quot;, &quot;IER&quot;, contains(&quot;DMSO&quot;)) %&gt;%
+  group_by(Chrom, start, stop, strand) %&gt;%
+  summarise(IER.mean=mean(IER)) %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;=&quot;end&quot;, &quot;strand&quot;)) %&gt;%
+  left_join(HostIntronsToQuantifyInDrugInducedCassetteExons) %&gt;%
+  group_by(gene_ids) %&gt;%
+  filter(any(!is.na(UpstreamJunc))) %&gt;%
+  ungroup() %&gt;%
+  mutate(IsHostIntronOfDrugInducedCassetteExon = if_else(is.na(UpstreamJunc), &quot;Control Intron&quot;, &quot;Host Intron&quot;)) %&gt;%
+  # group_by(gene_names, IsHostIntronOfDrugInducedCassetteExon) %&gt;%
+  # sample_n(1) %&gt;%
+  ggplot(aes(x=IER.mean, color=IsHostIntronOfDrugInducedCassetteExon)) +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y=&quot;ecdf&quot;, x=&quot;IntronExcisionRatio&quot;, caption=str_wrap(&quot;Comparing introns hosting the drug-induced cassette exons to all introns within the same set of genes&quot;, 50))</code></pre>
+<p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The intron excision ratio metric is basically the length-normalized intronic coverage, relative to the flanking exons… So if there is a cassette exon that is spliced in at an appreciable rate in DMSO samples, that might explain this. The splice efficiency metric, based only on exon-exon junction and exon-intron, intron-exon reads should be less sensitive to this. let’s check that the effect is there too.</p>
+<pre class="r"><code>SpliceQ.SE %&gt;%
+  dplyr::select(1:4, matches(&quot;DMSO_NA_LCL_chRNA_.+&quot;)) %&gt;%
+  gather(&quot;Sample&quot;, &quot;IER&quot;, contains(&quot;DMSO&quot;)) %&gt;%
+  group_by(Chrom, start, stop, strand) %&gt;%
+  summarise(IER.mean=mean(IER)) %&gt;%
+  inner_join(all.samples.intron.annotations, by=c(&quot;Chrom&quot;=&quot;chrom&quot;, &quot;start&quot;, &quot;stop&quot;=&quot;end&quot;, &quot;strand&quot;)) %&gt;%
+  left_join(HostIntronsToQuantifyInDrugInducedCassetteExons) %&gt;%
+  group_by(gene_ids) %&gt;%
+  filter(any(!is.na(UpstreamJunc))) %&gt;%
+  ungroup() %&gt;%
+  mutate(IsHostIntronOfDrugInducedCassetteExon = if_else(is.na(UpstreamJunc), &quot;Control Intron&quot;, &quot;Host Intron&quot;)) %&gt;%
+  # group_by(gene_names, IsHostIntronOfDrugInducedCassetteExon) %&gt;%
+  # sample_n(1) %&gt;%
+  ggplot(aes(x=IER.mean, color=IsHostIntronOfDrugInducedCassetteExon)) +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y=&quot;ecdf&quot;, x=&quot;SpicingEfficiency&quot;, caption=str_wrap(&quot;Comparing introns hosting the drug-induced cassette exons to all introns within the same set of genes&quot;, 50))</code></pre>
+<p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Hm, here there is some very modest effect, but I will get to doing a more proper test for significance later.</p>
+<p>Finally I want to get to the question about whether that exon-definition effect was apparent, wherein the upstream intron has more efficient splicing… I think I’ll do this later, as it requires me to quantify intron retention in unannotated introns, which isn’t in the existing intron retention quantifications that I made using splice-q.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.1 (2019-07-05)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: CentOS Linux 7 (Core)
+
+Matrix products: default
+BLAS/LAPACK: /software/openblas-0.2.19-el7-x86_64/lib/libopenblas_haswellp-r0.2.19.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8 LC_NUMERIC=C         LC_TIME=C           
+ [4] LC_COLLATE=C         LC_MONETARY=C        LC_MESSAGES=C       
+ [7] LC_PAPER=C           LC_NAME=C            LC_ADDRESS=C        
+[10] LC_TELEPHONE=C       LC_MEASUREMENT=C     LC_IDENTIFICATION=C 
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] gplots_3.0.1.1  forcats_0.4.0   stringr_1.4.0   dplyr_1.0.9    
+ [5] purrr_0.3.4     readr_1.3.1     tidyr_1.2.0     tibble_3.1.7   
+ [9] ggplot2_3.3.6   tidyverse_1.3.0
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.5         lubridate_1.7.4    gtools_3.9.2.2     assertthat_0.2.1  
+ [5] rprojroot_2.0.2    digest_0.6.20      utf8_1.1.4         R6_2.4.0          
+ [9] cellranger_1.1.0   backports_1.4.1    reprex_0.3.0       evaluate_0.15     
+[13] httr_1.4.4         highr_0.9          pillar_1.7.0       rlang_1.0.5       
+[17] readxl_1.3.1       rstudioapi_0.14    gdata_2.18.0       rmarkdown_1.13    
+[21] labeling_0.3       munsell_0.5.0      broom_1.0.0        compiler_3.6.1    
+[25] httpuv_1.5.1       modelr_0.1.8       xfun_0.31          pkgconfig_2.0.2   
+[29] htmltools_0.5.3    tidyselect_1.1.2   workflowr_1.6.2    fansi_0.4.0       
+[33] crayon_1.3.4       dbplyr_1.4.2       withr_2.5.0        later_0.8.0       
+[37] bitops_1.0-6       grid_3.6.1         jsonlite_1.6       gtable_0.3.0      
+[41] lifecycle_1.0.1    DBI_1.1.0          git2r_0.26.1       magrittr_1.5      
+[45] scales_1.1.0       KernSmooth_2.23-15 cli_3.3.0          stringi_1.4.3     
+[49] farver_2.1.0       fs_1.5.2           promises_1.0.1     xml2_1.3.2        
+[53] ellipsis_0.3.2     generics_0.1.3     vctrs_0.4.1        tools_3.6.1       
+[57] glue_1.6.2         hms_0.5.3          fastmap_1.1.0      yaml_2.2.0        
+[61] colorspace_1.4-1   caTools_1.17.1.2   rvest_0.3.5        knitr_1.39        
+[65] haven_2.3.1       </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

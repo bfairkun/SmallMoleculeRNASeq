@@ -1,0 +1,347 @@
+---
+title: "20220919_chRNA_IntronRetention"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+
+## Intro
+
+I have quantified intron retention with splice-q package for each sample. I want to investigate the hypothesis that some of the introns affected by small molecules have unique signatures as measured by intron retention or splicing in chRNA dataset. In particular, from looking at the HTT locus below, I notice a few things:
+
+1. The drug-induced exon is in a host-intron with a bit more intron retention compared to the surrounding introns in untreated (DMSO) samples. Perhaps introns with slower splicing are a bit predisposed to new drug-induced splicing.
+1. The drug induced exon is spliced-in at a higher rate (relative to the skipping event) in the chRNA, presumably since NMD quickly degrades the exon-included isoform post-transcriptionally.
+1. The intron upstream of the drug-induced exon seems to be spliced more efficiently in treated samples, relative to the downstream intron which actually contains the target 5' GA|GT splice site (black line in screenshot) that interacts with the small molecule. This is reminiscent of early exon definition experiments wherein strengthening a downstream 5'ss enhances splicing of the upstream intron.
+
+![IGVScreenshot](../docs/assets/ScreenShot_HTT.png)
+
+In this notebook, I will explore whether these observations are representative of drug-induced exons genomewide.
+First, read in the data...
+
+```{r}
+library(tidyverse)
+library(gplots)
+
+#Read in sample metadata
+sample.list <- read_tsv("../code/bigwigs/BigwigList.tsv",
+                        col_names = c("SampleName", "bigwig", "group", "strand")) %>%
+  filter(strand==".") %>%
+  mutate(old.sample.name = str_replace(bigwig, "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw", "\\1")) %>%
+  separate(SampleName, into=c("treatment", "dose.nM", "cell.type", "libType", "rep"), convert=T, remove=F, sep="_") %>%
+  left_join(
+    read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names = c("group", "color", "bed", "supergroup")),
+    by="group"
+  )
+
+SampleNameConversionKey <- sample.list %>%
+  dplyr::select(SampleName, old.sample.name) %>%
+  deframe()
+
+GA.GT.Introns <- read_tsv("../output/EC50Estimtes.FromPSI.txt.gz")
+
+read.SpliceQ.Table <- function(fn){
+  read_tsv(fn) %>%
+  rename_at(vars(-Intron), ~str_replace(.x, ".+?Merged/(.+?)\\.txt\\.gz", "\\1")) %>%
+  rename(!!!SampleNameConversionKey) %>%
+  separate(Intron, into=c("Chrom", "start", "stop", "strand"), convert=T, sep="_") %>%
+  mutate(stop = stop+1) %>%
+  mutate(Chrom=paste0("chr", Chrom)) %>%
+  dplyr::select(Chrom:strand, everything())
+}
+
+SpliceQ.IER <- read.SpliceQ.Table("../code/SplicingAnalysis/SpliceQ/MergedTable.IER.txt.gz")
+SpliceQ.SE <- read.SpliceQ.Table("../code/SplicingAnalysis/SpliceQ/MergedTable.SE.txt.gz")
+  
+
+all.samples.PSI <- read_tsv("../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz")
+
+all.samples.5ss <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz", col_names = c("intron", "seq", "score")) %>%
+  mutate(intron = str_replace(intron, "^(.+?)::.+$", "\\1")) %>%
+  separate(intron, into=c("chrom", "start", "stop", "strand"), sep="_", convert=T, remove=F)
+
+all.samples.intron.annotations <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz")
+
+```
+
+### effect sizes in chRNA versus polyA
+
+Let's check the first hypothesis... that chRNA will generally show larger effect sizes between ratio of included versus skipped reads.
+
+```{r}
+GA.GT.Introns.DrugInducedCassetteExons <- GA.GT.Introns %>%
+  filter(!is.na(Steepness)) %>%
+  filter(UpperLimit > LowerLimit) %>%
+  filter(!is.na(UpstreamSpliceAcceptor)) %>%
+  dplyr::rename(strand=strand.y)
+
+
+chRNA.Comparison.Samples <- sample.list %>%
+  filter(cell.type=="LCL") %>%
+  group_by(dose.nM, treatment) %>%
+  filter(any(libType=="chRNA"))
+
+
+IntronsToQuantifyInDrugInducedCassetteExons <- all.samples.PSI %>%
+  filter(gid %in% GA.GT.Introns$gid) %>%
+  mutate(SpliceAcceptor = case_when(
+    strand == "+" ~ paste(`#Chrom`, end, strand, sep="."),
+    strand == "-" ~ paste(`#Chrom`, start-2, strand, sep=".")
+  )) %>%
+  select(1:6, SpliceAcceptor, contains("LCL")) %>%
+  gather(key="Sample", value="PSI", contains("LCL")) %>%
+  group_by(junc, gid, strand, SpliceAcceptor) %>%
+  drop_na() %>%
+  summarise(mean=mean(PSI, na.rm = F)) %>%
+  group_by(SpliceAcceptor) %>%
+  filter(mean == max(mean)) %>%
+  ungroup() %>%
+  dplyr::select(UpstreamJunc = junc, SpliceAcceptor) %>%
+  inner_join(GA.GT.Introns.DrugInducedCassetteExons, by=c("SpliceAcceptor"="UpstreamSpliceAcceptor")) %>%
+  rename(DownstreamJunc = junc) %>%
+  mutate(SkippingJunc = case_when(
+    strand == "+" ~ str_replace(paste(UpstreamJunc, DownstreamJunc), "^(chr.+?):(.+?):(.+?):(clu.+?) (chr.+?):(.+?):(.+?):clu.+$", "\\1:\\2:\\7:\\4"),
+    strand == "-" ~ str_replace(paste(UpstreamJunc, DownstreamJunc), "^(chr.+?):(.+?):(.+?):(clu.+?) (chr.+?):(.+?):(.+?):clu.+$", "\\1:\\6:\\3:\\4")
+  )) %>%
+  dplyr::select(UpstreamJunc,DownstreamJunc, SkippingJunc ) %>%
+  gather(key="IntronType", value="junc") %>%
+  distinct(.keep_all = T) %>%
+  mutate(gid = str_replace(junc, ".+?:(clu.+$)", "\\1")) %>%
+  add_count(gid) %>%
+  filter(n==3)
+
+chRNA.Comparison.PSI.Inclusion.tidy <- IntronsToQuantifyInDrugInducedCassetteExons %>%
+  dplyr::select(-n, -gid) %>%
+  inner_join(
+    all.samples.PSI %>%
+      select(1:6, chRNA.Comparison.Samples$SampleName),
+    by="junc"
+  ) %>%
+  gather("Sample", "PSI", contains("LCL")) %>%
+  pivot_wider(names_from = "IntronType", values_from="PSI", id_cols=c("gid", "Sample")) %>%
+  unnest() %>%
+  mutate(InclusionPSI=UpstreamJunc+DownstreamJunc) %>%
+  separate(Sample, into=c("treatment", "dose.nM", "cell.type", "libType", "rep"), sep="_", convert=T) %>%
+  group_by("treatment", "dose.nM") %>%
+  filter(any(libType == "chRNA")) %>%
+  ungroup() %>%
+  group_by(gid, treatment, dose.nM, cell.type, libType) %>%
+  summarise_at(vars(UpstreamJunc:InclusionPSI), mean, na.rm=T) %>%
+  mutate(TreatedOrControl = if_else(treatment=="DMSO", "Control", "Treatment")) %>%
+  ungroup()
+
+
+inner_join(
+    chRNA.Comparison.PSI.Inclusion.tidy %>%
+      filter(TreatedOrControl == "Treatment") %>%
+      dplyr::select(-TreatedOrControl),
+    chRNA.Comparison.PSI.Inclusion.tidy %>%
+      filter(TreatedOrControl == "Control") %>%
+      dplyr::select(-TreatedOrControl, -treatment, -dose.nM),
+    by=c("gid", "cell.type", "libType"),
+    suffix=c(".treatment", ".control")) %>%
+  inner_join(
+  sample.list %>%
+    filter(cell.type=="LCL") %>%
+    distinct(treatment, dose.nM, color)) %>%
+ggplot(aes(x=InclusionPSI.treatment-InclusionPSI.control, color=color)) +
+  stat_ecdf(aes(linetype=libType)) +
+  scale_color_identity() +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  labs(title="Comparing DeltaPSI in drug-induced exons (treatment - DMSO)", y="ecdf",
+       caption="Darker color is higher dose\nPSI_treatment-PSIcontrol")
+
+
+inner_join(
+    chRNA.Comparison.PSI.Inclusion.tidy %>%
+      filter(TreatedOrControl == "Treatment") %>%
+      dplyr::select(-TreatedOrControl),
+    chRNA.Comparison.PSI.Inclusion.tidy %>%
+      filter(TreatedOrControl == "Control") %>%
+      dplyr::select(-TreatedOrControl, -treatment, -dose.nM),
+    by=c("gid", "cell.type", "libType"),
+    suffix=c(".treatment", ".control")) %>%
+  inner_join(
+  sample.list %>%
+    filter(cell.type=="LCL") %>%
+    distinct(treatment, dose.nM, color)) %>%
+ggplot(aes(x=InclusionPSI.treatment/InclusionPSI.control, color=color)) +
+  stat_ecdf(aes(linetype=libType)) +
+  scale_color_identity() +
+  scale_x_continuous(trans="log2") +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  labs(title="Comparing DeltaPSI in drug-induced exons (treatment / DMSO)", y="ecdf",
+       caption="Darker color is higher dose\nPSI_treatment/PSIcontrol")
+```
+
+Ok, so while we can see these exons have a generally positive deltaPSI (as expected, by design of how i filtered the data), and the deltaPSI is more positive at higher dose, it doesn't seem that the deltaPSI is any bigger in chRNA. And how you choose to the process the data makes all the difference (Difference in PSI, versus Ratio).
+
+```{r}
+inner_join(
+    chRNA.Comparison.PSI.Inclusion.tidy %>%
+      filter(TreatedOrControl == "Treatment") %>%
+      dplyr::select(-TreatedOrControl),
+    chRNA.Comparison.PSI.Inclusion.tidy %>%
+      filter(TreatedOrControl == "Control") %>%
+      dplyr::select(-TreatedOrControl, -treatment, -dose.nM),
+    by=c("gid", "cell.type", "libType"),
+    suffix=c(".treatment", ".control")) %>%
+  inner_join(
+  sample.list %>%
+    filter(cell.type=="LCL") %>%
+    distinct(treatment, dose.nM, color)) %>%
+ggplot(aes(x=(InclusionPSI.treatment/SkippingJunc.treatment)/(InclusionPSI.control/SkippingJunc.control), color=color)) +
+  stat_ecdf(aes(linetype=libType)) +
+  scale_color_identity() +
+  scale_x_continuous(trans="log2") +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  labs(title="Comparing DeltaPSI in drug-induced exons (treatment / DMSO)", y="ecdf",
+       caption="Darker color is higher dose\nPSI_treatment/PSIcontrol")
+```
+
+
+```{r}
+AddPsuedocount <- function(x){
+  return(x+0.01)
+}
+
+dat.to.plot <- inner_join(
+    chRNA.Comparison.PSI.Inclusion.tidy %>%
+      filter(TreatedOrControl == "Treatment") %>%
+      dplyr::select(-TreatedOrControl),
+    chRNA.Comparison.PSI.Inclusion.tidy %>%
+      filter(TreatedOrControl == "Control") %>%
+      dplyr::select(-TreatedOrControl, -treatment, -dose.nM),
+    by=c("gid", "cell.type", "libType"),
+    suffix=c(".treatment", ".control")) %>%
+  inner_join(
+  sample.list %>%
+    filter(cell.type=="LCL") %>%
+    distinct(treatment, dose.nM, color)) %>%
+  #Add pseudocount to PSI
+  mutate_at(vars(UpstreamJunc.treatment:InclusionPSI.control), AddPsuedocount) %>%
+  mutate(SkippingToInclusionRatio = (InclusionPSI.treatment/SkippingJunc.treatment)/(InclusionPSI.control/SkippingJunc.control)) %>%
+  dplyr::select(-(UpstreamJunc.treatment:InclusionPSI.control)) %>%
+  pivot_wider(names_from="libType", values_from="SkippingToInclusionRatio")
+
+ggplot(dat.to.plot, aes(x=(chRNA/polyA), color=color)) +
+  geom_vline(xintercept=1) +
+  stat_ecdf() +
+  scale_color_identity() +
+  scale_x_continuous(trans="log10") +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  labs(title="effect sizes don't appear stronger in chRNA", y="ecdf",
+       x="DrugInducedSkippingRatio_chRNA/DrugInducedSkippingRatio_polyA",
+       caption="DrugInducedSkippingRatio = (PSI_included_treatment/PSI_skip_treatment)/(PSI_included_control/PSI_skip_control)")
+```
+
+And to verify that I did the analysis reasonably, let's look at the HTT skipping event, where I know (from manually inspecting the screenshot at the top with the sashimi plots of the raw PSI) that chRNA should have a higher DrugInducedSkipping Ratio in branaplam
+
+```{r}
+GA.GT.Introns.DrugInducedCassetteExons %>%
+  filter(gene_names == "HTT")
+
+dat.to.plot %>%
+  filter(gid=="chr4_clu_9322_+")
+  
+```
+
+...as expected. Overall I don't think drug-induced exons are actually that more apparent in chRNA. Later I will peruse a large handful of sashimi plots to make verify. Now let's move on to looking at the natural splicing rate of introns that host the drug-induced exons...
+
+
+### Host intron inclusion of drug-induced introns 
+
+First let's look at the correlation matrix based on IntronExcisionRatio and SpliceEfficiency metrics (see [SpliceQ](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04282-6) paper) for the GA|GT introns that I previously fit dose-response curves to... Since 
+
+```{r, fig.height=10, fig.width=10}
+
+GA.GT.Introns.DrugInducedCassetteExons
+
+chRNA.Comparison.PSI.Inclusion.tidy
+
+HostIntronsToQuantifyInDrugInducedCassetteExons <- IntronsToQuantifyInDrugInducedCassetteExons %>%
+  pivot_wider(names_from="IntronType", values_from="junc") %>%
+  separate(SkippingJunc, into=c("Chrom", "start","stop","cluster"), sep=":", convert=T) %>%
+  mutate(strand = str_extract(cluster, "[+-]"))
+
+SpliceQ.IER %>%
+  dplyr::select(1:4, matches("DMSO_NA_LCL_chRNA_.+")) %>%
+  gather("Sample", "IER", contains("DMSO")) %>%
+  group_by(Chrom, start, stop, strand) %>%
+  summarise(IER.mean=mean(IER)) %>%
+  inner_join(all.samples.intron.annotations, by=c("Chrom"="chrom", "start", "stop"="end", "strand")) %>%
+  left_join(HostIntronsToQuantifyInDrugInducedCassetteExons) %>%
+  group_by(gene_ids) %>%
+  filter(any(!is.na(UpstreamJunc))) %>%
+  ungroup() %>%
+  ggplot(aes(x=IER.mean)) +
+  stat_ecdf() +
+  geom_vline(
+    data = . %>% filter(!is.na(UpstreamJunc)),
+    aes(xintercept=IER.mean)
+  ) +
+  facet_wrap(~gene_names) +
+  theme_bw() +
+  labs(y="ecdf", x="IntronExcisionRatio", title="IER distribution of host introns, compared to other introns in host gene")
+  
+
+```
+
+Hmmm, It's not obvious if there is a trend... I was hypothesizing that introns hosting the cassette exon would have have lower intron excision ratios, indicating less efficient splicing. Let's plot this a few different ways:
+
+```{r}
+SpliceQ.IER %>%
+  dplyr::select(1:4, matches("DMSO_NA_LCL_chRNA_.+")) %>%
+  gather("Sample", "IER", contains("DMSO")) %>%
+  group_by(Chrom, start, stop, strand) %>%
+  summarise(IER.mean=mean(IER)) %>%
+  inner_join(all.samples.intron.annotations, by=c("Chrom"="chrom", "start", "stop"="end", "strand")) %>%
+  left_join(HostIntronsToQuantifyInDrugInducedCassetteExons) %>%
+  group_by(gene_ids) %>%
+  filter(any(!is.na(UpstreamJunc))) %>%
+  ungroup() %>%
+  mutate(IsHostIntronOfDrugInducedCassetteExon = if_else(is.na(UpstreamJunc), "Control Intron", "Host Intron")) %>%
+  # group_by(gene_names, IsHostIntronOfDrugInducedCassetteExon) %>%
+  # sample_n(1) %>%
+  ggplot(aes(x=IER.mean, color=IsHostIntronOfDrugInducedCassetteExon)) +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y="ecdf", x="IntronExcisionRatio", caption=str_wrap("Comparing introns hosting the drug-induced cassette exons to all introns within the same set of genes", 50))
+```
+
+The intron excision ratio metric is basically the length-normalized intronic coverage, relative to the flanking exons... So if there is a cassette exon that is spliced in at an appreciable rate in DMSO samples, that might explain this. The splice efficiency metric, based only on exon-exon junction and exon-intron, intron-exon reads should be less sensitive to this. let's check that the effect is there too.
+
+```{r}
+SpliceQ.SE %>%
+  dplyr::select(1:4, matches("DMSO_NA_LCL_chRNA_.+")) %>%
+  gather("Sample", "IER", contains("DMSO")) %>%
+  group_by(Chrom, start, stop, strand) %>%
+  summarise(IER.mean=mean(IER)) %>%
+  inner_join(all.samples.intron.annotations, by=c("Chrom"="chrom", "start", "stop"="end", "strand")) %>%
+  left_join(HostIntronsToQuantifyInDrugInducedCassetteExons) %>%
+  group_by(gene_ids) %>%
+  filter(any(!is.na(UpstreamJunc))) %>%
+  ungroup() %>%
+  mutate(IsHostIntronOfDrugInducedCassetteExon = if_else(is.na(UpstreamJunc), "Control Intron", "Host Intron")) %>%
+  # group_by(gene_names, IsHostIntronOfDrugInducedCassetteExon) %>%
+  # sample_n(1) %>%
+  ggplot(aes(x=IER.mean, color=IsHostIntronOfDrugInducedCassetteExon)) +
+  stat_ecdf() +
+  theme_bw() +
+  labs(y="ecdf", x="SpicingEfficiency", caption=str_wrap("Comparing introns hosting the drug-induced cassette exons to all introns within the same set of genes", 50))
+
+
+```
+
+
+
+Hm, here there is some very modest effect, but I will get to doing a more proper test for significance later.
+
+
+Finally I want to get to the question about whether that exon-definition effect was apparent, wherein the upstream intron has more efficient splicing... I think I'll do this later, as it requires me to quantify intron retention in unannotated introns, which isn't in the existing intron retention quantifications that I made using splice-q.

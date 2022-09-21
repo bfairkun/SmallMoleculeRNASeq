@@ -49,3 +49,5 @@ Merged.dat %>%
 ## Conclusion:
 
 SE and IER are generally measuring the same thing, though as the paper states, the IER in theory might be 'better' in the sense that it utilizes completely intronic reads and so there may be less sampling noise. However, this requires the assumption of no internal exons which can mess the unspliced counting. Also, the SE can be directly calculated from the output of the `-i` IER mode. So there is no point in running the non `-i` mode. I will run SPLICE-q to quantify intron retention in all samples.
+
+- Also, from manually inspecting the splice-q metrics of a handful of introns, and cross-referencing with IGV, it is clear that the sj5_cov refers to the 5' splice site, which on a minus strand gene corresponds to the rightmost ("end") coordinate.

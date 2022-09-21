@@ -373,12 +373,18 @@ rule MergeSpliceQ_Quantifications:
     input:
         expand("SplicingAnalysis/SpliceQ/Merged/{sample}.txt.gz", sample=AllSamples),
     output:
-        "SplicingAnalysis/SpliceQ/MergedTable.txt.gz"
-    conda:
-        "../envs/r_essentials.yml"
+        multiext("SplicingAnalysis/SpliceQ/MergedTable.", "SE.txt.gz", "IER.txt.gz", "exon5_cov.txt.gz", "sj5_cov_split.txt.gz", "sj5_cov_nonsplit.txt.gz", "intron_cov.txt.gz", "sj3_cov_split.txt.gz", "sj3_cov_nonsplit.txt.gz", "exon3_cov.txt.gz")
+    # conda:
+    #     "../envs/r_essentials.yml"
+    params:
+        prefix = "SplicingAnalysis/SpliceQ/MergedTable."
+    resources:
+        mem_mb = 24000
+    log:
+        "logs/MergeSpliceQ_Quantifications.log"
     shell:
         """
-        Rsript 
+        /software/R-3.6.1-el7-x86_64/bin/Rscript scripts/MergeSpliceQ.Tables.R {params.prefix} {input} &> {log}
         """
 
 rule TidyDoseResponseData:

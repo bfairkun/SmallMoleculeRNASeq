@@ -288,7 +288,6 @@ model.dat.df <- splicing.gagt.df.tidy %>%
   nest(-junc)
 ```
 
-
 ### Model-fitting
 
 this is basically the hackish code i used before. I kept trying to use `broom` functions to fit things, but I kept running into errors that I don't feel like figuring out, and the following code seems to get the job done, with a tryCatch statement to print out errors that might occur in the first 100 introns. so you will see, some things error because convergence failed (likely data dosen't even resemeble a nice dose-response curve), whereas some things error because "0 (non-NA) cases" which is confusing because i previously showed that error pops up even when there are no NAs in my data, but rather when PSI is exactly 0 for a lot of data points... In any case, when those errors pop up, I will just exclude those introns from the modelling results.
@@ -306,7 +305,8 @@ for(i in 1:nrow(model.dat.df)) {
                   data = data,
                   # curveid = treatment,
                   fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
-                  pmodels=data.frame(1, 1, 1, treatment)
+                  pmodels=data.frame(1, 1, 1, treatment),
+                  robust="mean"
                   )
       df.out <- fit$coefficients %>%
         as.data.frame() %>%
@@ -443,6 +443,64 @@ ggplot(aes(color=treatment)) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))
 ```
+
+```{r, eval=F, include=F}
+set.seed(2)
+model.dat.df %>%
+  unnest(data) %>%
+  ungroup() %>%
+  sample_n_of(10, junc) %>%
+  inner_join(
+    bind_rows(Results, .id="junc") %>%
+      separate(param, into=c("param", "treatment"), sep=":") %>%
+      filter(param=="ED50"),
+    by=c("junc", "treatment")) %>%
+ggplot(aes(color=treatment)) +
+  geom_vline(
+    data = (. %>%
+      distinct(junc, treatment, estimate)),
+    aes(xintercept=estimate, color=treatment),
+    linetype='dashed') +
+  geom_label(
+    data = (. %>%
+      distinct(junc, treatment, estimate) %>%
+      group_by(junc) %>%
+      mutate(vjust = row_number()) %>%
+      ungroup()),
+    aes(vjust = vjust, label=signif(estimate,3)),
+    y=Inf, x=-Inf, size=2.5, hjust=-0.1, label.padding=unit(0.1, "lines")
+  ) +
+  geom_line(aes(x=dose.nM, y=PSI)) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = "free_y") +
+  labs(title="10 random modelled introns, with EC50 estimate") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3))
+
+set.seed(2)
+model.dat.df %>%
+  unnest(data) %>%
+  ungroup() %>%
+  sample_n_of(10, junc) %>%
+  distinct(junc)
+
+data <- model.dat.df %>%
+  filter(junc == "chr8:47273450:47279862:clu_17426_+") %>%
+  pull(data) %>%
+  as.data.frame()
+fit <- 
+  drm(formula = PSI ~ dose.nM,treatment,
+            data = data,
+            # curveid = treatment,
+            fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50")),
+            pmodels=data.frame(1, 1, 1, treatment),
+            robust="mean"
+            )
+plot(fit)
+summary(fit)
+  
+```
+
 
 I think the EC50 estimates are actually pretty reasonable, given the limitations of the noisy data.
 
