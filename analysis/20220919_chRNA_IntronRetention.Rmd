@@ -16,7 +16,9 @@ I have quantified intron retention with splice-q package for each sample. I want
 1. The drug induced exon is spliced-in at a higher rate (relative to the skipping event) in the chRNA, presumably since NMD quickly degrades the exon-included isoform post-transcriptionally.
 1. The intron upstream of the drug-induced exon seems to be spliced more efficiently in treated samples, relative to the downstream intron which actually contains the target 5' GA|GT splice site (black line in screenshot) that interacts with the small molecule. This is reminiscent of early exon definition experiments wherein strengthening a downstream 5'ss enhances splicing of the upstream intron.
 
-![IGVScreenshot](../docs/assets/ScreenShot_HTT.png)
+![IGVScreenshot](assets/ScreenShot_HTT.png)
+
+![HTT](assets/ForJingxin_HTT.png)
 
 In this notebook, I will explore whether these observations are representative of drug-induced exons genomewide.
 First, read in the data...

@@ -345,7 +345,7 @@ $(document).ready(function () {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2022-09-21
+<strong>Last updated:</strong> 2022-09-22
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 2
@@ -369,7 +369,7 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 </div>
 <div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
@@ -460,16 +460,16 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree22476105f2a7d2618d3f38a3e01a91a0df15b8e2targetblank2247610a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/22476105f2a7d2618d3f38a3e01a91a0df15b8e2" target="_blank">2247610</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree7144e91a4c8cc1841aa792882b8089324408f2fetargetblank7144e91a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/7144e91a4c8cc1841aa792882b8089324408f2fe" target="_blank">7144e91</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree22476105f2a7d2618d3f38a3e01a91a0df15b8e2targetblank2247610a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree7144e91a4c8cc1841aa792882b8089324408f2fetargetblank7144e91a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/22476105f2a7d2618d3f38a3e01a91a0df15b8e2" target="_blank">2247610</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/7144e91a4c8cc1841aa792882b8089324408f2fe" target="_blank">7144e91</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -483,6 +483,7 @@ Ignored files:
     Ignored:    analysis/.RData
     Ignored:    analysis/.Rhistory
     Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    code/%
     Ignored:    code/.DS_Store
     Ignored:    code/._.DS_Store
     Ignored:    code/._DOCK7.pdf
@@ -533,16 +534,9 @@ Ignored files:
     Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
     Ignored:    output/._PioritizedIntronTargets.pdf
 
-Untracked files:
-    Untracked:  analysis/20220919_chRNA_IntronRetention.Rmd
-
 Unstaged changes:
-    Modified:   analysis/20220913_TidyDataForJingxin.Rmd
-    Modified:   analysis/20220915_ExploreSpliceQOutput.Rmd
-    Modified:   code/Snakefile
-    Modified:   code/rules/RNASeqProcessing.smk
+    Modified:   analysis/20220919_chRNA_IntronRetention.Rmd
     Modified:   code/scripts/GenometracksByGenotype
-    Modified:   code/scripts/MergeSpliceQ.Tables.R
 
 </code></pre>
 <p>
@@ -555,9 +549,69 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/20220919_chRNA_IntronRetention.Rmd</code>) and HTML (<code>docs/20220919_chRNA_IntronRetention.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/7144e91a4c8cc1841aa792882b8089324408f2fe/analysis/20220919_chRNA_IntronRetention.Rmd" target="_blank">7144e91</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-21
+</td>
+<td>
+added chRNA notebook
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/20220919_chRNA_IntronRetention.html" target="_blank">7144e91</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-21
+</td>
+<td>
+added chRNA notebook
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -571,8 +625,12 @@ There are no past versions. Publish this analysis with <code>wflow_publish()</co
 <li>The intron upstream of the drug-induced exon seems to be spliced more efficiently in treated samples, relative to the downstream intron which actually contains the target 5’ GA|GT splice site (black line in screenshot) that interacts with the small molecule. This is reminiscent of early exon definition experiments wherein strengthening a downstream 5’ss enhances splicing of the upstream intron.</li>
 </ol>
 <div class="figure">
-<img src="../docs/assets/ScreenShot_HTT.png" alt="IGVScreenshot" />
+<img src="assets/ScreenShot_HTT.png" alt="IGVScreenshot" />
 <p class="caption">IGVScreenshot</p>
+</div>
+<div class="figure">
+<img src="assets/ForJingxin_HTT.png" alt="HTT" />
+<p class="caption">HTT</p>
 </div>
 <p>In this notebook, I will explore whether these observations are representative of drug-induced exons genomewide. First, read in the data…</p>
 <pre class="r"><code>library(tidyverse)
@@ -702,6 +760,43 @@ ggplot(aes(x=InclusionPSI.treatment-InclusionPSI.control, color=color)) +
   labs(title=&quot;Comparing DeltaPSI in drug-induced exons (treatment - DMSO)&quot;, y=&quot;ecdf&quot;,
        caption=&quot;Darker color is higher dose\nPSI_treatment-PSIcontrol&quot;)</code></pre>
 <p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-2-1.png" target="_blank">7144e91</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>inner_join(
     chRNA.Comparison.PSI.Inclusion.tidy %&gt;%
       filter(TreatedOrControl == &quot;Treatment&quot;) %&gt;%
@@ -724,6 +819,43 @@ ggplot(aes(x=InclusionPSI.treatment/InclusionPSI.control, color=color)) +
   labs(title=&quot;Comparing DeltaPSI in drug-induced exons (treatment / DMSO)&quot;, y=&quot;ecdf&quot;,
        caption=&quot;Darker color is higher dose\nPSI_treatment/PSIcontrol&quot;)</code></pre>
 <p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-2">
+Past versions of unnamed-chunk-2-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-2-2.png" target="_blank">7144e91</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok, so while we can see these exons have a generally positive deltaPSI (as expected, by design of how i filtered the data), and the deltaPSI is more positive at higher dose, it doesn’t seem that the deltaPSI is any bigger in chRNA. And how you choose to the process the data makes all the difference (Difference in PSI, versus Ratio).</p>
 <pre class="r"><code>inner_join(
     chRNA.Comparison.PSI.Inclusion.tidy %&gt;%
@@ -747,6 +879,43 @@ ggplot(aes(x=(InclusionPSI.treatment/SkippingJunc.treatment)/(InclusionPSI.contr
   labs(title=&quot;Comparing DeltaPSI in drug-induced exons (treatment / DMSO)&quot;, y=&quot;ecdf&quot;,
        caption=&quot;Darker color is higher dose\nPSI_treatment/PSIcontrol&quot;)</code></pre>
 <p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-3-1.png" target="_blank">7144e91</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>AddPsuedocount &lt;- function(x){
   return(x+0.01)
 }
@@ -781,6 +950,43 @@ ggplot(dat.to.plot, aes(x=(chRNA/polyA), color=color)) +
        x=&quot;DrugInducedSkippingRatio_chRNA/DrugInducedSkippingRatio_polyA&quot;,
        caption=&quot;DrugInducedSkippingRatio = (PSI_included_treatment/PSI_skip_treatment)/(PSI_included_control/PSI_skip_control)&quot;)</code></pre>
 <p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-4-1.png" target="_blank">7144e91</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>And to verify that I did the analysis reasonably, let’s look at the HTT skipping event, where I know (from manually inspecting the screenshot at the top with the sashimi plots of the raw PSI) that chRNA should have a higher DrugInducedSkipping Ratio in branaplam</p>
 <pre class="r"><code>GA.GT.Introns.DrugInducedCassetteExons %&gt;%
   filter(gene_names == &quot;HTT&quot;)</code></pre>
@@ -873,6 +1079,43 @@ SpliceQ.IER %&gt;%
   theme_bw() +
   labs(y=&quot;ecdf&quot;, x=&quot;IntronExcisionRatio&quot;, title=&quot;IER distribution of host introns, compared to other introns in host gene&quot;)</code></pre>
 <p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-6-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-6-1.png" target="_blank">7144e91</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Hmmm, It’s not obvious if there is a trend… I was hypothesizing that introns hosting the cassette exon would have have lower intron excision ratios, indicating less efficient splicing. Let’s plot this a few different ways:</p>
 <pre class="r"><code>SpliceQ.IER %&gt;%
   dplyr::select(1:4, matches(&quot;DMSO_NA_LCL_chRNA_.+&quot;)) %&gt;%
@@ -892,6 +1135,43 @@ SpliceQ.IER %&gt;%
   theme_bw() +
   labs(y=&quot;ecdf&quot;, x=&quot;IntronExcisionRatio&quot;, caption=str_wrap(&quot;Comparing introns hosting the drug-induced cassette exons to all introns within the same set of genes&quot;, 50))</code></pre>
 <p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-7-1.png" target="_blank">7144e91</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The intron excision ratio metric is basically the length-normalized intronic coverage, relative to the flanking exons… So if there is a cassette exon that is spliced in at an appreciable rate in DMSO samples, that might explain this. The splice efficiency metric, based only on exon-exon junction and exon-intron, intron-exon reads should be less sensitive to this. let’s check that the effect is there too.</p>
 <pre class="r"><code>SpliceQ.SE %&gt;%
   dplyr::select(1:4, matches(&quot;DMSO_NA_LCL_chRNA_.+&quot;)) %&gt;%
@@ -911,6 +1191,43 @@ SpliceQ.IER %&gt;%
   theme_bw() +
   labs(y=&quot;ecdf&quot;, x=&quot;SpicingEfficiency&quot;, caption=str_wrap(&quot;Comparing introns hosting the drug-induced cassette exons to all introns within the same set of genes&quot;, 50))</code></pre>
 <p><img src="figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/figure/20220919_chRNA_IntronRetention.Rmd/unnamed-chunk-8-1.png" target="_blank">7144e91</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Hm, here there is some very modest effect, but I will get to doing a more proper test for significance later.</p>
 <p>Finally I want to get to the question about whether that exon-definition effect was apparent, wherein the upstream intron has more efficient splicing… I think I’ll do this later, as it requires me to quantify intron retention in unannotated introns, which isn’t in the existing intron retention quantifications that I made using splice-q.</p>
 <br>
@@ -947,19 +1264,19 @@ loaded via a namespace (and not attached):
  [5] rprojroot_2.0.2    digest_0.6.20      utf8_1.1.4         R6_2.4.0          
  [9] cellranger_1.1.0   backports_1.4.1    reprex_0.3.0       evaluate_0.15     
 [13] httr_1.4.4         highr_0.9          pillar_1.7.0       rlang_1.0.5       
-[17] readxl_1.3.1       rstudioapi_0.14    gdata_2.18.0       rmarkdown_1.13    
-[21] labeling_0.3       munsell_0.5.0      broom_1.0.0        compiler_3.6.1    
-[25] httpuv_1.5.1       modelr_0.1.8       xfun_0.31          pkgconfig_2.0.2   
-[29] htmltools_0.5.3    tidyselect_1.1.2   workflowr_1.6.2    fansi_0.4.0       
-[33] crayon_1.3.4       dbplyr_1.4.2       withr_2.5.0        later_0.8.0       
-[37] bitops_1.0-6       grid_3.6.1         jsonlite_1.6       gtable_0.3.0      
-[41] lifecycle_1.0.1    DBI_1.1.0          git2r_0.26.1       magrittr_1.5      
-[45] scales_1.1.0       KernSmooth_2.23-15 cli_3.3.0          stringi_1.4.3     
-[49] farver_2.1.0       fs_1.5.2           promises_1.0.1     xml2_1.3.2        
-[53] ellipsis_0.3.2     generics_0.1.3     vctrs_0.4.1        tools_3.6.1       
-[57] glue_1.6.2         hms_0.5.3          fastmap_1.1.0      yaml_2.2.0        
-[61] colorspace_1.4-1   caTools_1.17.1.2   rvest_0.3.5        knitr_1.39        
-[65] haven_2.3.1       </code></pre>
+[17] readxl_1.3.1       gdata_2.18.0       rstudioapi_0.14    whisker_0.3-2     
+[21] rmarkdown_1.13     labeling_0.3       munsell_0.5.0      broom_1.0.0       
+[25] compiler_3.6.1     httpuv_1.5.1       modelr_0.1.8       xfun_0.31         
+[29] pkgconfig_2.0.2    htmltools_0.5.3    tidyselect_1.1.2   workflowr_1.6.2   
+[33] fansi_0.4.0        crayon_1.3.4       dbplyr_1.4.2       withr_2.5.0       
+[37] later_0.8.0        bitops_1.0-6       grid_3.6.1         jsonlite_1.6      
+[41] gtable_0.3.0       lifecycle_1.0.1    DBI_1.1.0          git2r_0.26.1      
+[45] magrittr_1.5       scales_1.1.0       KernSmooth_2.23-15 cli_3.3.0         
+[49] stringi_1.4.3      farver_2.1.0       fs_1.5.2           promises_1.0.1    
+[53] xml2_1.3.2         ellipsis_0.3.2     generics_0.1.3     vctrs_0.4.1       
+[57] tools_3.6.1        glue_1.6.2         hms_0.5.3          fastmap_1.1.0     
+[61] yaml_2.2.0         colorspace_1.4-1   caTools_1.17.1.2   rvest_0.3.5       
+[65] knitr_1.39         haven_2.3.1       </code></pre>
 </div>
 </div>
 </div>
