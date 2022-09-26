@@ -1,0 +1,277 @@
+---
+title: "20220922_Explore_SubparRNAseq"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Intro
+
+Jingxin's lab has made many compounds (ie >50) from one or two scaffolds, and is interseted in using RNA-seq to readout splicing effects. Obviously at this scale, with limited resources, and with low prior knowledge about their splice-modulating activity, it doesn't make sense to do a full titration experiment with RNA-seq for each compound. We are more likely to settle with a single dose, at a smaller read depth, and try to learn what we can about the activity and specificity of these compounds. Here I will explore our existing data just to gain some intuitions on the power of RNA-seq, keeping in mind what it would be like if we only had one replicate at lower read coverage. Eventually I may do a more careful power analysis, involving sub-sampling reads from our existing data, and re-analyzing them to simulate potential study designs.
+
+
+## Analysis
+
+First let's read in library size in terms of mapped reads.
+
+```{r}
+library(tidyverse)
+library(gplots)
+library(RColorBrewer)
+
+counts <- read_tsv("../output/QC/ReadCountsAndJunctionsPerSamples.tsv", col_names = c("fn", "ChromosomalReads"))
+
+sample.list <- read_tsv("../code/bigwigs/BigwigList.tsv",
+                        col_names = c("SampleName", "bigwig", "group", "strand")) %>%
+  filter(strand==".") %>%
+  dplyr::select(-strand) %>%
+  mutate(old.sample.name = str_replace(bigwig, "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw", "\\1")) %>%
+  separate(SampleName, into=c("treatment", "dose.nM", "cell.type", "libType", "rep"), convert=T, remove=F, sep="_") %>%
+  left_join(
+    read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names = c("group", "color", "bed", "supergroup")),
+    by="group"
+  )
+
+counts.plot.dat <- counts %>%
+  mutate(old.sample.name = str_replace(fn, "Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam", "\\1")) %>%
+  inner_join(sample.list) %>%
+  arrange(cell.type, libType, desc(treatment=="DMSO"), treatment, dose.nM, rep) %>%
+  mutate(SampleName = factor(SampleName, levels=SampleName)) %>%
+  mutate(Experiment = case_when(
+    libType == "chRNA" ~ "nascent RNA profiling",
+    cell.type == "LCL" & libType == "polyA" ~ "dose response experiment",
+    cell.type == "Fibroblast" ~ "Initial experiment in fibroblast"
+  )) %>%
+  mutate(label = paste0(treatment,"; ", dose.nM))
+
+counts.plot.labels <- counts.plot.dat %>%
+  dplyr::select(SampleName, label) %>% deframe()
+
+ggplot(counts.plot.dat, aes(x=SampleName, y=ChromosomalReads/2E6, fill=color)) +
+  geom_col() +
+  scale_fill_identity() +
+  scale_x_discrete(name="Sample; treatment_nanomolar-dose", label=counts.plot.labels) +
+  facet_grid(cols = vars(Experiment), scales="free", space = "free_x") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=5)) +
+  theme(strip.text.x = element_text(size = 8)) +
+  labs(title="RNA-seq datasets", y="Read count (M)")
+
+```
+
+Now let's read in the table of a few hundred GA-GT splice sites that I previously shared with Jingxin, along with some other splice count tables... I want to see how rare these GA-GT splice sites are in our data, to get a sense how many reads we need to detect them.
+
+```{r}
+
+GA.GT.Introns <- read_tsv("../output/EC50Estimtes.FromPSI.txt.gz")
+
+
+all.samples.PSI <- read_tsv("../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz")
+all.samples.junccounts <- read_tsv("../code/SplicingAnalysis/leafcutter_all_samples/JuncCounts.table.bed.gz")
+
+all.samples.5ss <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz", col_names = c("intron", "seq", "score")) %>%
+  mutate(intron = str_replace(intron, "^(.+?)::.+$", "\\1")) %>%
+  separate(intron, into=c("chrom", "start", "stop", "strand"), sep="_", convert=T, remove=F)
+
+all.samples.intron.annotations <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz")
+
+All.GA.GT <- all.samples.5ss %>%
+  filter(str_detect(seq, "^\\w{2}GAGT")) %>%
+  inner_join(all.samples.intron.annotations %>%
+               rename(stop=end) %>%
+               dplyr::select(-score)) %>%
+  left_join(
+    GA.GT.Introns %>%
+      dplyr::select(chrom=`#Chrom`, start, stop=end, strand=strand.y, LowerLimit, UpperLimit, UpstreamSpliceAcceptor, spearman.coef.Branaplam, spearman.coef.C2C5,spearman.coef.Risdiplam)
+  ) %>%
+  mutate(GAGT.set = case_when(
+    !is.na(LowerLimit) ~ "Juncs modelled in LCL",
+    !is.na(spearman.coef.Branaplam) ~ "Juncs counted in LCL",
+    TRUE ~ "Other juncs observed across datasets"
+  )) %>%
+  inner_join(
+    all.samples.junccounts %>%
+      dplyr::select(junc, contains("LCL")) %>%
+      dplyr::select(junc, contains("polyA")) %>%
+      mutate(intron = str_replace(junc, "^(chr.+?):(.+?):(.+?):clu.+?([+-])$", "\\1_\\2_\\3_\\4"))
+  )
+
+GA.GT.CPM.Plot.dat <- All.GA.GT %>%
+  dplyr::select(intron, GAGT.set, contains("LCL")) %>%
+  add_count(GAGT.set) %>%
+  gather("SampleName", "JuncCounts", contains("LCL")) %>%
+  group_by(SampleName, n, GAGT.set) %>%
+  summarise(sumJuncCounts = sum(JuncCounts)) %>%
+  inner_join(counts.plot.dat) %>%
+  mutate(CPM=sumJuncCounts/(ChromosomalReads/1E6)) %>%
+  mutate(FacetLabel = paste0(GAGT.set, ";n=",n)) %>%
+  arrange(cell.type, libType, desc(treatment=="DMSO"), treatment, dose.nM, rep, GAGT.set)
+
+GA.GT.CPM.Plot.dat$SampleName <- factor(GA.GT.CPM.Plot.dat$SampleName, levels=unique(GA.GT.CPM.Plot.dat$SampleName))
+
+ggplot(GA.GT.CPM.Plot.dat, aes(x=SampleName, y=CPM, fill=color, color=color)) +
+  geom_col() +
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_x_discrete(name="Sample; treatment_nanomolar-dose", label=counts.plot.labels) +
+  facet_wrap(~FacetLabel, scales="free_y") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=5)) +
+  theme(strip.text.x = element_text(size = 6)) +
+  labs(title="DetectionOf GA|GT introns in aggregate", y="CountsPerMillion")
+
+```
+
+Ok, aggregating the set of 600 or so junctions that I modelled I see clear dose-dependent differences between DMSO and treatments, with CountsPerMillions (expression of junction reads) in the hundreds... Even with a single sample at a fraction of the read depth, i think this would be easily detectable.
+
+
+Perhaps another way to consider what it would be like to analyze data with just one replicate, is to look at delta-PSI, based on either 1 sample, or the average of 3 samples, from the fibroblast data...
+
+
+```{r}
+cluster_sig_files <- list.files("../code/SplicingAnalysis/leafcutter/differential_splicing", "*_cluster_significance.txt", full.names = T)
+effect_sizes_files <- list.files("../code/SplicingAnalysis/leafcutter/differential_splicing", "*_effect_sizes.txt", full.names = T)
+treatments <- str_replace(cluster_sig_files, ".+/(.+?)_cluster_significance.txt", "\\1")
+
+cluster.sig <- map(cluster_sig_files, read_tsv) %>%
+  set_names(cluster_sig_files) %>%
+  bind_rows(.id="f") %>%
+  mutate(treatment = str_replace(f, ".+/(.+?)_cluster_significance.txt", "\\1")) %>%
+  select(-f)
+
+effect_sizes <- map(effect_sizes_files, read_tsv) %>%
+  set_names(effect_sizes_files) %>%
+  bind_rows(.id="f") %>%
+  mutate(treatment = str_replace(f, ".+/(.+?)_effect_sizes.txt", "\\1")) %>%
+  select(-f) %>%
+  unite("psi_treatment", treatments, sep=" ", na.rm=T) %>%
+  mutate(psi_treatment = as.numeric(psi_treatment),
+         cluster = str_replace(intron, "(.+?:).+:(.+?)", "\\1\\2"))
+
+
+#Based on all introns
+all.samples.PSI %>%
+  dplyr::select(1:6, contains("Fibroblast")) %>%
+  dplyr::select(-c(1:6)) %>%
+  drop_na() %>%
+  as.matrix() %>%
+  cor() %>%
+  heatmap.2(trace='none')
+
+#Based on all GA|GT introns
+all.samples.PSI %>%
+  dplyr::select(1:6, contains("Fibroblast")) %>%
+  inner_join(dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)) %>%
+  dplyr::select(-c(1:6)) %>%
+  drop_na() %>%
+  as.matrix() %>%
+  cor() %>%
+  heatmap.2(trace='none')
+
+```
+
+Lastly, I think way to plot it that Yang is interested in is to average the 3 replicates for treatment, calculate delta-psi (from DMSO averaged across three replicates), and compare to the delta-psi from just a single replicate. Let's include one GA-GT introns for this...
+
+```{r}
+DMSO.mean.PSI <- all.samples.PSI %>%
+  dplyr::select(1:6, contains("Fibroblast")) %>%
+  inner_join(dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)) %>%
+  drop_na() %>%
+  dplyr::select(junc, contains("Fibroblast")) %>%
+  gather("SampleName", "PSI", contains("Fibroblast")) %>%
+  inner_join(sample.list) %>%
+  filter(treatment == "DMSO") %>%
+  group_by(junc) %>%
+  summarise(meanPSI.DMSO = mean(PSI)) %>%
+  ungroup()
+
+treament.mean.PSI <- all.samples.PSI %>%
+  dplyr::select(1:6, contains("Fibroblast")) %>%
+  inner_join(dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)) %>%
+  drop_na() %>%
+  dplyr::select(junc, contains("Fibroblast")) %>%
+  gather("SampleName", "PSI", contains("Fibroblast")) %>%
+  inner_join(sample.list) %>%
+  filter(!treatment == "DMSO") %>%
+  group_by(treatment, junc) %>%
+  summarise(PSI = mean(PSI)) %>%
+  ungroup() %>%
+  mutate(SampleName = paste(treatment, "mean", sep="_")) %>%
+  mutate(PSI.Calculation = "Average across 3 treatment replicates")
+  
+Compare3vs1Replicate.Dat.To.Plot <- all.samples.PSI %>%
+  dplyr::select(1:6, contains("Fibroblast")) %>%
+  inner_join(dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)) %>%
+  drop_na() %>%
+  dplyr::select(junc, contains("Fibroblast")) %>%
+  gather("SampleName", "PSI", contains("Fibroblast")) %>%
+  inner_join(sample.list) %>%
+  filter(!treatment == "DMSO") %>%
+  dplyr::select(treatment, SampleName, junc, PSI) %>%
+  mutate(PSI.Calculation = "Single treatment replicate") %>%
+  bind_rows(treament.mean.PSI) %>%
+  inner_join(DMSO.mean.PSI) %>%
+  mutate(DeltaPSI = PSI-meanPSI.DMSO)
+
+ggplot(Compare3vs1Replicate.Dat.To.Plot, aes(x=DeltaPSI, color=treatment)) +
+  stat_ecdf(aes(linetype=PSI.Calculation)) +
+  facet_wrap(~treatment) +
+  theme_bw() +
+  coord_cartesian(xlim=c(-10, 10)) +
+  labs(y="ecdf")
+
+Compare3vs1Replicate.Dat.To.Plot.As.matrix <- Compare3vs1Replicate.Dat.To.Plot %>%
+  dplyr::select(SampleName, junc, DeltaPSI) %>%
+  pivot_wider(names_from = "SampleName", values_from="DeltaPSI") %>%
+  column_to_rownames("junc")
+
+ConvertToColorVector <- function(Vector, PalletteString="Set1"){
+  ConversionKey <- setNames(brewer.pal(length(unique(Vector)), PalletteString), unique(Vector))[1:length(unique(Vector))]
+  ColorVector <- recode(Vector, !!!ConversionKey)
+  return( list(Key=ConversionKey, ColorVector=ColorVector))
+}
+
+Rowcols <- colnames(Compare3vs1Replicate.Dat.To.Plot.As.matrix) %>%
+  str_replace("^(.+?)_.+", "\\1") %>% ConvertToColorVector()
+Colcols <- colnames(Compare3vs1Replicate.Dat.To.Plot.As.matrix) %>%
+  str_detect("mean") %>% as.character() %>% ConvertToColorVector(PalletteString="Set2")
+cor(Compare3vs1Replicate.Dat.To.Plot.As.matrix) %>%
+  heatmap.2(trace='none', ColSideColors = Colcols$ColorVector, RowSideColors = Rowcols$ColorVector)
+
+Compare3vs1Replicate.Dat.To.Plot$treatment
+
+
+sample_n_of <- function(data, size, ...) {
+  dots <- quos(...)
+  
+  group_ids <- data %>% 
+    group_by(!!! dots) %>% 
+    group_indices()
+  
+  sampled_groups <- sample(unique(group_ids), size)
+  
+  data %>% 
+    filter(group_ids %in% sampled_groups)
+}
+
+set.seed(0)
+Compare3vs1Replicate.Dat.To.Plot %>%
+  sample_n_of(20, junc) %>%
+  ggplot(aes(y=DeltaPSI, x=SampleName, color=PSI.Calculation, fill=treatment)) +
+  geom_col() +
+  facet_wrap(~junc,scales="free_y") +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  labs(title="20 random GA|GT introns", y="DeltaPSI (versus DMSO from 3 replicates)", color="Treatment PSI from")
+
+```
+
+## Conclusion
+
+though I haven't worked out the details of how I would want to perform an analysis with one RNA-seq replicate, I'm confident there is enough genome-wide information to at the very least discriminate "active" from inactive compounds from 1 replicate...
+
+We might not need to do a formal statistical test (ie leafcutter) for each splice event to get a decent profile of each treatment. I could probably consider doing simpler things like looking at meta-intron features (the sum of junction counts many GA|GT introns), or if I wanted to get a broad sense of specificity, plotting things in the same PC space as previously calculated will at least distinguish the branaplam-vs-risdiplam dimension. Though, a better understanding of specificity may require more unbiased analysis which will no doubt benefit from first doing splice-event-level statistical tests.

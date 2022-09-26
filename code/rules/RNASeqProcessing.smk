@@ -407,5 +407,27 @@ rule TidyDoseResponseData:
         Rscript scripts/TidyAndSpearmanCorTitrationData.R &> {log}
         """
 
+rule DownloadMouseAnnotation:
+    output:
+        gtf = "ReferenceGenomes/Mouse_M30/Mouse_M30.gtf",
+        chain = "hg38ToMm39.over.chain.gz"
+    shell:
+        """
+        wget -O- https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M30/gencode.vM30.annotation.gtf.gz | zcat > {output.gtf}
+        wget -O {output.chain} http://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/hg38ToMm39.over.chain.gz
+        """
+
+rule Download_UCSC_PhyloP_Bigwig:
+    output:
+        "PhyloP/SourceTrack/PhyloP.hg38.bw"
+    shell:
+        """
+        wget -O- http://hgdownload.cse.ucsc.edu/goldenpath/hg38/phyloP100way/hg38.phyloP100way.bw > {output}
+        """
+
+rule GetPhyloP_All5ssPositions:
+    input:
+        "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz"
+
 ## Check how ClinVar splice site annotations relate to splice sites:
 # zcat ClinVar/PangolinResults.tsv.gz | grep 'splice_donor' | awk -v OFS='\t' '{print "chr"$1, $2, $2+1}' | sort -u | bedtools sort -i - | bedtools closest -a - -b <( bedtools flank -g /project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Fasta/GRCh38.primary_assembly.genome.fa.fai  -i <(zcat SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.gz | awk -v OFS='\t' 'NR>1 {print $1,$2,$3,".",".",$6}' ) -l 1 -r 0 | sort -u | bedtools sort -i -  ) -D b | less -S
