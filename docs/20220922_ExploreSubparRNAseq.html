@@ -459,16 +459,16 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree272cd7602a7f90fe4cf35c8919e39787aa3c8d38targetblank272cd76a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/272cd7602a7f90fe4cf35c8919e39787aa3c8d38" target="_blank">272cd76</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree9a23a3ece39b84f39a7d5946b11d334a61e7276etargetblank9a23a3ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/9a23a3ece39b84f39a7d5946b11d334a61e7276e" target="_blank">9a23a3e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree272cd7602a7f90fe4cf35c8919e39787aa3c8d38targetblank272cd76a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree9a23a3ece39b84f39a7d5946b11d334a61e7276etargetblank9a23a3ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/272cd7602a7f90fe4cf35c8919e39787aa3c8d38" target="_blank">272cd76</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/9a23a3ece39b84f39a7d5946b11d334a61e7276e" target="_blank">9a23a3e</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -482,7 +482,6 @@ Ignored files:
     Ignored:    analysis/.RData
     Ignored:    analysis/.Rhistory
     Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
-    Ignored:    analysis/figure/
     Ignored:    code/%
     Ignored:    code/.DS_Store
     Ignored:    code/._.DS_Store
@@ -538,6 +537,7 @@ Ignored files:
 
 Unstaged changes:
     Modified:   analysis/20220922_ExploreSubparRNAseq.Rmd
+    Modified:   analysis/20220923_ExploreSpecificityEstimates.Rmd
 
 </code></pre>
 <p>
@@ -576,6 +576,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/9a23a3ece39b84f39a7d5946b11d334a61e7276e/analysis/20220922_ExploreSubparRNAseq.Rmd" target="_blank">9a23a3e</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+<td>
+update site
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/9a23a3ece39b84f39a7d5946b11d334a61e7276e/docs/20220922_ExploreSubparRNAseq.html" target="_blank">9a23a3e</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+<td>
+update site
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -639,6 +673,24 @@ sample.list &lt;- read_tsv(&quot;../code/bigwigs/BigwigList.tsv&quot;,
   left_join(
     read_tsv(&quot;../code/bigwigs/BigwigList.groups.tsv&quot;, col_names = c(&quot;group&quot;, &quot;color&quot;, &quot;bed&quot;, &quot;supergroup&quot;)),
     by=&quot;group&quot;
+  )
+
+TreatmentColorsForLabels &lt;- sample.list %&gt;%
+  group_by(treatment) %&gt;%
+  filter(dose.nM == max(dose.nM) | treatment == &quot;DMSO&quot;) %&gt;%
+  ungroup() %&gt;%
+  distinct(treatment, .keep_all=T) %&gt;%
+  arrange(dose.nM) %&gt;%
+  mutate(vjust=row_number()*1.2)
+
+TreatmentColorsForLabelsKey &lt;- TreatmentColorsForLabels %&gt;%
+  filter(!treatment==&quot;DMSO&quot;) %&gt;%
+  dplyr::select(treatment, color) %&gt;% deframe()
+
+TreatmentColorsLabels.Layer &lt;- geom_text(
+    data = TreatmentColorsForLabels, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=Inf, hjust=1.05
   )
 
 counts.plot.dat &lt;- counts %&gt;%
@@ -986,6 +1038,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/9a23a3ece39b84f39a7d5946b11d334a61e7276e/docs/figure/20220922_ExploreSubparRNAseq.Rmd/unnamed-chunk-4-1.png" target="_blank">9a23a3e</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220922_ExploreSubparRNAseq.Rmd/unnamed-chunk-4-1.png" target="_blank">272cd76</a>
 </td>
 <td>
@@ -999,6 +1062,8 @@ Benjmain Fair
 </table>
 </div>
 </div>
+<p>Ok, so the mean genomewide distribution (plotted as ecdf) of the delta-PSI of GA.GT introns looks visually indistinguishable whether you average 3 replicates or if you just use one replicate.</p>
+<p>Let’s now plot these DeltaPSIs again (comparing deltaPSI calculated from one replicate, versus average from three replicates) as a correlation matrix, with clustering the rows and columns…</p>
 <pre class="r"><code>Compare3vs1Replicate.Dat.To.Plot.As.matrix &lt;- Compare3vs1Replicate.Dat.To.Plot %&gt;%
   dplyr::select(SampleName, junc, DeltaPSI) %&gt;%
   pivot_wider(names_from = &quot;SampleName&quot;, values_from=&quot;DeltaPSI&quot;) %&gt;%
@@ -1014,46 +1079,13 @@ Rowcols &lt;- colnames(Compare3vs1Replicate.Dat.To.Plot.As.matrix) %&gt;%
   str_replace(&quot;^(.+?)_.+&quot;, &quot;\\1&quot;) %&gt;% ConvertToColorVector()
 Colcols &lt;- colnames(Compare3vs1Replicate.Dat.To.Plot.As.matrix) %&gt;%
   str_detect(&quot;mean&quot;) %&gt;% as.character() %&gt;% ConvertToColorVector(PalletteString=&quot;Set2&quot;)
+
+# Row colors are treatments
+# Column colors are 1 or 3 replicates
 cor(Compare3vs1Replicate.Dat.To.Plot.As.matrix) %&gt;%
   heatmap.2(trace=&#39;none&#39;, ColSideColors = Colcols$ColorVector, RowSideColors = Rowcols$ColorVector)</code></pre>
-<p><img src="figure/20220922_ExploreSubparRNAseq.Rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-2">
-Past versions of unnamed-chunk-4-2.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-4-2" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220922_ExploreSubparRNAseq.Rmd/unnamed-chunk-4-2.png" target="_blank">272cd76</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-26
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/20220922_ExploreSubparRNAseq.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Let’s plot deltaPSI from 1 vs 3 averaged replicates for some individual introns. A random sample of GA|GT introns. I always find looking at a random sample of introns to be helpful, to gain some intuition.</p>
 <pre class="r"><code>sample_n_of &lt;- function(data, size, ...) {
   dots &lt;- quos(...)
   
@@ -1078,49 +1110,99 @@ Compare3vs1Replicate.Dat.To.Plot %&gt;%
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank()) +
   labs(title=&quot;20 random GA|GT introns&quot;, y=&quot;DeltaPSI (versus DMSO from 3 replicates)&quot;, color=&quot;Treatment PSI from&quot;)</code></pre>
-<p><img src="figure/20220922_ExploreSubparRNAseq.Rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-3">
-Past versions of unnamed-chunk-4-3.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-4-3" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220922_ExploreSubparRNAseq.Rmd/unnamed-chunk-4-3.png" target="_blank">272cd76</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-26
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/20220922_ExploreSubparRNAseq.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Hmm.. so as expected, individual intron measurements can be quite noisy, and I still haven’t figured out how or if I will want to do any differential splicing tests at the individual intron level.</p>
+<p>Let’s go back to thinking about characterizing samples on a global level… I wonder if it will be useful to plot new samples in a previously determined priniciple component space that is more interpretable. For example, let’s go back to the dose response experiment, calculate principal components, and overlay the fibroblast samples in the same principle component axes. Keep in mind the experiments were done in different cell types, so I’m not sure what to expect here, but let’s just see…</p>
+<pre class="r"><code>#First compute principle components from dose response data
+pca.results &lt;- all.samples.PSI %&gt;%
+  inner_join(
+    dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)
+    ) %&gt;%
+  drop_na() %&gt;%
+  dplyr::select(1:6, contains(&quot;LCL&quot;)) %&gt;%
+  dplyr::select(1:6, contains(&quot;polyA&quot;)) %&gt;%
+  dplyr::select(junc, contains(&quot;LCL&quot;)) %&gt;%
+  column_to_rownames(&quot;junc&quot;) %&gt;%
+  scale() %&gt;% t() %&gt;% prcomp(scale=T)
+
+summary(pca.results)</code></pre>
+<pre><code>Importance of components:
+                           PC1    PC2     PC3     PC4     PC5     PC6     PC7
+Standard deviation     17.1445 8.3535 6.58435 4.88941 4.21117 3.98381 3.44426
+Proportion of Variance  0.5148 0.1222 0.07593 0.04187 0.03106 0.02779 0.02078
+Cumulative Proportion   0.5148 0.6370 0.71290 0.75477 0.78583 0.81362 0.83440
+                           PC8     PC9    PC10    PC11   PC12    PC13    PC14
+Standard deviation     3.29972 3.02333 2.72737 2.68984 2.4602 2.40520 2.34934
+Proportion of Variance 0.01907 0.01601 0.01303 0.01267 0.0106 0.01013 0.00967
+Cumulative Proportion  0.85347 0.86948 0.88250 0.89518 0.9058 0.91591 0.92557
+                          PC15    PC16   PC17    PC18    PC19    PC20    PC21
+Standard deviation     2.22745 2.15526 2.0963 2.07448 1.98977 1.93936 1.85475
+Proportion of Variance 0.00869 0.00814 0.0077 0.00754 0.00693 0.00659 0.00602
+Cumulative Proportion  0.93426 0.94240 0.9501 0.95763 0.96456 0.97115 0.97717
+                          PC22    PC23    PC24    PC25    PC26      PC27
+Standard deviation     1.75061 1.67522 1.62255 1.52060 1.48911 1.928e-14
+Proportion of Variance 0.00537 0.00491 0.00461 0.00405 0.00388 0.000e+00
+Cumulative Proportion  0.98254 0.98746 0.99207 0.99612 1.00000 1.000e+00</code></pre>
+<pre class="r"><code># Then plot original samples
+pca.results$x %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column(&quot;SampleName&quot;) %&gt;%
+  dplyr::select(SampleName, PC1, PC2, PC3) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  ggplot(aes(x=PC1, y=PC2, color=color)) +
+  TreatmentColorsLabels.Layer +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using all GA|GT introns&quot;, x=&quot;PC1 (52% variance explained)&quot;, y=&quot;PC2 (15% variance explained)&quot;)</code></pre>
+<p><img src="figure/20220922_ExploreSubparRNAseq.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Now let’s try plotting the fibroblast data in the old PC space. From visually looking at a few loci in the genome browser, I already know that SM2 is a lot like branaplam, so I’ll look for that effect…</p>
+<pre class="r"><code>FirboblastDat &lt;- all.samples.PSI %&gt;%
+  inner_join(
+    dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)
+    ) %&gt;%
+  drop_na() %&gt;%
+  dplyr::select(junc, contains(&quot;Fibroblast&quot;)) %&gt;%
+  column_to_rownames(&quot;junc&quot;) %&gt;%
+  scale() %&gt;% t()
+
+Fibroblastdat.projected &lt;- predict(pca.results, FirboblastDat)
+
+TreatmentColorsForLabels.FibroblastColorsAdded &lt;-
+sample.list %&gt;%
+  group_by(treatment) %&gt;%
+  filter(dose.nM == max(dose.nM) | treatment == &quot;DMSO&quot; | cell.type==&quot;Fibroblast&quot;) %&gt;%
+  ungroup() %&gt;%
+  distinct(treatment, .keep_all=T) %&gt;%
+  arrange(dose.nM) %&gt;%
+  mutate(vjust=row_number()*1.2)
+
+TreatmentColorsLabels.Layer.FibroblastColorsAdded &lt;- geom_text(
+    data = TreatmentColorsForLabels.FibroblastColorsAdded, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=Inf, hjust=1.05
+  )
+
+bind_rows(
+    Fibroblastdat.projected %&gt;% as.data.frame(),
+    pca.results$x %&gt;% as.data.frame()
+  ) %&gt;%
+  rownames_to_column(&quot;SampleName&quot;) %&gt;%
+  dplyr::select(SampleName, PC1, PC2, PC3) %&gt;%
+  left_join(sample.list, by=&quot;SampleName&quot;) %&gt;%
+  ggplot(aes(x=PC1, y=PC2, color=color, shape=cell.type)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  theme_bw() +
+  labs(title = &quot;PCA using all GA|GT introns&quot;, x=&quot;PC1 (52% variance explained)&quot;, y=&quot;PC2 (15% variance explained)&quot;)</code></pre>
+<p><img src="figure/20220922_ExploreSubparRNAseq.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, I rather like looking at the data this way, and each point is a single sample, and each point is placed nicely in a place I expect and can somewhat interpret in these two dimensions.</p>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
 <p>though I haven’t worked out the details of how I would want to perform an analysis with one RNA-seq replicate, I’m confident there is enough genome-wide information to at the very least discriminate “active” from inactive compounds from 1 replicate…</p>
-<p>We might not need to do a formal statistical test (ie leafcutter) for each splice event to get a decent profile of each treatment. I could probably consider doing simpler things like looking at meta-intron features (the sum of junction counts many GA|GT introns), or if I wanted to get a broad sense of specificity, plotting things in the same PC space as previously calculated will at least distinguish the branaplam-vs-risdiplam dimension. Though, a better understanding of specificity may require more unbiased analysis which will no doubt benefit from first doing splice-event-level statistical tests.</p>
+<p>We might not need to do a formal statistical test (ie leafcutter) for each splice event to get a decent profile of each treatment. I could probably consider doing simpler things like looking at meta-intron features (the sum of junction counts many GA|GT introns), or if I wanted to get a broad sense of specificity, plotting things as I have done in the same PC space as previously calculated will at least distinguish the branaplam-vs-risdiplam dimension. Though, a better understanding of specificity (particularly for new dimensions that might not easily be described in the risdiplam-branaplam axis) may require more unbiased analysis which will no doubt benefit from first doing splice-event-level statistical tests.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

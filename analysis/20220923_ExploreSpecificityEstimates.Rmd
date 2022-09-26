@@ -434,3 +434,4 @@ generally, like I've concluded before, branaplam prefers -3A, and perhaps there 
 
 
 Also, many of the forms of analysis and results from my fibroblast data can be replicated using spearman coef as a measure of effect size in this LCL dose response series.
+
