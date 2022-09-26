@@ -174,7 +174,7 @@ all.samples.PSI %>%
 
 Lastly, I think way to plot it that Yang is interested in is to average the 3 replicates for treatment, calculate delta-psi (from DMSO averaged across three replicates), and compare to the delta-psi from just a single replicate. Let's include one GA-GT introns for this...
 
-```{r}
+```{r, fig.height=7, fig.width=7}
 DMSO.mean.PSI <- all.samples.PSI %>%
   dplyr::select(1:6, contains("Fibroblast")) %>%
   inner_join(dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)) %>%
@@ -215,12 +215,13 @@ Compare3vs1Replicate.Dat.To.Plot <- all.samples.PSI %>%
   inner_join(DMSO.mean.PSI) %>%
   mutate(DeltaPSI = PSI-meanPSI.DMSO)
 
+
 ggplot(Compare3vs1Replicate.Dat.To.Plot, aes(x=DeltaPSI, color=treatment)) +
   stat_ecdf(aes(linetype=PSI.Calculation)) +
   facet_wrap(~treatment) +
   theme_bw() +
   coord_cartesian(xlim=c(-10, 10)) +
-  labs(y="ecdf")
+  labs(y="ecdf", title='effects of GA|GT introns')
 
 Compare3vs1Replicate.Dat.To.Plot.As.matrix <- Compare3vs1Replicate.Dat.To.Plot %>%
   dplyr::select(SampleName, junc, DeltaPSI) %>%
@@ -239,9 +240,6 @@ Colcols <- colnames(Compare3vs1Replicate.Dat.To.Plot.As.matrix) %>%
   str_detect("mean") %>% as.character() %>% ConvertToColorVector(PalletteString="Set2")
 cor(Compare3vs1Replicate.Dat.To.Plot.As.matrix) %>%
   heatmap.2(trace='none', ColSideColors = Colcols$ColorVector, RowSideColors = Rowcols$ColorVector)
-
-Compare3vs1Replicate.Dat.To.Plot$treatment
-
 
 sample_n_of <- function(data, size, ...) {
   dots <- quos(...)
