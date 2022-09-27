@@ -77,7 +77,7 @@ Expression.tidy <- read_tsv("../code/DoseResponseData/LCL/TidyExpressionDoseData
 #gene names
 gene_list <- read_tsv("../data/Genes.list.txt")
 
-GenesOfInterest <- c("FOXM1", "STAT1", "HTT", "GALC")
+GenesOfInterest <- c("FOXM1", "STAT1", "HTT", "GALC", "SMN1", "SMN2")
 
 # read in info about splice sites
 all.samples.5ss <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz", col_names = c("intron", "seq", "score")) %>%
@@ -90,6 +90,7 @@ all.samples.intron.annotations <- read_tsv("../code/SplicingAnalysis/FullSpliceS
 let's plot some dose response curves for genes/introns of interest
 
 ```{r}
+
 
 GA.GT %>%
   filter(gene_names %in% GenesOfInterest) %>%
@@ -343,10 +344,36 @@ PSI.tidy %>%
   facet_wrap(~facettitle) +
   scale_color_manual(values=TreatmentColorsForLabelsKey) +
   theme_bw() +
-  labs(y='ecdf', title="dose-response spearman by NNAG|GT 5'ss", x="spearman coef")
+  labs(y='ecdf', title="dose-response spearman by NNGA|GT 5'ss", x="spearman coef")
 ```
 
 Ok as before, I see an effect for -3A that distinguished branaplam from risdiplam (but interestingly, not so much for *AA*GA|GT). Also, though the sample size is small, there may be something to the *GC*AG|GT to distinguish C2C5 from branaplam.
+
+Yang is also interseted in NNCA|GT. Let's plot that...
+
+```{r}
+PSI.tidy %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  filter(str_detect(seq, "^\\w{2}GTGT")) %>%
+  mutate(NN = substr(seq, 1, 2)) %>%
+  add_count(NN, treatment) %>%
+  mutate(facettitle = paste0(NN, "; n=", n)) %>%
+  ggplot(aes(x=spearman, color=treatment)) +
+  geom_vline(xintercept=0) +
+  geom_vline(
+    data = . %>%
+      group_by(facettitle, treatment) %>%
+      summarise(med = median(spearman, na.rm=T)),
+    aes(xintercept=med, color=treatment),
+    linetype='dashed'
+  ) +
+  stat_ecdf() +
+  facet_wrap(~facettitle) +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  theme_bw() +
+  labs(y='ecdf', title="dose-response spearman by NNGT|GT 5'ss", x="spearman coef")
+```
+
 
 Now let's test for enhanced splicing at the other 5'ss bulges I previously tested in firboblasts...
 
@@ -427,6 +454,7 @@ PSI.tidy %>%
   labs(title='26 random introns')
 
 ```
+
 
 ## Conlusion
 

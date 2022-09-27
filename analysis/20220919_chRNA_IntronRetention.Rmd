@@ -68,6 +68,7 @@ all.samples.intron.annotations <- read_tsv("../code/SplicingAnalysis/FullSpliceS
 
 ```
 
+
 ### effect sizes in chRNA versus polyA
 
 Let's check the first hypothesis... that chRNA will generally show larger effect sizes between ratio of included versus skipped reads.
@@ -263,9 +264,9 @@ First let's look at the correlation matrix based on IntronExcisionRatio and Spli
 
 ```{r, fig.height=10, fig.width=10}
 
-GA.GT.Introns.DrugInducedCassetteExons
+# GA.GT.Introns.DrugInducedCassetteExons
 
-chRNA.Comparison.PSI.Inclusion.tidy
+# chRNA.Comparison.PSI.Inclusion.tidy
 
 HostIntronsToQuantifyInDrugInducedCassetteExons <- IntronsToQuantifyInDrugInducedCassetteExons %>%
   pivot_wider(names_from="IntronType", values_from="junc") %>%
@@ -346,4 +347,126 @@ SpliceQ.SE %>%
 Hm, here there is some very modest effect, but I will get to doing a more proper test for significance later.
 
 
-Finally I want to get to the question about whether that exon-definition effect was apparent, wherein the upstream intron has more efficient splicing... I think I'll do this later, as it requires me to quantify intron retention in unannotated introns, which isn't in the existing intron retention quantifications that I made using splice-q.
+Finally I want to get to the question about whether that exon-definition effect was apparent, wherein the upstream intron has more efficient splicing... I think I'll do this later, as it requires me to quantify intron retention in unannotated introns, which isn't in the existing intron retention quantifications that I made using splice-q. For now I think I can get some intuitions by looking at a number of loci with pygenometracks...
+
+### Plotting with pygenometracks
+
+Let's plot all of the drug induced exons with high confidence dose-response effects in a way that might make clear what is happening in the chromatin-associated RNA...
+
+```{r, eval=F}
+
+dir.create("../code/scratch/20220926_Plot_chRNA")
+
+NewBigwigSampleList <- bind_rows(
+  sample.list %>%
+    filter(cell.type=="LCL" & libType=="chRNA" & treatment == "DMSO") %>%
+    mutate(Treatment.topair=c("Risdiplam", "Branaplam", "C2C5")) %>%
+    expand(SampleName, Treatment.topair) %>%
+    inner_join(sample.list) %>%
+    mutate(treatment = paste(treatment,Treatment.topair, sep=".")) %>%
+    mutate(NewGroup = paste(treatment,dose.nM, cell.type, libType, "u", sep="_")) %>%
+    mutate(SampleName = paste(treatment,dose.nM, cell.type, libType, rep, sep="_")),
+  sample.list %>%
+    filter(!(cell.type=="LCL" & libType=="chRNA" & treatment=="DMSO")) %>%
+    mutate(NewGroup = group)) %>%
+  dplyr::select(SampleName, bigwig, group, NewGroup, strand)
+
+
+groups <- read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names=c("GroupName", "Color", "PSI", "Supergroup")) %>%
+  filter(str_detect(GroupName, "_u$"))
+
+left_join(NewBigwigSampleList, groups, by=c("group"="GroupName")) %>%
+  distinct(NewGroup, .keep_all=T) %>%
+  dplyr::select(NewGroup, Color, PSI, Supergroup) %>%
+  mutate(Supergroup = case_when(
+    str_detect(NewGroup, "^DMSO\\.") ~ str_replace(NewGroup, "DMSO\\.(.+?)_.+$", "\\1_LCL_chRNA_u"),
+    TRUE ~ Supergroup
+  )) %>%
+  separate(NewGroup, into=c("treatment", "dose.nM", "cell.type", "libType"), convert=T, remove=F, sep="_") %>%
+  mutate(IsControl = treatment == "DMSO") %>%
+  mutate(IsControl2 = str_detect(treatment, "DMSO")) %>%
+  arrange(cell.type, libType, desc(IsControl), desc(IsControl2), treatment, dose.nM) %>%
+  dplyr::select(NewGroup, Color, PSI, Supergroup) %>%
+  write_tsv("../code/scratch/20220926_Plot_chRNA/.groups.tsv", col_names = F)
+
+NewBigwigSampleList %>% dplyr::select(-group) %>%
+write_tsv("../code/scratch/20220926_Plot_chRNA/.bwList.tsv", col_names = F)
+  
+
+RegionsToPlot <- all.samples.PSI %>%
+  filter(gid %in% GA.GT.Introns$gid) %>%
+  mutate(SpliceAcceptor = case_when(
+    strand == "+" ~ paste(`#Chrom`, end, strand, sep="."),
+    strand == "-" ~ paste(`#Chrom`, start-2, strand, sep=".")
+  )) %>%
+  select(1:6, SpliceAcceptor, contains("LCL")) %>%
+  gather(key="Sample", value="PSI", contains("LCL")) %>%
+  group_by(junc, gid, strand, SpliceAcceptor) %>%
+  drop_na() %>%
+  summarise(mean=mean(PSI, na.rm = F)) %>%
+  group_by(SpliceAcceptor) %>%
+  filter(mean == max(mean)) %>%
+  ungroup() %>%
+  dplyr::select(UpstreamJunc = junc, SpliceAcceptor) %>%
+  inner_join(GA.GT.Introns.DrugInducedCassetteExons, by=c("SpliceAcceptor"="UpstreamSpliceAcceptor")) %>%
+  filter(IntronType == "Alt 5'ss") %>%
+  rename(DownstreamJunc = junc) %>%
+  mutate(SkippingJunc = case_when(
+    strand == "+" ~ str_replace(paste(UpstreamJunc, DownstreamJunc), "^(chr.+?):(.+?):(.+?):(clu.+?) (chr.+?):(.+?):(.+?):clu.+$", "\\1:\\2:\\7:\\4"),
+    strand == "-" ~ str_replace(paste(UpstreamJunc, DownstreamJunc), "^(chr.+?):(.+?):(.+?):(clu.+?) (chr.+?):(.+?):(.+?):clu.+$", "\\1:\\6:\\3:\\4")
+  )) %>%
+  dplyr::select(UpstreamJunc,DownstreamJunc, SkippingJunc )
+
+
+
+
+# Write out GA|GT splice sites, I will highlight these with a vertical bar
+RegionsToPlot %>%
+  separate(DownstreamJunc, into=c("chrom", "start", "end", "cluster"), convert=T, remove=F, sep=":") %>%
+  mutate(strand = str_extract(cluster, "[+-]$")) %>%
+  mutate(SpliceDonor = case_when(
+    strand == "+" ~ start,
+    strand == "-" ~ end
+  )) %>%
+  mutate(SpliceDonorEnd = SpliceDonor + 1) %>%
+  select(`chrom`, SpliceDonor, SpliceDonorEnd) %>%
+  write_tsv("../code/scratch/20220926_Plot_chRNA/.SpliceDonors.bed", col_names = F)
+
+# write out pygenometracks ini file for GA|GT splice sites track
+fileConn<-file("../code/scratch/20220926_Plot_chRNA/.SpliceDonors.ini")
+writeLines(c("[vlines]","type = vlines", "file = scratch/20220926_Plot_chRNA/.SpliceDonors.bed"), con=fileConn)
+close(fileConn)
+
+# Write out sashimi filter juncs
+RegionsToPlot %>%
+  gather(key="type", value="junc") %>%
+  separate(junc, into=c("chrom", "start", "end", "cluster"), convert=T, sep=":") %>%
+  dplyr::select(chrom, start, end) %>%
+  write_tsv("../code/scratch/20220926_Plot_chRNA/.SpliceJuncsToFilter.bed", col_names = F)
+
+
+
+# Write out shell commands that use a helper script of mine for plotting the data nicely.
+#--FilterJuncsByBed scratch/ToPlot.introns.bed
+RegionsToPlot %>%
+  left_join(
+    GA.GT.Introns %>%
+      dplyr::select(DownstreamJunc=junc, gene_names)) %>%
+  drop_na() %>%
+  mutate(gene_names=str_replace_all(gene_names, ",", "-")) %>%
+  separate(SkippingJunc, into=c("chrom", "start", "end", "cluster"), convert=T, remove=F, sep=":") %>%
+  mutate(min=start-400, max=end+400) %>%
+  mutate(n=row_number()) %>%
+  mutate(n.pad=str_pad(n,3,pad="0")) %>%
+  mutate(cmd = str_glue("python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile scratch/20220926_Plot_chRNA/.groups.tsv --BigwigList scratch/20220926_Plot_chRNA/.bwList.tsv --Normalization WholeGenome --Region {chrom}:{min}-{max} --BigwigListType KeyFile --FilterJuncsByBed scratch/20220926_Plot_chRNA/.SpliceJuncsToFilter.bed --OutputPrefix scratch/20220926_Plot_chRNA/. -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz\npyGenomeTracks --tracks <(cat scratch/20220926_Plot_chRNA/.tracks.ini scratch/20220926_Plot_chRNA/.SpliceDonors.ini) --out scratch/20220926_Plot_chRNA/{n.pad}_{gene_names}_{chrom}_{start}_{end}.png --region {chrom}:{min}-{max} --trackLabelFraction 0.15 --title {gene_names}_{chrom}_{start}\n\n")) %>%
+  select(cmd) %>%
+  write.table("../code/scratch/20220926_Plot_chRNA/MakePlots.sh", quote=F, row.names = F, col.names = F)
+```
+
+And run the script to plot...
+
+```{bash, eval=F}
+cd /project2/yangili1/bjf79/20211209_JingxinRNAseq/code/
+bash scratch/20220926_Plot_chRNA/MakePlots.sh
+```
+

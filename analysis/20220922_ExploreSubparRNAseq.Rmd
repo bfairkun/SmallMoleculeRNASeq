@@ -335,7 +335,52 @@ pca.results$x %>%
   scale_color_identity() +
   theme_bw() +
   labs(title = "PCA using all GA|GT introns", x="PC1 (52% variance explained)", y="PC2 (15% variance explained)")
+
+pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleName") %>%
+  dplyr::select(SampleName, PC1:PC6) %>%
+  left_join(sample.list, by="SampleName") %>%
+  ggplot(aes(x=PC3, y=PC4, color=color)) +
+  TreatmentColorsLabels.Layer +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using all GA|GT introns")
+
+pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleName") %>%
+  dplyr::select(SampleName, PC1:PC6) %>%
+  left_join(sample.list, by="SampleName") %>%
+  ggplot(aes(x=PC5, y=PC6, color=color)) +
+  TreatmentColorsLabels.Layer +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using all GA|GT introns")
+
+
 ```
+
+
+Hmm, it looks like PC5 does a decent job at seperating C2C5 from risidiplam. Let's plot just PC2 and PC5...
+
+```{r}
+pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleName") %>%
+  dplyr::select(SampleName, PC1:PC6) %>%
+  left_join(sample.list, by="SampleName") %>%
+  ggplot(aes(x=PC2, y=PC5, color=color)) +
+  TreatmentColorsLabels.Layer +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using all GA|GT introns")
+```
+
+
 
 Now let's try plotting the fibroblast data in the old PC space. From visually looking at a few loci in the genome browser, I already know that SM2 is a lot like branaplam, so I'll look for that effect...
 
@@ -373,7 +418,7 @@ bind_rows(
     pca.results$x %>% as.data.frame()
   ) %>%
   rownames_to_column("SampleName") %>%
-  dplyr::select(SampleName, PC1, PC2, PC3) %>%
+  dplyr::select(SampleName, PC1:PC6) %>%
   left_join(sample.list, by="SampleName") %>%
   ggplot(aes(x=PC1, y=PC2, color=color, shape=cell.type)) +
   geom_point(size=3) +
@@ -383,9 +428,25 @@ bind_rows(
   labs(title = "PCA using all GA|GT introns", x="PC1 (52% variance explained)", y="PC2 (15% variance explained)")
 
 
+bind_rows(
+    Fibroblastdat.projected %>% as.data.frame(),
+    pca.results$x %>% as.data.frame()
+  ) %>%
+  rownames_to_column("SampleName") %>%
+  dplyr::select(SampleName, PC1:PC6) %>%
+  left_join(sample.list, by="SampleName") %>%
+  ggplot(aes(x=PC2, y=PC5, color=color, shape=cell.type)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  theme_bw() +
+  labs(title = "PCA using all GA|GT introns")
+
+
+
 ```
 
-Ok, I rather like looking at the data this way, and each point is a single sample, and each point is placed nicely in a place I expect and can somewhat interpret in these two dimensions.
+Ok, I rather like looking at the data this way, and each point is a single sample, and each point is placed nicely in a place I expect and can somewhat interpret in a few of these principle components.
 
 ## Conclusion
 

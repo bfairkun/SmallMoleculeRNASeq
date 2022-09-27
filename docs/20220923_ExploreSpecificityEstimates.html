@@ -368,7 +368,7 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 </div>
 <div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
@@ -459,16 +459,16 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree25df2a69d3076822b53c88404ffda33cc3e524b4targetblank25df2a6a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/25df2a69d3076822b53c88404ffda33cc3e524b4" target="_blank">25df2a6</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreeb2293ec46b5f5dadb91c331fe69c506e31e25bd2targetblankb2293eca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/b2293ec46b5f5dadb91c331fe69c506e31e25bd2" target="_blank">b2293ec</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree25df2a69d3076822b53c88404ffda33cc3e524b4targetblank25df2a6a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreeb2293ec46b5f5dadb91c331fe69c506e31e25bd2targetblankb2293eca" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/25df2a69d3076822b53c88404ffda33cc3e524b4" target="_blank">25df2a6</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/b2293ec46b5f5dadb91c331fe69c506e31e25bd2" target="_blank">b2293ec</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -510,6 +510,7 @@ Ignored files:
     Ignored:    code/Multiqc/
     Ignored:    code/OMIM/
     Ignored:    code/OldBigWigs/
+    Ignored:    code/PhyloP/
     Ignored:    code/QC/
     Ignored:    code/ReferenceGenomes/
     Ignored:    code/Session.vim
@@ -524,7 +525,6 @@ Ignored files:
     Ignored:    code/log
     Ignored:    code/logs/
     Ignored:    code/scratch/
-    Ignored:    code/scripts/.TidyAndSpearmanCorTitrationData.R.swp
     Ignored:    code/test.txt.gz
     Ignored:    code/testPlottingWithMyScript.ForJingxin.sh
     Ignored:    code/testPlottingWithMyScript.ForJingxin2.sh
@@ -535,12 +535,8 @@ Ignored files:
     Ignored:    data/._Hijikata_TableS2_41598_2017_8902_MOESM3_ESM.xls
     Ignored:    output/._PioritizedIntronTargets.pdf
 
-Untracked files:
-    Untracked:  analysis/20220922_ExploreSubparRNAseq.Rmd
-    Untracked:  analysis/20220923_ExploreSpecificityEstimates.Rmd
-
 Unstaged changes:
-    Modified:   code/rules/RNASeqProcessing.smk
+    Modified:   analysis/20220923_ExploreSpecificityEstimates.Rmd
 
 </code></pre>
 <p>
@@ -553,9 +549,86 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/20220923_ExploreSpecificityEstimates.Rmd</code>) and HTML (<code>docs/20220923_ExploreSpecificityEstimates.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/b2293ec46b5f5dadb91c331fe69c506e31e25bd2/analysis/20220923_ExploreSpecificityEstimates.Rmd" target="_blank">b2293ec</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+<td>
+update site
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/analysis/20220923_ExploreSpecificityEstimates.Rmd" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+<td>
+update site
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/20220923_ExploreSpecificityEstimates.html" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+<td>
+update site
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -627,7 +700,7 @@ Expression.tidy &lt;- read_tsv(&quot;../code/DoseResponseData/LCL/TidyExpression
 #gene names
 gene_list &lt;- read_tsv(&quot;../data/Genes.list.txt&quot;)
 
-GenesOfInterest &lt;- c(&quot;FOXM1&quot;, &quot;STAT1&quot;, &quot;HTT&quot;, &quot;GALC&quot;)
+GenesOfInterest &lt;- c(&quot;FOXM1&quot;, &quot;STAT1&quot;, &quot;HTT&quot;, &quot;GALC&quot;, &quot;SMN1&quot;, &quot;SMN2&quot;)
 
 # read in info about splice sites
 all.samples.5ss &lt;- read_tsv(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz&quot;, col_names = c(&quot;intron&quot;, &quot;seq&quot;, &quot;score&quot;)) %&gt;%
@@ -649,6 +722,43 @@ all.samples.intron.annotations &lt;- read_tsv(&quot;../code/SplicingAnalysis/Ful
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5))</code></pre>
 <p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-2-1.png" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>gene_list %&gt;%
   filter(hgnc_symbol %in% c(&quot;SMN2&quot;, &quot;FOXM1&quot;, &quot;STAT1&quot;, &quot;HTT&quot;, &quot;ACTB&quot;))</code></pre>
 <pre><code># A tibble: 7 × 2
@@ -675,6 +785,43 @@ all.samples.intron.annotations &lt;- read_tsv(&quot;../code/SplicingAnalysis/Ful
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5))</code></pre>
 <p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-2">
+Past versions of unnamed-chunk-2-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-2-2.png" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>diag_limitrange &lt;- function(data, mapping, ...) { 
   ggplot(data = data, mapping = mapping, ...) + 
     geom_density(...) + 
@@ -725,6 +872,43 @@ GA.GT %&gt;%
   theme_classic() +
   labs(x=&quot;dose (nanomolar)&quot;)</code></pre>
 <p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-3-1.png" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Let’s count how many significant examples from each contrast…</p>
 <pre class="r"><code>GA.GT %&gt;%
   filter_at(vars(starts_with(&quot;EC.Ratio.Test.Estimate.FDR&quot;)), any_vars((.&lt;0.05))) %&gt;%
@@ -817,6 +1001,43 @@ Nuc.freq.plot.dat %&gt;%
   theme(strip.text.y = element_text(size = 4.2)) +
   labs(title=&quot;Molecule-specific GA|GT 5&#39;splice site preferences&quot;, y=&quot;Frequency&quot;, x=&quot;Position relative to 5&#39;ss&quot;)</code></pre>
 <p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-6-1.png" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Previously though, I thought it was informative to break up introns by whether they are AGA|GT versus BGA|GT</p>
 <pre class="r"><code>Nuc.freq.plot.dat %&gt;%
   dplyr::select(Group, seq) %&gt;%
@@ -832,6 +1053,43 @@ Nuc.freq.plot.dat %&gt;%
   theme(strip.text.y = element_text(size = 4.2)) +
   labs(title=&quot;Molecule-specific GA|GT 5&#39;splice site preferences&quot;, y=&quot;Frequency&quot;, x=&quot;Position relative to 5&#39;ss&quot;)</code></pre>
 <p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-7-1.png" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code># sample size in each group for above plot
 Nuc.freq.plot.dat %&gt;%
   dplyr::select(Group, seq) %&gt;%
@@ -902,7 +1160,45 @@ Nuc.freq.plot.dat %&gt;%
   scale_color_manual(values=TreatmentColorsForLabelsKey) +
   theme_bw() +
   labs(y=&#39;ecdf&#39;, title=&quot;dose-response spearman by NN|GT 5&#39;ss&quot;, x=&quot;spearman coef&quot;)</code></pre>
-<p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /> Ok, as before, and as expected, I see a major effect for GA|GT introns, and a small but very likely significant (though I didn’t calculate or show a formal P-value here) effect for GT|GT introns, which has also been documented in the literature and is apparent in the fibroblast data. This builds confidence in using spearman coef like this.</p>
+<p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-8-1.png" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Ok, as before, and as expected, I see a major effect for GA|GT introns, and a small but very likely significant (though I didn’t calculate or show a formal P-value here) effect for GT|GT introns, which has also been documented in the literature and is apparent in the fibroblast data. This builds confidence in using spearman coef like this.</p>
 <p>Now let’s look at NNGA|GT sequences…</p>
 <pre class="r"><code>PSI.tidy %&gt;%
   distinct(junc, treatment, .keep_all=T) %&gt;%
@@ -923,9 +1219,105 @@ Nuc.freq.plot.dat %&gt;%
   facet_wrap(~facettitle) +
   scale_color_manual(values=TreatmentColorsForLabelsKey) +
   theme_bw() +
-  labs(y=&#39;ecdf&#39;, title=&quot;dose-response spearman by NNAG|GT 5&#39;ss&quot;, x=&quot;spearman coef&quot;)</code></pre>
+  labs(y=&#39;ecdf&#39;, title=&quot;dose-response spearman by NNGA|GT 5&#39;ss&quot;, x=&quot;spearman coef&quot;)</code></pre>
 <p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-9-1.png" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok as before, I see an effect for -3A that distinguished branaplam from risdiplam (but interestingly, not so much for <em>AA</em>GA|GT). Also, though the sample size is small, there may be something to the <em>GC</em>AG|GT to distinguish C2C5 from branaplam.</p>
+<p>Yang is also interseted in NNCA|GT. Let’s plot that…</p>
+<pre class="r"><code>PSI.tidy %&gt;%
+  distinct(junc, treatment, .keep_all=T) %&gt;%
+  filter(str_detect(seq, &quot;^\\w{2}GTGT&quot;)) %&gt;%
+  mutate(NN = substr(seq, 1, 2)) %&gt;%
+  add_count(NN, treatment) %&gt;%
+  mutate(facettitle = paste0(NN, &quot;; n=&quot;, n)) %&gt;%
+  ggplot(aes(x=spearman, color=treatment)) +
+  geom_vline(xintercept=0) +
+  geom_vline(
+    data = . %&gt;%
+      group_by(facettitle, treatment) %&gt;%
+      summarise(med = median(spearman, na.rm=T)),
+    aes(xintercept=med, color=treatment),
+    linetype=&#39;dashed&#39;
+  ) +
+  stat_ecdf() +
+  facet_wrap(~facettitle) +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  theme_bw() +
+  labs(y=&#39;ecdf&#39;, title=&quot;dose-response spearman by NNGT|GT 5&#39;ss&quot;, x=&quot;spearman coef&quot;)</code></pre>
+<p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-10-1.png" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Now let’s test for enhanced splicing at the other 5’ss bulges I previously tested in firboblasts…</p>
 <pre class="r"><code>PSI.tidy %&gt;%
   distinct(junc, treatment, .keep_all=T) %&gt;%
@@ -971,7 +1363,44 @@ Nuc.freq.plot.dat %&gt;%
   theme(axis.text.y=element_text(size=16,  family=&quot;mono&quot;)) +
   theme(legend.position=&quot;bottom&quot;) +
   ggtitle(&quot;Summary heatmap of median effects by 5&#39;ss pattern&quot;)</code></pre>
-<p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-11-1.png" target="_blank">272cd76</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2022-09-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok, this recapitulates what i saw in fibroblast… namely, as expected, I could see strong and significant effects for GA|GT introns, and weaker but significant for GT|GT introns. And most interestingly, although the sample size is very small, I see effects that might be significant (well, maybe not after test correction, unless I’m looking at branaplam) for guUaag. The magnitude of the effects are similar or greater than GT|GT introns, but the significance is lacking in part because there are only a small number (26) introns that match my search pattern. This may still be a significant finding since it is a bulge at a different position, and something else that small molecules could be screened for to find splice modulators with very different properties.</p>
 <p>Since the g|guUaag introns are such a small set, let’s just plot all 26 dose response curves…</p>
 <pre class="r"><code>PSI.tidy %&gt;%
@@ -984,7 +1413,7 @@ Nuc.freq.plot.dat %&gt;%
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5)) +
   labs(title=&#39;26 g|guUaag introns&#39;)</code></pre>
-<p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>set.seed(0)
 PSI.tidy %&gt;%
   sample_n_of(26, junc) %&gt;%
@@ -996,7 +1425,7 @@ PSI.tidy %&gt;%
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5)) +
   labs(title=&#39;26 random introns&#39;)</code></pre>
-<p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220923_ExploreSpecificityEstimates.Rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="conlusion" class="section level2">
 <h2>Conlusion</h2>
@@ -1033,21 +1462,21 @@ other attached packages:
 
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.5         lubridate_1.7.4    assertthat_0.2.1   rprojroot_2.0.2   
- [5] digest_0.6.20      utf8_1.1.4         R6_2.4.0           cellranger_1.1.0  
- [9] plyr_1.8.4         backports_1.4.1    reprex_0.3.0       evaluate_0.15     
+ [5] digest_0.6.20      utf8_1.1.4         plyr_1.8.4         R6_2.4.0          
+ [9] cellranger_1.1.0   backports_1.4.1    reprex_0.3.0       evaluate_0.15     
 [13] httr_1.4.4         highr_0.9          pillar_1.7.0       rlang_1.0.5       
-[17] readxl_1.3.1       rstudioapi_0.14    rmarkdown_1.13     labeling_0.3      
-[21] munsell_0.5.0      broom_1.0.0        compiler_3.6.1     httpuv_1.5.1      
-[25] modelr_0.1.8       xfun_0.31          pkgconfig_2.0.2    htmltools_0.5.3   
-[29] tidyselect_1.1.2   workflowr_1.6.2    reshape_0.8.8      fansi_0.4.0       
-[33] crayon_1.3.4       dbplyr_1.4.2       withr_2.5.0        later_0.8.0       
-[37] grid_3.6.1         jsonlite_1.6       gtable_0.3.0       lifecycle_1.0.1   
-[41] DBI_1.1.0          git2r_0.26.1       magrittr_1.5       scales_1.1.0      
-[45] cli_3.3.0          stringi_1.4.3      farver_2.1.0       fs_1.5.2          
-[49] promises_1.0.1     xml2_1.3.2         ellipsis_0.3.2     generics_0.1.3    
-[53] vctrs_0.4.1        RColorBrewer_1.1-2 tools_3.6.1        glue_1.6.2        
-[57] hms_0.5.3          fastmap_1.1.0      yaml_2.2.0         colorspace_1.4-1  
-[61] rvest_0.3.5        knitr_1.39         haven_2.3.1       </code></pre>
+[17] readxl_1.3.1       rstudioapi_0.14    whisker_0.3-2      rmarkdown_1.13    
+[21] labeling_0.3       munsell_0.5.0      broom_1.0.0        compiler_3.6.1    
+[25] httpuv_1.5.1       modelr_0.1.8       xfun_0.31          pkgconfig_2.0.2   
+[29] htmltools_0.5.3    tidyselect_1.1.2   workflowr_1.6.2    reshape_0.8.8     
+[33] fansi_0.4.0        crayon_1.3.4       dbplyr_1.4.2       withr_2.5.0       
+[37] later_0.8.0        grid_3.6.1         jsonlite_1.6       gtable_0.3.0      
+[41] lifecycle_1.0.1    DBI_1.1.0          git2r_0.26.1       magrittr_1.5      
+[45] scales_1.1.0       cli_3.3.0          stringi_1.4.3      farver_2.1.0      
+[49] fs_1.5.2           promises_1.0.1     xml2_1.3.2         ellipsis_0.3.2    
+[53] generics_0.1.3     vctrs_0.4.1        RColorBrewer_1.1-2 tools_3.6.1       
+[57] glue_1.6.2         hms_0.5.3          fastmap_1.1.0      yaml_2.2.0        
+[61] colorspace_1.4-1   rvest_0.3.5        knitr_1.39         haven_2.3.1       </code></pre>
 </div>
 </div>
 
