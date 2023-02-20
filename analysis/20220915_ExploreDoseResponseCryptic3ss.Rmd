@@ -81,6 +81,10 @@ TreatmentColorsLabels.Layer <- geom_text(
     y=Inf, x=Inf, hjust=1.05
   )
 
+TreatmentColors.namedVector <- TreatmentColorsForLabels %>%
+  filter(!treatment == "DMSO") %>%
+  dplyr::select(treatment, color) %>% deframe()
+
 # Read in list of introns detected across all experiments that pass leafcutter's default clustering processing thresholds
 all.samples.PSI <- read_tsv("../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz")
 
@@ -344,6 +348,7 @@ spearman.dat %>%
   ggplot(aes(color=treatment)) +
     geom_line(aes(x=dose.nM, y=PSI)) +
     scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+    scale_color_manual(values = TreatmentColors.namedVector) +
     facet_wrap(~gid, scales = "free_y") +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, size=4)) +
@@ -352,7 +357,29 @@ spearman.dat %>%
 
 ```
 
-Ok, so these cryptic 5'ss that aren't in a GA-GT-containing cluster, and also these cryptic 3'ss that aren't in a GA-GT-containing cluster, both look like really quality/believable dose-response relationship... So again, I am intriguied by the possibility of non GA-GT related mechanisms for splice modulation.
+
+
+Ok, so these cryptic 5'ss that aren't in a GA-GT-containing cluster, and also these cryptic 3'ss that aren't in a GA-GT-containing cluster, both look like really quality/believable dose-response relationship...  And some of theme look to have similar EC50 as some of the GA-GT introns. Like this example:
+
+```{r, fig.height=4, fig.width=4.5}
+spearman.dat %>%
+  inner_join(SimpleClustersToPlot, by="gid") %>%
+  mutate(gid = paste(gid, ClusterConfiguration, In.GAGT.cluster, sep="\n")) %>%
+  filter(!IntronType=="Annotated") %>%
+  filter(str_detect(junc, "clu_7595") | str_detect(junc, "clu_31678")) %>%
+  ggplot(aes(color=treatment)) +
+      geom_line(aes(x=dose.nM, y=PSI)) +
+      scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+      scale_color_manual(values = TreatmentColors.namedVector) +
+      facet_wrap(~gid, scales = "free_y", nrow = 2) +
+      theme_bw() +
+      theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=7)) +
+    labs(title="An example upregulated cryptic 3'ss\nand cryptic 5'ss introns", caption="FacetTitle:\nclusterID\nClusterConfiguration\nDoes.Cluster.Contain.GA|GT.Intron") +
+    theme(strip.text.x = element_text(size = 10))
+```
+
+
+So again, I am intriguied by the possibility of non GA-GT related mechanisms for splice modulation.
 
 ## Find some candidate introns for potentially minigene cloning
 

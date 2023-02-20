@@ -77,7 +77,7 @@ Expression.tidy <- read_tsv("../code/DoseResponseData/LCL/TidyExpressionDoseData
 #gene names
 gene_list <- read_tsv("../data/Genes.list.txt")
 
-GenesOfInterest <- c("FOXM1", "STAT1", "HTT", "GALC", "SMN1", "SMN2")
+GenesOfInterest <- c("FOXM1", "STAT1", "HTT", "GALC", "RNF170")
 
 # read in info about splice sites
 all.samples.5ss <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz", col_names = c("intron", "seq", "score")) %>%
@@ -94,7 +94,7 @@ let's plot some dose response curves for genes/introns of interest
 
 GA.GT %>%
   filter(gene_names %in% GenesOfInterest) %>%
-  filter(!is.na(UpstreamSpliceAcceptor)) %>%
+  filter((!is.na(UpstreamSpliceAcceptor)) | str_detect(junc,"chr8:42874006:42887802")) %>%
   dplyr::select(junc, gene_names) %>%
   inner_join(PSI.tidy) %>%
   ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
@@ -103,11 +103,13 @@ GA.GT %>%
   scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), labels=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
   facet_wrap(~gene_names, scales = "free_y") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=7)) +
+  labs(y="Splicing of GA|GT intron (PSI)", x="dose (nanomolar)")
+
 
 
 gene_list %>%
-  filter(hgnc_symbol %in% c("SMN2", "FOXM1", "STAT1", "HTT", "ACTB"))
+  filter(hgnc_symbol %in% c("RNF170", "FOXM1", "STAT1", "HTT"))
 
 
 gene_list %>%
@@ -122,7 +124,8 @@ gene_list %>%
   scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), labels=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
   facet_wrap(~hgnc_symbol, scales = "free_y") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=7)) +
+  labs(y="Gene expression (CountsPerMillion)", x="dose (nanomolar)")
 ```
 
 

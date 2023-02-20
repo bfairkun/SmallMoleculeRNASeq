@@ -67,7 +67,7 @@ counts.plot.dat <- counts %>%
 counts.plot.labels <- counts.plot.dat %>%
   dplyr::select(SampleName, label) %>% deframe()
 
-ggplot(counts.plot.dat, aes(x=SampleName, y=ChromosomalReads/2E6, fill=color)) +
+ReadsPerDataset <- ggplot(counts.plot.dat, aes(x=SampleName, y=ChromosomalReads/2E6, fill=color)) +
   geom_col() +
   scale_fill_identity() +
   scale_x_discrete(name="Sample; treatment_nanomolar-dose", label=counts.plot.labels) +
@@ -76,8 +76,13 @@ ggplot(counts.plot.dat, aes(x=SampleName, y=ChromosomalReads/2E6, fill=color)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=5)) +
   theme(strip.text.x = element_text(size = 8)) +
   labs(title="RNA-seq datasets", y="Read count (M)")
-
+ReadsPerDataset
 ```
+
+```{r, eval=F}
+ggsave("../code/figs/Original/ReadsPerSample.pdf", ReadsPerDataset, height=3, width=7)
+```
+
 
 Now let's read in the table of a few hundred GA-GT splice sites that I previously shared with Jingxin, along with some other splice count tables... I want to see how rare these GA-GT splice sites are in our data, to get a sense how many reads we need to detect them.
 

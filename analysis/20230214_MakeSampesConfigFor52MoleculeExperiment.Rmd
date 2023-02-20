@@ -1,0 +1,55 @@
+---
+title: "MakeSamplesConfigFor52MoleculeExp"
+output: html_document
+date: "2023-02-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+```{r}
+library(tidyverse)
+
+samples_excel <- readxl::read_excel("../data/52CompoundsTempPlateLayoutForPipettingConvenience.xlsx", sheet=2) %>%
+  gather(key="NewLayoutCol", value="WellPositionFromJingxin",-NewLayout) %>%
+  mutate(NewLayoutWellPosition = paste0(NewLayout, NewLayoutCol)) %>%
+  dplyr::select(WellPositionFromJingxin, NewLayoutWellPosition)
+
+files <- data.frame( fn = Sys.glob("/cds/yangili1/bjf79/Fastq/20230216_52SmallMoleculesRNAseq_NovaSeq/YLi*.fastq.gz")) %>%
+    mutate(fn_info = str_replace(fn, "^.+?([1-2])-([A-H][1-7])_S.+?_(R[1-2])_001.fastq.gz$", "\\1_\\2_\\3")) %>%
+    separate(fn_info, into=c("BioRep", "NewLayoutWellPosition", "Read"), convert=T, sep='_') %>%
+    pivot_wider(names_from = "Read", values_from="fn")
+
+PaddedWellNames <- expand.grid(c("A", "B", "C", "D", "E", "F", "G", "H"),1:12) %>%
+    mutate(V2.padded = str_pad(Var2, width=2, side="left", pad="0")) %>%
+    mutate(UnpaddedWell = paste0(Var1, Var2)) %>%
+    mutate(PaddedWell = paste0(Var1, V2.padded)) %>%
+    dplyr::select(UnpaddedWell, PaddedWell) %>%
+    deframe()
+
+bind_rows(
+  samples_excel %>%
+    mutate(BioRep = 1),
+  samples_excel %>%
+    mutate(BioRep = 2)
+) %>%
+  drop_na() %>%
+  mutate(Plate = BioRep) %>%
+  inner_join(files) %>%
+  # pull(WellPositionFromJingxin) %>% unique()
+  mutate(WellPositionFromJingxin = recode(WellPositionFromJingxin, !!!PaddedWellNames)) %>%
+  mutate(NewLayoutWellPosition = recode(NewLayoutWellPosition, !!!PaddedWellNames)) %>%
+  mutate(Treatment = if_else(WellPositionFromJingxin %in% c("E05", "E06", "E07"), "DMSO", WellPositionFromJingxin)) %>%
+  arrange(Plate, WellPositionFromJingxin) %>%
+  group_by(Treatment) %>%
+  mutate(BioRep = row_number()) %>%
+  ungroup() %>% 
+  mutate(SampleID = paste0("NewMolecule.", WellPositionFromJingxin, "-", BioRep)) %>%
+  dplyr::select(SampleID, WellPositionFromJingxin, NewLayoutWellPosition, BioRep, Plate, Treatment, R1, R2) %>%
+  write_tsv("../code/config/samples.52MoleculeExperiment.tsv")
+
+
+
+```
+

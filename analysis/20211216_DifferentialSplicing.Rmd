@@ -110,11 +110,16 @@ hist(mean.cpm)
 
 ExpressedGeneCounts <- GeneCounts[mean.cpm>1,]
 
+Colors <- sample.list %>%
+  dplyr::select(old.sample.name, color) %>%
+  right_join(data.frame(old.sample.name = as.character(colnames(ExpressedGeneCounts)))) %>%
+  deframe()
+
 #Speaman correlation matrix heatmap for CountsPerMillion expression
 ExpressedGeneCounts %>%
   cpm(log=T) %>%
   cor(method="pearson") %>%
-  heatmap.2(trace="none")
+  heatmap.2(trace="none", RowSideColors = Colors, ColSideColors = Colors)
 ```
 
 Samples sequenced to similar depths, plenty of reads per sample. High correlation as expected for RNA-seq (Pearson R > 0.9) Samples cluster as expected, based on correlation of gene expression (CountsPerMillion). That is, each treatment clusters with its other replicates, and CUOME clusters closest to DMSO.
@@ -1865,7 +1870,7 @@ It appears none of the junctions in SNCA or MAPT genes passed filters for testin
 
 Let's read in the leafcutter count table and search for these genes:
 
-```{r}
+```{r, eval=F}
 
 PSI.table %>%
   mutate(Intron=str_replace(intron, "(.+?):(.+?):(.+?):.+", "\\1_\\2_\\3")) %>%
@@ -2602,5 +2607,75 @@ Run script as follows
 conda activate GenometracksByGenotype
 cd ../code
 bash testPlottingWithMyScript.ForJingxin.sh
+```
+
+
+```{r, eval=F}
+dir.create("../code/scratch/20220927_PlotExamples")
+
+# RNF170 junc: "chr8:42874006:42887728"
+# HTT 5'ss: chr4:3,213,737
+
+leafcutter.ds.annotated %>%
+      filter((!is.na(gene_names)) & str_detect(gene_ids, ",", negate=T)) %>%
+      mutate(gene_ids=str_replace(gene_ids, "\\..+$", "")) %>%
+        full_join(
+          (DE.results %>%
+             mutate(gene_ids=str_replace(EnsemblID, "\\..+$", ""))), 
+        by=c("treatment","gene_ids")) %>%
+  filter(str_detect(intron, "clu_11248_-") | str_detect(intron, "clu_6379_+")) %>% 
+  filter(UpstreamOfDonor2BaseSeq == "GA" | IntronType=="Annotated" | IntronType == "Alt 3'ss" ) %>%
+  distinct(intron, .keep_all=T) %>%
+  separate(intron, into=c("chrom", "start", "end", "clu"), convert=T, sep=":") %>%
+  dplyr::select(chrom, start, end) %>%
+  arrange(chrom, start, end) %>%
+  write_tsv("../code/scratch/20220927_PlotExamples/.Juncs.bed", col_names=T)
+
+
+leafcutter.ds.annotated %>%
+      filter((!is.na(gene_names)) & str_detect(gene_ids, ",", negate=T)) %>%
+      mutate(gene_ids=str_replace(gene_ids, "\\..+$", "")) %>%
+        full_join(
+          (DE.results %>%
+             mutate(gene_ids=str_replace(EnsemblID, "\\..+$", ""))), 
+        by=c("treatment","gene_ids")) %>%
+  filter(str_detect(intron, "clu_11248_-") | str_detect(intron, "clu_6379_+")) %>% 
+  distinct(gene_ids, treatment, .keep_all=T)
+
+#Write splice donors and vertical line track
+fileConn<-file("../code/scratch/20220927_PlotExamples/.SpliceDonors.bed")
+writeLines(c("chr8\t42887728\t42887729", "chr4\t3213737\t3213738"), con=fileConn)
+close(fileConn)
+
+fileConn<-file("../code/scratch/20220927_PlotExamples/.SpliceDonors.ini")
+writeLines(c("[vlines]","type = vlines", "file = scratch/20220927_PlotExamples/.SpliceDonors.bed"), con=fileConn)
+close(fileConn)
+
+
+read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names=c("GroupName", "Color", "PSI", "Supergroup")) %>%
+  filter(str_detect(GroupName, "_u$")) %>%
+  filter(str_detect(GroupName, "Fibroblast")) %>%
+  mutate(Supergroup = "FibroblastExp") %>%
+  write_tsv("../code/scratch/20220927_PlotExamples/.groups.tsv")
+
+```
+
+```{bash, eval=F}
+cd /project2/yangili1/bjf79/20211209_JingxinRNAseq/code
+
+# python helper plotting script RNF170
+python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile scratch/20220927_PlotExamples/.groups.tsv --BigwigList bigwigs/BigwigList.tsv --Normalization WholeGenome --Region chr8:42847637-42898605 --BigwigListType KeyFile --FilterJuncsByBed scratch/20220927_PlotExamples/.Juncs.bed --OutputPrefix scratch/20220927_PlotExamples/. -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz
+
+# pygenomtracks plotting
+pyGenomeTracks --tracks <(cat scratch/20220927_PlotExamples/.tracks.ini scratch/20220927_PlotExamples/.SpliceDonors.ini) --out scratch/20220927_PlotExamples/RNF170.pdf --region chr8:42847637-42898605 --trackLabelFraction 0.15 --title RNF170
+
+# python helper plotting script HTT
+python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile scratch/20220927_PlotExamples/.groups.tsv --BigwigList bigwigs/BigwigList.tsv --Normalization WholeGenome --Region chr4:3,211,313-3,216,142 --BigwigListType KeyFile --FilterJuncsByBed scratch/20220927_PlotExamples/.Juncs.bed --OutputPrefix scratch/20220927_PlotExamples/. -vv --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz
+
+# pygenomtracks plotting
+pyGenomeTracks --tracks <(cat scratch/20220927_PlotExamples/.tracks.ini scratch/20220927_PlotExamples/.SpliceDonors.ini) --out scratch/20220927_PlotExamples/HTT.pdf --region chr4:3,211,313-3,216,142 --trackLabelFraction 0.15 --title HTT
+
+
+
 ```
 

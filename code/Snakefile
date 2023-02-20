@@ -13,6 +13,7 @@ include: "rules/pangolin.smk"
 include: "rules/RNASeqProcessing.smk"
 include: "rules/ProcessTitrationSeries.smk"
 include: "rules/Process_chRNA.smk"
+include: "rules/Process_ExpOf52.smk"
 
 
 
@@ -26,7 +27,8 @@ localrules:
     SplitClinVarVcfByChrom,
     DE_testing,
     GatherEditings,
-    CopyAndMergeFastq_chRNA
+    CopyAndMergeFastq_chRNA,
+    CopyAndMergeFastq_ExpOf52
 
 # Instead of using samples.tsv file, a quick/dirty way to apply rules over grob of existing files is this:
 # IDS, = glob_wildcards("Path/To/{MyFileNames}.bed.gz")

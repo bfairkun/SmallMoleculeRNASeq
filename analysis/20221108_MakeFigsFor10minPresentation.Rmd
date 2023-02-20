@@ -1,0 +1,601 @@
+---
+title: "20221104_MakeFigsFor10minPresentation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Intro
+
+I'll be presenting a 10 min summary presentation on behalf on Li lab to DoM Executive Committee and Chair. Here I'll make any specific figures I need to make for that presentation. I think I have to convey the following rough outline of ideas:
+
+(i) Small molecules as promising drug modality, (ii) we generated data that allowed us to better understand mechanism of action, (iii) this allows us to design reporters to screen for SM with different targets
+
+```{r}
+library(tidyverse)
+library(gplots)
+library(RColorBrewer)
+
+theme_set(theme_classic())
+
+```
+
+```{r}
+counts <- read_tsv("../output/QC/ReadCountsAndJunctionsPerSamples.tsv", col_names = c("fn", "ChromosomalReads"))
+
+sample.list <- read_tsv("../code/bigwigs/BigwigList.tsv",
+                        col_names = c("SampleName", "bigwig", "group", "strand")) %>%
+  filter(strand==".") %>%
+  dplyr::select(-strand) %>%
+  mutate(old.sample.name = str_replace(bigwig, "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw", "\\1")) %>%
+  separate(SampleName, into=c("treatment", "dose.nM", "cell.type", "libType", "rep"), convert=T, remove=F, sep="_") %>%
+  left_join(
+    read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names = c("group", "color", "bed", "supergroup")),
+    by="group"
+  )
+
+
+TreatmentColorsForLabels <- sample.list %>%
+  group_by(treatment) %>%
+  filter(dose.nM == max(dose.nM) | treatment == "DMSO") %>%
+  ungroup() %>%
+  distinct(treatment, .keep_all=T) %>%
+  arrange(dose.nM) %>%
+  mutate(vjust=row_number()*1.2)
+
+TreatmentColorsForLabelsKey <- TreatmentColorsForLabels %>%
+  filter(!treatment=="DMSO") %>%
+  dplyr::select(treatment, color) %>% deframe()
+
+TreatmentColorsLabels.Layer <- geom_text(
+    data = TreatmentColorsForLabels, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=Inf, hjust=1.05
+  )
+
+
+
+```
+
+# Reads per dataset
+
+```{r}
+counts.plot.dat <- counts %>%
+  mutate(old.sample.name = str_replace(fn, "Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam", "\\1")) %>%
+  inner_join(sample.list) %>%
+  arrange(cell.type, libType, desc(treatment=="DMSO"), treatment, dose.nM, rep) %>%
+  mutate(SampleName = factor(SampleName, levels=SampleName)) %>%
+  mutate(Experiment = case_when(
+    libType == "chRNA" ~ "nascent RNA profiling",
+    cell.type == "LCL" & libType == "polyA" ~ "Dose response titration",
+    cell.type == "Fibroblast" ~ "Single high dose"
+  )) %>%
+  mutate(dose.nM = case_when(
+    treatment == "DMSO" ~ "NA",
+    cell.type == "Fibroblast" ~ "CC50 dose",
+    TRUE ~ as.character(dose.nM)
+  )) %>%
+  mutate(label = dose.nM) %>%
+  filter(Experiment == "Dose response titration")
+
+counts.plot.labels <- counts.plot.dat %>%
+  dplyr::select(SampleName, label) %>% deframe()
+
+ReadsPerDataset <- ggplot(counts.plot.dat, aes(x=SampleName, y=ChromosomalReads/2E6, fill=color)) +
+  geom_col() +
+  scale_fill_identity() +
+  scale_x_discrete(name="dose (nanomolar)", label=counts.plot.labels) +
+  scale_y_continuous(expand=c(0,0), limits=c(0, 125)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12)) +
+  theme(strip.text.x = element_text(size = 8)) +
+  labs(title="RNA-seq datasets", y="Read count (M)")
+ReadsPerDataset
+
+dir.create("../code/scratch/PlotForPresentation")
+ggsave("../code/scratch/PlotForPresentation/ReadsPerDataset.pdf", ReadsPerDataset, width=6, height=3.5)
+```
+
+## ED50 scatter, with FDR<0.05 highlighted
+
+```{r}
+
+TreatmentColorsForLabels
+
+P1 <- GA.GT.Introns %>%
+  mutate(Color = case_when(
+    EC.Ratio.Test.Estimate.FDR_Branaplam.Risdiplam > 0.05 ~ "#969696",
+    ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam > 1 ~ "#084594",
+    ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam < 1 ~ "#005A32"
+  )) %>%
+  ggplot(aes(x=ED50_Branaplam, y=ED50_Risdiplam, color=Color)) +
+  geom_point() +
+  scale_x_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_y_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_color_identity() +
+  labs(x= "Branaplam\nED50 (nanomolar)", y= "Risdiplam\nED50 (nanomolar)")
+
+P2 <- GA.GT.Introns %>%
+  mutate(Color = case_when(
+    EC.Ratio.Test.Estimate.FDR_Branaplam.C2C5 > 0.05 ~ "#969696",
+    ECRatio.ComparedToGenomewideMedian_Branaplam.C2C5 > 1 ~ "#4A1486",
+    ECRatio.ComparedToGenomewideMedian_Branaplam.C2C5 < 1 ~ "#005A32"
+  )) %>%
+  ggplot(aes(x=ED50_Branaplam, y=ED50_C2C5, color=Color)) +
+  geom_point() +
+  scale_x_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_y_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_color_identity() +
+  labs(x= "Branaplam\nED50 (nanomolar)", y= "C2C5\nED50 (nanomolar)")
+
+P3 <- GA.GT.Introns %>%
+  mutate(Color = case_when(
+    EC.Ratio.Test.Estimate.FDR_C2C5.Risdiplam > 0.05 ~ "#969696",
+    ECRatio.ComparedToGenomewideMedian_C2C5.Risdiplam > 1 ~ "#084594",
+    ECRatio.ComparedToGenomewideMedian_C2C5.Risdiplam < 1 ~ "#4A1486"
+  )) %>%
+  ggplot(aes(x=ED50_C2C5, y=ED50_Risdiplam, color=Color)) +
+  geom_point() +
+  scale_x_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_y_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_color_identity() +
+  labs(x= "Branaplam\nED50 (nanomolar)", y= "Risdiplam\nED50 (nanomolar)")
+
+  
+P1
+P2
+P3
+
+```
+
+```{r, eval=F}
+ggsave("../code/scratch/PlotForPresentation/P1.pdf", P1, width=3, height=3)
+ggsave("../code/scratch/PlotForPresentation/P2.pdf", P2, width=3, height=3)
+ggsave("../code/scratch/PlotForPresentation/P3.pdf", P3, width=3, height=3)
+
+```
+
+
+## Plot dose response gene expression
+
+```{r}
+# Read in gene expression tidy for dose-response plotting
+Expression.tidy <- read_tsv("../code/DoseResponseData/LCL/TidyExpressionDoseData.txt.gz")
+
+#gene names
+gene_list <- read_tsv("../data/Genes.list.txt")
+
+GenesOfInterest <- c("FOXM1", "STAT1", "HTT", "TRIM14","TPGS2","TNRC6B")
+
+
+gene_list %>%
+  inner_join(
+    Expression.tidy %>%
+      mutate(ensembl_gene_id = str_replace(Geneid, "^(.+?)\\..+?$", "\\1"))
+    ) %>%
+  filter(hgnc_symbol %in% GenesOfInterest) %>%
+  ggplot(aes(x=dose.nM, y=CPM, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), labels=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~hgnc_symbol, scales = "free_y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=7)) +
+  labs(y="Gene expression (CountsPerMillion)", x="dose (nanomolar)")
+
+GeneDoseResponses <- gene_list %>%
+  filter(hgnc_symbol %in% GenesOfInterest) %>%
+  inner_join(
+    Expression.tidy %>%
+      mutate(ensembl_gene_id = str_replace(Geneid, "^(.+?)\\..+?$", "\\1"))
+    ) %>%
+  group_by(hgnc_symbol, treatment) %>%
+  mutate(Concentration = (dense_rank(dose.nM) - 6)/2) %>%
+  mutate(Concentration2 = 10**Concentration) %>%
+  ungroup() %>%
+  filter(hgnc_symbol %in% GenesOfInterest) %>%
+  mutate(hgnc_symbol=factor(hgnc_symbol, levels=c("STAT1", "FOXM1", "HTT", "TRIM14","TPGS2","TNRC6B"))) %>%
+  ggplot(aes(x=Concentration2, y=CPM, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans='log10', breaks=c(0.01, 0.1, 1, 10), labels=c("0.01", "0.1", "1", "10")) +
+  # scale_y_continuous(trans='log10') +
+  facet_wrap(~hgnc_symbol, scales = "free_y", nrow=1) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  labs(y="Gene expression\n(CountsPerMillion)", x="Dose (Relative to STAT1 ED50 concentration)")
+GeneDoseResponses
+```
+
+```{r, eval=F}
+ggsave("../code/scratch/PlotForPresentation/GeneDoseResponses.pdf", GeneDoseResponses, height=2.5, width=11)
+```
+
+
+## Risdiplam vs C2C5 example
+
+Find an example that distinguishes risdiplam from C2C5
+
+```{r}
+Risdi.vs.C2C5.Specific.Examples <- GA.GT.Introns %>%
+  filter(EC.Ratio.Test.Estimate.FDR_C2C5.Risdiplam < 0.1) %>%
+  arrange(EC.Ratio.Test.Estimate.FDR_C2C5.Risdiplam) %>%
+  filter(!is.na(gene_names)) %>%
+  head(40) %>%
+  dplyr::select(junc, hgnc_symbol=gene_names, Ratio=ECRatio.ComparedToGenomewideMedian_C2C5.Risdiplam, FDR=EC.Ratio.Test.Estimate.FDR_C2C5.Risdiplam)
+
+```
+
+
+```{r}
+
+gene_list %>%
+  inner_join(
+    Expression.tidy %>%
+      mutate(ensembl_gene_id = str_replace(Geneid, "^(.+?)\\..+?$", "\\1"))
+    ) %>%
+  inner_join(
+    Risdi.vs.C2C5.Specific.Examples
+  ) %>%
+  group_by(hgnc_symbol, treatment) %>%
+  mutate(Concentration = dense_rank(dose.nM)) %>%
+  ungroup() %>%
+  ggplot(aes(x=Concentration, y=CPM, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_y_continuous(trans='log10') +
+  facet_wrap(~hgnc_symbol, scales = "free_y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=7)) +
+  labs(y="Gene expression (CountsPerMillion)", x="dose (nanomolar)")
+
+#IDH1 and CRYL1
+
+```
+
+## Find another risdiplam-specific example
+```{r}
+Branaplam.vs.risdi.Specific.Examples <- GA.GT.Introns %>%
+  filter(EC.Ratio.Test.Estimate.FDR_Branaplam.Risdiplam < 0.1) %>%
+  filter(ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam < 1) %>%
+  arrange(EC.Ratio.Test.Estimate.FDR_Branaplam.Risdiplam) %>%
+  filter(!is.na(gene_names)) %>%
+  head(40) %>%
+  dplyr::select(junc, hgnc_symbol=gene_names, Ratio=ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam, FDR=EC.Ratio.Test.Estimate.FDR_Branaplam.Risdiplam)
+
+gene_list %>%
+  inner_join(
+    Expression.tidy %>%
+      mutate(ensembl_gene_id = str_replace(Geneid, "^(.+?)\\..+?$", "\\1"))
+    ) %>%
+  inner_join(
+    Branaplam.vs.risdi.Specific.Examples
+  ) %>%
+  group_by(hgnc_symbol, treatment) %>%
+  mutate(Concentration = dense_rank(dose.nM)) %>%
+  ungroup() %>%
+  ggplot(aes(x=Concentration, y=CPM, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_y_continuous(trans='log10') +
+  facet_wrap(~hgnc_symbol, scales = "free_y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=7)) +
+  labs(y="Gene expression (CountsPerMillion)", x="dose (nanomolar)")
+
+#risdi specific: TPGS2
+# branaplam specific: TRIM14, ERBIN
+```
+
+
+## Splicing dose response curves
+```{r}
+splicing.tidy <- read_tsv("../code/DoseResponseData/LCL/TidySplicingDoseData.txt.gz")
+
+SplicingDoseResponseTNRC6B <- splicing.tidy %>%
+  inner_join(
+    GA.GT.Introns %>%
+    filter(str_detect(gene_names, "TNRC6B")) %>%
+    dplyr::select(junc)
+  ) %>%
+  group_by(junc, treatment) %>%
+  mutate(Concentration = (dense_rank(dose.nM) - 6)/2) %>%
+  mutate(Concentration2 = 10**Concentration) %>%
+  ungroup() %>%
+  mutate(junc = "Cryptic exon with bulged A 5'ss") %>%
+  ggplot(aes(x=Concentration2, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans='log10', breaks=c(0.01, 0.1, 1, 10), labels=c("0.01", "0.1", "1", "10")) +
+  facet_wrap(~junc, scales = "free_y", nrow=1) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  labs(y="Splicing level\n(Percent spliced in)", x="") +
+  theme(strip.text.x = element_text(size = 8))
+SplicingDoseResponseTNRC6B
+
+
+GeneDoseResponsesTNRC6B <- gene_list %>%
+  filter(hgnc_symbol == "TNRC6B") %>%
+  inner_join(
+    Expression.tidy %>%
+      mutate(ensembl_gene_id = str_replace(Geneid, "^(.+?)\\..+?$", "\\1"))
+    ) %>%
+  group_by(hgnc_symbol, treatment) %>%
+  mutate(Concentration = (dense_rank(dose.nM) - 6)/2) %>%
+  mutate(Concentration2 = 10**Concentration) %>%
+  ungroup() %>%
+  filter(hgnc_symbol == "TNRC6B") %>%
+  ggplot(aes(x=Concentration2, y=CPM, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans='log10', breaks=c(0.01, 0.1, 1, 10), labels=c("0.01", "0.1", "1", "10")) +
+  # scale_y_continuous(trans='log10') +
+  facet_wrap(~hgnc_symbol, scales = "free_y", nrow=1) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  theme(legend.position="none") +
+  labs(y="Gene expression\n(CountsPerMillion)", x="")
+GeneDoseResponsesTNRC6B
+
+```
+
+```{r, eval=F}
+ggsave("../code/scratch/PlotForPresentation/TNRC6B_Splicing.pdf", SplicingDoseResponseTNRC6B, height=2.5, width=3.5)
+ggsave("../code/scratch/PlotForPresentation/TNRC6B_Expression.pdf", GeneDoseResponsesTNRC6B, height=2.5, width=2.5)
+
+```
+
+
+## PCA
+
+
+```{r}
+GA.GT.Introns <- read_tsv("../output/EC50Estimtes.FromPSI.txt.gz")
+
+all.samples.PSI <- read_tsv("../code/SplicingAnalysis/leafcutter_all_samples/PSI.table.bed.gz")
+all.samples.junccounts <- read_tsv("../code/SplicingAnalysis/leafcutter_all_samples/JuncCounts.table.bed.gz")
+all.samples.5ss <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz", col_names = c("intron", "seq", "score")) %>%
+  mutate(intron = str_replace(intron, "^(.+?)::.+$", "\\1")) %>%
+  separate(intron, into=c("chrom", "start", "stop", "strand"), sep="_", convert=T, remove=F)
+
+all.samples.intron.annotations <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz")
+
+All.GA.GT <- all.samples.5ss %>%
+  filter(str_detect(seq, "^\\w{2}GAGT")) %>%
+  inner_join(all.samples.intron.annotations %>%
+               rename(stop=end) %>%
+               dplyr::select(-score)) %>%
+  left_join(
+    GA.GT.Introns %>%
+      dplyr::select(chrom=`#Chrom`, start, stop=end, strand=strand.y, LowerLimit, UpperLimit, UpstreamSpliceAcceptor, spearman.coef.Branaplam, spearman.coef.C2C5,spearman.coef.Risdiplam)
+  ) %>%
+  mutate(GAGT.set = case_when(
+    !is.na(LowerLimit) ~ "Juncs modelled in LCL",
+    !is.na(spearman.coef.Branaplam) ~ "Juncs counted in LCL",
+    TRUE ~ "Other juncs observed across datasets"
+  )) %>%
+  inner_join(
+    all.samples.junccounts %>%
+      dplyr::select(junc, contains("LCL")) %>%
+      dplyr::select(junc, contains("polyA")) %>%
+      mutate(intron = str_replace(junc, "^(chr.+?):(.+?):(.+?):clu.+?([+-])$", "\\1_\\2_\\3_\\4"))
+  )
+
+pca.results <- all.samples.PSI %>%
+  inner_join(
+    dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)
+    ) %>%
+  drop_na() %>%
+  dplyr::select(1:6, contains("LCL")) %>%
+  dplyr::select(1:6, contains("polyA")) %>%
+  dplyr::select(junc, contains("LCL")) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+summary(pca.results)
+
+# Then plot original samples
+pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleName") %>%
+  dplyr::select(SampleName, PC1, PC2, PC3) %>%
+  left_join(sample.list, by="SampleName") %>%
+  ggplot(aes(x=PC1, y=PC2, color=color)) +
+  geom_text(
+    data = TreatmentColorsForLabels, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=-Inf, hjust=-0.1
+  ) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  scale_x_reverse() +
+  theme_bw() +
+  labs(title = "Visualize transcriptome after\ndimensionality reduction", x="PC1\n52% variance explained", y="PC2\n15% variance explained")
+
+```
+
+```{r, eval=F}
+ggsave("../code/scratch/PlotForPresentation/PCA.pdf", width=4, height=3)
+```
+
+## PCA with more molecules addded
+```{r}
+FirboblastDat <- all.samples.PSI %>%
+  inner_join(
+    dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)
+    ) %>%
+  drop_na() %>%
+  dplyr::select(junc, contains("Fibroblast")) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t()
+
+Fibroblastdat.projected <- predict(pca.results, FirboblastDat)
+
+TreatmentColorsForLabels.FibroblastColorsAdded <-
+sample.list %>%
+  group_by(treatment) %>%
+  filter(dose.nM == max(dose.nM) | treatment == "DMSO" | cell.type=="Fibroblast") %>%
+  ungroup() %>%
+  distinct(treatment, .keep_all=T) %>%
+  arrange(dose.nM) %>%
+  mutate(vjust=row_number()*1.2)
+
+TreatmentColorsLabels.Layer.FibroblastColorsAdded <- geom_text(
+    data = TreatmentColorsForLabels.FibroblastColorsAdded, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=-Inf, hjust=-.05
+  )
+
+PCA.FibroblastsAdded <- bind_rows(
+    Fibroblastdat.projected %>% as.data.frame(),
+    pca.results$x %>% as.data.frame()
+  ) %>%
+  rownames_to_column("SampleName") %>%
+  dplyr::select(SampleName, PC1:PC6) %>%
+  left_join(sample.list, by="SampleName") %>%
+  ggplot(aes(x=PC1, y=PC2, color=color, shape=cell.type)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  scale_x_reverse() +
+  scale_shape_manual(values=c("Fibroblast"=17, "LCL"=19)) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  theme_bw() +
+  theme(legend.position='none') +
+  labs(title = "Testing more chemical deriviatives\n at a single high dose in replicate", x="PC1", y="PC2")
+PCA.FibroblastsAdded
+
+bind_rows(
+    Fibroblastdat.projected %>% as.data.frame(),
+    pca.results$x %>% as.data.frame()
+  ) %>%
+  rownames_to_column("SampleName") %>%
+  dplyr::select(SampleName, PC1:PC6) %>%
+  left_join(sample.list, by="SampleName") %>%
+  ggplot(aes(x=PC2, y=PC5, color=color, shape=cell.type)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  theme_bw() +
+  labs(title = "PCA using all GA|GT introns")
+```
+
+```{r, eval=F}
+ggsave("../code/scratch/PlotForPresentation/PCA_FibroblastsAdded.pdf",PCA.FibroblastsAdded, width=4, height=3)
+
+```
+
+
+## Bulge effects
+
+```{r}
+Heatmap.bulges <- splicing.tidy %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  select(intron=junc, treatment, spearman, DonorSeq=seq) %>%
+  mutate(
+    `1_ncag|guaagn` = str_detect(DonorSeq, "^\\wCAGGTAAG\\w"),
+    `2_nagA|guaagn` = str_detect(DonorSeq, "^\\wAGAGTAAG\\w"),
+    `3_nagG|guaagn` = str_detect(DonorSeq, "^\\wAGGGTAAG\\w"),
+    `4_nagU|guaagn` = str_detect(DonorSeq, "^\\wAGTGTAAG\\w"),
+    # `5.1_uagA|guaagn` = str_detect(DonorSeq, "^TAGAGTAAG\\w"),
+    # `5.2_aagA|guaagn` = str_detect(DonorSeq, "^AAGAGTAAG\\w"),
+    `5.3_cagA|guaagn` = str_detect(DonorSeq, "^CAGAGTAAG\\w"),
+    `5.4_augA|guaagn` = str_detect(DonorSeq, "^ATGAGTAAG\\w"),
+    `6_nnng|guUaag` = str_detect(DonorSeq, "^\\w\\w\\wGGTTAAG"),
+    `7_nnng|guAaag` = str_detect(DonorSeq, "^\\w\\w\\wGGTAAAG")
+  ) %>%
+  filter_at(vars(-c("intron", "treatment", "spearman", "DonorSeq")), any_vars(. == T)) %>%
+  gather(key="Pattern", value="IsMatch", -c("intron", "treatment", "spearman", "DonorSeq")) %>%
+  filter(IsMatch) %>%
+  group_by(Pattern, treatment) %>%
+  summarise(median = median(spearman, na.rm = T),
+            p = wilcox.test(spearman, alternative="greater")$p.value,
+            n = sum(IsMatch)) %>%
+  ungroup() %>%
+  separate(Pattern, into = c("PlotOrder", "Pattern"), sep = "_", convert=T) %>%
+  arrange(PlotOrder) %>%
+  ggplot(aes(x=reorder(Pattern, desc(PlotOrder)), y=treatment, fill=median)) +
+  # geom_point(aes(size=-log10(p), color=median)) +
+  geom_tile() +
+  geom_text(aes(label=paste0("p=",format.pval(p, digits=2), "   n=", n) ), size=3) +
+  # scale_fill_viridis_c(option = "E", limits = c(-1, 1)) +
+  # scale_fill_viridis_c(option = "E", limits = c(-1, 1)) +
+  # scale_fill_distiller(palette = "Spectral", limits = c(-1, 1)) +
+  scale_fill_gradient2(name=str_wrap("Median dose-response effect", 10)) +
+  scale_x_discrete(expand = c(0, 0), limits=rev) +
+  scale_y_discrete(expand = c(0, 0)) +
+  xlab("5'Splice Site Pattern,\npredicted bulges and mismatches capitalized") +
+  theme_classic() +
+  theme(axis.text.x = element_text(size = 5)) +
+  # theme(axis.text.y=element_text(size=16,  family="mono")) +
+  theme(legend.position="left")
+Heatmap.bulges
+
+splicing.tidy %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  select(intron=junc, treatment, spearman, DonorSeq=seq) %>%
+  mutate(
+    `1_ncag|guaagn` = str_detect(DonorSeq, "^\\wCAGGTAAG\\w"),
+    `2_nagA|guaagn` = str_detect(DonorSeq, "^\\wAGAGTAAG\\w"),
+    `3_nagG|guaagn` = str_detect(DonorSeq, "^\\wAGGGTAAG\\w"),
+    `4_nagU|guaagn` = str_detect(DonorSeq, "^\\wAGTGTAAG\\w"),
+    `5.1_uagA|guaagn` = str_detect(DonorSeq, "^TAGAGTAAG\\w"),
+    `5.2_aagA|guaagn` = str_detect(DonorSeq, "^AAGAGTAAG\\w"),
+    `6_nnng|guUaag` = str_detect(DonorSeq, "^\\w\\w\\wGGTTAAG"),
+    `7_nnng|guAaag` = str_detect(DonorSeq, "^\\w\\w\\wGGTAAAG")
+  ) %>%
+  filter_at(vars(-c("intron", "treatment", "spearman", "DonorSeq")), any_vars(. == T)) %>%
+  gather(key="Pattern", value="IsMatch", -c("intron", "treatment", "spearman", "DonorSeq")) %>%
+  filter(IsMatch) %>%
+  separate(Pattern, into = c("PlotOrder", "Pattern"), sep = "_", convert=T) %>%
+  ggplot(aes(x=spearman, color=treatment)) +
+  geom_vline(xintercept=0, linestyle='dashed') +
+  stat_ecdf() +
+  geom_rug(
+    data = . %>%
+      group_by(Pattern, treatment) %>%
+      summarise(med = median(spearman, na.rm=T)),
+    aes(x=med, color=treatment),
+    size=2
+  ) +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  facet_wrap(~Pattern, scales="free_y") +
+  labs(x="Dose:response correlation ceof\nLess Splicing<- ->More Splicing", y="Cumulative distribution")
+
+GA.GT.Introns %>%
+  filter(gene_names %in% c("HTT", "TNRC6B"))
+
+#Statistical test for brana vs risdiplam effects
+splicing.tidy %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  select(intron=junc, treatment, spearman, DonorSeq=seq) %>%
+  mutate(
+    # `5.1_uagA|guaagn` = str_detect(DonorSeq, "^TAGAGTAAG\\w")
+    `5.2_aagA|guaagn` = str_detect(DonorSeq, "^AAGAGTAAG\\w")
+  ) %>%
+  filter_at(vars(-c("intron", "treatment", "spearman", "DonorSeq")), any_vars(. == T)) %>%
+  gather(key="Pattern", value="IsMatch", -c("intron", "treatment", "spearman", "DonorSeq")) %>%
+  filter(IsMatch) %>%
+  dplyr::select(intron, treatment, spearman) %>%
+  pivot_wider(names_from="treatment", values_from="spearman") %>%
+  rowwise() %>%
+  mutate(RC = mean(c_across(C2C5:Risdiplam), na.rm=T)) %>%
+  ungroup() %>%
+  mutate(Diff = Branaplam - RC) %>%
+  pull(Diff) %>%
+  wilcox.test()
+
+```
+
+```{r, eval=F}
+ggsave("../code/scratch/PlotForPresentation/HandpickedBulgesHeatmap.pdf",Heatmap.bulges, width=12, height=2.4)
+
+```
+
+```{r}
+GA.GT.Introns %>%
+  filter(gene_names=="HTT") %>%
+  pull(seq)
+```
+

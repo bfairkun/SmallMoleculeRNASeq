@@ -136,9 +136,6 @@ use rule leafcutter_cluster as leafcutter_cluster_all with:
         "-r SplicingAnalysis/leafcutter_all_samples/"
     log:
         "logs/leafcutter_cluster_all.log"
-    output:
-        "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind.counts.gz",
-        "SplicingAnalysis/leafcutter_all_samples/autosomes/leafcutter_perind_numers.counts.gz"
 
 rule MakeGroupsFiles:
     output:
@@ -261,15 +258,18 @@ rule leafcutter_ds:
         "SplicingAnalysis/leafcutter/differential_splicing/{treatment}_effect_sizes.txt",
         "SplicingAnalysis/leafcutter/differential_splicing/{treatment}_cluster_significance.txt"
     threads: 4
+    wildcard_constraints:
+        treatment = "|".join(NonControlTreatments)
     resources:
         ntasks = 5
     params:
-        "-i 3 -g 3"
+        Prefix = "SplicingAnalysis/leafcutter/differential_splicing/",
+        ExtraParams = "-i 3 -g 3"
     log:
         "logs/leafcutter_ds/{treatment}.log"
     shell:
         """
-        /software/R-3.4.3-el7-x86_64/bin/Rscript {input.Rscript} -p {threads} -o  SplicingAnalysis/leafcutter/differential_splicing/{wildcards.treatment} {params} {input.numers} {input.groupfile} &> {log}
+        /software/R-3.4.3-el7-x86_64/bin/Rscript {input.Rscript} -p {threads} -o {params.Prefix}{wildcards.treatment} {params.ExtraParams} {input.numers} {input.groupfile} &> {log}
         """
 
 rule featurecounts:
@@ -428,6 +428,16 @@ rule Download_UCSC_PhyloP_Bigwig:
 rule GetPhyloP_All5ssPositions:
     input:
         "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz"
+
+use rule featurecounts as featureCounts_ALLSAMPLES_basic with:
+    input:
+        bam = expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam", sample= AllSamples),
+        bai = expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam.bai", sample= AllSamples),
+        Comprehensive_gtf = "/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Annotations/gencode.v34.chromasomal.basic.annotation.gtf",
+    log:
+        "logs/featureCounts_ALLSAMPLES_basic.log"
+    output:
+        "featureCounts/AllSamples_Counts.txt"
 
 ## Check how ClinVar splice site annotations relate to splice sites:
 # zcat ClinVar/PangolinResults.tsv.gz | grep 'splice_donor' | awk -v OFS='\t' '{print "chr"$1, $2, $2+1}' | sort -u | bedtools sort -i - | bedtools closest -a - -b <( bedtools flank -g /project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Fasta/GRCh38.primary_assembly.genome.fa.fai  -i <(zcat SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.gz | awk -v OFS='\t' 'NR>1 {print $1,$2,$3,".",".",$6}' ) -l 1 -r 0 | sort -u | bedtools sort -i -  ) -D b | less -S
