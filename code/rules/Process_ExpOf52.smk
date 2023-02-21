@@ -8,6 +8,10 @@ rule GatherExpOf52Results:
         expand("SplicingAnalysis/leafcutter/groupsfiles/ExpOf52_{treatment}.txt", treatment=ExpOf52_samples_NonControlTreatments),
         "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab",
         expand("SplicingAnalysis/leafcutter/differential_splicing/ExpOf52_{treatment}_effect_sizes.txt", treatment=ExpOf52_samples_NonControlTreatments),
+        "DE_testing/ExpOf52_Counts.mat.txt.gz",
+        # expand("bigwigs/unstranded/{sample}.bw", sample=AllSamples),
+        # expand("bigwigs/stranded/{sample}.minus.bw", sample=AllNEBNextSamples),
+        # expand("bigwigs/stranded/{sample}.plus.bw", sample=AllNEBNextSamples)
 
 use rule CopyAndMergeFastq as CopyAndMergeFastq_ExpOf52 with:
     input:
@@ -33,7 +37,7 @@ rule MakeGroupsFiles_ExpOf52:
 use rule leafcutter_ds as leafcutter_ds_ExpOf52 with:
     input:
         groupfile = "SplicingAnalysis/leafcutter/groupsfiles/ExpOf52_{treatment}.txt",
-        numers = "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind.counts.gz",
+        numers = "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numers.counts.gz",
         Rscript = "scripts/leafcutter/scripts/leafcutter_ds.R"
     output:
         "SplicingAnalysis/leafcutter/differential_splicing/ExpOf52_{treatment}_effect_sizes.txt",
@@ -46,3 +50,15 @@ use rule leafcutter_ds as leafcutter_ds_ExpOf52 with:
     log:
         "logs/leafcutter_ds_ExpOf52/{treatment}.log"
 
+rule DE_testing_ExpOf52:
+    input:
+        "featureCounts/AllSamples_Counts.txt"
+    output:
+        results = "DE_testing/ExpOf52_Results.txt.gz",
+        counts = "DE_testing/ExpOf52_Counts.mat.txt.gz"
+    log:
+        "logs/DE_testing_ExpOf52.log"
+    shell:
+        """
+        /software/R-3.4.3-el7-x86_64/bin/Rscript scripts/DE_edgeR_ExpOf52.R {input} {output.results} {output.counts} &> {log}
+        """

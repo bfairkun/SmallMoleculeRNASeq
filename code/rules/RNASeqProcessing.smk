@@ -182,6 +182,8 @@ rule collapse_juncfiles_allsamples:
         "SplicingAnalysis/FullSpliceSiteAnnotations/ALL_SAMPLES.junc"
     conda:
         "../envs/r_essentials.yml"
+    resources:
+        mem_mb = much_more_mem_after_first_attempt
     shell:
         """
         Rscript scripts/Collapse_Juncfiles.R
