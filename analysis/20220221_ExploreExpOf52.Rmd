@@ -1,0 +1,642 @@
+---
+title: "browse exp of 52"
+output: html_document
+date: '2023-02-21'
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+library(tidyverse)
+library(RColorBrewer)
+library(data.table)
+library(edgeR)
+library(qvalue)
+library(Heatplus)
+
+# define some useful funcs
+sample_n_of <- function(data, size, ...) {
+  dots <- quos(...)
+  
+  group_ids <- data %>% 
+    group_by(!!! dots) %>% 
+    group_indices()
+  
+  sampled_groups <- sample(unique(group_ids), size)
+  
+  data %>% 
+    filter(group_ids %in% sampled_groups)
+}
+
+
+# Set theme
+theme_set(
+  theme_classic() +
+  theme(text=element_text(size=16,  family="Helvetica")))
+
+# I use layer a lot, to rotate long x-axis labels
+Rotate_x_labels <- theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+#test plot
+ggplot(mtcars, aes(x=mpg, y=cyl)) +
+  geom_point()
+
+
+```
+
+## Intro
+
+Jingxin's lab has synthesized (or maybe contracted out synthesis of) hundred(s) branaplam/risdiplam derivatives. They screened them for splice-modifying activity using a SMN2 minigene I believe, resulting in 52 compounds that they send Gabi and I for further experiments: We recieved the 52 compounds in a 96 well plate, and in subsequent plots we are naming them just by the well position they were shipped in (ie A01, A02, ..., E04). The molar concentration of each molecule was determined by Jingxin's lab and shipped at 500x concentration. I think molar concentration is based on EC90 of SMN2 splice modifying activity in their initial screen. We grew LCLs cells to a density of approximately 1M cells per mL, and split into seperate flasks each containing 7mL: 2 seperate replicate flasks for each molecule treatment, and 6 flasks of DMSO control (total of 110 samples), and applied 14uL of treatment. The following day, cells were collected by centrifugation, supernate was discarded and stored in 1mL of Trizol at -20C for futher processing. We extracted RNA by phase seperation (Trizol manufacturer's instructions). The top phase was mixed with an equal volume of ethanol, and applied to Zymo5 nucleic-acid purification columns. After two washes, we performed on-column DNAse I treatment, followed by an extra application of binding buffer and two more washes, and finally elution in water. Qubit quantification was used to quantify RNA before using [NEBNext ultra directional ii ](https://www.neb.com/products/e7760-nebnext-ultra-ii-directional-rna-library-prep-kit-for-illumina#Product%20Information) RNAseq kits with NEB's polyA capture kit. There are a couple optional steps in the kit preparation: We fragmented the RNA for only5 minutes, and performed size selection (step 6.3) to preferentially obtain longer insert sizes. The libraries were intially sequenced on a MiSeq (~20M reads total), to determine optimal re-pooling volumes (aiming for equal representation of each sample) and to confirm long insert sizes to justify the 150+150 paired end sequencing that we ended up doing on the NovaSeq S4 (~10B reads total). In practice, I noticed that one sample had very very low number of reads, and will likely have to be dropped from analysis (see below). Also, sample pooling volumes weren't as perfect as I would have hoped, but I think they are acceptable. see below.
+
+
+In the remainder of this notebook, I will explore this data is ways similar to my previous notebooks regarding Jingxin's RNAseq - analyses that I can do quickly. The pre-processing that I have done leading up to this notebook includes read trimming ([fastp](https://academic.oup.com/bioinformatics/article/34/17/i884/5093234)), alignment with STAR (I used single pass mode, but perhaps before publication it might be worth aligning all samples and re-aligning samples for STAR's "two-pass" procedure for most sensitive identification of unannotated junctions), gene counting with featureCounts, differential expression analysis with edgeR (a separate contrast for each treatment, comparing to the same 6 DMSO replicates ), splicing quantification and differential testing with leafcutter (again, comparing each treatment to 6 DMSO replicates).
+
+### Reads per sample
+
+Let's just consider protein coding genes, as written out in my reformatted featureCounts output, which I will read in here. I will occasionally read in data from previous experiments too for comparison.
+
+```{r}
+# read in sample metadata
+
+
+Metadata.ExpOf52 <- read_tsv("../code/config/samples.52MoleculeExperiment.tsv") %>%
+  mutate(cell.type = "LCL", libType="polyA", rep=BioRep, old.sample.name=SampleID, dose.nM=NA) %>%
+  mutate(treatment = if_else(Treatment=="DMSO", "DMSO", paste0("W", Treatment))) %>%
+  dplyr::select(treatment, cell.type, dose.nM, libType, rep, old.sample.name) %>%
+  mutate(SampleName = paste(treatment, dose.nM, cell.type, libType, rep, sep = "_"))
+
+Metadata.PreviousExperiments <- read_tsv("../code/bigwigs/BigwigList.tsv",col_names = c("SampleName", "bigwig", "group", "strand")) %>%
+  filter(strand==".") %>%
+  dplyr::select(-strand) %>%
+  mutate(old.sample.name = str_replace(bigwig, "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw", "\\1")) %>%
+  separate(SampleName, into=c("treatment", "dose.nM", "cell.type", "libType", "rep"), convert=T, remove=F, sep="_") %>%
+  left_join(
+    read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names = c("group", "color", "bed", "supergroup")),
+    by="group"
+  )
+
+FullMetadata <- bind_rows(Metadata.ExpOf52, Metadata.PreviousExperiments) %>%
+  mutate(Experiment = case_when(
+    cell.type == "Fibroblast" ~ "Single high dose fibroblast",
+    startsWith(old.sample.name, "TitrationExp") ~ "Dose response titration",
+    startsWith(old.sample.name, "chRNA") ~ "nascent RNA profiling",
+    startsWith(old.sample.name, "NewMolecule") ~ "Single high dose LCL"
+  )) %>%
+  mutate(color = case_when(
+    treatment == "DMSO" ~ "#969696",
+    Experiment == "Single high dose LCL" ~ "#252525",
+    TRUE ~ color
+  )) %>%
+  mutate(leafcutter.name = str_replace_all(old.sample.name, "-", "."))
+
+
+
+gene.counts <- read_tsv("../code/DE_testing/ExpOf52_Counts.mat.txt.gz") %>%
+  column_to_rownames("Geneid") %>%
+  DGEList() %>%
+  calcNormFactors()
+
+counts.plot.dat <- gene.counts$samples %>%
+  rownames_to_column("old.sample.name") %>%
+  inner_join(FullMetadata, by="old.sample.name") %>%
+  mutate(dose.nM = case_when(
+    treatment == "DMSO" ~ "NA",
+    cell.type == "Fibroblast" ~ "CC50 dose",
+    Experiment == "Single high dose LCL" ~ "SMN_EC90 dose",
+    TRUE ~ as.character(dose.nM)
+  )) %>%
+  mutate(label = dose.nM) %>%
+  arrange(Experiment, treatment, dose.nM)
+
+counts.plot.labels <- counts.plot.dat %>%
+  dplyr::select(old.sample.name, label) %>% deframe()
+
+counts.plot.dat %>%
+  filter(Experiment=="Single high dose LCL")
+
+ReadsPerDataset <- ggplot(counts.plot.dat, aes(x=old.sample.name, y=lib.size/2E6, fill=color)) +
+  geom_col() +
+  scale_fill_identity() +
+  scale_x_discrete(name="dose (nanomolar)", label=counts.plot.labels) +
+  scale_y_continuous(expand=c(0,0)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3)) +
+  theme(strip.text.x = element_text(size = 8)) +
+  facet_grid(~Experiment, scales = "free_x", space = "free_x", labeller = label_wrap_gen(15)) +
+  labs(title="RNA-seq datasets", y="Read count (M)")
+ReadsPerDataset
+
+```
+
+So for the most part, these libraries were sequenced deeper than any of our previous experiments with Jingxin. Let's make note of that one outlier sample that was clearly not sequenced well. This sample will probably have to be excluded from further analysis...
+
+```{r}
+counts.plot.dat %>%
+  arrange(lib.size) %>%
+  head(1)
+
+```
+
+Ok so rep2 of the molecule in well C04 will probably have to be excluded. 4M reads isn't enough to get much out of, and I sort of worry whether those 4M reads are even from the corresponding library versus barcode contamination from other samples on the lane...
+
+### Gene expression PCA
+
+First let's perform PCA with all samples, including fibroblasts. I know this isn't necessarily the most interpretable, but I am just curious what the first few PCs will look like...
+
+
+```{r}
+
+SamplesToInclude <- FullMetadata %>%
+  pull(old.sample.name)
+
+CPM <- gene.counts %>%
+  cpm(log=T, prior.count=T) %>%
+  as.data.frame() %>%
+  rownames_to_column("Geneid") %>%
+  dplyr::select(Geneid, all_of(SamplesToInclude))
+
+Top14K_ExpressedGenes <- (CPM %>%
+  column_to_rownames("Geneid") %>%
+  apply(1, mean) %>%
+  sort(decreasing=T))[1:14000] %>%
+  names()
+
+pca.results <- CPM %>%
+  filter(Geneid %in% Top14K_ExpressedGenes) %>%
+  column_to_rownames("Geneid") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+summary(pca.results)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("old.sample.name") %>%
+  dplyr::select(old.sample.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="old.sample.name")
+
+ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nAll samples")
+ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nAll samples")
+ggplot(pca.results.to.plot, aes(x=PC5, y=PC6, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nAll samples")
+
+```
+
+Let's repeat but just include the dose titration experiment samples and this recent experiment of 52 molecules...
+
+
+```{r}
+
+SamplesToInclude <- FullMetadata %>%
+  filter(Experiment %in% c("Single high dose LCL", "Dose response titration")) %>%
+  pull(old.sample.name)
+
+CPM <- gene.counts %>%
+  cpm(log=T, prior.count=T) %>%
+  as.data.frame() %>%
+  rownames_to_column("Geneid") %>%
+  dplyr::select(Geneid, all_of(SamplesToInclude))
+
+Top14K_ExpressedGenes <- (CPM %>%
+  column_to_rownames("Geneid") %>%
+  apply(1, mean) %>%
+  sort(decreasing=T))[1:14000] %>%
+  names()
+
+pca.results <- CPM %>%
+  filter(Geneid %in% Top14K_ExpressedGenes) %>%
+  column_to_rownames("Geneid") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+summary(pca.results)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("old.sample.name") %>%
+  dplyr::select(old.sample.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="old.sample.name")
+
+ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nTitration experiment and ExpOf52")
+ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nTitration experiment and ExpOf52")
+ggplot(pca.results.to.plot, aes(x=PC5, y=PC6, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nTitration experiment and ExpOf52")
+
+pca.results.to.plot %>%
+  filter(PC5>200)
+
+```
+
+
+Ok... some interesting patterns. That one outlier in PC5 is the sample with low read depth that I want to exclude.  It seems like the lab/batch effects are quite strong, the first two PCs have nothing to do with dose. (Lighter gray points are the DMSO controls in both experiments).. Maybe PC3 is related to this? But it's not going to be so straightforward to integrate this experiment of 52 data with the previous dose titration experiment also done in LCLs. Well at least previously when I perform PCA based on splicing junction excision ratios these batch and tissue effects seem to dissappear in the PCA, so maybe those splicing comparisons might be more fair without more careful integration. Now let's try PCA again but now just looking at the samples in this recent experiment of 52 molecules, to check at least that the DMSO samples cluster together...
+
+```{r}
+SamplesToInclude <- FullMetadata %>%
+  filter(Experiment %in% c("Single high dose LCL")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  pull(old.sample.name)
+
+CPM <- gene.counts %>%
+  cpm(log=T, prior.count=T) %>%
+  as.data.frame() %>%
+  rownames_to_column("Geneid") %>%
+  dplyr::select(Geneid, all_of(SamplesToInclude))
+
+Top14K_ExpressedGenes <- (CPM %>%
+  column_to_rownames("Geneid") %>%
+  apply(1, mean) %>%
+  sort(decreasing=T))[1:14000] %>%
+  names()
+
+pca.results <- CPM %>%
+  filter(Geneid %in% Top14K_ExpressedGenes) %>%
+  column_to_rownames("Geneid") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+summary(pca.results)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("old.sample.name") %>%
+  dplyr::select(old.sample.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="old.sample.name")
+
+ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nExpOf52")
+ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nExpOf52")
+ggplot(pca.results.to.plot, aes(x=PC5, y=PC6, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nExpOf52")
+
+```
+
+Ok, even though I am looking at only the first 6 PCs, it seems pretty clear that the DMSO samples don't cleanly cluster together. Perhaps some of these molecules weren't very active.
+
+Now just for curiosity, let's just include the fibroblast and the dose titration experiment.
+
+```{r}
+SamplesToInclude <- FullMetadata %>%
+  filter(Experiment %in% c("Dose response titration", "Single high dose fibroblast")) %>%
+  pull(old.sample.name)
+
+CPM <- gene.counts %>%
+  cpm(log=T, prior.count=T) %>%
+  as.data.frame() %>%
+  rownames_to_column("Geneid") %>%
+  dplyr::select(Geneid, all_of(SamplesToInclude))
+
+Top14K_ExpressedGenes <- (CPM %>%
+  column_to_rownames("Geneid") %>%
+  apply(1, mean) %>%
+  sort(decreasing=T))[1:14000] %>%
+  names()
+
+pca.results <- CPM %>%
+  filter(Geneid %in% Top14K_ExpressedGenes) %>%
+  column_to_rownames("Geneid") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+summary(pca.results)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("old.sample.name") %>%
+  dplyr::select(old.sample.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="old.sample.name")
+
+ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nTitrationExp and FibroblastExp")
+ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nTitrationExp and FibroblastExp")
+ggplot(pca.results.to.plot, aes(x=PC5, y=PC6, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using top 14K genes\nTitrationExp and FibroblastExp")
+```
+
+Wow, so in that, the second PC seems to pretty obviously reflect dose. I am quite surprised we don't see something so obvious with the new samples... Somewhat concerning. Of course, perhaps it's not too surprising considering this experiment just has so many more samples, only a few of which are DMSO, that maybe I shouldn't expect some dose effect in the first few PCs... One other thing I have done that was helpful last time was to perform PCA on the titration series then project new samples in the same PC space. I'll try that later...
+
+
+Now Let's check for some splicing effects. Maybe that will be more illuminating...
+
+### Verify genome-wide GA-GT splice site induction
+
+Let's start by checking for global enrichment of GA|GT juncs... If this doesn't show an effect I'll be very skeptical about the usefulness of this data.
+
+```{r}
+leafcutter.sig <- Sys.glob("../code/SplicingAnalysis/leafcutter/differential_splicing/ExpOf52_*_cluster_significance.txt") %>%
+  setNames(str_replace(., "../code/SplicingAnalysis/leafcutter/differential_splicing/ExpOf52_(.+?)_cluster_significance.txt", "W\\1")) %>%
+  lapply(fread) %>%
+  bind_rows(.id="treatment")
+
+leafcutter.effects <- Sys.glob("../code/SplicingAnalysis/leafcutter/differential_splicing/ExpOf52_*_effect_sizes.txt") %>%
+  setNames(str_replace(., "../code/SplicingAnalysis/leafcutter/differential_splicing/ExpOf52_(.+?)_effect_sizes.txt", "W\\1")) %>%
+  lapply(fread, col.names=c("intron", "logef", "treatment_PSI", "DMSO_PSI", "deltapsi")) %>%
+  bind_rows(.id="treatment") %>%
+  mutate(name = str_replace(intron, "(.+?):(.+?):(.+?):clu.+([+-])", "\\1_\\2_\\3_\\4")) %>%
+  mutate(deltapsi = deltapsi * -1, logef=logef*-1)
+
+Introns <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz", col_names = c("name", "seq", "score")) %>%
+  separate(name, into=c("name", "pos"), sep = "::")
+
+Introns.annotations <- read_tsv("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz") %>%
+  mutate(name = paste(chrom, start, end, strand, sep = "_")) %>%
+  left_join(Introns, by="name")
+
+
+leafcutter.effects %>%
+  inner_join(
+    Introns.annotations %>%
+    mutate(IsGAGT = if_else(str_detect(seq, "^\\w\\wGAGT"), "GA-GT", "not GA-GT")),
+    by="name") %>%
+  # count(IsGAGT, treatment)
+  ggplot(aes(x=logef, group=treatment)) +
+  stat_ecdf() +
+  coord_cartesian(xlim=c(-2,2)) +
+  facet_wrap(~IsGAGT) +
+  theme_bw() +
+  labs(title="Distribution of log(FC) for all tested introns\nExpOf52", y="ecdf", x="Splicing log(FC)")
+
+```
+
+
+Ok so I see some subtle general up-regulation of GA-GT introns... That's reassuring. But the degree to which all samples have about the same general effect size is surprising to me... I expected some of the compounds to be less active... Even though we normalized concentration based on SMN2 minigene EC90, I suspected a bit of noise in that estimate anyway. Let's compare this to the analogous plot from the previous fibroblast dataset where I also did differential splicing with leafcutter to estimate splicing log(FC)...
+
+```{r}
+leafcutter.effects.fibroblasts <- list.files(path="../code/SplicingAnalysis/leafcutter/differential_splicing", pattern="^[A-Z]+[0-9]*_effect_sizes.txt", full.names=T) %>%
+  setNames(str_replace(., "../code/SplicingAnalysis/leafcutter/differential_splicing/(.+?)_effect_sizes.txt", "\\1")) %>%
+  lapply(fread, col.names=c("intron", "logef", "treatment_PSI", "DMSO_PSI", "deltapsi")) %>%
+  bind_rows(.id="treatment") %>%
+  mutate(name = str_replace(intron, "(.+?):(.+?):(.+?):clu.+([+-])", "\\1_\\2_\\3_\\4")) %>%
+  mutate(deltapsi = deltapsi * -1, logef=logef*-1)
+
+leafcutter.sig.fibroblasts <-list.files(path="../code/SplicingAnalysis/leafcutter/differential_splicing", pattern="^[A-Z]+[0-9]*_cluster_significance.txt", full.names=T) %>%
+  setNames(str_replace(., "../code/SplicingAnalysis/leafcutter/differential_splicing/(.+?)_cluster_significance.txt", "\\1")) %>%
+  lapply(fread) %>%
+  bind_rows(.id="treatment")
+
+
+Fibroblast.colors <- FullMetadata %>%
+  filter(cell.type=="Fibroblast") %>%
+  distinct(treatment, .keep_all=T) %>%
+  dplyr::select(treatment, color) %>%
+  deframe()
+
+leafcutter.effects.fibroblasts %>%
+  inner_join(
+    Introns.annotations %>%
+    mutate(IsGAGT = if_else(str_detect(seq, "^\\w\\wGAGT"), "GA-GT", "not GA-GT")),
+    by="name") %>%
+  # count(IsGAGT, treatment)
+  ggplot(aes(x=logef, color=treatment)) +
+  stat_ecdf() +
+  scale_color_manual(values=Fibroblast.colors) +
+  coord_cartesian(xlim=c(-2,2)) +
+  facet_wrap(~IsGAGT) +
+  theme_bw() +
+  labs(title="Distribution of log(FC) for all tested introns\nFibroblast Exp", y="ecdf", x="Splicing log(FC)")
+
+
+```
+Ok, so maybe the degree of these 52 treatments are roughly on the order of the CUOME treatment in fibroblast data. Not too strong. I'm still not totally sure this is even real... 
+
+Ok, so now let's doing PCA just using GA|GT juncs... I think this should really work. Let's start by including all samples. If I don't really see DMSO control pop out from the rest, I will be a bit worried.
+
+
+### Splicing correlation matrix and PCA
+
+
+Actually before doing PCA, to get a broad overview of results, let's calculate the correlation coefficient across samples based on splicing. For sake of quickly getting an overview, and picking reasonable GA-GT introns (that aren't too noisy to measure) let's just consider the 500ish GA-GT introns I previously modelled. These are a pretty 'good' set of differentially spliced GA-GT introns based on risdiplam,branaplam,C2C5...
+
+
+
+```{r}
+#Read in splice junction count table
+
+PSI <- fread("../code/SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numers.bed.gz", sep = '\t' ) %>%
+  dplyr::select(-"NewMolecule.C04.2")
+
+Modelled.introns <- read_tsv("../output/EC50Estimtes.FromPSI.txt.gz") %>%
+  dplyr::select(`#Chrom`, start, end, strand=strand.y)
+
+
+colnames(PSI)
+
+PSI.GAGT.Only <- PSI %>%
+  inner_join(Modelled.introns) %>%
+  dplyr::select(junc, A10.1:NewMolecule.E07.6) %>%
+  drop_na()
+
+data.frame(leafcutter.name  = PSI.GAGT.Only.cormat %>% colnames() ) %>%
+  left_join(FullMetadata) %>%
+  mutate()
+
+PSI.GAGT.Only.cormat <- PSI.GAGT.Only %>%
+  column_to_rownames("junc") %>%
+  cor(method='s')
+
+heatmap.2(PSI.GAGT.Only.cormat, trace='none')
+```
+
+And now let's do PCA based on these introns...
+
+```{r}
+pca.results <- PSI.GAGT.Only %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+summary(pca.results)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="leafcutter.name")
+
+ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 1090 GAGT introns\nAll samples")
+ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 1090 GAGT introns\nAll samples")
+ggplot(pca.results.to.plot, aes(x=PC5, y=PC6, color=color, shape=Experiment)) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 1090 GAGT introns\nAll samples")
+
+
+```
+
+That is actually kind of reassuring. The first PC is definitely related to dose. And all DMSO samples cluster together. However, again, the effective dosage seems a bit weak compared to fibroblast experiments... Looks like most of the samples are roughly equivalent to ~100nM risdiplam, so still perhaps on the high end of what would be realistic clinical concentration but I think a slightly higher dose would have been more informative. In this particular PCA, it looks like PC3 sepearates branaplam vs risdiplam, and it's not totally clear how these molecules are different along that axis... I could try, as mentioned before just doing PCA using the dose titration experiments then projecting the new samples in that space... But first let's do a PCA just using the samples from the new experiment..
+
+```{r}
+SamplesToInclude <- FullMetadata %>%
+  filter(Experiment %in% c("Single high dose LCL")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  pull(leafcutter.name)
+
+pca.results <- PSI.GAGT.Only %>%
+  dplyr::select(junc, all_of(SamplesToInclude)) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+summary(pca.results)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="leafcutter.name")
+
+ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 1090 GAGT introns\nExpOf52 samples")
+ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 1090 GAGT introns\nExpOf52 samples")
+ggplot(pca.results.to.plot, aes(x=PC5, y=PC6, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 1090 GAGT introns\nExpOf52 samples")
+```
+
+Ok, reassuringly, again DMSO samples stick out in the first PC, and I see a few biological replicates are close together.
+
+Ok, now I want to try projecting the old titration series data into this same PCA spaace, which might help interpretability.
+
+```{r}
+SamplesToProject <- FullMetadata %>%
+  filter(!Experiment %in% c("Single high dose LCL")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  pull(leafcutter.name)
+
+pca.results.to.plot_AdditionProjections <- PSI.GAGT.Only %>%
+  dplyr::select(junc, all_of(SamplesToProject)) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% predict(pca.results, .) %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="leafcutter.name")
+
+
+TreatmentColorsForLabels.FibroblastColorsAdded <-
+FullMetadata %>%
+  group_by(treatment) %>%
+  filter(dose.nM == max(dose.nM) | treatment == "DMSO" | cell.type=="Fibroblast") %>%
+  ungroup() %>%
+  distinct(treatment, .keep_all=T) %>%
+  arrange(dose.nM) %>%
+  mutate(vjust=row_number()*1.2)
+
+TreatmentColorsLabels.Layer.FibroblastColorsAdded <- geom_text(
+    data = TreatmentColorsForLabels.FibroblastColorsAdded, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=Inf, hjust=1.05
+  )
+
+  
+ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 1090 GAGT introns\nExpOf52 samples", caption="Additional samples projected")
+ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 1090 GAGT introns\nAll samples")
+
+```
+
+I think these PCA are interseting... it's still hard to make sense of it all... And this isn't really the way to identify new axes of specifity since the introns were selected precisely because of their effect in risdiplam/branaplam/C2C5 in previous experiments... Better would be to identify all differentially spliced introns and perform a PCA on that, also projecting the old risdiplam/branaplam/C2C5 data in the PCA for help with interpretation... Let's work towards that....
+
+
+### Leafcutter differential splicing
+
+First, let's explore the leafcutter differential splicing results... From previous plots, I suspect the effective dosage of these new data to be much less than the fibroblast data, and perhaps we will get much fewer significant differential splicing events... First Let's check it out, the number of differentially spliced clusters, some P value histograms, etc.
+
+```{r}
+leafcutter.sig %>%
+  sample_n_of(12, treatment) %>%
+  filter(!is.na(p)) %>%
+  ggplot(aes(x=p)) +
+    geom_histogram() +
+    facet_wrap(~treatment, scales="free") +
+  labs(caption="P value histograms for some random splicing contrasts", title="Exp of 52")
+  
+```
+
+...and compare that to the fibroblast tests...
+
+```{r}
+leafcutter.sig.fibroblasts %>%
+  filter(!is.na(p)) %>%
+  ggplot(aes(x=p)) +
+    geom_histogram() +
+    facet_wrap(~treatment, scales="free") +
+  labs(caption="P value histograms for some random splicing contrasts", title="fibroblast experiment")
+```
+
+ok, so a lot these will probably have less significant hits than the fibroblast CUOME contrast.
+
+
+```{r}
+
+```
+
