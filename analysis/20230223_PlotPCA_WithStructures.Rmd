@@ -1,0 +1,124 @@
+---
+title: "Plot PCA with structures"
+output: html_document
+date: "2023-02-23"
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+library(tidyverse)
+library(RColorBrewer)
+library(data.table)
+library(ggimage)
+
+
+# define some useful funcs
+sample_n_of <- function(data, size, ...) {
+  dots <- quos(...)
+  
+  group_ids <- data %>% 
+    group_by(!!! dots) %>% 
+    group_indices()
+  
+  sampled_groups <- sample(unique(group_ids), size)
+  
+  data %>% 
+    filter(group_ids %in% sampled_groups)
+}
+
+
+# Set theme
+theme_set(
+  theme_classic() +
+  theme(text=element_text(size=16,  family="Helvetica")))
+
+# I use layer a lot, to rotate long x-axis labels
+Rotate_x_labels <- theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+#test plot
+ggplot(mtcars, aes(x=mpg, y=cyl)) +
+  geom_point()
+
+
+```
+
+## Intro
+
+I previously performed a PCA to visualize the 52 compounds, relative to risdiplam/branaplam/C2C5 titrations. Here I want to plot that data with chemical structures for points.
+
+```{r}
+FullMetadata <- read_tsv("../output/20230223_FullMetadata.tsv")
+
+PSI.IntronsToInclude <- read_tsv("../output/20230223_IntronsToInclude.tsv.gz")
+
+PCA.dat <- read_tsv("../output/20230223_PCA_Projections.tsv.gz")
+
+MoleculeIdentities <- read_csv("../code/DataNotToCommit/CompoundsAndConcentrations_ZT.csv")
+
+
+Images <- data.frame( Images = Sys.glob("../code/DataNotToCommit/4x/*.png") ) %>%
+  mutate(CompoundName = str_replace(Images, "../code/DataNotToCommit/4x/(.+?).png", "\\1")) %>%
+  left_join(MoleculeIdentities)
+
+```
+
+There will be a few too many points to make sense of the plot imo. For now, (hackish solution) I will just average PC values across biological replicates and plot just one point per treatment.
+
+```{r}
+TreatmentColorsForLabels.FibroblastColorsAdded <-
+FullMetadata %>%
+  group_by(treatment) %>%
+  filter(dose.nM == max(dose.nM) | treatment == "DMSO" | cell.type=="Fibroblast") %>%
+  ungroup() %>%
+  distinct(treatment, .keep_all=T) %>%
+  arrange(dose.nM) %>%
+  mutate(vjust=row_number()*1.2)
+
+TreatmentColorsLabels.Layer.FibroblastColorsAdded <- geom_text(
+    data = TreatmentColorsForLabels.FibroblastColorsAdded, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=Inf, hjust=1.05
+  )
+
+  
+
+
+pca.results.to.plot <- PCA.dat %>%
+  group_by(treatment, dose.nM, color, Experiment) %>%
+  summarise(PC1 = mean(PC1), PC2=mean(PC2), PC3=mean(PC3), PC4=mean(PC4), PC5=mean(PC5)) %>%
+  ungroup() %>%
+  left_join(Images %>%
+              dplyr::select(-dose.nM), by="treatment")
+
+
+PC1.PC2 <- ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, shape=Experiment)) +
+  # geom_image(aes(image=Images), size=0.15) +
+  geom_text(aes(label=treatment)) +
+  geom_point(data = . %>%
+               filter(Experiment %in% c("Dose response titration", "Single high dose fibroblast")), aes(color=color)) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 475 GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
+PC1.PC2
+
+
+PC3.PC4 <- ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, shape=Experiment)) +
+  geom_image(aes(image=Images), size=0.15) +
+  geom_point(data = . %>%
+               filter(Experiment %in% c("Dose response titration", "Single high dose fibroblast")), aes(color=color)) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 475 GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
+
+
+```
+
+```{r, eval=F}
+ggsave("../code/scratch/PC1.PC2.png",PC1.PC2, height=5, width=7)
+```
+
+
+

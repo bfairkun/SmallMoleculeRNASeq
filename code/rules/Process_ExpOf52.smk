@@ -13,7 +13,7 @@ rule GatherExpOf52Results:
         expand("bigwigs/stranded/{sample}.minus.bw", sample=AllNEBNextSamples),
         expand("bigwigs/stranded/{sample}.plus.bw", sample=AllNEBNextSamples),
         "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numersJunctionCounts.bed.gz.tbi" ,
-        "SplicingAnalysis/MergedExp52_Contrast/effect_sizes.txt",
+        "SplicingAnalysis/MergedExp52_Contrast/_effect_sizes.txt",
 
 use rule CopyAndMergeFastq as CopyAndMergeFastq_ExpOf52 with:
     input:
@@ -69,8 +69,8 @@ rule leafcutter_ds_ExpOf52_MergedContrast:
         numers = "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numers.counts.gz",
         Rscript = "scripts/leafcutter/scripts/leafcutter_ds.R"
     output:
-        "SplicingAnalysis/MergedExp52_Contrast/effect_sizes.txt",
-        "SplicingAnalysis/MergedExp52_Contrast/cluster_significance.txt"
+        "SplicingAnalysis/MergedExp52_Contrast/_effect_sizes.txt",
+        "SplicingAnalysis/MergedExp52_Contrast/_cluster_significance.txt"
     params:
         Prefix = "SplicingAnalysis/MergedExp52_Contrast/",
         ExtraParams = ""
