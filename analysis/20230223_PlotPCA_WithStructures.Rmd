@@ -13,6 +13,7 @@ library(data.table)
 library(ggimage)
 
 
+
 # define some useful funcs
 sample_n_of <- function(data, size, ...) {
   dots <- quos(...)
@@ -93,14 +94,16 @@ pca.results.to.plot <- PCA.dat %>%
 
 
 PC1.PC2 <- ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, shape=Experiment)) +
-  # geom_image(aes(image=Images), size=0.15) +
-  geom_text(aes(label=treatment)) +
+  geom_image(aes(image=Images), size=0.14) +
+  # geom_text(aes(label=treatment)) +
   geom_point(data = . %>%
                filter(Experiment %in% c("Dose response titration", "Single high dose fibroblast")), aes(color=color)) +
   TreatmentColorsLabels.Layer.FibroblastColorsAdded +
   scale_color_identity() +
+  xlim(c(-20, 42)) +
   theme_bw() +
-  labs(title = "PCA using 475 GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
+  labs(title = "PCA using 475 GAGT introns\nAll samples", caption="Introns based on being significant in any contrast") +
+  theme(legend.position='none')
 PC1.PC2
 
 
@@ -117,7 +120,9 @@ PC3.PC4 <- ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, shape=Experiment)) +
 ```
 
 ```{r, eval=F}
-ggsave("../code/scratch/PC1.PC2.png",PC1.PC2, height=5, width=7)
+ggsave("../code/scratch/PC1.PC2.png",PC1.PC2, height=8, width=12)
+
+FullMetadata
 ```
 
 

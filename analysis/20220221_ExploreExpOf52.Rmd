@@ -12,8 +12,9 @@ library(RColorBrewer)
 library(data.table)
 library(edgeR)
 library(qvalue)
-# library(Heatplus)
+library(Heatplus)
 library(gplots)
+library(ggrepel)
 
 # define some useful funcs
 sample_n_of <- function(data, size, ...) {
@@ -750,6 +751,8 @@ IntronsToInclude <- leafcutter.sig %>%
   filter(str_detect(seq, "^\\w\\wGAGT")) %>%
   pull(intron)
 
+
+
 length(IntronsToInclude)
 
 PSI.IntronsToInclude <- PSI %>%
@@ -765,11 +768,11 @@ Ok, so only 475 introns left... This probably won't change anything from my prev
 
 ```{r}
 
-
 SamplesToInclude <- FullMetadata %>%
   filter(Experiment %in% c("Single high dose LCL")) %>%
   filter(!old.sample.name == "NewMolecule.C04-2") %>%
   pull(leafcutter.name)
+
 
 pca.results <- PSI.IntronsToInclude %>%
   dplyr::select(junc, all_of(SamplesToInclude)) %>%
@@ -833,9 +836,10 @@ ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
 
 ```
 
-Ok this is actually somewhat interpretable. Again the main axis of specificity seems to be along branaplam vs risdiplam effects, and there is plenty of stuff in between. WD07 is actually 500nM risdiplam, which looks fitting in relation to previous experiments. I think perhaps WC05 (SMSM32) and WD08 (4F-Py) the most interesting point I see so far... as both replicates doesn't neatly lie on either the risdiplam axis or the branaplam axis. Just browsing these molecules structure that ZT shared with me, these seem by my eye pretty structurally distinct. I would plot the structures of these in the PCA but `ggimage` is kind of tricky to install in my current R environment, so that may have to wait for later...
+Ok this is actually somewhat interpretable. Again the main axis of specificity seems to be along branaplam vs risdiplam effects, and there is plenty of stuff in between. WD07 is actually 500nM risdiplam, which looks fitting in relation to previous experiments. I think perhaps WC05 (SMSM32) and WD08 (4F-Py) the most interesting point I see so far... as both replicates doesn't neatly lie on either the risdiplam axis or the branaplam axis. Just browsing these molecules structure that ZT shared with me, these seem by my eye pretty structurally distinct. I would plot the structures of these in the PCA but `ggimage` is kind of tricky to install in my current R environment, so that may have to wait for later
 
-For now, I think it will be convenient to write out some files for further processing this later without having to rerun as much code...
+- update: I turned out making that plot with ggimage in a seperate notebook that I run in a different R environment... I wrote out the data for that plot in the block below and wrote a seperate notebook to just read in that data and plot...
+
 
 ```{r, eval=F}
 FullMetadata %>%
@@ -853,12 +857,623 @@ PSI.IntronsToInclude %>%
 ```
 
 
-## TO DO
-some of the first things to do:
-- repeat analysis without constricting to GA-GT introns, to look for really novel types of induced splicing
-- Check dependencies at -4 and -3 positions, as these positions distinguish rsidiplam.
-- Both of those things are sort of difficult with the limited power with the limited dosage. Obviously higher dose experiments would be nice, but maybe some of the power issues can be compensated by thoughtfully combining similar samples for estimating effects - like with mash
-- replot PCA with ggimage, to help relate effects to structural motifs
+Let's make sure these three molecules don't have very different read depth or something...
+
+```{r}
+pca.results.to.plot %>%
+  inner_join(
+    counts.plot.dat %>%
+      dplyr::select(SampleName, lib.size)
+    ) %>%
+ggplot( aes(x=PC1, y=PC2, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment, color=lib.size)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  scale_color_viridis_c(trans='log10') +
+  # scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 475 GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
+```
+Ok, that makes me feel better these three interesting candidate molecules aren't just outliers in read depth.
+
+Next I want to plot a heatmap of the correlation matrix based on these introns, I wonder if any clear clustering patterns will come out of this... Part of what I want to get out of this is to answer if these three outliers (WD08, WC05, WB12) are similar to each other, or if they are as distant from eachother as they are from risdiplam/branaplam.
+
+```{r}
+
+SamplesToInclude <- FullMetadata %>%
+  filter(Experiment %in% c("Single high dose LCL", "Dose response titration")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  pull(leafcutter.name)
+
+PSI.IntronsToInclude.cormat <- PSI.IntronsToInclude %>%
+  dplyr::select(junc, all_of(SamplesToInclude)) %>%
+  column_to_rownames("junc") %>%
+  cor(method='s')
+
+GetColorPallete <- function(MyVector, PalletteName = "Dark2"){
+  UniqueFactors <- MyVector %>% unique()
+  return (setNames(brewer.pal(n=length(UniqueFactors), name=PalletteName), UniqueFactors))
+}
+
+
+
+MetadataForCormat <- data.frame(leafcutter.name = PSI.IntronsToInclude.cormat %>%
+  rownames()) %>%
+  left_join(FullMetadata) %>%
+  mutate(color = if_else(
+    treatment %in% c("WD08", "WC05", "WB12"),
+    "#e34a33",
+    color
+  )) %>%
+  mutate(ExperimentColor = recode(Experiment, !!!GetColorPallete(FullMetadata$Experiment)
+))
+
+
+  
+heatmap.2(PSI.IntronsToInclude.cormat, trace='none', RowSideColors = MetadataForCormat$color, ColSideColors = MetadataForCormat$color, labRow = MetadataForCormat$treatment, cexRow=0.2, labCol = MetadataForCormat$treatment, cexCol=0.2)
+
+```
+
+```{r, eval=F}
+pdf("../code/scratch/Heatmap.pdf")
+heatmap.2(PSI.IntronsToInclude.cormat, trace='none', RowSideColors = MetadataForCormat$color, ColSideColors = MetadataForCormat$color, labRow = MetadataForCormat$treatment, cexRow=0.2, labCol = MetadataForCormat$treatment, cexCol=0.2)
+dev.off()
+```
+
+
+Ok samples mostly just are clustering by effective dose, so you can't really see the specificity effect here like you can in the second PC above... Well, you can see in the hierarchal clustering that both reps of WC05, a rep of WD08, and a rep of WB12 cluster together... And far away on another branch are the other replicates of WD08 and WB12...
+
+so maybe their effects are similar? It's just really hard to tell.
+
+As a slightly less biased way of making this PCA and possibly reproducing the potential uniqueness of these 3 molecules, let's try changing the criteria for including introns to be more inclusive.
+
+```{r}
+IntronsToInclude <- leafcutter.sig %>%
+  filter(p.adjust < 0.1) %>%
+  inner_join(leafcutter.effects, by=c("treatment", "cluster")) %>%
+  filter(abs(deltapsi) > 0.01) %>%
+  distinct(name, .keep_all=T) %>%
+  inner_join(Introns.annotations, by='name') %>%
+  # filter(str_detect(seq, "^\\w\\wGAGT")) %>%
+  pull(intron)
+
+length(IntronsToInclude)
+
+PSI.IntronsToInclude <- PSI %>%
+  filter(junc %in% IntronsToInclude) %>%
+  dplyr::select(junc, A10.1:NewMolecule.E07.6) %>%
+  drop_na()
+
+dim(PSI.IntronsToInclude)
+
+SamplesToInclude <- FullMetadata %>%
+  filter(Experiment %in% c("Single high dose LCL")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  pull(leafcutter.name)
+
+
+pca.results <- PSI.IntronsToInclude %>%
+  dplyr::select(junc, all_of(SamplesToInclude)) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="leafcutter.name") %>%
+  mutate(color = if_else(
+    treatment %in% c("WD08", "WC05", "WB12"),
+    "#e34a33",
+    color
+  )) 
+
+SamplesToProject <- FullMetadata %>%
+  filter(!Experiment %in% c("Single high dose LCL")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  pull(leafcutter.name)
+
+pca.results.to.plot_AdditionProjections <- PSI.IntronsToInclude %>%
+  dplyr::select(junc, all_of(SamplesToProject)) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% predict(pca.results, .) %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="leafcutter.name")
+
+  
+ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 23416 introns\nAll samples", caption="Introns based on being significant in any contrast")
+
+pca.results.to.plot %>%
+  inner_join(
+    counts.plot.dat %>%
+      dplyr::select(SampleName, lib.size)
+    ) %>%
+ggplot(aes(x=PC1, y=PC2, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment, color=lib.size)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  scale_color_viridis_c(trans='log10') +
+  # scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 23416 introns\nAll samples", caption="Introns based on being significant in any contrast. Colored by depth")
+
+ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 23416 introns\nAll samples", caption="Introns based on being significant in any contrast")
+
+ggplot(pca.results.to.plot, aes(x=PC4, y=PC5, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 23416 introns\nAll samples", caption="Introns based on being significant in any contrast")
+```
+Ok interesting... when you look at all significant introns with abs(deltapsi) > 0.01, the first few PCs measure hidden technical variables that don't seem to cluster biological replicates very well. deeper PCs seem to work better to find the dosage axis (PC4) branaplam vs risdiplam axis (PC5) and biological replicates still are close to one another... But in this space, a different set of molecules starts to show up, and perhaps on a different 'arm' of the data. I still see D08 sticking out.. WE02 also sticks out here along that axis, and WE02 was previously along the branaplam axis and is structurally most like branaplam.
+
+Now I'm a bit concerned about the robustness of the PCA to interpret it as being a distinct thing.. Let's try changing up the intron critera a tad a again and see how robust the PCA is...
+
+```{r}
+IntronsToInclude <- leafcutter.sig %>%
+  filter(p.adjust < 0.1) %>%
+  inner_join(leafcutter.effects, by=c("treatment", "cluster")) %>%
+  filter(logef > 0) %>%
+  distinct(name, .keep_all=T) %>%
+  inner_join(Introns.annotations, by='name') %>%
+  filter(str_detect(seq, "^\\w\\wGAGT")) %>%
+  pull(intron)
+
+length(IntronsToInclude)
+
+PSI.IntronsToInclude <- PSI %>%
+  filter(junc %in% IntronsToInclude) %>%
+  dplyr::select(junc, A10.1:NewMolecule.E07.6) %>%
+  drop_na()
+
+dim(PSI.IntronsToInclude)
+
+SamplesToInclude <- FullMetadata %>%
+  filter(Experiment %in% c("Single high dose LCL")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  pull(leafcutter.name)
+
+
+pca.results <- PSI.IntronsToInclude %>%
+  dplyr::select(junc, all_of(SamplesToInclude)) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="leafcutter.name") %>%
+  mutate(color = if_else(
+    treatment %in% c("WD08", "WC05", "WB12"),
+    "#e34a33",
+    color
+  )) 
+
+SamplesToProject <- FullMetadata %>%
+  filter(!Experiment %in% c("Single high dose LCL")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  pull(leafcutter.name)
+
+pca.results.to.plot_AdditionProjections <- PSI.IntronsToInclude %>%
+  dplyr::select(junc, all_of(SamplesToProject)) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% predict(pca.results, .) %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="leafcutter.name")
+
+  
+ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
+
+pca.results.to.plot %>%
+  inner_join(
+    counts.plot.dat %>%
+      dplyr::select(SampleName, lib.size)
+    ) %>%
+ggplot(aes(x=PC1, y=PC2, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment, color=lib.size)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  scale_color_viridis_c(trans='log10') +
+  # scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nAll samples", caption="Introns based on being significant in any contrast. Colored by depth")
+
+ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
+
+ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  # geom_point(data = pca.results.to.plot_AdditionProjections) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
+
+ggplot(pca.results.to.plot, aes(x=PC4, y=PC5, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  geom_point(data = pca.results.to.plot_AdditionProjections) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
+
+ggplot(pca.results.to.plot, aes(x=PC4, y=PC5, color=color, shape=Experiment)) +
+  geom_text(size=3, aes(label=treatment)) +
+  # geom_point(data = pca.results.to.plot_AdditionProjections) +
+  TreatmentColorsLabels.Layer.FibroblastColorsAdded +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
+```
+
+Hmm, ok much like the first PCA. Of course these are surely mostly overlapping introns. But at least is sort of comforting. I thought looking at deeper PCs might reveal something... Mostly reveals that interpreting PCs is not always straightforward.
+
+Also, if C05, D08, and B12 have unique properties, it is not so clear if  are similar or distinct from each other.
+
+## Investigation of the C05, D08, and B12
+
+Let's check the behavior of the hits (and all samples) on some particular introns or genes... The HTT, MYB, SMN2, STAT1
+
+First let's glance at the differential expression test results (which also include effect size estimates for these genes). Since gene expression changes are generally less noisy to estimate than splicing, we can also use these as proxies for risdiplam vs branaplam-specific effects for a set of known genes.
+
+```{r}
+diff.expression <- fread("../code/DE_testing/ExpOf52_Results.txt.gz") %>%
+  mutate(treatment = str_replace(treatment, "group(.+?)", "W\\1")) %>%
+  separate(Geneid, into=c("EnsemblID", "symbol"), sep='_')
+
+diff.expression %>%
+  filter(symbol %in% c("STAT1", "HTT", "MYB", "SMN2", "SMN1", "GALC", "FOXM1")) %>%
+  left_join(FullMetadata) %>%
+  mutate(color = if_else(
+    treatment %in% c("WD08", "WC05", "WB12"),
+    "#e34a33",
+    color
+  )) %>%
+  mutate(Sig = case_when(
+    PValue < 0.001 ~ "!",
+    PValue < 0.05 ~ "*",
+    TRUE ~ NA_character_
+  )) %>%
+  ggplot(aes(x=treatment, y=logFC, fill=color)) +
+  geom_col() +
+  geom_text(aes(label=Sig), y=Inf, vjust=1) +
+  scale_fill_identity() +
+  facet_wrap(~symbol) +
+  Rotate_x_labels +
+  theme(axis.text.x = element_text(size=3))
+```
+
+
+Hmm.. Offhand I can't really remember which if any of these genes (besides HTT) should be branaplam or risdiplam-specific. I think one helpful way to plot this will be to incorporate titration series data somehow, but that is a bit of work. Another way will be to color all samples (some of which are clearly on the risdiplam or branaplam axis) by the degree to which they were on those axes in PC space. Let's come up with a color scheme based on that idea...
+
+For example, looking at the previous PCA plot...
+
+If PC2 > 0 then blue,
+ifelse PC2 < 0, then green
+And PC2 is an alpha fill scale.
+
+```{r}
+
+NewColors <- pca.results.to.plot %>%
+  filter(Experiment == "Single high dose LCL") %>%
+  group_by(treatment) %>%
+  summarise(PC1 = mean(PC1), PC2=mean(PC2)) %>%
+  mutate(NewColor = case_when(
+    PC2 > 0 ~ "#08519c",
+    PC2 < 0 ~ "#006d2c",
+  ))
+
+MinPC1 <- min(NewColors$PC1)
+MaxPC1 <- max(NewColors$PC1)
+
+NewColors <- NewColors %>%
+  mutate(alpha = (PC1 - MinPC1)/(MaxPC1 - MinPC1)) %>%
+  mutate(NewColor = if_else(
+    treatment %in% c("WD08", "WC05", "WB12"),
+    "#e34a33",
+    NewColor
+  ))
+
+diff.expression %>%
+  filter(symbol %in% c("STAT1", "HTT", "MYB", "SMN2", "SMN1", "GALC", "FOXM1")) %>%
+  left_join(NewColors) %>%
+  mutate(PC2 = if_else(NewColor == "#e34a33", 0, PC2)) %>%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %>%
+  mutate(Sig = case_when(
+    PValue < 0.001 ~ "!",
+    PValue < 0.05 ~ "*",
+    TRUE ~ NA_character_
+  )) %>%
+  ggplot(aes(x=treatment, y=logFC, fill=NewColor)) +
+  geom_col(aes(alpha=alpha)) +
+  geom_text(aes(label=Sig), y=Inf, vjust=1) +
+  scale_fill_identity() +
+  facet_wrap(~symbol) +
+  Rotate_x_labels +
+  theme(axis.text.x = element_text(size=5)) +
+  labs(title="Expression changes in genes of interest", y="log2FC", caption=str_wrap("P<0.05 = *\nP<0.001 = !\nColor and  fill transparency based on PC1 & PC2 to distinguish risdiplam/branaplam axes", 30))
+
+```
+
+Ok, so based on these subset of genes, the red molecules have some risdiplam-like effects and some branaplam-like effects. Let's look more globally at the DE results..
+
+```{r}
+
+XaxisColors <- NewColors %>%
+  mutate(PC2 = if_else(NewColor == "#e34a33", 0, PC2)) %>%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %>%
+  arrange(treatment) %>% pull(NewColor)
+
+
+NumberDE.genes <- bind_rows(
+diff.expression %>%
+  filter(FDR < 0.01) %>%
+  count(treatment) %>%
+  mutate(FDR = 0.01),
+diff.expression %>%
+  filter(FDR < 0.05) %>%
+  count(treatment) %>%
+  mutate(FDR = 0.05),
+diff.expression %>%
+  filter(FDR < 0.1) %>%
+  count(treatment) %>%
+  mutate(FDR = 0.1)) %>%
+  left_join(NewColors, by='treatment') %>%
+  mutate(PC2 = if_else(NewColor == "#e34a33", 0, PC2)) %>%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %>%
+  ggplot(aes(x=treatment, y=n)) +
+  geom_bar(stat="identity",position = "identity", alpha=.15) +
+  geom_text(y=Inf,  vjust=1, label="*", aes(color=NewColor, alpha=alpha)) +
+  Rotate_x_labels +
+  scale_color_identity() +
+  theme(axis.text.x = element_text(size=6)) +
+  theme(legend.position='none') +
+  labs(title="Number of DE genes", x="treatment", caption=str_wrap("FDR 1%, 5%, 10%\nAsterisk Color for PC1/PC2 to approximate branaplam/risdiplam axes", 30))
+NumberDE.genes
+```
+
+Ok wow WD08 is a real outlier there. Tons of DE genes... It also had the most leafcutter hits from this experiment. I'll have to look more into that later. First let's zoom in on the y=axis to better look at the other contrasts.
+
+```{r}
+NumberDE.genes +
+  coord_cartesian(ylim=c(0,20))
+```
+
+Ok so a typical contrast has more like 5-10 DE genes at a reasonable FDR threshold. It's also worth noting that the branaplam like molecules, when roughly have similar amounts of differential splicing, have much less differential expression.
+
+Let me go back to WD08... I'm wondering if this sample just had a crazy amount of read depth or something..
+
+```{r}
+
+counts.plot.dat %>%
+  filter(Experiment == "Single high dose LCL") %>%
+  dplyr::select(SampleName, lib.size, treatment) %>%
+  left_join(NewColors) %>%
+  mutate(PC2 = if_else(NewColor == "#e34a33", 0, PC2)) %>%
+  mutate(SampleName = fct_reorder(SampleName, PC2 * alpha)) %>%
+  ggplot(aes(x=SampleName, y=lib.size)) +
+  geom_col(aes(fill=NewColor, alpha=alpha)) +
+  Rotate_x_labels +
+  scale_fill_identity() +
+  theme(axis.text.x = element_text(size=6)) +
+  theme(legend.position='none')
+
+
+```
+Ok, so those three treatments, included WD08 are not huge outliers in terms of sequencing depth. Maybe there is something genuinely different about it that makes it have many DE genes and splicing changes.
+
+Let's go back to looking at genomewide GA-GT activation levels...
+
+```{r}
+
+leafcutter.effects %>%
+  inner_join(
+    Introns.annotations %>%
+    mutate(IsGAGT = if_else(str_detect(seq, "^\\w\\wGAGT"), "GA-GT", "not GA-GT")),
+    by="name") %>%
+  group_by(IsGAGT, treatment) %>%
+  summarise(medLogef = median(logef)) %>%
+  left_join(NewColors) %>%
+  mutate(PC2 = if_else(NewColor == "#e34a33", 0, PC2)) %>%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %>%
+  ggplot(aes(x=treatment, y=medLogef, fill=NewColor, alpha=alpha)) +
+  geom_col() +
+  scale_fill_identity() +
+  coord_flip() +
+  facet_wrap(~IsGAGT) +
+  theme(axis.text.y = element_text(size=6)) +
+  theme(legend.position='none') +
+  labs(title="3 treatments in question still activate GA-GT\nto similar levels as branaplam/risdiplam -like treatments", y="median splicing logFC")
+
+```
+
+Ok I have to do this for all dinucleotides... 
+
+```{r, fig.width=7, fig.height=10}
+
+leafcutter.effects %>%
+  inner_join(
+    Introns.annotations %>%
+    mutate(UpstreamOfDonor2BaseSeq = substr(seq, 3, 4)),
+    by="name") %>%
+  group_by(UpstreamOfDonor2BaseSeq, treatment) %>%
+  summarise(medLogef = median(logef)) %>%
+  left_join(NewColors) %>%
+  mutate(PC2 = if_else(NewColor == "#e34a33", 0, PC2)) %>%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %>%
+  ggplot(aes(y=treatment, x=UpstreamOfDonor2BaseSeq, fill=medLogef)) +
+  geom_raster() +
+  scale_fill_viridis_c() +
+  theme(axis.text.y = element_text(size=6, colour = XaxisColors))
+```
+
+Ok, well firstly it is nice to see preferential activation of GA across the board. And there isn't any other dinucleotide that pops out in the three red samples in question. And the degree of GA-GT activation doesn't seem all that different from other treatments similar in PC1. I think this is particularly interesting for WD08 which at 3-4x as many differentially spliced clusters and ~100x as many DE genes as a typical treatment. I'm leaning towards thinking this molecule just might elicit non-splicing related toxic effects. Let's count the number of differentially spliced NNGT introns for each effect to better understand this... I'm wondering whether those 3-4x as many differentially spliced introns are from non GAGT introns (eg indirect effects).
+
+
+
+```{r}
+leafcutter.effects_and_sig <- leafcutter.effects %>%
+  inner_join(leafcutter.sig) %>%
+  inner_join(
+    Introns.annotations %>%
+    mutate(UpstreamOfDonor2BaseSeq = substr(seq, 3, 4)),
+    by="name")
+
+leafcutter.effects_and_sig %>%
+  group_by(cluster, treatment) %>%
+  mutate(ContainsGAGT = any(UpstreamOfDonor2BaseSeq=="GA")) %>%
+  ungroup() %>%
+  filter(p.adjust < 0.1) %>%
+  distinct(cluster, treatment, .keep_all=T) %>%
+  count(ContainsGAGT, treatment) %>%
+  left_join(NewColors) %>%
+  mutate(PC2 = if_else(NewColor == "#e34a33", 0, PC2)) %>%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %>%
+  ggplot(aes(x=treatment, y=n, fill=ContainsGAGT)) +
+  geom_col(position="stack") +
+  coord_flip() +
+  theme(axis.text.y = element_text(size=6, colour = XaxisColors), legend.position='bottom') +
+  labs(title="WD08 has many non-GAGT effects", y="Number significant clusters, FDR<10%")
+```
+Ok, so now I am sort of worried the WD08 effect might be indirect effects. There is much more AS but much of it is not at GAGT introns, and also there is tons of tons of DE.
+
+The other two interesting molecules were WC05 and WB12. Those ones I still don't understand as well. Looking at the PCA again, WC05 is the larger deparature from the rsidiplam/branaplam axes than WB12. I'll keep a particular eye on WC05.
+
+I'm going to look at the -3 and -4 positions now. So I'll just filter for the GAGT introns, and make a similar plot as the heatmap I plotted above for the -3 and -4 position ...
+
+```{r, fig.width=7, fig.height=10}
+leafcutter.effects_and_sig %>%
+  filter(UpstreamOfDonor2BaseSeq == "GA") %>%
+  mutate(NNGAGT = substr(seq, 1, 2)) %>%
+  group_by(NNGAGT, treatment) %>%
+  summarise(medLogef = median(logef)) %>%
+  left_join(NewColors) %>%
+  mutate(PC2 = if_else(NewColor == "#e34a33", 0, PC2)) %>%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %>%
+  ggplot(aes(y=treatment, x=NNGAGT, fill=medLogef)) +
+  geom_raster() +
+  scale_fill_viridis_c() +
+  theme(axis.text.y = element_text(size=6, colour = XaxisColors))
+
+```
+Ok, so similar to previous Bhattacharya et al, and our dose titration series, we can see the -4 and -3 positions distinguish the branaplam-like molecules vs the risdiplam-like molecules. WC05 and WB12 don't look particularly special on this plot. If anything I think WC05 may look a bit more like risdiplam in this respect (I'm looking in particular at the AT column), consistent with its structural similarity with risdiplam. WC04 pops out as interesting, even though it didn't necessarily pop out from the PCA. I do notice in the above plots that WC04 had a lot of non GAGT diff splicing and a larger number of DE genes. Could also be some indirect effects.
+
+Let's go back to the DE results. For now I'll plot volcano plots of some select molecules to see what the top genes are for some samples of interest: WC05, WB12, and some reference samples to represent risdiplam like effects (WB09, WB10) and branaplam like effects (WE02, WE04)
+
+```{r, fig.width=10, fig.height=8}
+
+
+diff.expression %>%
+  filter(treatment %in% c("WC05", "WB12", "WE04", "WE02", "WB09","WB10")) %>%
+  mutate(IsSig = FDR<0.1) %>%
+  mutate(label = if_else(
+    IsSig,
+    symbol,
+    NA_character_
+  )) %>%
+  mutate(treatment = recode(treatment,
+    "WE02" = "WE02; branaplam-like",
+    "WE04" = "WE04; branaplam-like",
+    "WB09" = "WB09; risdiplam-like",
+    "WB10" = "WB10; risdiplam-like",
+  )) %>%
+  ggplot(aes(x=logFC, y=-log10(PValue), color=IsSig)) +
+  geom_point() +
+  scale_color_manual(values=c(`TRUE`="red", `FALSE`="black")) +
+  geom_text_repel(aes(label=label), size=3, max.overlaps=) +
+  facet_wrap(~treatment, scales = "free")
+
+```
+
+
+Ok honing in on some genes, in some ways WC05 and WB12 are more risdiplam-like (DENND5A), and in some other ways they are more branaplam like (CRYL1), and in some ways they might be like niether (ZNF837)...
+
+
+Let's plot these genes and a few others more closely...
+
+```{r}
+diff.expression %>%
+  filter(symbol %in% c("HTT", "RCC1", "CRYL1", "ZNF837", "DENND5A", "FHOD3", "STAT1", "PITPNB")) %>%
+  left_join(NewColors) %>%
+  mutate(PC2 = if_else(NewColor == "#e34a33", 0, PC2)) %>%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %>%
+  mutate(Sig = case_when(
+    PValue < 0.001 ~ "!",
+    PValue < 0.05 ~ "*",
+    TRUE ~ NA_character_
+  )) %>%
+  ggplot(aes(x=treatment, y=logFC, fill=NewColor)) +
+  geom_col(aes(alpha=alpha)) +
+  geom_text(aes(label=Sig), y=Inf, vjust=1) +
+  scale_fill_identity() +
+  facet_wrap(~symbol) +
+  Rotate_x_labels +
+  theme(axis.text.x = element_text(size=5), legend.position='none') +
+  labs(title="Expression changes in genes of interest", y="log2FC", caption=str_wrap("P<0.05 = *\nP<0.001 = !\nColor and  fill transparency based on PC1 & PC2 to distinguish risdiplam/branaplam axes", 30))
+```
+
+
+Let's repeat but just consider more systematically any DE gene found in C05 or B12 with FDR<20%
+
+```{r, fig.height=8, fig.width=6}
+diff.expression %>%
+  filter(treatment %in% c("WC05", "WB12")) %>%
+  filter( FDR<0.2) %>%
+  distinct(EnsemblID) %>%
+  left_join(diff.expression) %>%
+  left_join(NewColors) %>%
+  mutate(PC2 = if_else(NewColor == "#e34a33", 0, PC2)) %>%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %>%
+  mutate(Sig = case_when(
+    PValue < 0.001 ~ "!",
+    PValue < 0.05 ~ "*",
+    TRUE ~ NA_character_
+  )) %>%
+  ggplot(aes(x=treatment, y=logFC, fill=NewColor)) +
+  geom_col(aes(alpha=alpha)) +
+  geom_text(aes(label=Sig), y=Inf, vjust=1) +
+  scale_fill_identity() +
+  facet_wrap(~symbol) +
+  Rotate_x_labels +
+  theme(axis.text.x = element_text(size=5), legend.position='none') +
+  labs(title="Expression changes in genes of interest", y="log2FC", caption=str_wrap("P<0.05 = *\nP<0.001 = !\nColor and  fill transparency based on PC1 & PC2 to distinguish risdiplam/branaplam axes", 30))
+```
+
+Ok, based on this I'm not sure there are any astoundingly specific DE changes with WC05 or WB12... Sure in some ways it is unique becase it may be risdiplam like, and in some other ways it may be more branaplam like, and there are some changes in effect sizes, but no totally new DE discoveries.
+
+I think it might be better to just report this to Jingxin before trying to make a list of things to verify by qPCR... That doesn't seem to interesting to me given these results.
+
+Next thing I am curious about is following up on the WC04 effect at the -4 and -3 position. It seemed to have a preference for CGGA|GT and GGGA|GT that was not found in either risdiplam or branaplam like molecules. First let me verify this is really a believable effect and not just noise due to sampling a very low number of introns or something.
+
 
 
 
