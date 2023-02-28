@@ -81,6 +81,25 @@ rule leafcutter_ds_ExpOf52_MergedContrast:
         /software/R-3.4.3-el7-x86_64/bin/Rscript {input.Rscript} -p {threads} -o {params.Prefix} {params.ExtraParams} {input.numers} {input.groupfile} &> {log}
         """
 
+use rule leafcutter_ds_ExpOf52_MergedContrast as leafcutter_ds_ExpOf52_CustomContrasts with:
+    input:
+        groupfile = "../output/CustomLeafcutterGroupFiles/{ContrastName}.tsv",
+        numers = "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numers.counts.gz",
+        Rscript = "scripts/leafcutter/scripts/leafcutter_ds.R"
+    output:
+        "SplicingAnalysis/Exp52_CustomContrasts/{ContrastName}_effect_sizes.txt",
+        "SplicingAnalysis/Exp52_CustomContrasts/{ContrastName}_cluster_significance.txt"
+    params:
+        Prefix = "SplicingAnalysis/Exp52_CustomContrasts/{ContrastName}",
+        ExtraParams = "-i 2 -g 2"
+    log:
+        "logs/leafcutter_ds_Exp52_CustomContrasts/{ContrastName}.log"
+
+CustomContrasts, = glob_wildcards("../output/CustomLeafcutterGroupFiles/{ContrastName}.tsv")
+rule GatherCustomContrasts:
+    input:
+        expand("SplicingAnalysis/Exp52_CustomContrasts/{ContrastName}_effect_sizes.txt", ContrastName = CustomContrasts)
+
 rule DE_testing_ExpOf52:
     input:
         "featureCounts/AllSamples_Counts.txt"

@@ -53,7 +53,7 @@ FullMetadata <- read_tsv("../output/20230223_FullMetadata.tsv")
 
 PSI.IntronsToInclude <- read_tsv("../output/20230223_IntronsToInclude.tsv.gz")
 
-PCA.dat <- read_tsv("../output/20230223_PCA_Projections.tsv.gz")
+PCA.dat <- read_tsv("../output/20230227_PCA_Projections.tsv.gz")
 
 MoleculeIdentities <- read_csv("../code/DataNotToCommit/CompoundsAndConcentrations_ZT.csv")
 
@@ -61,6 +61,11 @@ MoleculeIdentities <- read_csv("../code/DataNotToCommit/CompoundsAndConcentratio
 Images <- data.frame( Images = Sys.glob("../code/DataNotToCommit/4x/*.png") ) %>%
   mutate(CompoundName = str_replace(Images, "../code/DataNotToCommit/4x/(.+?).png", "\\1")) %>%
   left_join(MoleculeIdentities)
+
+data.frame( Images = Sys.glob("../code/DataNotToCommit/4x/*.png") ) %>%
+  mutate(CompoundName = str_replace(Images, "../code/DataNotToCommit/4x/(.+?).png", "\\1")) %>%
+  full_join(MoleculeIdentities) %>%
+  filter(is.na(treatment) | is.na(Images))
 
 ```
 
@@ -114,7 +119,7 @@ PC3.PC4 <- ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, shape=Experiment)) +
   TreatmentColorsLabels.Layer.FibroblastColorsAdded +
   scale_color_identity() +
   theme_bw() +
-  labs(title = "PCA using 475 GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
+  labs(title = "PCA using 632 GAGT introns\nAll samples", caption="Introns based on being significant in any contrast")
 
 
 ```
@@ -122,8 +127,77 @@ PC3.PC4 <- ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, shape=Experiment)) +
 ```{r, eval=F}
 ggsave("../code/scratch/PC1.PC2.png",PC1.PC2, height=8, width=12)
 
-FullMetadata
 ```
 
+
+Ok, the only thing that is annoying about this plot is there are too many overlapping sticks. maybe a more useful way to plot this is as a heatmap with each skeleton in their own box, and fill the box by the color based on PC1/PC2...
+
+```{r}
+NewColors <- PCA.dat %>%
+  filter(Experiment == "Single high dose LCL") %>%
+  # group_by(treatment) %>%
+  # summarise(PC1 = mean(PC1), PC2=mean(PC2)) %>%
+  mutate(NewColor = case_when(
+    PC2 > 0 ~ "#08519c",
+    PC2 < 0 ~ "#006d2c",
+  ))
+
+MinPC1 <- min(NewColors$PC1)
+MaxPC1 <- max(NewColors$PC1)
+
+NewColors <- NewColors %>%
+  mutate(alpha = (PC1 - MinPC1)/(MaxPC1 - MinPC1)) %>%
+  mutate(NewColor = if_else(
+    treatment %in% c("WD08", "WC05", "WB12"),
+    "#e34a33",
+    NewColor
+  ))
+
+PCA.TwoColorsAndFill <- NewColors %>%
+  mutate(treatment=str_remove_all(treatment, "W")) %>%
+  ggplot(aes(x=PC1, y=PC2, color=PC2, alpha=PC1)) +
+  geom_text(aes(label=treatment),size=3) +
+  scale_colour_gradient(low="#e34a33", high="#08519c") +
+  # scale_color_gradient2(low="#006d2c", mid="#e34a33", high="#08519c", midpoint=-5) +
+  scale_alpha_continuous(range=c(0, 1))
+PCA.TwoColorsAndFill
+
+Heatmap.Plate <- NewColors %>%
+  dplyr::select(-dose.nM) %>%
+  left_join(MoleculeIdentities) %>%
+  mutate(Row_Column = str_replace(leafcutter.name, "NewMolecule.([A-E])(\\d+).[1-6]$", "\\1_\\2")) %>%
+  replace_na(list(CompoundName="DMSO")) %>%
+  separate(Row_Column, into=c("Row", "Column"), sep="_", convert=T) %>%
+  group_by(Row, Column, treatment) %>%
+  mutate(rep = row_number()) %>%
+  ungroup() %>%
+  left_join(Images) %>%
+  ggplot(aes(x=rep, y=1)) +
+  geom_col(aes(fill=PC2, alpha=PC1), position = "fill", width=1) + 
+  geom_text(data = . %>%
+              filter(rep==1),
+            aes(label=CompoundName), x=1, y=-Inf, hjust=0.2, vjust=-1, size=2.5) +
+  geom_image(data = . %>%
+               filter(rep==1),
+             aes(image=Images), size=0.9, y=0.7, x=1, nudge_x=0.5) +
+  scale_fill_gradient(low="#e34a33", high="#08519c") +
+  # scale_fill_gradient2(low="#006d2c", mid="#e34a33", high="#08519c", midpoint=-5) +
+  scale_alpha_continuous(range=c(0, 1)) +
+  facet_grid(Row~Column) +
+  scale_y_continuous(expand = c(0, 0)) + 
+  scale_x_continuous(expand = c(0, 0)) +
+  theme(axis.title=element_blank(),
+        axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        aspect.ratio = 1)
+Heatmap.Plate
+
+```
+
+```{r, eval=F}
+ggsave("../code/scratch/PlateLayout_PCA_Heatmap.png",Heatmap.Plate, height=6, width=12)
+ggsave("../code/scratch/PlateLayout_PCA_TwoColors.png",PCA.TwoColorsAndFill, height=6, width=7)
+
+```
 
 

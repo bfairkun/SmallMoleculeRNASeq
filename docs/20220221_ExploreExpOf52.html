@@ -330,7 +330,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-02-24
+<strong>Last updated:</strong> 2023-02-28
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -491,15 +491,15 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreea8c9152c8020689603208f678ef53d6864f0077ctargetblanka8c9152a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree0e2a3601db2a0f243a1f62c7add5d1f194e074cdtargetblank0e2a360a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/a8c9152c8020689603208f678ef53d6864f0077c" target="_blank">a8c9152</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/0e2a3601db2a0f243a1f62c7add5d1f194e074cd" target="_blank">0e2a360</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreea8c9152c8020689603208f678ef53d6864f0077ctargetblanka8c9152a"
+id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree0e2a3601db2a0f243a1f62c7add5d1f194e074cdtargetblank0e2a360a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -509,7 +509,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/a8c9152c8020689603208f678ef53d6864f0077c" target="_blank">a8c9152</a>.
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/0e2a3601db2a0f243a1f62c7add5d1f194e074cd" target="_blank">0e2a360</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -573,8 +573,6 @@ Ignored files:
     Ignored:    code/log
     Ignored:    code/logs/
     Ignored:    code/rstudio-server.job
-    Ignored:    code/rules/.Process_ExpOf52.smk.swp
-    Ignored:    code/rules/.RNASeqProcessing.smk.swp
     Ignored:    code/scratch/
     Ignored:    code/test.txt.gz
     Ignored:    code/testPlottingWithMyScript.ForJingxin.sh
@@ -585,9 +583,15 @@ Ignored files:
     Ignored:    data/~$52CompoundsTempPlateLayoutForPipettingConvenience.xlsx
     Ignored:    output/._PioritizedIntronTargets.pdf
 
+Untracked files:
+    Untracked:  output/20230227_PCA_Projections.tsv.gz
+    Untracked:  output/CustomLeafcutterGroupFiles/
+
 Unstaged changes:
     Modified:   analysis/20220221_ExploreExpOf52.Rmd
     Modified:   analysis/20230223_PlotPCA_WithStructures.Rmd
+    Modified:   code/rules/Process_ExpOf52.smk
+    Modified:   code/rules/common.smk
 
 </code></pre>
 <p>
@@ -634,6 +638,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/analysis/20220221_ExploreExpOf52.Rmd" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+<td>
+update exp52 notebook
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/20220221_ExploreExpOf52.html" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+<td>
+update exp52 notebook
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -724,6 +762,7 @@ Attaching package: &#39;gplots&#39;</code></pre>
 
     lowess</code></pre>
 <pre class="r"><code>library(ggrepel)
+library(knitr)
 
 # define some useful funcs
 sample_n_of &lt;- function(data, size, ...) {
@@ -3766,8 +3805,45 @@ ggplot( aes(x=PC1, y=PC2, shape=Experiment)) +
   # scale_color_identity() +
   theme_bw() +
   labs(title = &quot;PCA using 475 GAGT introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast&quot;)</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" />
-Ok, that makes me feel better these three interesting candidate
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-21-1">
+Past versions of unnamed-chunk-21-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-21-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-21-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Ok, that makes me feel better these three interesting candidate
 molecules aren’t just outliers in read depth.</p>
 <p>Next I want to plot a heatmap of the correlation matrix based on
 these introns, I wonder if any clear clustering patterns will come out
@@ -3806,6 +3882,43 @@ MetadataForCormat &lt;- data.frame(leafcutter.name = PSI.IntronsToInclude.cormat
   
 heatmap.2(PSI.IntronsToInclude.cormat, trace=&#39;none&#39;, RowSideColors = MetadataForCormat$color, ColSideColors = MetadataForCormat$color, labRow = MetadataForCormat$treatment, cexRow=0.2, labCol = MetadataForCormat$treatment, cexCol=0.2)</code></pre>
 <p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-22-1">
+Past versions of unnamed-chunk-22-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-22-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-22-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>pdf(&quot;../code/scratch/Heatmap.pdf&quot;)
 heatmap.2(PSI.IntronsToInclude.cormat, trace=&#39;none&#39;, RowSideColors = MetadataForCormat$color, ColSideColors = MetadataForCormat$color, labRow = MetadataForCormat$treatment, cexRow=0.2, labCol = MetadataForCormat$treatment, cexCol=0.2)
 dev.off()</code></pre>
@@ -3883,6 +3996,43 @@ ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
   theme_bw() +
   labs(title = &quot;PCA using 23416 introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast&quot;)</code></pre>
 <p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-24-1">
+Past versions of unnamed-chunk-24-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-24-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-24-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>pca.results.to.plot %&gt;%
   inner_join(
     counts.plot.dat %&gt;%
@@ -3896,6 +4046,43 @@ ggplot(aes(x=PC1, y=PC2, shape=Experiment)) +
   theme_bw() +
   labs(title = &quot;PCA using 23416 introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast. Colored by depth&quot;)</code></pre>
 <p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-24-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-24-2">
+Past versions of unnamed-chunk-24-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-24-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-24-2.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
   geom_text(size=3, aes(label=treatment)) +
   geom_point(data = pca.results.to.plot_AdditionProjections) +
@@ -3904,6 +4091,43 @@ ggplot(aes(x=PC1, y=PC2, shape=Experiment)) +
   theme_bw() +
   labs(title = &quot;PCA using 23416 introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast&quot;)</code></pre>
 <p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-24-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-24-3">
+Past versions of unnamed-chunk-24-3.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-24-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-24-3.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ggplot(pca.results.to.plot, aes(x=PC4, y=PC5, color=color, shape=Experiment)) +
   geom_text(size=3, aes(label=treatment)) +
   geom_point(data = pca.results.to.plot_AdditionProjections) +
@@ -3911,8 +4135,45 @@ ggplot(aes(x=PC1, y=PC2, shape=Experiment)) +
   scale_color_identity() +
   theme_bw() +
   labs(title = &quot;PCA using 23416 introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast&quot;)</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-24-4.png" width="672" style="display: block; margin: auto;" />
-Ok interesting… when you look at all significant introns with
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-24-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-24-4">
+Past versions of unnamed-chunk-24-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-24-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-24-4.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Ok interesting… when you look at all significant introns with
 abs(deltapsi) &gt; 0.01, the first few PCs measure hidden technical
 variables that don’t seem to cluster biological replicates very well.
 deeper PCs seem to work better to find the dosage axis (PC4) branaplam
@@ -3989,6 +4250,43 @@ ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
   theme_bw() +
   labs(title = &quot;PCA using 632 upregulated GAGT introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast&quot;)</code></pre>
 <p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-25-1">
+Past versions of unnamed-chunk-25-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-25-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>pca.results.to.plot %&gt;%
   inner_join(
     counts.plot.dat %&gt;%
@@ -4002,6 +4300,43 @@ ggplot(aes(x=PC1, y=PC2, shape=Experiment)) +
   theme_bw() +
   labs(title = &quot;PCA using 632 upregulated GAGT introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast. Colored by depth&quot;)</code></pre>
 <p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-25-2">
+Past versions of unnamed-chunk-25-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-25-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-2.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
   geom_text(size=3, aes(label=treatment)) +
   geom_point(data = pca.results.to.plot_AdditionProjections) +
@@ -4010,6 +4345,43 @@ ggplot(aes(x=PC1, y=PC2, shape=Experiment)) +
   theme_bw() +
   labs(title = &quot;PCA using 632 upregulated GAGT introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast&quot;)</code></pre>
 <p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-25-3">
+Past versions of unnamed-chunk-25-3.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-25-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-3.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ggplot(pca.results.to.plot, aes(x=PC3, y=PC4, color=color, shape=Experiment)) +
   geom_text(size=3, aes(label=treatment)) +
   # geom_point(data = pca.results.to.plot_AdditionProjections) +
@@ -4018,6 +4390,43 @@ ggplot(aes(x=PC1, y=PC2, shape=Experiment)) +
   theme_bw() +
   labs(title = &quot;PCA using 632 upregulated GAGT introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast&quot;)</code></pre>
 <p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-25-4">
+Past versions of unnamed-chunk-25-4.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-25-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-4.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ggplot(pca.results.to.plot, aes(x=PC4, y=PC5, color=color, shape=Experiment)) +
   geom_text(size=3, aes(label=treatment)) +
   geom_point(data = pca.results.to.plot_AdditionProjections) +
@@ -4026,6 +4435,43 @@ ggplot(aes(x=PC1, y=PC2, shape=Experiment)) +
   theme_bw() +
   labs(title = &quot;PCA using 632 upregulated GAGT introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast&quot;)</code></pre>
 <p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-5.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-25-5">
+Past versions of unnamed-chunk-25-5.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-25-5" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-5.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ggplot(pca.results.to.plot, aes(x=PC4, y=PC5, color=color, shape=Experiment)) +
   geom_text(size=3, aes(label=treatment)) +
   # geom_point(data = pca.results.to.plot_AdditionProjections) +
@@ -4034,12 +4480,52 @@ ggplot(aes(x=PC1, y=PC2, shape=Experiment)) +
   theme_bw() +
   labs(title = &quot;PCA using 632 upregulated GAGT introns\nAll samples&quot;, caption=&quot;Introns based on being significant in any contrast&quot;)</code></pre>
 <p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-6.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-25-6">
+Past versions of unnamed-chunk-25-6.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-25-6" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-25-6.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Hmm, ok much like the first PCA. Of course these are surely mostly
 overlapping introns. But at least is sort of comforting. I thought
 looking at deeper PCs might reveal something… Mostly reveals that
 interpreting PCs is not always straightforward.</p>
 <p>Also, if C05, D08, and B12 have unique properties, it is not so clear
 if are similar or distinct from each other.</p>
+<p>First let’s write out these PCA, for later use…</p>
+<pre class="r"><code>pca.results.to.plot %&gt;%
+  write_tsv(&quot;../output/20230227_PCA_Projections.tsv.gz&quot;)</code></pre>
 </div>
 </div>
 <div id="investigation-of-the-c05-d08-and-b12" class="section level2">
@@ -4075,7 +4561,44 @@ diff.expression %&gt;%
   facet_wrap(~symbol) +
   Rotate_x_labels +
   theme(axis.text.x = element_text(size=3))</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-27-1">
+Past versions of unnamed-chunk-27-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-27-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-27-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Hmm.. Offhand I can’t really remember which if any of these genes
 (besides HTT) should be branaplam or risdiplam-specific. I think one
 helpful way to plot this will be to incorporate titration series data
@@ -4124,7 +4647,44 @@ diff.expression %&gt;%
   Rotate_x_labels +
   theme(axis.text.x = element_text(size=5)) +
   labs(title=&quot;Expression changes in genes of interest&quot;, y=&quot;log2FC&quot;, caption=str_wrap(&quot;P&lt;0.05 = *\nP&lt;0.001 = !\nColor and  fill transparency based on PC1 &amp; PC2 to distinguish risdiplam/branaplam axes&quot;, 30))</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-28-1">
+Past versions of unnamed-chunk-28-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-28-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-28-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok, so based on these subset of genes, the red molecules have some
 risdiplam-like effects and some branaplam-like effects. Let’s look more
 globally at the DE results..</p>
@@ -4159,14 +4719,88 @@ diff.expression %&gt;%
   theme(legend.position=&#39;none&#39;) +
   labs(title=&quot;Number of DE genes&quot;, x=&quot;treatment&quot;, caption=str_wrap(&quot;FDR 1%, 5%, 10%\nAsterisk Color for PC1/PC2 to approximate branaplam/risdiplam axes&quot;, 30))
 NumberDE.genes</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-29-1">
+Past versions of unnamed-chunk-29-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-29-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-29-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok wow WD08 is a real outlier there. Tons of DE genes… It also had
 the most leafcutter hits from this experiment. I’ll have to look more
 into that later. First let’s zoom in on the y=axis to better look at the
 other contrasts.</p>
 <pre class="r"><code>NumberDE.genes +
   coord_cartesian(ylim=c(0,20))</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-30-1">
+Past versions of unnamed-chunk-30-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-30-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-30-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok so a typical contrast has more like 5-10 DE genes at a reasonable
 FDR threshold. It’s also worth noting that the branaplam like molecules,
 when roughly have similar amounts of differential splicing, have much
@@ -4185,8 +4819,45 @@ amount of read depth or something..</p>
   scale_fill_identity() +
   theme(axis.text.x = element_text(size=6)) +
   theme(legend.position=&#39;none&#39;)</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" />
-Ok, so those three treatments, included WD08 are not huge outliers in
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-31-1">
+Past versions of unnamed-chunk-31-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-31-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-31-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Ok, so those three treatments, included WD08 are not huge outliers in
 terms of sequencing depth. Maybe there is something genuinely different
 about it that makes it have many DE genes and splicing changes.</p>
 <p>Let’s go back to looking at genomewide GA-GT activation levels…</p>
@@ -4208,7 +4879,44 @@ about it that makes it have many DE genes and splicing changes.</p>
   theme(axis.text.y = element_text(size=6)) +
   theme(legend.position=&#39;none&#39;) +
   labs(title=&quot;3 treatments in question still activate GA-GT\nto similar levels as branaplam/risdiplam -like treatments&quot;, y=&quot;median splicing logFC&quot;)</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-32-1">
+Past versions of unnamed-chunk-32-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-32-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-32-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok I have to do this for all dinucleotides…</p>
 <pre class="r"><code>leafcutter.effects %&gt;%
   inner_join(
@@ -4224,7 +4932,44 @@ about it that makes it have many DE genes and splicing changes.</p>
   geom_raster() +
   scale_fill_viridis_c() +
   theme(axis.text.y = element_text(size=6, colour = XaxisColors))</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-33-1">
+Past versions of unnamed-chunk-33-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-33-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-33-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok, well firstly it is nice to see preferential activation of GA
 across the board. And there isn’t any other dinucleotide that pops out
 in the three red samples in question. And the degree of GA-GT activation
@@ -4236,7 +4981,22 @@ non-splicing related toxic effects. Let’s count the number of
 differentially spliced NNGT introns for each effect to better understand
 this… I’m wondering whether those 3-4x as many differentially spliced
 introns are from non GAGT introns (eg indirect effects).</p>
-<pre class="r"><code>leafcutter.effects_and_sig &lt;- leafcutter.effects %&gt;%
+<pre class="r"><code># leafcutter.effects %&gt;%
+#   inner_join(
+#     Introns.annotations %&gt;%
+#     mutate(UpstreamOfDonor2BaseSeq = substr(seq, 3, 4)),
+#     by=&quot;name&quot;) %&gt;%
+#   group_by(UpstreamOfDonor2BaseSeq, treatment) %&gt;%
+#   summarise(medLogef = median(logef)) %&gt;%
+#   left_join(NewColors) %&gt;%
+#   mutate(PC2 = if_else(NewColor == &quot;#e34a33&quot;, 0, PC2)) %&gt;%
+#   mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %&gt;%
+#   ggplot(aes(y=treatment, x=UpstreamOfDonor2BaseSeq, fill=medLogef)) +
+#   geom_raster() +
+#   scale_fill_viridis_c() +
+#   theme(axis.text.y = element_text(size=6, colour = XaxisColors))
+
+leafcutter.effects_and_sig &lt;- leafcutter.effects %&gt;%
   inner_join(leafcutter.sig) %&gt;%
   inner_join(
     Introns.annotations %&gt;%
@@ -4258,8 +5018,45 @@ leafcutter.effects_and_sig %&gt;%
   coord_flip() +
   theme(axis.text.y = element_text(size=6, colour = XaxisColors), legend.position=&#39;bottom&#39;) +
   labs(title=&quot;WD08 has many non-GAGT effects&quot;, y=&quot;Number significant clusters, FDR&lt;10%&quot;)</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" />
-Ok, so now I am sort of worried the WD08 effect might be indirect
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-34-1">
+Past versions of unnamed-chunk-34-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-34-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-34-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Ok, so now I am sort of worried the WD08 effect might be indirect
 effects. There is much more AS but much of it is not at GAGT introns,
 and also there is tons of tons of DE.</p>
 <p>The other two interesting molecules were WC05 and WB12. Those ones I
@@ -4281,8 +5078,45 @@ above for the -3 and -4 position …</p>
   geom_raster() +
   scale_fill_viridis_c() +
   theme(axis.text.y = element_text(size=6, colour = XaxisColors))</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;" />
-Ok, so similar to previous Bhattacharya et al, and our dose titration
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-35-1">
+Past versions of unnamed-chunk-35-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-35-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-35-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Ok, so similar to previous Bhattacharya et al, and our dose titration
 series, we can see the -4 and -3 positions distinguish the
 branaplam-like molecules vs the risdiplam-like molecules. WC05 and WB12
 don’t look particularly special on this plot. If anything I think WC05
@@ -4314,8 +5148,46 @@ like effects (WB09, WB10) and branaplam like effects (WE02, WE04)</p>
   geom_point() +
   scale_color_manual(values=c(`TRUE`=&quot;red&quot;, `FALSE`=&quot;black&quot;)) +
   geom_text_repel(aes(label=label), size=3, max.overlaps=) +
-  facet_wrap(~treatment, scales = &quot;free&quot;)</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-35-1.png" width="960" style="display: block; margin: auto;" /></p>
+  facet_wrap(~treatment, scales = &quot;free&quot;) +
+  labs(&quot;DE results, focusing on WB12 and WC05&quot;, color=&quot;FDR&lt;10%&quot;)</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-36-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-36-1">
+Past versions of unnamed-chunk-36-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-36-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-36-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok honing in on some genes, in some ways WC05 and WB12 are more
 risdiplam-like (DENND5A), and in some other ways they are more branaplam
 like (CRYL1), and in some ways they might be like niether (ZNF837)…</p>
@@ -4338,7 +5210,65 @@ like (CRYL1), and in some ways they might be like niether (ZNF837)…</p>
   Rotate_x_labels +
   theme(axis.text.x = element_text(size=5), legend.position=&#39;none&#39;) +
   labs(title=&quot;Expression changes in genes of interest&quot;, y=&quot;log2FC&quot;, caption=str_wrap(&quot;P&lt;0.05 = *\nP&lt;0.001 = !\nColor and  fill transparency based on PC1 &amp; PC2 to distinguish risdiplam/branaplam axes&quot;, 30))</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-37-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-37-1">
+Past versions of unnamed-chunk-37-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-37-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0e2a3601db2a0f243a1f62c7add5d1f194e074cd/docs/figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-37-1.png" target="_blank">0e2a360</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-02-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>There are a few treatments in this plot that also catch my eye in HTT
+and DENND5A… Let’s look at those closer..</p>
+<pre class="r"><code>diff.expression %&gt;%
+  filter(symbol %in% c(&quot;HTT&quot;, &quot;DENND5A&quot;)) %&gt;%
+  left_join(NewColors) %&gt;%
+  mutate(PC2 = if_else(NewColor == &quot;#e34a33&quot; | treatment %in% c(&quot;WC10&quot;, &quot;WC11&quot;, &quot;WC12&quot;), 0, PC2)) %&gt;%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %&gt;%
+  mutate(Sig = case_when(
+    PValue &lt; 0.001 ~ &quot;!&quot;,
+    PValue &lt; 0.05 ~ &quot;*&quot;,
+    TRUE ~ NA_character_
+  )) %&gt;%
+  ggplot(aes(x=treatment, y=logFC, fill=NewColor)) +
+  geom_col(aes(alpha=alpha)) +
+  geom_text(aes(label=Sig), y=Inf, vjust=1) +
+  scale_fill_identity() +
+  facet_wrap(~symbol) +
+  Rotate_x_labels +
+  theme(axis.text.x = element_text(size=5), legend.position=&#39;none&#39;) +
+  labs(title=&quot;Expression changes in genes of interest&quot;, y=&quot;log2FC&quot;, caption=str_wrap(&quot;P&lt;0.05 = *\nP&lt;0.001 = !\nColor and  fill transparency based on PC1 &amp; PC2 to distinguish risdiplam/branaplam axes. C10, C11, C12 reordered by reds&quot;, 30))</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Let’s repeat but just consider more systematically any DE gene found
 in C05 or B12 with FDR&lt;20%</p>
 <pre class="r"><code>diff.expression %&gt;%
@@ -4362,7 +5292,7 @@ in C05 or B12 with FDR&lt;20%</p>
   Rotate_x_labels +
   theme(axis.text.x = element_text(size=5), legend.position=&#39;none&#39;) +
   labs(title=&quot;Expression changes in genes of interest&quot;, y=&quot;log2FC&quot;, caption=str_wrap(&quot;P&lt;0.05 = *\nP&lt;0.001 = !\nColor and  fill transparency based on PC1 &amp; PC2 to distinguish risdiplam/branaplam axes&quot;, 30))</code></pre>
-<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-37-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-39-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>Ok, based on this I’m not sure there are any astoundingly specific DE
 changes with WC05 or WB12… Sure in some ways it is unique becase it may
 be risdiplam like, and in some other ways it may be more branaplam like,
@@ -4371,12 +5301,430 @@ discoveries.</p>
 <p>I think it might be better to just report this to Jingxin before
 trying to make a list of things to verify by qPCR… That doesn’t seem to
 interesting to me given these results.</p>
+<p>Well, actually, let’s at least do the analgous analysis but for
+splicing. And if that looks at all promising, then I can consider doing
+a more careful differential splicing or differential expression to
+directly compare the WC05 or WB12 treatments to more risdiplam like
+treatments or more branaplam like treatments to find what makes them
+unique.</p>
+<p><strong>Still to do that…</strong>*</p>
 <p>Next thing I am curious about is following up on the WC04 effect at
 the -4 and -3 position. It seemed to have a preference for CGGA|GT and
 GGGA|GT that was not found in either risdiplam or branaplam like
 molecules. First let me verify this is really a believable effect and
 not just noise due to sampling a very low number of introns or
 something.</p>
+<p>First let’s see how many introns that median effect was based on and
+if it is significant…</p>
+<p>For sake of not making the plot too big, let’s just include a few
+hand picked dinucleotides based on previous plot.</p>
+<pre class="r"><code>leafcutter.effects_and_sig %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  mutate(NNGAGT = substr(seq, 1, 2)) %&gt;%
+  filter(NNGAGT %in% c(&quot;AA&quot;,&quot;AT&quot;, &quot;CA&quot;,&quot;CG&quot;, &quot;GG&quot;, &quot;TA&quot;, &quot;TG&quot;, &quot;TT&quot;)) %&gt;%
+  group_by(NNGAGT, treatment) %&gt;%
+  summarise(
+    medLogef = median(logef),
+    n=n(),
+    MannWhitneyP=format.pval(wilcox.test(logef, alternative=&quot;greater&quot;)$p.value, 2)) %&gt;%
+  left_join(NewColors) %&gt;%
+  mutate(PC2 = if_else(NewColor == &quot;#e34a33&quot;, 0, PC2)) %&gt;%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %&gt;%
+  ggplot(aes(y=treatment, x=NNGAGT, fill=medLogef)) +
+  geom_raster() +
+  geom_text(color=&#39;red&#39;, size=3, aes(label = paste(n, MannWhitneyP, sep=&#39;|&#39;))) +
+  scale_fill_viridis_c() +
+  theme(axis.text.y = element_text(size=6, colour = XaxisColors))</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-41-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Oh ok, actually those weird C04 effects are because that was the
+treatment where one of the replicates was a failed sample, that I have
+been excluding from some (but mistakenly not all) analyses.</p>
+<p>Let’s also plot the effects for that new bulge (guUaag) that I
+hypothesized in previous experiments is affected by these molecules
+(albeit to a lesser extent than gA|gu bulge).</p>
+<pre class="r"><code>leafcutter.effects_and_sig %&gt;%
+  dplyr::select(treatment, intron, seq, logef) %&gt;%
+  pivot_wider(names_from = &quot;treatment&quot;, values_from = &quot;logef&quot;) %&gt;%
+  mutate(
+    `1_ncag|guaagn` = str_detect(seq, &quot;^\\wCAGGTAAG\\w&quot;),
+    `2_nagA|guaagn` = str_detect(seq, &quot;^\\wAGAGTAAG\\w&quot;),
+    `3_nagG|guaagn` = str_detect(seq, &quot;^\\wAGGGTAAG\\w&quot;),
+    `4_nagU|guaagn` = str_detect(seq, &quot;^\\wAGTGTAAG\\w&quot;),
+    # `5.1_uagA|guaagn` = str_detect(seq, &quot;^TAGAGTAAG\\w&quot;),
+    # `5.2_aagA|guaagn` = str_detect(seq, &quot;^AAGAGTAAG\\w&quot;),
+    `5.3_cagA|guaagn` = str_detect(seq, &quot;^CAGAGTAAG\\w&quot;),
+    `5.4_augA|guaagn` = str_detect(seq, &quot;^ATGAGTAAG\\w&quot;),
+    `6_nnng|guUaag` = str_detect(seq, &quot;^\\w\\w\\wGGTTAAG&quot;),
+    `7_nnng|guAaag` = str_detect(seq, &quot;^\\w\\w\\wGGTAAAG&quot;),
+  ) %&gt;%
+  # filter_at(vars(matches(&quot;^\\d.+_.+$&quot;,perl=T)),any_vars(. == T)) %&gt;%
+  gather(key=&quot;Pattern&quot;, value=&quot;IsMatch&quot;, matches(&quot;^\\d.+&quot;,perl=T)) %&gt;%
+  # pull(Pattern) %&gt;% unique()
+  filter(IsMatch) %&gt;%
+  gather(key=&quot;treatment&quot;, value=&quot;logef&quot;, matches(&quot;^W.+&quot;)) %&gt;%
+  group_by(Pattern, treatment) %&gt;%
+  summarise(medLogef = median(logef, na.rm = T),
+            p = format.pval(wilcox.test(logef, alternative=&quot;greater&quot;)$p.value, 2),
+            n = sum(IsMatch)) %&gt;%
+  ungroup() %&gt;%
+  separate(Pattern, into = c(&quot;PlotOrder&quot;, &quot;Pattern&quot;), sep = &quot;_&quot;, convert=T) %&gt;%
+  arrange(PlotOrder) %&gt;%
+  left_join(NewColors) %&gt;%
+  mutate(PC2 = if_else(NewColor == &quot;#e34a33&quot;, 0, PC2)) %&gt;%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %&gt;%
+  ggplot(aes(y=treatment, x=Pattern, fill=medLogef)) +
+  geom_raster() +
+  geom_text(color=&#39;red&#39;, size=2, aes(label = paste(n, p, sep=&#39;|&#39;))) +
+  scale_fill_gradient2(name=str_wrap(&quot;Median dose-response effect&quot;, 10)) +
+  Rotate_x_labels +
+  theme(axis.text.y = element_text(size=6, colour = XaxisColors))</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-42-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>Ok, there really isn’t anything to be said of that. We just lack
+power to say anything about the hypothesized effect on the guUaag bulge.
+We Again, we can’t even really see the effects at the GT|GT introns
+which I previously saw at high concentrations and have been documented
+in other lit.</p>
+<p>Ok, I think the last thing I want to try is to find the
+C05/B12-specific splicing changes by doing a direct contrast with
+branaplam-like and risdiplam-like molecules..</p>
+<p>Let’s replot the PCA, and highlight the samples I proposed picking
+for leafcutter contrasts. I’ll do 3 contrasts for each sample of
+interest, labelled RisdiLike_High, RisdiLike_Med, and BranadLike_Med.
+I’ll write out the leafcutter groups files for those contrasts, perform
+the contrast (in the snakemake), and then explore results in later code
+chunks:</p>
+<pre class="r"><code>dir.create(&quot;../output/CustomLeafcutterGroupFiles&quot;)
+
+Samples_of_interest &lt;- c(&quot;WD08&quot;, &quot;WC05&quot;, &quot;WB12&quot;)
+RisdiLike_Med_Samples &lt;- c(&quot;WB06&quot;, &quot;WB09&quot;, &quot;WB10&quot;)
+RisdiLike_High_Samples &lt;- c(&quot;WD05&quot;, &quot;WD07&quot;, &quot;WB09&quot;)
+BranaLike_Med_Samples &lt;- c(&quot;WE04&quot;, &quot;WE02&quot;, &quot;WD10&quot;)
+
+
+NewColors %&gt;%
+  dplyr::select(treatment, NewColor, alpha) %&gt;%
+  inner_join(pca.results.to.plot) %&gt;%
+ggplot(aes(x=PC1, y=PC2, color=NewColor)) +
+  geom_point(size=3, aes(alpha=alpha)) +
+  geom_text_repel(data = . %&gt;%
+            filter(treatment %in% c(Samples_of_interest, RisdiLike_Med_Samples)),
+          aes(label=treatment)) +
+  # geom_point(data = pca.results.to.plot_AdditionProjections) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 632 upregulated GAGT introns\nAll samples&quot;, caption=&quot;Samples in RisdiLike_Med contrast labelled&quot;)</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-43-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>NewColors %&gt;%
+  dplyr::select(treatment, NewColor, alpha) %&gt;%
+  inner_join(pca.results.to.plot) %&gt;%
+ggplot(aes(x=PC1, y=PC2, color=NewColor)) +
+  geom_point(size=3, aes(alpha=alpha)) +
+  geom_text_repel(data = . %&gt;%
+            filter(treatment %in% c(Samples_of_interest, RisdiLike_High_Samples)),
+          aes(label=treatment)) +
+  # geom_point(data = pca.results.to.plot_AdditionProjections) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 632 upregulated GAGT introns\nAll samples&quot;, caption=&quot;Samples in RisdiLike_High contrast labelled&quot;)</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-43-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>NewColors %&gt;%
+  dplyr::select(treatment, NewColor, alpha) %&gt;%
+  inner_join(pca.results.to.plot) %&gt;%
+ggplot(aes(x=PC1, y=PC2, color=NewColor)) +
+  geom_point(size=3, aes(alpha=alpha)) +
+  geom_text_repel(data = . %&gt;%
+            filter(treatment %in% c(Samples_of_interest, BranaLike_Med_Samples)),
+          aes(label=treatment)) +
+  # geom_point(data = pca.results.to.plot_AdditionProjections) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = &quot;PCA using 632 upregulated GAGT introns\nAll samples&quot;, caption=&quot;Samples in BranaLike_Med contrast labelled&quot;)</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-43-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ControlSamples &lt;- data.frame(BranaLike_Med_Samples, RisdiLike_High_Samples, RisdiLike_Med_Samples) %&gt;%
+  gather(key=&quot;ContrastName&quot;, value = &quot;treatment&quot;) %&gt;%
+  mutate(Group = &quot;Control&quot;) %&gt;%
+  left_join(FullMetadata) %&gt;%
+  dplyr::select(old.sample.name, Group, ContrastName)
+
+for (treatment in Samples_of_interest){
+  data.frame(treatment=treatment, ContrastName = c(&quot;BranaLike_Med_Samples&quot;, &quot;RisdiLike_High_Samples&quot;, &quot;RisdiLike_Med_Samples&quot;)) %&gt;%
+    left_join(FullMetadata) %&gt;%
+    dplyr::select(old.sample.name, ContrastName) %&gt;%
+    mutate(Group = &quot;Treatment&quot;) %&gt;%
+    bind_rows(ControlSamples) %&gt;%
+    arrange(ContrastName, Group, old.sample.name) %&gt;%
+    group_by(ContrastName) %&gt;%
+    group_walk(~ write_tsv(.x, paste0(&quot;../output/CustomLeafcutterGroupFiles/Contrast_&quot;, treatment, &quot;_vs_&quot;,.y$ContrastName, &quot;groups.tsv&quot;), col_names = F))
+}</code></pre>
+<p>And then I added rules to the snakemake pipeline to run these
+contrasts:</p>
+<pre class="bash"><code>snakemake GatherCustomContrasts</code></pre>
+<p>Now let’s explore the results..</p>
+<pre class="r"><code>leafcutter.effects.CustomContrasts &lt;- list.files(path=&quot;../code/SplicingAnalysis/Exp52_CustomContrasts&quot;, pattern=&quot;^.+_effect_sizes.txt&quot;, full.names=T) %&gt;%
+  setNames(str_replace(., &quot;../code/SplicingAnalysis/Exp52_CustomContrasts/(.+?)_effect_sizes.txt&quot;, &quot;\\1&quot;)) %&gt;%
+  lapply(fread) %&gt;%
+  bind_rows(.id=&quot;Contrast&quot;) %&gt;%
+  mutate(name = str_replace(intron, &quot;(.+?):(.+?):(.+?):clu.+([+-])&quot;, &quot;\\1_\\2_\\3_\\4&quot;)) %&gt;%
+  mutate(cluster = str_replace(intron, &quot;(.+?):.+?:.+?:(clu.+[+-])&quot;, &quot;\\1:\\2&quot;))
+
+leafcutter.sig.CustomContrasts &lt;-list.files(path=&quot;../code/SplicingAnalysis/Exp52_CustomContrasts&quot;, pattern=&quot;^.+_cluster_significance.txt&quot;, full.names=T) %&gt;%
+  setNames(str_replace(., &quot;../code/SplicingAnalysis/Exp52_CustomContrasts/(.+?)_cluster_significance.txt&quot;, &quot;\\1&quot;)) %&gt;%
+  lapply(fread) %&gt;%
+  bind_rows(.id=&quot;Contrast&quot;)
+
+leafcutter.effects.Merged.CustomContrasts &lt;- leafcutter.effects.CustomContrasts %&gt;%
+  inner_join(leafcutter.sig.CustomContrasts, by=c(&#39;cluster&#39;, &#39;Contrast&#39;)) %&gt;%
+  left_join(Introns.annotations, by=&quot;name&quot;) %&gt;%
+  mutate(
+    TestTreatment = str_replace(Contrast,&quot;^Contrast_(.+?)_vs_(.+?)_Samplesgroups$&quot;, &quot;\\1&quot;),
+    ControlTreatment = str_replace(Contrast,&quot;^Contrast_(.+?)_vs_(.+?)_Samplesgroups$&quot;, &quot;\\2&quot;),
+    UpstreamOfDonor2BaseSeq = substr(seq, 3, 4)
+  )
+
+leafcutter.effects.Merged.CustomContrasts$TestTreatment %&gt;% unique()</code></pre>
+<pre><code>[1] &quot;WB12&quot; &quot;WC05&quot; &quot;WD08&quot;</code></pre>
+<pre class="r"><code>leafcutter.effects.Merged.CustomContrasts %&gt;%
+  group_by(cluster, TestTreatment, ControlTreatment) %&gt;%
+  mutate(ContainsGAGT = any(UpstreamOfDonor2BaseSeq==&quot;GA&quot;)) %&gt;%
+  ungroup() %&gt;%
+  filter(p.adjust &lt; 0.1) %&gt;%
+  distinct(cluster, TestTreatment, ControlTreatment, .keep_all=T) %&gt;%
+  count(ContainsGAGT, TestTreatment, ControlTreatment) %&gt;%
+  ggplot(aes(x=ControlTreatment, y=n, fill=ContainsGAGT)) +
+  geom_col(position=&quot;stack&quot;) +
+  facet_wrap(~TestTreatment, scales=&quot;free&quot;) +
+  theme(legend.position=&#39;bottom&#39;) +
+  Rotate_x_labels +
+  labs(title=str_wrap(&quot;contrasts vs brana-like and risdi-like treatments&quot;, 40), y=&quot;Number significant clusters, FDR&lt;10%&quot;)</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-45-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so there are fair number of significant differences. That was
+totally expected. but of course I am particulary interseted in the GAGT
+introns that are <em>more activated</em> in C05/D08/B12</p>
+<pre class="r"><code>leafcutter.effects.Merged.CustomContrasts %&gt;%
+  group_by(cluster, TestTreatment, ControlTreatment) %&gt;%
+  mutate(ContainsGAGT = any(UpstreamOfDonor2BaseSeq==&quot;GA&quot;)) %&gt;%
+  ungroup() %&gt;%
+  filter(p.adjust &lt; 0.1) %&gt;%
+  filter(ContainsGAGT) %&gt;%
+  mutate(sign = sign(logef)) %&gt;%
+  count(sign, TestTreatment, ControlTreatment) %&gt;%
+  ggplot(aes(x=ControlTreatment, y=n, fill=as.factor(sign))) +
+  geom_col(position=&quot;stack&quot;) +
+  facet_wrap(~TestTreatment, scales=&quot;free&quot;) +
+  theme(legend.position=&#39;bottom&#39;) +
+  Rotate_x_labels +
+  labs(title=str_wrap(&quot;contrasts vs brana-like and risdi-like treatments&quot;, 40), y=&quot;Number significant GAGT introns, FDR&lt;10%&quot;)</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-46-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, about the same number of upregulated vs downregulated introns in
+each contrast. What I am really after I should say are the introns that
+are upregulated in all contrasts. So I’ll filter for GA|GT introns that
+are FDR&lt;10% significant in at least one contrast, and nominally
+significant in all contrasts (P&lt;0.05), and with a effect size
+direction favoring upregulation in the treatment of interest.</p>
+<pre class="r"><code>IntronsActivatedByTreatmentsOfInterest &lt;- leafcutter.effects.Merged.CustomContrasts %&gt;%
+  filter(UpstreamOfDonor2BaseSeq == &quot;GA&quot;) %&gt;%
+  group_by(intron, TestTreatment) %&gt;%
+  filter(any(p.adjust &lt; 0.1)) %&gt;%
+  filter(all(p &lt; 0.05)) %&gt;%
+  filter(all(logef &gt; 0)) %&gt;%
+  filter(all(deltapsi &gt; 0.05)) %&gt;%
+  ungroup()
+
+IntronsActivatedByTreatmentsOfInterest %&gt;%
+  dplyr::select(intron, Treatment, Control, TestTreatment, ControlTreatment ) %&gt;%
+  group_by(TestTreatment, intron) %&gt;%
+  mutate(MeanTreatment = mean(Treatment)) %&gt;%
+  distinct(intron, TestTreatment, ControlTreatment, .keep_all=T) %&gt;%
+  dplyr::select(-Treatment) %&gt;%
+  pivot_wider(names_from = &quot;ControlTreatment&quot;, values_from=&quot;Control&quot;) %&gt;%
+  gather(key=&quot;Group&quot;, value=&quot;IntronicPSI&quot;, -c(&quot;intron&quot;, &quot;TestTreatment&quot;)) %&gt;%
+  mutate(Group= relevel(factor(Group), ref=&quot;MeanTreatment&quot;)) %&gt;%
+  mutate(label = paste(TestTreatment, intron, sep=&#39;\n&#39;)) %&gt;%
+  ggplot(aes(x=Group, y=IntronicPSI, fill=Group)) +
+  geom_col() +
+  facet_wrap(~label, scales=&quot;free&quot;) +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        strip.text.x = element_text(size = 5)) +
+  labs(title=&quot;GA-GT introns most specific to samples of interest&quot;, caption=str_wrap(&quot;DeltaPSI&gt;5% in all contrasts, FDR&lt;10% in at least one contrast, P&lt;0.05 in all contrasts&quot;, 40))</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-47-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>Ok these are the kinds of introns I’m looking for, that Jingxin can
+consider validating as specific to these three molecules of interest.
+Let’s look the original data for each sample for these sets of introns…
+And then double check in the genome browser.</p>
+<pre class="r"><code>IntronsActivatedByTreatmentsOfInterest.vec &lt;- IntronsActivatedByTreatmentsOfInterest %&gt;% pull(intron) %&gt;% unique()
+
+AllSamplesInContrasts &lt;- c(Samples_of_interest, RisdiLike_Med_Samples, RisdiLike_High_Samples, BranaLike_Med_Samples)
+
+
+PSI %&gt;%
+  filter(junc %in% IntronsActivatedByTreatmentsOfInterest.vec) %&gt;%
+  dplyr::select(junc, contains(&quot;NewMolecule&quot;)) %&gt;%
+  gather(key = &quot;leafcutter.name&quot;, value=&quot;IntronicPSI&quot;, -junc) %&gt;%
+  left_join(FullMetadata, by=&quot;leafcutter.name&quot;) %&gt;%
+  inner_join(NewColors) %&gt;%
+  mutate(PC2 = if_else(NewColor == &quot;#e34a33&quot; | treatment %in% c(&quot;WC10&quot;, &quot;WC11&quot;, &quot;WC12&quot;), 0, PC2)) %&gt;%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %&gt;%
+  filter(treatment %in% AllSamplesInContrasts) %&gt;%
+  # sample_n_of(5, junc) %&gt;%
+  ggplot(aes(x=treatment, y=IntronicPSI, color=NewColor)) +
+  geom_text(aes(alpha=alpha, label=treatment), size=3) +
+  facet_wrap(~junc, scales=&quot;free&quot;) +
+  scale_color_identity() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        strip.text.x = element_text(size = 5),
+        legend.position=&#39;none&#39;) +
+  labs(title=&quot;Candidate treatment-of-interest-specific effects&quot;, x=&quot;Treatments, roughly in order&quot;, y=&quot;Intronic PSI&quot;)</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-48-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>Ok, I guess that seems reasonable based on the previous plots. I
+don’t think there is a bug in my code.</p>
+<p>Ok, let’s include all samples in these plots now, to see to what
+extent these candidates are just specific to the molecule of
+interest.</p>
+<pre class="r"><code>PSI %&gt;%
+  filter(junc %in% IntronsActivatedByTreatmentsOfInterest.vec) %&gt;%
+  dplyr::select(junc, contains(&quot;NewMolecule&quot;)) %&gt;%
+  gather(key = &quot;leafcutter.name&quot;, value=&quot;IntronicPSI&quot;, -junc) %&gt;%
+  left_join(FullMetadata, by=&quot;leafcutter.name&quot;) %&gt;%
+  inner_join(NewColors) %&gt;%
+  mutate(PC2 = if_else(NewColor == &quot;#e34a33&quot; | treatment %in% c(&quot;WC10&quot;, &quot;WC11&quot;, &quot;WC12&quot;), 0, PC2)) %&gt;%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %&gt;%
+  # sample_n_of(5, junc) %&gt;%
+  ggplot(aes(x=treatment, y=IntronicPSI, color=NewColor)) +
+  geom_text(aes(alpha=alpha, label=treatment), size=3) +
+  facet_wrap(~junc, scales=&quot;free&quot;) +
+  scale_color_identity() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        strip.text.x = element_text(size = 5),
+        legend.position=&#39;none&#39;) +
+    labs(title=&quot;Candidate treatment-of-interest-specific effects&quot;, x=&quot;Treatments, roughly in order&quot;, y=&quot;Intronic PSI&quot;)</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-49-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, there are a few D08 specific effects, but perhaps that isn’t
+surprising given previous plots that show so many effects in this
+particular treatment.</p>
+<p>In any case, as promised, I’ll write out some of the most promising
+things, including FHOD3, as junctions worthy of validation… Maybe the
+better approach for identifying the worthy candidate list this is just
+to forget these specific contrasts, and look at the DE plots I made, and
+intersect with potential GA|GT intron drivers…</p>
+<pre class="r"><code>GenesToHighlight &lt;- c(&quot;HSPA1L&quot;, &quot;CRYL1&quot;, &quot;FHOD3&quot;, &quot;ZFYVE26&quot;)
+
+diff.expression %&gt;%
+  filter(symbol %in% GenesToHighlight) %&gt;%
+  left_join(NewColors) %&gt;%
+  mutate(PC2 = if_else(NewColor == &quot;#e34a33&quot;, 0, PC2)) %&gt;%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %&gt;%
+  mutate(Sig = case_when(
+    PValue &lt; 0.001 ~ &quot;!&quot;,
+    PValue &lt; 0.05 ~ &quot;*&quot;,
+    TRUE ~ NA_character_
+  )) %&gt;%
+  ggplot(aes(x=treatment, y=logFC, fill=NewColor)) +
+  geom_col(aes(alpha=alpha)) +
+  geom_text(aes(label=Sig), y=Inf, vjust=1) +
+  scale_fill_identity() +
+  facet_wrap(~symbol) +
+  Rotate_x_labels +
+  theme(axis.text.x = element_text(size=5), legend.position=&#39;none&#39;) +
+  labs(title=&quot;Expression changes in genes of interest&quot;, y=&quot;log2FC&quot;, caption=str_wrap(&quot;P&lt;0.05 = *\nP&lt;0.001 = !\nColor and  fill transparency based on PC1 &amp; PC2 to distinguish risdiplam/branaplam axes&quot;, 30))</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-50-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>These 4 genes are examples of how these red treatments may sometimes
+be more branaplam like on some genes, and more risdiplam like on others.
+Now let’s try and find the GA-GT introns drivers for these genes…</p>
+<p>For convenience let’s look from the data table I wrote out from
+estimating EC50s from the dose response experiment</p>
+<pre class="r"><code>GA.GT.introns_FromDoseResponseExperiment &lt;- read_tsv(&quot;../output/EC50Estimtes.FromPSI.txt.gz&quot;)
+
+GA.GT.introns_FromDoseResponseExperiment %&gt;%
+  separate_rows(gene_names, sep=&quot;,&quot;) %&gt;%
+  filter(gene_names %in% GenesToHighlight)</code></pre>
+<pre><code># A tibble: 1 × 34
+  junc        `#Chrom`  start    end gid   strand.y seq   Donor.score gene_names
+  &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;     
+1 chr13:2040… chr13    2.04e7 2.04e7 chr1… -        GAGA…        5.45 CRYL1     
+# … with 25 more variables: gene_ids &lt;chr&gt;, SpliceDonor &lt;chr&gt;,
+#   UpstreamSpliceAcceptor &lt;chr&gt;, IntronType &lt;chr&gt;, Steepness &lt;dbl&gt;,
+#   LowerLimit &lt;dbl&gt;, UpperLimit &lt;dbl&gt;, ED50_Branaplam &lt;dbl&gt;, ED50_C2C5 &lt;dbl&gt;,
+#   ED50_Risdiplam &lt;dbl&gt;, spearman.coef.Branaplam &lt;dbl&gt;,
+#   spearman.coef.C2C5 &lt;dbl&gt;, spearman.coef.Risdiplam &lt;dbl&gt;,
+#   EC.Ratio.Test.Estimate_Branaplam.C2C5 &lt;dbl&gt;,
+#   EC.Ratio.Test.Estimate_Branaplam.Risdiplam &lt;dbl&gt;, …</code></pre>
+<p>Ok actually that didn’t find much… And according to that previous
+data, CRYL1 GA-GT intron as actually more risdiplam-specific… weird. Ok,
+let’s just go back to trying to find the GA-GT intron from the
+leafcutter results…</p>
+<pre class="r"><code>leafcutter.effects_and_sig %&gt;%
+  filter(UpstreamOfDonor2BaseSeq==&quot;GA&quot;) %&gt;%
+  separate_rows(gene_names, sep=&quot;,&quot;) %&gt;%
+  filter(gene_names %in% GenesToHighlight) %&gt;%
+  distinct(intron, gene_names) %&gt;%
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">intron</th>
+<th align="left">gene_names</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">chr13:20404741:20405904:clu_31084_-</td>
+<td align="left">CRYL1</td>
+</tr>
+<tr class="even">
+<td align="left">chr18:36742468:36742737:clu_40538_+</td>
+<td align="left">FHOD3</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>leafcutter.effects_and_sig %&gt;%
+  filter(UpstreamOfDonor2BaseSeq==&quot;GA&quot;) %&gt;%
+  separate_rows(gene_names, sep=&quot;,&quot;) %&gt;%
+  filter(gene_names %in% GenesToHighlight) %&gt;%
+  # distinct(intron, .keep_all=T) %&gt;%
+  dplyr::select(intron, treatment_PSI, DMSO_PSI, treatment, gene_names) %&gt;%
+  group_by(intron) %&gt;%
+  mutate(DMSO_PSI = mean(DMSO_PSI)) %&gt;%
+  ungroup() %&gt;%
+  pivot_wider(names_from=&quot;treatment&quot;, values_from=&quot;treatment_PSI&quot;, names_glue=&quot;{treatment}_PSI&quot;) %&gt;%
+  dplyr::select(intron, gene_names, everything()) %&gt;%
+  gather(key=&quot;treatment&quot;, value=&quot;IntronPSI&quot;, -c(&quot;gene_names&quot;, &quot;intron&quot;)) %&gt;%
+  mutate(treatment = str_replace(treatment, &quot;^(.+?)_PSI&quot;, &quot;\\1&quot;)) %&gt;%
+  mutate(label=paste(intron, gene_names, sep=&#39;\n&#39;)) %&gt;%
+  left_join(NewColors) %&gt;%
+  mutate(PC2 = if_else(NewColor == &quot;#e34a33&quot;, 0, PC2)) %&gt;%
+  mutate(treatment = fct_reorder(treatment, PC2 * alpha)) %&gt;%
+  ggplot(aes(x=treatment, y=IntronPSI, fill=NewColor)) +
+  geom_col(aes(alpha=alpha)) +
+  scale_fill_identity() +
+  facet_wrap(~label, scales=&quot;free&quot;) +
+  Rotate_x_labels +
+  theme(legend.position=&#39;none&#39;, axis.text.x = element_text(size=5))</code></pre>
+<p><img src="figure/20220221_ExploreExpOf52.Rmd/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so I recovered the same CRYL1 intron, and also the FHOD3 intron.
+Still couldn’t find the intron for the other two genes… I think I am
+satisfied enough just to say these two introns might be good to validate
+molecule-specific effects, and also probably any number of the
+risdiplam-specific or branaplam-specific introns that I previously
+shared from the dose-response data.</p>
+<p>Also, looking at the genome browser of these two introns listed above
+it becomes obvious what the exon coordinates are if you were to design
+qPCR probes for validation… FHOD3 is particularly interesting… Much like
+I previously observed in HTT, the actual intron with the GA-GT 5’ss
+seems to be mostly retained in the treatment - it is the upstream
+cryptic intron that more obviously gets excised in the treatment. This
+suggests that the treatment may aid in U1 binding and activation of exon
+definition without necessarily activating the 5’ss bound to the
+molecule. This may also somewhat explain my previous observation that
+these molecules induce much cryptic 3’ss that aren’t in a leafcutter
+cluster with a cryptic 5’ss.</p>
+<p>Here is an screenshot of what I mean.</p>
+<p>[<img src="assets/FHOD3_Example" alt="FHOD3" />]</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -4403,11 +5751,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] ggrepel_0.9.1      gplots_3.1.3       Heatplus_3.4.0     qvalue_2.28.0     
- [5] edgeR_3.38.4       limma_3.52.4       data.table_1.14.2  RColorBrewer_1.1-3
- [9] forcats_0.5.1      stringr_1.4.0      dplyr_1.0.9        purrr_0.3.4       
-[13] readr_2.1.2        tidyr_1.2.0        tibble_3.1.7       ggplot2_3.3.6     
-[17] tidyverse_1.3.1   
+ [1] knitr_1.39         ggrepel_0.9.1      gplots_3.1.3       Heatplus_3.4.0    
+ [5] qvalue_2.28.0      edgeR_3.38.4       limma_3.52.4       data.table_1.14.2 
+ [9] RColorBrewer_1.1-3 forcats_0.5.1      stringr_1.4.0      dplyr_1.0.9       
+[13] purrr_0.3.4        readr_2.1.2        tidyr_1.2.0        tibble_3.1.7      
+[17] ggplot2_3.3.6      tidyverse_1.3.1   
 
 loaded via a namespace (and not attached):
  [1] bitops_1.0-7       fs_1.5.2           bit64_4.0.5        lubridate_1.8.0   
@@ -4425,12 +5773,12 @@ loaded via a namespace (and not attached):
 [49] R.methodsS3_1.8.1  lifecycle_1.0.1    stringi_1.7.6      whisker_0.4       
 [53] yaml_2.3.5         plyr_1.8.7         grid_4.2.0         parallel_4.2.0    
 [57] promises_1.2.0.1   crayon_1.5.1       lattice_0.20-45    haven_2.5.0       
-[61] splines_4.2.0      hms_1.1.1          locfit_1.5-9.7     knitr_1.39        
-[65] pillar_1.7.0       reshape2_1.4.4     reprex_2.0.1       glue_1.6.2        
-[69] evaluate_0.15      modelr_0.1.8       vctrs_0.4.1        tzdb_0.3.0        
-[73] httpuv_1.6.5       cellranger_1.1.0   gtable_0.3.0       assertthat_0.2.1  
-[77] xfun_0.30          broom_0.8.0        later_1.3.0        viridisLite_0.4.0 
-[81] workflowr_1.7.0    ellipsis_0.3.2    </code></pre>
+[61] splines_4.2.0      hms_1.1.1          locfit_1.5-9.7     pillar_1.7.0      
+[65] reshape2_1.4.4     reprex_2.0.1       glue_1.6.2         evaluate_0.15     
+[69] modelr_0.1.8       vctrs_0.4.1        tzdb_0.3.0         httpuv_1.6.5      
+[73] cellranger_1.1.0   gtable_0.3.0       assertthat_0.2.1   xfun_0.30         
+[77] broom_0.8.0        later_1.3.0        viridisLite_0.4.0  workflowr_1.7.0   
+[81] ellipsis_0.3.2    </code></pre>
 </div>
 </div>
 

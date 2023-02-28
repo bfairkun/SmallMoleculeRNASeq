@@ -24,6 +24,7 @@ ExpOf52_samples = pd.read_csv("config/samples.52MoleculeExperiment.tsv", sep='\t
 ExpOf52_samples_Treatments = ExpOf52_samples['Treatment'].unique()
 ExpOf52_samples_NonControlTreatments = [i for i in ExpOf52_samples_Treatments if i != 'DMSO'] 
 
+
 AllSamples = list(itertools.chain(*[i.index.unique().tolist() for i in [samples, titration_series_samples, chRNA_samples, ExpOf52_samples]]))
 AllNEBNextSamples = list(itertools.chain(*[i.index.unique().tolist() for i in [titration_series_samples, chRNA_samples, ExpOf52_samples]]))
 
