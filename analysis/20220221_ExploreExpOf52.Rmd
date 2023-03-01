@@ -1193,7 +1193,7 @@ If PC2 > 0 then blue,
 ifelse PC2 < 0, then green
 And PC2 is an alpha fill scale.
 
-```{r}
+```{r, fig.width=8, fig.height=6}
 
 NewColors <- pca.results.to.plot %>%
   filter(Experiment == "Single high dose LCL") %>%
@@ -1231,10 +1231,15 @@ diff.expression %>%
   scale_fill_identity() +
   facet_wrap(~symbol) +
   Rotate_x_labels +
-  theme(axis.text.x = element_text(size=5)) +
+  theme(axis.text.x = element_text(size=6), legend.position='none') +
   labs(title="Expression changes in genes of interest", y="log2FC", caption=str_wrap("P<0.05 = *\nP<0.001 = !\nColor and  fill transparency based on PC1 & PC2 to distinguish risdiplam/branaplam axes", 30))
 
 ```
+
+```{r, eval=F}
+ggsave("../code/scratch/scratch.pdf", height=6, width=10)
+```
+
 
 Ok, so based on these subset of genes, the red molecules have some risdiplam-like effects and some branaplam-like effects. Let's look more globally at the DE results..
 
@@ -1519,6 +1524,8 @@ diff.expression %>%
   Rotate_x_labels +
   theme(axis.text.x = element_text(size=5), legend.position='none') +
   labs(title="Expression changes in genes of interest", y="log2FC", caption=str_wrap("P<0.05 = *\nP<0.001 = !\nColor and  fill transparency based on PC1 & PC2 to distinguish risdiplam/branaplam axes", 30))
+
+# ggsave("../code/scratch/scratch.pdf", height=8, width=12)
 ```
 
 Ok, based on this I'm not sure there are any astoundingly specific DE changes with WC05 or WB12... Sure in some ways it is unique becase it may be risdiplam like, and in some other ways it may be more branaplam like, and there are some changes in effect sizes, but no totally new DE discoveries.
@@ -1782,6 +1789,8 @@ IntronsActivatedByTreatmentsOfInterest %>%
         axis.ticks.x=element_blank(),
         strip.text.x = element_text(size = 5)) +
   labs(title="GA-GT introns most specific to samples of interest", caption=str_wrap("DeltaPSI>5% in all contrasts, FDR<10% in at least one contrast, P<0.05 in all contrasts", 40))
+
+# ggsave("../code/scratch/scratch.pdf", height=6, width=12)
 ```
 
 Ok these are the kinds of introns I'm looking for, that Jingxin can consider validating as specific to these three molecules of interest. Let's look the original data for each sample for these sets of introns... And then double check in the genome browser.
@@ -1929,3 +1938,166 @@ Here is an screenshot of what I mean.
 
 [![FHOD3](assets/FHOD3_Example)]
 
+### PCA on subset of scaffolds
+
+Jingxin shared a powerpoint in which he color coded samples based on their scaffolds... Using these and some of my custom observations, I wrote factors for each treatment. I'm going to save that data replot PCA a few different ways for exploration.
+
+```{r}
+
+TreatmentFactors <- read_csv("../code/DataNotToCommit/CompoundsAndManualAnnotationFactors.csv") %>%
+  mutate(treatment = paste0("W", Well))
+
+```
+
+First let me replot the PCA the way I have been plotting it previously with colors consistent with previous plots
+
+```{r}
+pca.results.to.plot %>%
+  left_join(
+    NewColors %>%
+      dplyr::select(NewColor, alpha, treatment)) %>%
+ggplot(aes(x=PC1, y=PC2, color=NewColor, alpha=alpha)) +
+  geom_text(size=2, aes(label=treatment)) +
+  scale_color_identity() +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nAll samples", caption="Colored consistent in other plots")
+
+
+pca.results.to.plot %>%
+  left_join(TreatmentFactors) %>%
+ggplot(aes(x=PC1, y=PC2, color=Factor)) +
+  geom_text(size=2, aes(label=treatment)) +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nAll samples", caption="Colored by structural groupings from Jingxins")
+
+
+pca.results.to.plot %>%
+  left_join(TreatmentFactors) %>%
+ggplot(aes(x=PC3, y=PC4, color=Factor)) +
+  geom_text(size=2, aes(label=treatment)) +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nAll samples", caption="Colored by structural groupings from Jingxins")
+```
+
+Ok, one thing I want to try is to repeat the PCA but only exclude the branaplam-based molecules
+
+
+```{r}
+NonBranaplamBasedMolecules <- TreatmentFactors %>%
+  filter(!Factor=="G") %>% pull(treatment)
+
+SamplesToInclude <- 
+  FullMetadata %>%
+  filter(Experiment %in% c("Single high dose LCL")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  filter(treatment %in% c("DMSO", NonBranaplamBasedMolecules)) %>%
+  pull(leafcutter.name)
+  
+
+pca.results <- PSI.IntronsToInclude %>%
+  dplyr::select(junc, all_of(SamplesToInclude)) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata %>%
+              dplyr::select(leafcutter.name, treatment)) %>%
+  left_join(TreatmentFactors, by="treatment")
+
+pca.results.to.plot %>%
+  mutate(ToHighlight = if_else(
+    treatment %in% c("WB12", "WC05", "WD08"),
+    1,
+    0.5
+    )) %>%
+ggplot(aes(x=PC1, y=PC2, color=Factor, alpha=ToHighlight)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_alpha_continuous(range=c(0.5,1)) +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nNon branaplam skeletons", caption="Colored by structural groupings from Jingxins")
+
+pca.results.to.plot %>%
+  mutate(ToHighlight = if_else(
+    treatment %in% c("WB12", "WC05", "WD08"),
+    1,
+    0.5
+    )) %>%
+ggplot(aes(x=PC3, y=PC4, color=Factor, alpha=ToHighlight)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_alpha_continuous(range=c(0.5,1)) +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nNon branaplam skeletons", caption="Colored by structural groupings from Jingxin")
+
+pca.results.to.plot %>%
+  mutate(ToHighlight = if_else(
+    treatment %in% c("WB12", "WC05", "WD08"),
+    1,
+    0.5
+    )) %>%
+ggplot(aes(x=PC5, y=PC6, color=Factor, alpha=ToHighlight)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_alpha_continuous(range=c(0.5,1)) +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nNon branaplam skeletons", caption="Colored by structural groupings from Jingxin")
+```
+
+And let's do the same for branaplam based molecules
+
+```{r}
+BranaplamBasedMolecules <- TreatmentFactors %>%
+  filter(Factor=="G") %>% pull(treatment)
+
+SamplesToInclude <- 
+  FullMetadata %>%
+  filter(Experiment %in% c("Single high dose LCL")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  filter(treatment %in% c("DMSO", BranaplamBasedMolecules)) %>%
+  pull(leafcutter.name)
+  
+
+pca.results <- PSI.IntronsToInclude %>%
+  dplyr::select(junc, all_of(SamplesToInclude)) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata %>%
+              dplyr::select(leafcutter.name, treatment)) %>%
+  left_join(TreatmentFactors, by="treatment")
+
+pca.results.to.plot %>%
+  mutate(ToHighlight = if_else(
+    treatment %in% c("WB12", "WC05", "WD08"),
+    1,
+    0.5
+    )) %>%
+ggplot(aes(x=PC1, y=PC2, color=Factor, alpha=ToHighlight)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_alpha_continuous(range=c(0.5,1)) +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nNon branaplam skeletons", caption="Colored by structural groupings from Jingxins")
+
+pca.results.to.plot %>%
+  mutate(ToHighlight = if_else(
+    treatment %in% c("WB12", "WC05", "WD08"),
+    1,
+    0.5
+    )) %>%
+ggplot(aes(x=PC3, y=PC4, color=Factor, alpha=ToHighlight)) +
+  geom_text(size=3, aes(label=treatment)) +
+  scale_alpha_continuous(range=c(0.5,1)) +
+  theme_bw() +
+  labs(title = "PCA using 632 upregulated GAGT introns\nNon branaplam skeletons", caption="Colored by structural groupings from Jingxin")
+
+
+```
+
+I'm re-questioning whether C05 and B12 are special in any worthwhile way
