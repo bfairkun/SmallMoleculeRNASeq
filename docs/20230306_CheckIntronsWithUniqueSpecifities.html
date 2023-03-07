@@ -450,15 +450,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreeea36e65d3d24bcefa896febc6457716cfc0c3f13targetblankea36e65a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreec2a4a84e07cfc9e9ce4e2a1580108b6dab356d58targetblankc2a4a84a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/ea36e65d3d24bcefa896febc6457716cfc0c3f13" target="_blank">ea36e65</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/c2a4a84e07cfc9e9ce4e2a1580108b6dab356d58" target="_blank">c2a4a84</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreeea36e65d3d24bcefa896febc6457716cfc0c3f13targetblankea36e65a"
+id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreec2a4a84e07cfc9e9ce4e2a1580108b6dab356d58targetblankc2a4a84a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -468,7 +468,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/ea36e65d3d24bcefa896febc6457716cfc0c3f13" target="_blank">ea36e65</a>.
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/c2a4a84e07cfc9e9ce4e2a1580108b6dab356d58" target="_blank">c2a4a84</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -596,6 +596,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/c2a4a84e07cfc9e9ce4e2a1580108b6dab356d58/analysis/20230306_CheckIntronsWithUniqueSpecifities.Rmd" target="_blank">c2a4a84</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-07
+</td>
+<td>
+update screenshot nb
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/c2a4a84e07cfc9e9ce4e2a1580108b6dab356d58/docs/20230306_CheckIntronsWithUniqueSpecifities.html" target="_blank">c2a4a84</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-07
+</td>
+<td>
+update screenshot nb
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -772,7 +806,15 @@ the same folder, such as a folder named <code>code</code>).</p>
 <code>Branaplam_Risdiplam_specific_introns.bed</code> track, and Ctl-F
 or Ctl-B to jump to the next GA-GT introns, colored according to
 significance. Browse around to find coordinates of potential splice
-events for validation.</p>
+events for validation. Note that each bigwig is already normalized
+signal relative to library depth. With autoscaling for the y-axis turned
+on (the default), it may be visually obvious to see the poison exons,
+but it might not be totally obvious to see if there are effects on gene
+expression. To better visualize effects on host gene expression, I
+recommend just selecting all bigwig tracks and right-click to “group
+autoscale”. Since coverage of each track is already normalized by
+library size, it should be easy to visually interpret if there is a
+change in gene expression.</p>
 <p>Here are screenshots of a few examples…</p>
 <div class="figure">
 <img src="assets/BranaSpecificExample1.png" alt="" />

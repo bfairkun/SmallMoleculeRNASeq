@@ -62,7 +62,7 @@ tabix -p bed ../code/Branaplam_Risdiplam_specific_introns.bed.gz
 
 So to view, you will need to use the globus link I shared with Jingxin to download the `code` directory, or at minimum download the `code/bigwigs` folder of bigwig files, the `code/tracks.xml` IGV session, and the `code/Branaplam_Risdiplam_specific_introns.bed.gz` and `code/Branaplam_Risdiplam_specific_introns.bed.gz.tbi`. Then, from IGV, go to File >> OpenSession and open the tracks.xml. The tracks.xml uses relative filepaths so you need to preserve the relative filepaths of the thing you downloaded (that is, they need to all be in the same folder, such as a folder named `code`).
 
-Now you should be able to select the `Branaplam_Risdiplam_specific_introns.bed` track, and Ctl-F or Ctl-B to jump to the next GA-GT introns, colored according to significance. Browse around to find coordinates of potential splice events for validation.
+Now you should be able to select the `Branaplam_Risdiplam_specific_introns.bed` track, and Ctl-F or Ctl-B to jump to the next GA-GT introns, colored according to significance. Browse around to find coordinates of potential splice events for validation. Note that each bigwig is already normalized signal relative to library depth. With autoscaling for the y-axis turned on (the default), it may be visually obvious to see the poison exons, but it might not be totally obvious to see if there are effects on gene expression. To better visualize effects on host gene expression, I recommend just selecting all bigwig tracks and right-click to "group autoscale". Since coverage of each track is already normalized by library size, it should be easy to visually interpret if there is a change in gene expression.
 
 Here are screenshots of a few examples...
 
