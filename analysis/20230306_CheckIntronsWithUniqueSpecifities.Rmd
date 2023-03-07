@@ -75,6 +75,18 @@ Here are screenshots of a few examples...
 
 In general, I'm noticing there a quite a few believable branaplam-specific examples but the risdlam-specific are for the most part very small specificity effect sizes. That is, there are very few obviously risdiplam-specific events, compared to branaplam-specific events.
 
+Let's list the top risdi-specific introns in the following table:
+
+```{r}
+P1.dat %>%
+  arrange(desc(ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam)) %>%
+  head() %>%
+  knitr::kable()
+```
+
+After looking at some of the top risdiplam-specific hits from the list above, here is perhaps the most clear example:
+
+![RisdiSpecific2](assets/RisdiSpecificExample2.png)
 
 
 

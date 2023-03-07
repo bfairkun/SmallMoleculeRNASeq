@@ -354,10 +354,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R
-Markdown file created these results, you’ll want to first commit it to
-the Git repo. If you’re still working on the analysis, you can ignore
-this warning. When you’re finished, you can run
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -450,15 +450,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreeb17f56891313238a84deb81dc0ac94fb949f8f02targetblankb17f568a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreeea36e65d3d24bcefa896febc6457716cfc0c3f13targetblankea36e65a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/b17f56891313238a84deb81dc0ac94fb949f8f02" target="_blank">b17f568</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/ea36e65d3d24bcefa896febc6457716cfc0c3f13" target="_blank">ea36e65</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreeb17f56891313238a84deb81dc0ac94fb949f8f02targetblankb17f568a"
+id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreeea36e65d3d24bcefa896febc6457716cfc0c3f13targetblankea36e65a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -468,7 +468,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/b17f56891313238a84deb81dc0ac94fb949f8f02" target="_blank">b17f568</a>.
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/ea36e65d3d24bcefa896febc6457716cfc0c3f13" target="_blank">ea36e65</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -546,11 +546,8 @@ Ignored files:
     Ignored:    data/~$52CompoundsTempPlateLayoutForPipettingConvenience.xlsx
     Ignored:    output/._PioritizedIntronTargets.pdf
 
-Untracked files:
-    Untracked:  analysis/20230306_CheckIntronsWithUniqueSpecifities.Rmd
-
 Unstaged changes:
-    Modified:   analysis/20220221_ExploreExpOf52.Rmd
+    Modified:   analysis/20230306_CheckIntronsWithUniqueSpecifities.Rmd
     Modified:   code/scripts/GenometracksByGenotype
 
 </code></pre>
@@ -566,10 +563,76 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown
+(<code>analysis/20230306_CheckIntronsWithUniqueSpecifities.Rmd</code>)
+and HTML
+(<code>docs/20230306_CheckIntronsWithUniqueSpecifities.html</code>)
+files. If you’ve configured a remote Git repository (see
+<code>?wflow_git_remote</code>), click on the hyperlinks in the table
+below to view the files as they were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/ea36e65d3d24bcefa896febc6457716cfc0c3f13/analysis/20230306_CheckIntronsWithUniqueSpecifities.Rmd" target="_blank">ea36e65</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-07
+</td>
+<td>
+added igv session
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/ea36e65d3d24bcefa896febc6457716cfc0c3f13/docs/20230306_CheckIntronsWithUniqueSpecifities.html" target="_blank">ea36e65</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-07
+</td>
+<td>
+added igv session
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -618,6 +681,43 @@ ggplot(P1.dat, aes(x=ED50_Branaplam, y=ED50_Risdiplam, color=Color)) +
   theme(legend.position=&#39;bottom&#39;) +
   theme_bw()</code></pre>
 <p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-1-1">
+Past versions of unnamed-chunk-1-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-1-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/ea36e65d3d24bcefa896febc6457716cfc0c3f13/docs/figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-1-1.png" target="_blank">ea36e65</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>P1.dat %&gt;%
   count(Color)</code></pre>
 <pre><code># A tibble: 4 × 2
@@ -691,6 +791,320 @@ branaplam-specific examples but the risdlam-specific are for the most
 part very small specificity effect sizes. That is, there are very few
 obviously risdiplam-specific events, compared to branaplam-specific
 events.</p>
+<p>Let’s list the top risdi-specific introns in the following table:</p>
+<pre class="r"><code>P1.dat %&gt;%
+  arrange(desc(ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam)) %&gt;%
+  head() %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<colgroup>
+<col width="4%" />
+<col width="0%" />
+<col width="1%" />
+<col width="1%" />
+<col width="2%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="2%" />
+<col width="1%" />
+<col width="2%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="1%" />
+<col width="2%" />
+<col width="2%" />
+<col width="2%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="5%" />
+<col width="6%" />
+<col width="5%" />
+<col width="4%" />
+<col width="5%" />
+<col width="4%" />
+<col width="4%" />
+<col width="5%" />
+<col width="4%" />
+<col width="2%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">junc</th>
+<th align="left">#Chrom</th>
+<th align="right">start</th>
+<th align="right">end</th>
+<th align="left">gid</th>
+<th align="left">strand.y</th>
+<th align="left">seq</th>
+<th align="right">Donor.score</th>
+<th align="left">gene_names</th>
+<th align="left">gene_ids</th>
+<th align="left">SpliceDonor</th>
+<th align="left">UpstreamSpliceAcceptor</th>
+<th align="left">IntronType</th>
+<th align="right">Steepness</th>
+<th align="right">LowerLimit</th>
+<th align="right">UpperLimit</th>
+<th align="right">ED50_Branaplam</th>
+<th align="right">ED50_C2C5</th>
+<th align="right">ED50_Risdiplam</th>
+<th align="right">spearman.coef.Branaplam</th>
+<th align="right">spearman.coef.C2C5</th>
+<th align="right">spearman.coef.Risdiplam</th>
+<th align="right">EC.Ratio.Test.Estimate_Branaplam.C2C5</th>
+<th align="right">EC.Ratio.Test.Estimate_Branaplam.Risdiplam</th>
+<th align="right">EC.Ratio.Test.Estimate_C2C5.Risdiplam</th>
+<th align="right">ECRatio.ComparedToGenomewideMedian_Branaplam.C2C5</th>
+<th
+align="right">ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam</th>
+<th align="right">ECRatio.ComparedToGenomewideMedian_C2C5.Risdiplam</th>
+<th align="right">EC.Ratio.Test.Estimate.P_Branaplam.C2C5</th>
+<th align="right">EC.Ratio.Test.Estimate.P_Branaplam.Risdiplam</th>
+<th align="right">EC.Ratio.Test.Estimate.P_C2C5.Risdiplam</th>
+<th align="right">EC.Ratio.Test.Estimate.FDR_Branaplam.C2C5</th>
+<th align="right">EC.Ratio.Test.Estimate.FDR_Branaplam.Risdiplam</th>
+<th align="right">EC.Ratio.Test.Estimate.FDR_C2C5.Risdiplam</th>
+<th align="left">Color</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">chr2:72179461:72182894:clu_4568_-</td>
+<td align="left">chr2</td>
+<td align="right">72179461</td>
+<td align="right">72182894</td>
+<td align="left">chr2_clu_4568_-</td>
+<td align="left">-</td>
+<td align="left">GAGAGTAAGTA</td>
+<td align="right">6.005894</td>
+<td align="left">EXOC6B</td>
+<td align="left">ENSG00000144036.16</td>
+<td align="left">chr2.72182894.-</td>
+<td align="left">chr2.72182903.-</td>
+<td align="left">Annotated</td>
+<td align="right">-2.7570544</td>
+<td align="right">3.1361062</td>
+<td align="right">31.384932</td>
+<td align="right">2.495499e+09</td>
+<td align="right">248.12468</td>
+<td align="right">785.0629479</td>
+<td align="right">0.2277339</td>
+<td align="right">0.5594024</td>
+<td align="right">0.9139077</td>
+<td align="right">1.005744e+07</td>
+<td align="right">3178724.1044</td>
+<td align="right">0.3160571</td>
+<td align="right">7.482724e+06</td>
+<td align="right">25547101.480</td>
+<td align="right">3.0610287</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="left">Risdiplam-specific</td>
+</tr>
+<tr class="even">
+<td align="left">chr13:20404741:20405904:clu_25569_-</td>
+<td align="left">chr13</td>
+<td align="right">20404741</td>
+<td align="right">20405904</td>
+<td align="left">chr13_clu_25569_-</td>
+<td align="left">-</td>
+<td align="left">GAGAGTAAGTC</td>
+<td align="right">5.446634</td>
+<td align="left">CRYL1</td>
+<td align="left">ENSG00000165475.15</td>
+<td align="left">chr13.20405904.-</td>
+<td align="left">chr13.20405997.-</td>
+<td align="left">Alt 5’ss</td>
+<td align="right">-2.8191629</td>
+<td align="right">3.3431713</td>
+<td align="right">48.302244</td>
+<td align="right">1.641993e+09</td>
+<td align="right">1400.00395</td>
+<td align="right">4071.6117233</td>
+<td align="right">0.1740777</td>
+<td align="right">0.6024948</td>
+<td align="right">0.9128709</td>
+<td align="right">1.172849e+06</td>
+<td align="right">403278.4047</td>
+<td align="right">0.3438452</td>
+<td align="right">8.725985e+05</td>
+<td align="right">3241109.952</td>
+<td align="right">3.3301579</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="left">Risdiplam-specific</td>
+</tr>
+<tr class="odd">
+<td align="left">chr9:108931201:108933271:clu_18237_-</td>
+<td align="left">chr9</td>
+<td align="right">108931201</td>
+<td align="right">108933271</td>
+<td align="left">chr9_clu_18237_-</td>
+<td align="left">-</td>
+<td align="left">AAGAGTAAGCA</td>
+<td align="right">4.905988</td>
+<td align="left">ELP1</td>
+<td align="left">ENSG00000070061.15</td>
+<td align="left">chr9.108933271.-</td>
+<td align="left">chr9.108933405.-</td>
+<td align="left">Alt 5’ss</td>
+<td align="right">-9.6753286</td>
+<td align="right">0.5638888</td>
+<td align="right">7.339398</td>
+<td align="right">2.540583e+07</td>
+<td align="right">33.32162</td>
+<td align="right">895.8671341</td>
+<td align="right">0.1926687</td>
+<td align="right">0.9052038</td>
+<td align="right">0.7822166</td>
+<td align="right">7.624427e+05</td>
+<td align="right">28358.9229</td>
+<td align="right">0.0371948</td>
+<td align="right">5.672567e+05</td>
+<td align="right">227917.950</td>
+<td align="right">0.3602338</td>
+<td align="right">0.0000021</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000023</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="left">Risdiplam-specific</td>
+</tr>
+<tr class="even">
+<td align="left">chr18:10773629:10774006:clu_33760_-</td>
+<td align="left">chr18</td>
+<td align="right">10773629</td>
+<td align="right">10774006</td>
+<td align="left">chr18_clu_33760_-</td>
+<td align="left">-</td>
+<td align="left">ATGAGTAAGTC</td>
+<td align="right">4.559120</td>
+<td align="left">PIEZO2</td>
+<td align="left">ENSG00000154864.12</td>
+<td align="left">chr18.10774006.-</td>
+<td align="left">chr18.10774036.-</td>
+<td align="left">Annotated</td>
+<td align="right">-2.2089456</td>
+<td align="right">0.0687500</td>
+<td align="right">51.453519</td>
+<td align="right">1.001587e+07</td>
+<td align="right">143.33677</td>
+<td align="right">1424.8728605</td>
+<td align="right">0.2738613</td>
+<td align="right">0.9128709</td>
+<td align="right">0.8416254</td>
+<td align="right">6.987650e+04</td>
+<td align="right">7029.3086</td>
+<td align="right">0.1005962</td>
+<td align="right">5.198805e+04</td>
+<td align="right">56493.880</td>
+<td align="right">0.9742791</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.4229854</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+<td align="right">0.6497405</td>
+<td align="left">Risdiplam-specific</td>
+</tr>
+<tr class="odd">
+<td align="left">chr19:10330526:10332870:clu_34319_-</td>
+<td align="left">chr19</td>
+<td align="right">10330526</td>
+<td align="right">10332870</td>
+<td align="left">chr19_clu_34319_-</td>
+<td align="left">-</td>
+<td align="left">GAGAGTACGCC</td>
+<td align="right">2.214523</td>
+<td align="left">RAVER1</td>
+<td align="left">ENSG00000161847.14</td>
+<td align="left">chr19.10332870.-</td>
+<td align="left">chr19.10332909.-</td>
+<td align="left">Alt 5’ss</td>
+<td align="right">-0.0000251</td>
+<td align="right">0.1685537</td>
+<td align="right">3.589164</td>
+<td align="right">1.413434e+03</td>
+<td align="right">22.81686</td>
+<td align="right">0.7759248</td>
+<td align="right">0.9831921</td>
+<td align="right">-0.2712254</td>
+<td align="right">-0.5135291</td>
+<td align="right">6.194690e+01</td>
+<td align="right">1821.6118</td>
+<td align="right">29.4060210</td>
+<td align="right">4.608844e+01</td>
+<td align="right">14640.120</td>
+<td align="right">284.7988165</td>
+<td align="right">0.9969948</td>
+<td align="right">0.9965823</td>
+<td align="right">0.9983501</td>
+<td align="right">0.4873920</td>
+<td align="right">0.4546814</td>
+<td align="right">1.0000000</td>
+<td align="left">Non significant</td>
+</tr>
+<tr class="even">
+<td align="left">chr4:41014398:41032584:clu_10225_-</td>
+<td align="left">chr4</td>
+<td align="right">41014398</td>
+<td align="right">41032584</td>
+<td align="left">chr4_clu_10225_-</td>
+<td align="left">-</td>
+<td align="left">AGGAGTAGGTG</td>
+<td align="right">5.043083</td>
+<td align="left">APBB2</td>
+<td align="left">ENSG00000163697.17</td>
+<td align="left">chr4.41032584.-</td>
+<td align="left">chr4.41032626.-</td>
+<td align="left">Alt 5’ss</td>
+<td align="right">-3.0030040</td>
+<td align="right">0.0355949</td>
+<td align="right">1.682290</td>
+<td align="right">3.820296e+05</td>
+<td align="right">22.66113</td>
+<td align="right">452.1565311</td>
+<td align="right">0.3195048</td>
+<td align="right">0.8580987</td>
+<td align="right">0.9082951</td>
+<td align="right">1.685837e+04</td>
+<td align="right">844.9056</td>
+<td align="right">0.0501179</td>
+<td align="right">1.254261e+04</td>
+<td align="right">6790.426</td>
+<td align="right">0.4853942</td>
+<td align="right">0.0010952</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0006567</td>
+<td align="right">0.0009786</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0025582</td>
+<td align="left">Risdiplam-specific</td>
+</tr>
+</tbody>
+</table>
+<p>After looking at some of the top risdiplam-specific hits from the
+list above, here is perhaps the most clear example:</p>
+<div class="figure">
+<img src="assets/RisdiSpecificExample2.png" alt="" />
+<p class="caption">RisdiSpecific2</p>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -726,19 +1140,19 @@ loaded via a namespace (and not attached):
  [5] digest_0.6.29    utf8_1.2.2       R6_2.5.1         cellranger_1.1.0
  [9] backports_1.4.1  reprex_2.0.1     evaluate_0.15    highr_0.9       
 [13] httr_1.4.3       pillar_1.7.0     rlang_1.0.2      readxl_1.4.0    
-[17] rstudioapi_0.13  jquerylib_0.1.4  rmarkdown_2.14   bit_4.0.4       
-[21] munsell_0.5.0    broom_0.8.0      compiler_4.2.0   httpuv_1.6.5    
-[25] modelr_0.1.8     xfun_0.30        pkgconfig_2.0.3  htmltools_0.5.2 
-[29] tidyselect_1.1.2 workflowr_1.7.0  fansi_1.0.3      crayon_1.5.1    
-[33] tzdb_0.3.0       dbplyr_2.1.1     withr_2.5.0      later_1.3.0     
-[37] grid_4.2.0       jsonlite_1.8.0   gtable_0.3.0     lifecycle_1.0.1 
-[41] DBI_1.1.2        git2r_0.30.1     magrittr_2.0.3   scales_1.2.0    
-[45] cli_3.3.0        stringi_1.7.6    vroom_1.5.7      farver_2.1.0    
-[49] fs_1.5.2         promises_1.2.0.1 xml2_1.3.3       bslib_0.3.1     
-[53] ellipsis_0.3.2   generics_0.1.2   vctrs_0.4.1      tools_4.2.0     
-[57] bit64_4.0.5      glue_1.6.2       hms_1.1.1        parallel_4.2.0  
-[61] fastmap_1.1.0    yaml_2.3.5       colorspace_2.0-3 rvest_1.0.2     
-[65] knitr_1.39       haven_2.5.0      sass_0.4.1      </code></pre>
+[17] rstudioapi_0.13  whisker_0.4      jquerylib_0.1.4  rmarkdown_2.14  
+[21] bit_4.0.4        munsell_0.5.0    broom_0.8.0      compiler_4.2.0  
+[25] httpuv_1.6.5     modelr_0.1.8     xfun_0.30        pkgconfig_2.0.3 
+[29] htmltools_0.5.2  tidyselect_1.1.2 workflowr_1.7.0  fansi_1.0.3     
+[33] crayon_1.5.1     tzdb_0.3.0       dbplyr_2.1.1     withr_2.5.0     
+[37] later_1.3.0      grid_4.2.0       jsonlite_1.8.0   gtable_0.3.0    
+[41] lifecycle_1.0.1  DBI_1.1.2        git2r_0.30.1     magrittr_2.0.3  
+[45] scales_1.2.0     vroom_1.5.7      cli_3.3.0        stringi_1.7.6   
+[49] farver_2.1.0     fs_1.5.2         promises_1.2.0.1 xml2_1.3.3      
+[53] bslib_0.3.1      ellipsis_0.3.2   generics_0.1.2   vctrs_0.4.1     
+[57] tools_4.2.0      bit64_4.0.5      glue_1.6.2       hms_1.1.1       
+[61] parallel_4.2.0   fastmap_1.1.0    yaml_2.3.5       colorspace_2.0-3
+[65] rvest_1.0.2      knitr_1.39       haven_2.5.0      sass_0.4.1      </code></pre>
 </div>
 </div>
 
