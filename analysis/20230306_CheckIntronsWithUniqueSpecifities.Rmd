@@ -1,0 +1,80 @@
+---
+title: "Check introns with unique specificities"
+output: html_document
+date: '2023-03-06'
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+library(tidyverse)
+
+```
+
+### Recheck list of risdi/brana-specific introns
+
+I previously made a list of risdiplam/branaplam/C2C5-specific introns based on the dose response experiment. Because the different molecules have different genome-wide effective potencies (ie, 100nM C2C5 is different than 100nM risdiplam, despite them having generally similar specificity profiles), I tested for a difference in the EC50 of each intron for each traitment pair, relative to the genome-wide median. You can see that in a [previous notebook](20220913_TidyDataForJingxin.html) I plotted the dose-response datapoints for a random sample of 20 of these significant molecule-specific effects, and they are generally believable effects from those.
+
+```{r}
+GA.GT.Introns <- read_tsv("../output/EC50Estimtes.FromPSI.txt.gz")
+
+ColorKey <- c("Branaplam-specific"="#005A32", "Risdiplam-specific"="#084594", "Non significant"="#969696")
+
+P1.dat <- GA.GT.Introns %>%
+  mutate(Color = case_when(
+    EC.Ratio.Test.Estimate.FDR_Branaplam.Risdiplam > 0.05 ~ "Non significant",
+    ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam > 1 ~ "Risdiplam-specific",
+    ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam < 1 ~ "Branaplam-specific"
+  ))
+
+ggplot(P1.dat, aes(x=ED50_Branaplam, y=ED50_Risdiplam, color=Color)) +
+  geom_point() +
+  scale_x_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_y_continuous(trans='log10', limits = c(1, 1E7)) +
+  scale_color_manual(values=ColorKey) +
+  labs(x= "Branaplam\nED50 (nanomolar)", y= "Risdiplam\nED50 (nanomolar)", color=NULL) +
+  theme(legend.position='bottom') +
+  theme_bw()
+
+
+P1.dat %>%
+  count(Color)
+
+```
+
+Ok, so each point is a branaplam-specific or risdiplam-specific GA-GT intron. There are 200 non-significant points, 161 risdiplam-specific points, and 240 branaplam-specific points. I think it will be useful for Jingxin to be able to easily visualize these before validating them... Some introns that change PSI from 1% to 3% might be very significant, but not the best for validation. Furthermore, not all of these events might be involved in poison exon inclusion. Some of them might just be alt 5'ss or something. And these details might inform which are the best candidates for validation by flanking PCR primers. Also, when looking at the data, some of the 'risdiplam-specific' introns I called are just not believable effects. Like the dose-response data points might just be too noisy. I did a reasonable job of filtering these out, and trying to make the FDR estimate reasonably calibrated... Or like there are some examples where it appears 'risdiplam-specific' but it is because the cryptic event is only just barely visible at the highest dose of risdiplam, and not visible in any of the branaplam doses (so it just requires a really really high dose to see the effect). So for all these reasons, it will be best to check the raw coverage data first... So I'll write the out this list as a bedfile for easy viewing in IGV, a save a session that has the bedfile loaded, along with bigwigs for the dose response experiment so hopefully it will be easy to view.
+
+```{r, eval=F}
+P1.dat %>%
+  dplyr::select(chrom=`#Chrom`, start, end, junc, score=ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam, strand=strand.y, Color) %>%
+  filter(!is.na(score)) %>%
+  mutate(thickStart = start, thickEnd=end, Color=recode(Color, !!!ColorKey)) %>%
+  mutate(RgbCol = apply(col2rgb(Color), 2, paste, collapse=',')) %>%
+  dplyr::select(chrom:strand, thickStart, thickEnd, RgbCol) %>%
+  arrange(chrom, start, end) %>%
+  write_tsv("../code/Branaplam_Risdiplam_specific_introns.bed", col_names = F)
+```
+
+```{bash, eval=F}
+bgzip ../code/Branaplam_Risdiplam_specific_introns.bed
+tabix -p bed ../code/Branaplam_Risdiplam_specific_introns.bed.gz
+```
+
+So to view, you will need to use the globus link I shared with Jingxin to download the `code` directory, or at minimum download the `code/bigwigs` folder of bigwig files, the `code/tracks.xml` IGV session, and the `code/Branaplam_Risdiplam_specific_introns.bed.gz` and `code/Branaplam_Risdiplam_specific_introns.bed.gz.tbi`. Then, from IGV, go to File >> OpenSession and open the tracks.xml. The tracks.xml uses relative filepaths so you need to preserve the relative filepaths of the thing you downloaded (that is, they need to all be in the same folder, such as a folder named `code`).
+
+Now you should be able to select the `Branaplam_Risdiplam_specific_introns.bed` track, and Ctl-F or Ctl-B to jump to the next GA-GT introns, colored according to significance. Browse around to find coordinates of potential splice events for validation.
+
+Here are screenshots of a few examples...
+
+![BranaSpecific1](assets/BranaSpecificExample1.png)
+
+![BranaSpecific2](assets/BranaSpecificExample2.png)
+
+![RisdiSpecific1](assets/RisdiSpecificExample1.png)
+
+
+In general, I'm noticing there a quite a few believable branaplam-specific examples but the risdlam-specific are for the most part very small specificity effect sizes. That is, there are very few obviously risdiplam-specific events, compared to branaplam-specific events.
+
+
+
+

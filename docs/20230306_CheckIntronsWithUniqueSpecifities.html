@@ -10,8 +10,9 @@
 
 
 
+<meta name="date" content="2023-03-06" />
 
-<title>Home</title>
+<title>Check introns with unique specificities</title>
 
 <script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -276,15 +277,24 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Home</h1>
+<h1 class="title toc-ignore">Check introns with unique
+specificities</h1>
+<h4 class="date">2023-03-06</h4>
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#recheck-list-of-risdibrana-specific-introns"
+id="toc-recheck-list-of-risdibrana-specific-introns">Recheck list of
+risdi/brana-specific introns</a></li>
+</ul>
+</div>
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -295,8 +305,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -309,9 +319,9 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong>
@@ -335,18 +345,21 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
@@ -553,265 +566,17 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were
-made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML
-(<code>docs/index.html</code>) files. If you’ve configured a remote Git
-repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
-in the table below to view the files as they were in that past version.
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
 </p>
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-File
-</th>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-<th>
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/a8c9152c8020689603208f678ef53d6864f0077c/docs/index.html" target="_blank">a8c9152</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2023-02-23
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/index.html" target="_blank">272cd76</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-26
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/index.html" target="_blank">7144e91</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-21
-</td>
-<td>
-added chRNA notebook
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/22476105f2a7d2618d3f38a3e01a91a0df15b8e2/docs/index.html" target="_blank">2247610</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-19
-</td>
-<td>
-fix index
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/d9999f1a431074b84fd1277f854d1c45b22ddec1/docs/index.html" target="_blank">d9999f1</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-13
-</td>
-<td>
-added more EC50 estimation with PSI
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/b2a3c34c9237c53696332969b8e0a3f0f1732dc4/docs/index.html" target="_blank">b2a3c34</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-12
-</td>
-<td>
-update site with branaplsm-specific analysis
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0d59720620fd3a949578040a4634edcb76629a20/analysis/index.Rmd" target="_blank">0d59720</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-08
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/0d59720620fd3a949578040a4634edcb76629a20/docs/index.html" target="_blank">0d59720</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-08
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/db9a4f02945a058f7c991284a3c04d3f0b005ed5/analysis/index.Rmd" target="_blank">db9a4f0</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-08-01
-</td>
-<td>
-big update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/db9a4f02945a058f7c991284a3c04d3f0b005ed5/docs/index.html" target="_blank">db9a4f0</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-08-01
-</td>
-<td>
-big update
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/4a410f53106f7a31fb71081b46c401f9fa7b7992/analysis/index.Rmd" target="_blank">4a410f5</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-03-08
-</td>
-<td>
-initial commit
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/4a410f53106f7a31fb71081b46c401f9fa7b7992/docs/index.html" target="_blank">4a410f5</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-03-08
-</td>
-<td>
-initial commit
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <hr>
 </div>
 </div>
 </div>
-<p>Welcome to my research website dealing with small molecule splicing
-stuff.</p>
-<div id="links-to-relevant-notebooks-by-description"
-class="section level2">
-<h2>Links to relevant notebooks by description:</h2>
-<p><a href="20211216_DifferentialSplicing.html">Splicing analysis
-notebook entry</a></p>
-<p><a href="20220629_FirstGlanceTitrationSeries.html">first glance at
-tiration series data notebook entry</a></p>
-<p><a href="20220707_TitrationSeries_DE_testing.html">DE testing and
-fitting curves to dose-response data</a></p>
-<p><a href="20220712_FitDoseResponseModels.html">fitting curves to
-dose-response data bit more carefully</a></p>
-</div>
-<div id="full-listing-of-all-rmarkdown-notebooks-by-file-name"
-class="section level2">
-<h2>Full listing of all Rmarkdown notebooks by file name:</h2>
-<pre class="r"><code>library(tidyverse)</code></pre>
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+library(tidyverse)</code></pre>
 <pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
 <pre><code>✔ ggplot2 3.3.6     ✔ purrr   0.3.4
 ✔ tibble  3.1.7     ✔ dplyr   1.0.9
@@ -820,55 +585,112 @@ class="section level2">
 <pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>rmds &lt;- list.files(path = &quot;../analysis/&quot;, pattern=&quot;^\\d+.+&quot;)
-rmd_htmls &lt;- str_replace(rmds, &quot;Rmd$&quot;, &quot;html&quot;)
-for(i in rmd_htmls){
-  cat(&quot;[&quot;, i, &quot;](&quot;, i,&quot;)\n\n&quot;, sep=&quot;&quot;)
-}</code></pre>
-<p><a
-href="20211216_DifferentialSplicing.html">20211216_DifferentialSplicing.html</a></p>
-<p><a
-href="20220221_ExploreExpOf52.html">20220221_ExploreExpOf52.html</a></p>
-<p><a
-href="20220629_FirstGlanceTitrationSeries.html">20220629_FirstGlanceTitrationSeries.html</a></p>
-<p><a
-href="20220707_TitrationSeries_DE_testing.html">20220707_TitrationSeries_DE_testing.html</a></p>
-<p><a
-href="20220707_TitrationSeries_DE_testing.nb.html">20220707_TitrationSeries_DE_testing.nb.html</a></p>
-<p><a
-href="20220712_FitDoseResponseModels.html">20220712_FitDoseResponseModels.html</a></p>
-<p><a
-href="20220726_Check_chRNATestSeq.html">20220726_Check_chRNATestSeq.html</a></p>
-<p><a
-href="20220804_MakeBigwigListTsv.html">20220804_MakeBigwigListTsv.html</a></p>
-<p><a href="20220809_geena.html">20220809_geena.html</a></p>
-<p><a href="20220822_Check_chRNA.html">20220822_Check_chRNA.html</a></p>
-<p><a
-href="20220907_IdentifyTargetsForVerification.html">20220907_IdentifyTargetsForVerification.html</a></p>
-<p><a
-href="20220908_IdentifyTargetsForVerification2.html">20220908_IdentifyTargetsForVerification2.html</a></p>
-<p><a
-href="20220913_TidyDataForJingxin.html">20220913_TidyDataForJingxin.html</a></p>
-<p><a
-href="20220915_ExploreDoseResponseCryptic3ss.html">20220915_ExploreDoseResponseCryptic3ss.html</a></p>
-<p><a
-href="20220915_ExploreSpliceQOutput.html">20220915_ExploreSpliceQOutput.html</a></p>
-<p><a
-href="20220916_CompareDE_LCL_Fibroblast.html">20220916_CompareDE_LCL_Fibroblast.html</a></p>
-<p><a
-href="20220919_chRNA_IntronRetention.html">20220919_chRNA_IntronRetention.html</a></p>
-<p><a
-href="20220922_ExploreSubparRNAseq.html">20220922_ExploreSubparRNAseq.html</a></p>
-<p><a
-href="20220923_ExploreSpecificityEstimates.html">20220923_ExploreSpecificityEstimates.html</a></p>
-<p><a
-href="20221108_MakeFigsFor10minPresentation.html">20221108_MakeFigsFor10minPresentation.html</a></p>
-<p><a
-href="20230214_MakeSampesConfigFor52MoleculeExperiment.html">20230214_MakeSampesConfigFor52MoleculeExperiment.html</a></p>
-<p><a
-href="20230223_PlotPCA_WithStructures.html">20230223_PlotPCA_WithStructures.html</a></p>
-<p><a
-href="20230306_CheckIntronsWithUniqueSpecifities.html">20230306_CheckIntronsWithUniqueSpecifities.html</a></p>
+<div id="recheck-list-of-risdibrana-specific-introns"
+class="section level3">
+<h3>Recheck list of risdi/brana-specific introns</h3>
+<p>I previously made a list of risdiplam/branaplam/C2C5-specific introns
+based on the dose response experiment. Because the different molecules
+have different genome-wide effective potencies (ie, 100nM C2C5 is
+different than 100nM risdiplam, despite them having generally similar
+specificity profiles), I tested for a difference in the EC50 of each
+intron for each traitment pair, relative to the genome-wide median. You
+can see that in a <a href="20220913_TidyDataForJingxin.html">previous
+notebook</a> I plotted the dose-response datapoints for a random sample
+of 20 of these significant molecule-specific effects, and they are
+generally believable effects from those.</p>
+<pre class="r"><code>GA.GT.Introns &lt;- read_tsv(&quot;../output/EC50Estimtes.FromPSI.txt.gz&quot;)
+
+ColorKey &lt;- c(&quot;Branaplam-specific&quot;=&quot;#005A32&quot;, &quot;Risdiplam-specific&quot;=&quot;#084594&quot;, &quot;Non significant&quot;=&quot;#969696&quot;)
+
+P1.dat &lt;- GA.GT.Introns %&gt;%
+  mutate(Color = case_when(
+    EC.Ratio.Test.Estimate.FDR_Branaplam.Risdiplam &gt; 0.05 ~ &quot;Non significant&quot;,
+    ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam &gt; 1 ~ &quot;Risdiplam-specific&quot;,
+    ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam &lt; 1 ~ &quot;Branaplam-specific&quot;
+  ))
+
+ggplot(P1.dat, aes(x=ED50_Branaplam, y=ED50_Risdiplam, color=Color)) +
+  geom_point() +
+  scale_x_continuous(trans=&#39;log10&#39;, limits = c(1, 1E7)) +
+  scale_y_continuous(trans=&#39;log10&#39;, limits = c(1, 1E7)) +
+  scale_color_manual(values=ColorKey) +
+  labs(x= &quot;Branaplam\nED50 (nanomolar)&quot;, y= &quot;Risdiplam\nED50 (nanomolar)&quot;, color=NULL) +
+  theme(legend.position=&#39;bottom&#39;) +
+  theme_bw()</code></pre>
+<p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>P1.dat %&gt;%
+  count(Color)</code></pre>
+<pre><code># A tibble: 4 × 2
+  Color                  n
+  &lt;chr&gt;              &lt;int&gt;
+1 Branaplam-specific   240
+2 Non significant      200
+3 Risdiplam-specific   161
+4 &lt;NA&gt;                2878</code></pre>
+<p>Ok, so each point is a branaplam-specific or risdiplam-specific GA-GT
+intron. There are 200 non-significant points, 161 risdiplam-specific
+points, and 240 branaplam-specific points. I think it will be useful for
+Jingxin to be able to easily visualize these before validating them…
+Some introns that change PSI from 1% to 3% might be very significant,
+but not the best for validation. Furthermore, not all of these events
+might be involved in poison exon inclusion. Some of them might just be
+alt 5’ss or something. And these details might inform which are the best
+candidates for validation by flanking PCR primers. Also, when looking at
+the data, some of the ‘risdiplam-specific’ introns I called are just not
+believable effects. Like the dose-response data points might just be too
+noisy. I did a reasonable job of filtering these out, and trying to make
+the FDR estimate reasonably calibrated… Or like there are some examples
+where it appears ‘risdiplam-specific’ but it is because the cryptic
+event is only just barely visible at the highest dose of risdiplam, and
+not visible in any of the branaplam doses (so it just requires a really
+really high dose to see the effect). So for all these reasons, it will
+be best to check the raw coverage data first… So I’ll write the out this
+list as a bedfile for easy viewing in IGV, a save a session that has the
+bedfile loaded, along with bigwigs for the dose response experiment so
+hopefully it will be easy to view.</p>
+<pre class="r"><code>P1.dat %&gt;%
+  dplyr::select(chrom=`#Chrom`, start, end, junc, score=ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam, strand=strand.y, Color) %&gt;%
+  filter(!is.na(score)) %&gt;%
+  mutate(thickStart = start, thickEnd=end, Color=recode(Color, !!!ColorKey)) %&gt;%
+  mutate(RgbCol = apply(col2rgb(Color), 2, paste, collapse=&#39;,&#39;)) %&gt;%
+  dplyr::select(chrom:strand, thickStart, thickEnd, RgbCol) %&gt;%
+  arrange(chrom, start, end) %&gt;%
+  write_tsv(&quot;../code/Branaplam_Risdiplam_specific_introns.bed&quot;, col_names = F)</code></pre>
+<pre class="bash"><code>bgzip ../code/Branaplam_Risdiplam_specific_introns.bed
+tabix -p bed ../code/Branaplam_Risdiplam_specific_introns.bed.gz</code></pre>
+<p>So to view, you will need to use the globus link I shared with
+Jingxin to download the <code>code</code> directory, or at minimum
+download the <code>code/bigwigs</code> folder of bigwig files, the
+<code>code/tracks.xml</code> IGV session, and the
+<code>code/Branaplam_Risdiplam_specific_introns.bed.gz</code> and
+<code>code/Branaplam_Risdiplam_specific_introns.bed.gz.tbi</code>. Then,
+from IGV, go to File &gt;&gt; OpenSession and open the tracks.xml. The
+tracks.xml uses relative filepaths so you need to preserve the relative
+filepaths of the thing you downloaded (that is, they need to all be in
+the same folder, such as a folder named <code>code</code>).</p>
+<p>Now you should be able to select the
+<code>Branaplam_Risdiplam_specific_introns.bed</code> track, and Ctl-F
+or Ctl-B to jump to the next GA-GT introns, colored according to
+significance. Browse around to find coordinates of potential splice
+events for validation.</p>
+<p>Here are screenshots of a few examples…</p>
+<div class="figure">
+<img src="assets/BranaSpecificExample1.png" alt="" />
+<p class="caption">BranaSpecific1</p>
+</div>
+<div class="figure">
+<img src="assets/BranaSpecificExample2.png" alt="" />
+<p class="caption">BranaSpecific2</p>
+</div>
+<div class="figure">
+<img src="assets/RisdiSpecificExample1.png" alt="" />
+<p class="caption">RisdiSpecific1</p>
+</div>
+<p>In general, I’m noticing there a quite a few believable
+branaplam-specific examples but the risdlam-specific are for the most
+part very small specificity effect sizes. That is, there are very few
+obviously risdiplam-specific events, compared to branaplam-specific
+events.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -902,20 +724,21 @@ other attached packages:
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.8.3     lubridate_1.8.0  assertthat_0.2.1 rprojroot_2.0.3 
  [5] digest_0.6.29    utf8_1.2.2       R6_2.5.1         cellranger_1.1.0
- [9] backports_1.4.1  reprex_2.0.1     evaluate_0.15    httr_1.4.3      
-[13] pillar_1.7.0     rlang_1.0.2      readxl_1.4.0     rstudioapi_0.13 
-[17] whisker_0.4      jquerylib_0.1.4  rmarkdown_2.14   munsell_0.5.0   
-[21] broom_0.8.0      compiler_4.2.0   httpuv_1.6.5     modelr_0.1.8    
-[25] xfun_0.30        pkgconfig_2.0.3  htmltools_0.5.2  tidyselect_1.1.2
-[29] workflowr_1.7.0  fansi_1.0.3      crayon_1.5.1     tzdb_0.3.0      
-[33] dbplyr_2.1.1     withr_2.5.0      later_1.3.0      grid_4.2.0      
-[37] jsonlite_1.8.0   gtable_0.3.0     lifecycle_1.0.1  DBI_1.1.2       
-[41] git2r_0.30.1     magrittr_2.0.3   scales_1.2.0     cli_3.3.0       
-[45] stringi_1.7.6    fs_1.5.2         promises_1.2.0.1 xml2_1.3.3      
-[49] bslib_0.3.1      ellipsis_0.3.2   generics_0.1.2   vctrs_0.4.1     
-[53] tools_4.2.0      glue_1.6.2       hms_1.1.1        fastmap_1.1.0   
-[57] yaml_2.3.5       colorspace_2.0-3 rvest_1.0.2      knitr_1.39      
-[61] haven_2.5.0      sass_0.4.1      </code></pre>
+ [9] backports_1.4.1  reprex_2.0.1     evaluate_0.15    highr_0.9       
+[13] httr_1.4.3       pillar_1.7.0     rlang_1.0.2      readxl_1.4.0    
+[17] rstudioapi_0.13  jquerylib_0.1.4  rmarkdown_2.14   bit_4.0.4       
+[21] munsell_0.5.0    broom_0.8.0      compiler_4.2.0   httpuv_1.6.5    
+[25] modelr_0.1.8     xfun_0.30        pkgconfig_2.0.3  htmltools_0.5.2 
+[29] tidyselect_1.1.2 workflowr_1.7.0  fansi_1.0.3      crayon_1.5.1    
+[33] tzdb_0.3.0       dbplyr_2.1.1     withr_2.5.0      later_1.3.0     
+[37] grid_4.2.0       jsonlite_1.8.0   gtable_0.3.0     lifecycle_1.0.1 
+[41] DBI_1.1.2        git2r_0.30.1     magrittr_2.0.3   scales_1.2.0    
+[45] cli_3.3.0        stringi_1.7.6    vroom_1.5.7      farver_2.1.0    
+[49] fs_1.5.2         promises_1.2.0.1 xml2_1.3.3       bslib_0.3.1     
+[53] ellipsis_0.3.2   generics_0.1.2   vctrs_0.4.1      tools_4.2.0     
+[57] bit64_4.0.5      glue_1.6.2       hms_1.1.1        parallel_4.2.0  
+[61] fastmap_1.1.0    yaml_2.3.5       colorspace_2.0-3 rvest_1.0.2     
+[65] knitr_1.39       haven_2.5.0      sass_0.4.1      </code></pre>
 </div>
 </div>
 
