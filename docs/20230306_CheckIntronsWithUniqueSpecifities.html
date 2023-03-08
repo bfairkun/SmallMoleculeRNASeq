@@ -288,6 +288,8 @@ specificities</h1>
 <li><a href="#recheck-list-of-risdibrana-specific-introns"
 id="toc-recheck-list-of-risdibrana-specific-introns">Recheck list of
 risdi/brana-specific introns</a></li>
+<li><a href="#update-20230308" id="toc-update-20230308">Update,
+20230308</a></li>
 </ul>
 </div>
 
@@ -450,15 +452,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree933025a6b519720ecd8fdc86b8e033c34a7c7a89targetblank933025aa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreea97c2eb77f216dfdf27c138ff3b12fdd5e780452targetblanka97c2eba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/933025a6b519720ecd8fdc86b8e033c34a7c7a89" target="_blank">933025a</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/a97c2eb77f216dfdf27c138ff3b12fdd5e780452" target="_blank">a97c2eb</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree933025a6b519720ecd8fdc86b8e033c34a7c7a89targetblank933025aa"
+id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreea97c2eb77f216dfdf27c138ff3b12fdd5e780452targetblanka97c2eba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -468,7 +470,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/933025a6b519720ecd8fdc86b8e033c34a7c7a89" target="_blank">933025a</a>.
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/a97c2eb77f216dfdf27c138ff3b12fdd5e780452" target="_blank">a97c2eb</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -489,6 +491,7 @@ Ignored files:
     Ignored:    analysis/.RData
     Ignored:    analysis/.Rhistory
     Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    analysis/figure/
     Ignored:    code/.DS_Store
     Ignored:    code/._DOCK7.pdf
     Ignored:    code/._DOCK7_DMSO1.pdf
@@ -596,6 +599,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/a97c2eb77f216dfdf27c138ff3b12fdd5e780452/analysis/20230306_CheckIntronsWithUniqueSpecifities.Rmd" target="_blank">a97c2eb</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-08
+</td>
+<td>
+update nb
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/a97c2eb77f216dfdf27c138ff3b12fdd5e780452/docs/20230306_CheckIntronsWithUniqueSpecifities.html" target="_blank">a97c2eb</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-08
+</td>
+<td>
+update nb
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1181,11 +1218,15 @@ list above, here is perhaps the most clear example:</p>
 <img src="assets/RisdiSpecificExample2.png" alt="" />
 <p class="caption">RisdiSpecific2</p>
 </div>
-<p>Let’s do some exploring of the data a bit more to see if there are
-any introns and interesting host genes with reasonable differences in
-specificity between the risdiplam and branaplam treatments. So like HTT
-should show up here for example, but I wonder what other interesting
-genes may be on the list.</p>
+</div>
+<div id="update-20230308" class="section level2">
+<h2>Update, 20230308</h2>
+<p>Yang suggested I do some more exploring/filtering of the data a bit
+more to see if there are any introns and interesting host genes with
+reasonable differences in specificity between the risdiplam and
+branaplam treatments. So like HTT should show up here for example, but I
+wonder what other interesting genes may be on the list. I want to get a
+more useful/filtered list for Yang and Jingxin to browse</p>
 <pre class="r"><code>ColorKey &lt;- c(&quot;Branaplam-specific&quot;=&quot;#005A32&quot;, &quot;Risdiplam-specific&quot;=&quot;#084594&quot;, &quot;Non significant&quot;=&quot;#969696&quot;)
 
 
@@ -1199,6 +1240,43 @@ P.histogram &lt;- P1.dat %&gt;%
 
 P.histogram</code></pre>
 <p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/a97c2eb77f216dfdf27c138ff3b12fdd5e780452/docs/figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-5-1.png" target="_blank">a97c2eb</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Let’s just consider stronger specificity effects, with abs(log2
 ratio) &gt; 2.</p>
 <p>Note that I haven’t filtered these GA-GT intron affects for those
@@ -1208,6 +1286,43 @@ host gene expression.</p>
   xlim(c(-10, 10)) +
   geom_vline(xintercept=c(-2,2))</code></pre>
 <p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/a97c2eb77f216dfdf27c138ff3b12fdd5e780452/docs/figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-6-1.png" target="_blank">a97c2eb</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>SpecificEffects &lt;- P1.dat %&gt;%
   mutate(log2Ratio = log2(ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam)) %&gt;%
   filter(abs(log2Ratio)&gt;2) %&gt;%
@@ -1233,8 +1348,12 @@ dose:response effect on expression, and also gather the FoldChange at
 the mid-point dose, which I think is a reasonable place to start to see
 some effects (the high dose in this experiment might be a bit ridiculous
 from the pharmacology point of view).</p>
-<pre class="r"><code>GeneExpressionData.tidy &lt;- read_tsv(&quot;../code/DoseResponseData/LCL/TidyExpressionDoseData.txt.gz&quot;) %&gt;%
-  mutate(CPM = log2(CPM))</code></pre>
+<pre class="r"><code>gene_names &lt;- read_tsv(&quot;../data/Genes.list.txt&quot;)
+
+GeneExpressionData.tidy &lt;- read_tsv(&quot;../code/DoseResponseData/LCL/TidyExpressionDoseData.txt.gz&quot;) %&gt;%
+  mutate(CPM = log2(CPM)) %&gt;%
+  mutate(ensembl_gene_id = str_replace(Geneid, &quot;^(.+?)\\..*$&quot;, &quot;\\1&quot;)) %&gt;%
+  left_join(gene_names)</code></pre>
 <p>As a data parsing side note… I can quickly get the doses for the
 midpoint doses by filtering on the color column. Let me remember how I
 coded the colors to get the appropriate doses</p>
@@ -1246,6 +1365,43 @@ coded the colors to get the appropriate doses</p>
   scale_fill_identity() +
   facet_wrap(~treatment)</code></pre>
 <p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/a97c2eb77f216dfdf27c138ff3b12fdd5e780452/docs/figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-8-1.png" target="_blank">a97c2eb</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok, so in other words, I want to filter for color = #969696 (DMSO),
 or #74C476 (middle branaplam dose), or #6BAED6 (middle risdiplam
 dose).</p>
@@ -1322,8 +1478,31 @@ MoleculeSpecificEffects %&gt;%
 </tbody>
 </table>
 <p>Ok that makes sense. Note that the CPM columns are actually log2CPM.
-We can see that HTT has a branaplam-specific effect. Let’s print the
-full table…</p>
+We can see that HTT has a branaplam-specific effect.</p>
+<p>Let’s print the full table…</p>
+<p>So for this table I only considered ones where there is a significant
+difference in splicing ED50 between risdiplam and branaplam.
+Technically, I renormalized EC50 to the genomewide median ED50 for GA-GT
+introns since risdiplam and branaplam molar concentrations aren’t
+directly comparable even for STAT1. Then, I filtered for the stronger
+effects (with log2 ratio) magnitude greater than 2 (see histogram above
+with the 2 vertical lines). Then, in the table, I am also listing the
+effects on expression in branaplam and risdiplam… Because some of the
+GA-GT introns that get upregulated don’t actually effect host gene
+expression, like if they don’t create an NMD poison exon. Note that all
+the CPM values in the table are actually log2CPM.</p>
+<p>Then, in the table there is also a column called “spearman_Branaplam”
+or “spearman_Risdiplam” which is the expression dose:response speraman
+correlation across the whole titration series… so in the example of HTT
+which is on the table (and also above), you can see that there is a
+similarly strong negative spearman correlation coefficient in the
+risdiplam and branaplam, but the log2RatioOfSplicingED50 column suggests
+it is quite branaplam specific, and if you look at the CPM_Branaplam
+(100nM branaplam) column compared to the CPM_DMSO and CPM_Risdiplam
+(316nM risdiplam) columns, you can see that there really is only a
+strong expression effect in branaplam at that midpoint dose… The
+midpoint dose is roughly comparable to some of the relatively low doses
+that Jingxin used in the recent experiment of 52 molecules</p>
 <pre class="r"><code>MoleculeSpecificEffects %&gt;%
   knitr::kable()</code></pre>
 <table>
@@ -4737,6 +4916,92 @@ full table…</p>
 </tr>
 </tbody>
 </table>
+<p>Yang noted that we didn’t see FOXM1 or LRKK2 on this list. Let’s
+investigate why.</p>
+<pre class="r"><code>SpecificEffects %&gt;%
+  filter(gene_names %in% c(&quot;FOXM1&quot;, &quot;LRRK2&quot;))</code></pre>
+<pre><code># A tibble: 0 × 4
+# … with 4 variables: Color &lt;chr&gt;, log2Ratio &lt;dbl&gt;, gene_names &lt;chr&gt;,
+#   gene_ids &lt;chr&gt;</code></pre>
+<pre class="r"><code>GA.GT.Introns %&gt;%
+  separate_rows(gene_names, gene_ids, sep=&#39;,&#39;) %&gt;%
+  filter(gene_names %in% c(&quot;FOXM1&quot;, &quot;LRRK2&quot;, &quot;HTT&quot;, &quot;STAT1&quot;))</code></pre>
+<pre><code># A tibble: 8 × 34
+  junc        `#Chrom`  start    end gid   strand.y seq   Donor.score gene_names
+  &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;     
+1 chr12:2859… chr12    2.86e6 2.86e6 chr1… -        ATGA…        4.63 FOXM1     
+2 chr12:4022… chr12    4.02e7 4.02e7 chr1… +        ATGA…        3.60 LRRK2     
+3 chr2:19097… chr2     1.91e8 1.91e8 chr2… -        AGGA…        4.83 STAT1     
+4 chr2:19101… chr2     1.91e8 1.91e8 chr2… -        CAGA…        5.99 STAT1     
+5 chr2:19101… chr2     1.91e8 1.91e8 chr2… -        CAGA…        5.99 STAT1     
+6 chr4:32137… chr4     3.21e6 3.21e6 chr4… +        CAGA…        5.53 HTT       
+7 chr4:32152… chr4     3.22e6 3.22e6 chr4… +        CAGA…        5.41 HTT       
+8 chr4:32152… chr4     3.22e6 3.22e6 chr4… +        CAGA…        5.41 HTT       
+# … with 25 more variables: gene_ids &lt;chr&gt;, SpliceDonor &lt;chr&gt;,
+#   UpstreamSpliceAcceptor &lt;chr&gt;, IntronType &lt;chr&gt;, Steepness &lt;dbl&gt;,
+#   LowerLimit &lt;dbl&gt;, UpperLimit &lt;dbl&gt;, ED50_Branaplam &lt;dbl&gt;, ED50_C2C5 &lt;dbl&gt;,
+#   ED50_Risdiplam &lt;dbl&gt;, spearman.coef.Branaplam &lt;dbl&gt;,
+#   spearman.coef.C2C5 &lt;dbl&gt;, spearman.coef.Risdiplam &lt;dbl&gt;,
+#   EC.Ratio.Test.Estimate_Branaplam.C2C5 &lt;dbl&gt;,
+#   EC.Ratio.Test.Estimate_Branaplam.Risdiplam &lt;dbl&gt;, …</code></pre>
+<pre class="r"><code>GA.GT.Introns.OfInterest &lt;- 
+  GA.GT.Introns %&gt;%
+  separate_rows(gene_names, gene_ids, sep=&#39;,&#39;) %&gt;%
+  filter(gene_names %in% c(&quot;FOXM1&quot;, &quot;LRRK2&quot;, &quot;HTT&quot;, &quot;STAT1&quot;)) %&gt;%
+  pull(junc)
+
+
+GeneExpressionData.tidy %&gt;%
+  filter(hgnc_symbol %in% c(&quot;FOXM1&quot;, &quot;LRRK2&quot;, &quot;HTT&quot;, &quot;STAT1&quot;)) %&gt;%
+  ggplot(aes(color=treatment)) +
+  geom_line(aes(x=dose.nM, y=log2(CPM))) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~hgnc_symbol, scales = &quot;free_y&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3)) +
+  labs(title=&quot;Dose response effects on gene expression genes of interest&quot;)</code></pre>
+<p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>…oops, with the x-axis in nanomolar units its kind of annoying to
+interpret. Let’s just plot the x-axis dose rank, instead of nanomolar
+units, since each of the titration curves cover similar effective
+dosages.</p>
+<pre class="r"><code>GeneExpressionData.tidy %&gt;%
+  filter(hgnc_symbol %in% c(&quot;FOXM1&quot;, &quot;LRRK2&quot;, &quot;HTT&quot;, &quot;STAT1&quot;)) %&gt;%
+  group_by(treatment) %&gt;%
+  mutate(DoseRank = dense_rank(dose.nM)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(color=treatment)) +
+  geom_line(aes(x=DoseRank, y=log2(CPM))) +
+  facet_wrap(~hgnc_symbol, scales = &quot;free_y&quot;) +
+  theme_bw() +
+  labs(title=&quot;Dose response effects on gene expression genes of interest&quot;)</code></pre>
+<p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>SplicingData.tidy &lt;- read_tsv(&quot;../code/DoseResponseData/LCL/TidySplicingDoseData.txt.gz&quot;)
+
+SplicingData.tidy %&gt;%
+  filter(junc %in% GA.GT.Introns.OfInterest) %&gt;%
+  group_by(treatment) %&gt;%
+  mutate(DoseRank = dense_rank(dose.nM)) %&gt;%
+  ungroup() %&gt;%
+  mutate(label = paste(gene_names, junc, sep=&#39;\n&#39;)) %&gt;%
+  ggplot(aes(color=treatment)) +
+  geom_line(aes(x=DoseRank, y=PSI)) +
+  facet_wrap(~label, scales = &quot;free_y&quot;) +
+  theme_bw() +
+  theme(strip.text.x = element_text(size = 5)) +
+  labs(title=&quot;All GAGT introns in genes of interest&quot;, y=&quot;Intronic PSI&quot;)</code></pre>
+<p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so I can see the dose response gene expression effects on those
+genes. And also here are the dose response splicing effects for all the
+detected GAGT introns (and passed default leafcutter cluster filters) in
+those genes. The intron in FOXM1 is not in the large table because it
+didn’t pass my filters for specific splicing effects, and that seems
+understandable looking at the splicing data. The LRRK2 intron isn’t in
+the long table because I didn’t even attempt fitting a dose-response
+curve to the splicing data because I filtered for introns with spearman
+&gt; 0.9 in at least one treatment. Perhaps that is a bit too strict to
+capture these introns that only start to show effects at the high
+doses.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

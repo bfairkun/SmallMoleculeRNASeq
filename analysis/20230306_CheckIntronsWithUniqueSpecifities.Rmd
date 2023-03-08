@@ -89,7 +89,9 @@ After looking at some of the top risdiplam-specific hits from the list above, he
 
 ![RisdiSpecific2](assets/RisdiSpecificExample2.png)
 
-Let's do some exploring of the data a bit more to see if there are any introns and interesting host genes with reasonable differences in specificity between the risdiplam and branaplam treatments. So like HTT should show up here for example, but I wonder what other interesting genes may be on the list.
+## Update, 20230308
+
+Yang suggested I do some more exploring/filtering of the data a bit more to see if there are any introns and interesting host genes with reasonable differences in specificity between the risdiplam and branaplam treatments. So like HTT should show up here for example, but I wonder what other interesting genes may be on the list. I want to get a more useful/filtered list for Yang and Jingxin to browse
 
 
 ```{r}
@@ -133,8 +135,15 @@ head(SpecificEffects)
 Let's also merge this with some gene expression data. For convenience, I'm just going to merge it with the spearman of the dose:response effect on expression, and also gather the FoldChange at the mid-point dose, which I think is a reasonable place to start to see some effects (the high dose in this experiment might be a bit ridiculous from the pharmacology point of view).
 
 ```{r}
+gene_names <- read_tsv("../data/Genes.list.txt")
+
 GeneExpressionData.tidy <- read_tsv("../code/DoseResponseData/LCL/TidyExpressionDoseData.txt.gz") %>%
-  mutate(CPM = log2(CPM))
+  mutate(CPM = log2(CPM)) %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+?)\\..*$", "\\1")) %>%
+  left_join(gene_names)
+
+
+ 
 ```
 
 As a data parsing side note... I can quickly get the doses for the midpoint doses by filtering on the color column. Let me remember how I coded the colors to get the appropriate doses
@@ -177,10 +186,83 @@ MoleculeSpecificEffects %>%
 
 ```
 
-Ok that makes sense. Note that the CPM columns are actually log2CPM. We can see that HTT has a branaplam-specific effect. Let's print the full table...
+
+Ok that makes sense. Note that the CPM columns are actually log2CPM. We can see that HTT has a branaplam-specific effect.
+
+
+
+Let's print the full table...
+
+So for this table I only considered ones where there is a significant difference in splicing ED50 between risdiplam and branaplam. Technically, I renormalized EC50 to the genomewide median ED50 for GA-GT introns since risdiplam and branaplam molar concentrations aren't directly comparable even for STAT1. Then, I filtered for the stronger effects (with log2 ratio) magnitude greater than 2 (see histogram above with the 2 vertical lines). Then, in the table, I am also listing the effects on expression in branaplam and risdiplam... Because some of the GA-GT introns that get upregulated don't actually effect host gene expression, like if they don't create an NMD poison exon. Note that all the CPM values in the table are actually log2CPM. 
+
+Then, in the table there is also a column called "spearman_Branaplam" or "spearman_Risdiplam" which is the expression dose:response speraman correlation across the whole titration series... so in the example of HTT which is on the table (and also above), you can see that there is a similarly strong negative spearman correlation coefficient in the risdiplam and branaplam, but the log2RatioOfSplicingED50 column suggests it is quite branaplam specific, and if you look at the CPM_Branaplam (100nM branaplam) column compared to the CPM_DMSO and CPM_Risdiplam (316nM risdiplam) columns, you can see that there really is only a strong expression effect in branaplam at that midpoint dose... The midpoint dose is roughly comparable to some of the relatively low doses that Jingxin used in the recent experiment of 52 molecules
 
 ```{r}
 MoleculeSpecificEffects %>%
   knitr::kable()
 ```
 
+
+Yang noted that we didn't see FOXM1 or LRKK2 on this list. Let's investigate why.
+
+```{r}
+SpecificEffects %>%
+  filter(gene_names %in% c("FOXM1", "LRRK2"))
+
+GA.GT.Introns %>%
+  separate_rows(gene_names, gene_ids, sep=',') %>%
+  filter(gene_names %in% c("FOXM1", "LRRK2", "HTT", "STAT1"))
+
+GA.GT.Introns.OfInterest <- 
+  GA.GT.Introns %>%
+  separate_rows(gene_names, gene_ids, sep=',') %>%
+  filter(gene_names %in% c("FOXM1", "LRRK2", "HTT", "STAT1")) %>%
+  pull(junc)
+
+
+GeneExpressionData.tidy %>%
+  filter(hgnc_symbol %in% c("FOXM1", "LRRK2", "HTT", "STAT1")) %>%
+  ggplot(aes(color=treatment)) +
+  geom_line(aes(x=dose.nM, y=log2(CPM))) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~hgnc_symbol, scales = "free_y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3)) +
+  labs(title="Dose response effects on gene expression genes of interest")
+
+```
+
+...oops,  with the x-axis in nanomolar units its kind of annoying to interpret. Let's just plot the x-axis dose rank, instead of nanomolar units, since each of the titration curves cover similar effective dosages.
+
+```{r}
+
+GeneExpressionData.tidy %>%
+  filter(hgnc_symbol %in% c("FOXM1", "LRRK2", "HTT", "STAT1")) %>%
+  group_by(treatment) %>%
+  mutate(DoseRank = dense_rank(dose.nM)) %>%
+  ungroup() %>%
+  ggplot(aes(color=treatment)) +
+  geom_line(aes(x=DoseRank, y=log2(CPM))) +
+  facet_wrap(~hgnc_symbol, scales = "free_y") +
+  theme_bw() +
+  labs(title="Dose response effects on gene expression genes of interest")
+
+SplicingData.tidy <- read_tsv("../code/DoseResponseData/LCL/TidySplicingDoseData.txt.gz")
+
+SplicingData.tidy %>%
+  filter(junc %in% GA.GT.Introns.OfInterest) %>%
+  group_by(treatment) %>%
+  mutate(DoseRank = dense_rank(dose.nM)) %>%
+  ungroup() %>%
+  mutate(label = paste(gene_names, junc, sep='\n')) %>%
+  ggplot(aes(color=treatment)) +
+  geom_line(aes(x=DoseRank, y=PSI)) +
+  facet_wrap(~label, scales = "free_y") +
+  theme_bw() +
+  theme(strip.text.x = element_text(size = 5)) +
+  labs(title="All GAGT introns in genes of interest", y="Intronic PSI")
+  
+
+```
+
+Ok, so I can see the dose response gene expression effects on those genes. And also here are the dose response splicing effects for all the detected GAGT introns (and passed default leafcutter cluster filters)  in those genes. The intron in FOXM1 is not in the large table because it didn't pass my filters for specific splicing effects, and that seems understandable looking at the splicing data. The LRRK2 intron isn't in the long table because I didn't even attempt fitting a dose-response curve to the splicing data because I filtered for introns with spearman > 0.9 in at least one treatment. Perhaps that is a bit too strict to capture these introns that only start to show effects at the high doses.
