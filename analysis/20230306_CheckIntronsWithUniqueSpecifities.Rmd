@@ -9,6 +9,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 
 library(tidyverse)
 
+
 ```
 
 ### Recheck list of risdi/brana-specific introns
@@ -88,5 +89,98 @@ After looking at some of the top risdiplam-specific hits from the list above, he
 
 ![RisdiSpecific2](assets/RisdiSpecificExample2.png)
 
+Let's do some exploring of the data a bit more to see if there are any introns and interesting host genes with reasonable differences in specificity between the risdiplam and branaplam treatments. So like HTT should show up here for example, but I wonder what other interesting genes may be on the list.
 
+
+```{r}
+ColorKey <- c("Branaplam-specific"="#005A32", "Risdiplam-specific"="#084594", "Non significant"="#969696")
+
+
+P.histogram <- P1.dat %>%
+  mutate(Color = factor(Color, levels=names(ColorKey))) %>%
+  ggplot(aes(x=log2(ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam), fill=Color)) +
+  geom_histogram() +
+  scale_fill_manual(values=ColorKey) +
+  theme(legend.position="bottom") +
+  labs(x="Specificity\nlog2(BranaplamEC50/RisdiplamEC50)", caption="EC50s normalized to median before comparing ratios")
+
+P.histogram
+```
+
+Let's just consider stronger specificity effects, with abs(log2 ratio) > 2.
+
+Note that I haven't filtered these GA-GT intron affects for those with effects on the host gene. So like some of these hits may not effect host gene expression.
+
+
+```{r}
+P.histogram +
+  xlim(c(-10, 10)) +
+  geom_vline(xintercept=c(-2,2))
+
+SpecificEffects <- P1.dat %>%
+  mutate(log2Ratio = log2(ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam)) %>%
+  filter(abs(log2Ratio)>2) %>%
+  filter(!Color == "Non significant") %>%
+  separate_rows(gene_names, gene_ids, sep=',') %>%
+  dplyr::select(Color, log2Ratio, gene_names, gene_ids) %>%
+  # filter(gene_names == "HTT") %>%
+  arrange(log2Ratio)
+
+head(SpecificEffects)
+
+```
+
+Let's also merge this with some gene expression data. For convenience, I'm just going to merge it with the spearman of the dose:response effect on expression, and also gather the FoldChange at the mid-point dose, which I think is a reasonable place to start to see some effects (the high dose in this experiment might be a bit ridiculous from the pharmacology point of view).
+
+```{r}
+GeneExpressionData.tidy <- read_tsv("../code/DoseResponseData/LCL/TidyExpressionDoseData.txt.gz") %>%
+  mutate(CPM = log2(CPM))
+```
+
+As a data parsing side note... I can quickly get the doses for the midpoint doses by filtering on the color column. Let me remember how I coded the colors to get the appropriate doses
+
+```{r}
+GeneExpressionData.tidy %>%
+  distinct(color, .keep_all=T) %>%
+  ggplot(aes(x=1, y=color, fill=color)) +
+  geom_raster() +
+  geom_label(aes(label=color)) +
+  scale_fill_identity() +
+  facet_wrap(~treatment)
+```
+
+Ok, so in other words, I want to filter for color = #969696 (DMSO), or #74C476 (middle branaplam dose), or #6BAED6 (middle risdiplam dose).
+
+```{r}
+
+MoleculeSpecificEffects <- GeneExpressionData.tidy %>%
+  filter(color %in% c("#74C476", "#6BAED6")) %>%
+  filter(Geneid %in% SpecificEffects$gene_ids) %>%
+  dplyr::select(Geneid, CPM, SampleName, treatment, spearman) %>%
+  left_join(
+    GeneExpressionData.tidy %>%
+      filter(color %in% c("#969696")) %>%
+      filter(Geneid %in% SpecificEffects$gene_ids) %>%
+      dplyr::select(Geneid, CPM) %>%
+      group_by(Geneid) %>%
+      summarise(CPM_DMSO = mean(CPM))
+  ) %>%
+  mutate(Log2FoldChange = CPM - CPM_DMSO) %>%
+  pivot_wider(names_from = c("treatment"), values_from=c("CPM", "spearman", "SampleName", "Log2FoldChange")) %>%
+  inner_join(SpecificEffects, by=c("Geneid"="gene_ids")) %>%
+  dplyr::rename(log2RatioOfSplicingED50= log2Ratio) %>%
+  arrange(log2RatioOfSplicingED50)
+
+MoleculeSpecificEffects %>%
+  filter(gene_names == "HTT") %>%
+  knitr::kable()
+
+```
+
+Ok that makes sense. Note that the CPM columns are actually log2CPM. We can see that HTT has a branaplam-specific effect. Let's print the full table...
+
+```{r}
+MoleculeSpecificEffects %>%
+  knitr::kable()
+```
 

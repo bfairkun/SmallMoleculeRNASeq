@@ -315,7 +315,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-03-07
+<strong>Last updated:</strong> 2023-03-08
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -450,15 +450,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreec2a4a84e07cfc9e9ce4e2a1580108b6dab356d58targetblankc2a4a84a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree933025a6b519720ecd8fdc86b8e033c34a7c7a89targetblank933025aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/c2a4a84e07cfc9e9ce4e2a1580108b6dab356d58" target="_blank">c2a4a84</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/933025a6b519720ecd8fdc86b8e033c34a7c7a89" target="_blank">933025a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreec2a4a84e07cfc9e9ce4e2a1580108b6dab356d58targetblankc2a4a84a"
+id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree933025a6b519720ecd8fdc86b8e033c34a7c7a89targetblank933025aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -468,7 +468,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/c2a4a84e07cfc9e9ce4e2a1580108b6dab356d58" target="_blank">c2a4a84</a>.
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/933025a6b519720ecd8fdc86b8e033c34a7c7a89" target="_blank">933025a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -596,6 +596,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/933025a6b519720ecd8fdc86b8e033c34a7c7a89/analysis/20230306_CheckIntronsWithUniqueSpecifities.Rmd" target="_blank">933025a</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-07
+</td>
+<td>
+update nb
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/933025a6b519720ecd8fdc86b8e033c34a7c7a89/docs/20230306_CheckIntronsWithUniqueSpecifities.html" target="_blank">933025a</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-07
+</td>
+<td>
+update nb
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1147,6 +1181,3562 @@ list above, here is perhaps the most clear example:</p>
 <img src="assets/RisdiSpecificExample2.png" alt="" />
 <p class="caption">RisdiSpecific2</p>
 </div>
+<p>Let’s do some exploring of the data a bit more to see if there are
+any introns and interesting host genes with reasonable differences in
+specificity between the risdiplam and branaplam treatments. So like HTT
+should show up here for example, but I wonder what other interesting
+genes may be on the list.</p>
+<pre class="r"><code>ColorKey &lt;- c(&quot;Branaplam-specific&quot;=&quot;#005A32&quot;, &quot;Risdiplam-specific&quot;=&quot;#084594&quot;, &quot;Non significant&quot;=&quot;#969696&quot;)
+
+
+P.histogram &lt;- P1.dat %&gt;%
+  mutate(Color = factor(Color, levels=names(ColorKey))) %&gt;%
+  ggplot(aes(x=log2(ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam), fill=Color)) +
+  geom_histogram() +
+  scale_fill_manual(values=ColorKey) +
+  theme(legend.position=&quot;bottom&quot;) +
+  labs(x=&quot;Specificity\nlog2(BranaplamEC50/RisdiplamEC50)&quot;, caption=&quot;EC50s normalized to median before comparing ratios&quot;)
+
+P.histogram</code></pre>
+<p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Let’s just consider stronger specificity effects, with abs(log2
+ratio) &gt; 2.</p>
+<p>Note that I haven’t filtered these GA-GT intron affects for those
+with effects on the host gene. So like some of these hits may not effect
+host gene expression.</p>
+<pre class="r"><code>P.histogram +
+  xlim(c(-10, 10)) +
+  geom_vline(xintercept=c(-2,2))</code></pre>
+<p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>SpecificEffects &lt;- P1.dat %&gt;%
+  mutate(log2Ratio = log2(ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam)) %&gt;%
+  filter(abs(log2Ratio)&gt;2) %&gt;%
+  filter(!Color == &quot;Non significant&quot;) %&gt;%
+  separate_rows(gene_names, gene_ids, sep=&#39;,&#39;) %&gt;%
+  dplyr::select(Color, log2Ratio, gene_names, gene_ids) %&gt;%
+  # filter(gene_names == &quot;HTT&quot;) %&gt;%
+  arrange(log2Ratio)
+
+head(SpecificEffects)</code></pre>
+<pre><code># A tibble: 6 × 4
+  Color              log2Ratio gene_names gene_ids          
+  &lt;chr&gt;                  &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;             
+1 Branaplam-specific    -30.8  ASB3       ENSG00000115239.24
+2 Branaplam-specific    -15.7  SETD5      ENSG00000168137.18
+3 Branaplam-specific     -8.13 C8orf88    ENSG00000253250.3 
+4 Branaplam-specific     -7.52 NCF2       ENSG00000116701.15
+5 Branaplam-specific     -7.16 ANKRD10    ENSG00000088448.14
+6 Branaplam-specific     -6.67 DAPP1      ENSG00000070190.13</code></pre>
+<p>Let’s also merge this with some gene expression data. For
+convenience, I’m just going to merge it with the spearman of the
+dose:response effect on expression, and also gather the FoldChange at
+the mid-point dose, which I think is a reasonable place to start to see
+some effects (the high dose in this experiment might be a bit ridiculous
+from the pharmacology point of view).</p>
+<pre class="r"><code>GeneExpressionData.tidy &lt;- read_tsv(&quot;../code/DoseResponseData/LCL/TidyExpressionDoseData.txt.gz&quot;) %&gt;%
+  mutate(CPM = log2(CPM))</code></pre>
+<p>As a data parsing side note… I can quickly get the doses for the
+midpoint doses by filtering on the color column. Let me remember how I
+coded the colors to get the appropriate doses</p>
+<pre class="r"><code>GeneExpressionData.tidy %&gt;%
+  distinct(color, .keep_all=T) %&gt;%
+  ggplot(aes(x=1, y=color, fill=color)) +
+  geom_raster() +
+  geom_label(aes(label=color)) +
+  scale_fill_identity() +
+  facet_wrap(~treatment)</code></pre>
+<p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, so in other words, I want to filter for color = #969696 (DMSO),
+or #74C476 (middle branaplam dose), or #6BAED6 (middle risdiplam
+dose).</p>
+<pre class="r"><code>MoleculeSpecificEffects &lt;- GeneExpressionData.tidy %&gt;%
+  filter(color %in% c(&quot;#74C476&quot;, &quot;#6BAED6&quot;)) %&gt;%
+  filter(Geneid %in% SpecificEffects$gene_ids) %&gt;%
+  dplyr::select(Geneid, CPM, SampleName, treatment, spearman) %&gt;%
+  left_join(
+    GeneExpressionData.tidy %&gt;%
+      filter(color %in% c(&quot;#969696&quot;)) %&gt;%
+      filter(Geneid %in% SpecificEffects$gene_ids) %&gt;%
+      dplyr::select(Geneid, CPM) %&gt;%
+      group_by(Geneid) %&gt;%
+      summarise(CPM_DMSO = mean(CPM))
+  ) %&gt;%
+  mutate(Log2FoldChange = CPM - CPM_DMSO) %&gt;%
+  pivot_wider(names_from = c(&quot;treatment&quot;), values_from=c(&quot;CPM&quot;, &quot;spearman&quot;, &quot;SampleName&quot;, &quot;Log2FoldChange&quot;)) %&gt;%
+  inner_join(SpecificEffects, by=c(&quot;Geneid&quot;=&quot;gene_ids&quot;)) %&gt;%
+  dplyr::rename(log2RatioOfSplicingED50= log2Ratio) %&gt;%
+  arrange(log2RatioOfSplicingED50)
+
+MoleculeSpecificEffects %&gt;%
+  filter(gene_names == &quot;HTT&quot;) %&gt;%
+  knitr::kable()</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="7%" />
+<col width="3%" />
+<col width="5%" />
+<col width="5%" />
+<col width="7%" />
+<col width="7%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+<col width="7%" />
+<col width="9%" />
+<col width="4%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Geneid</th>
+<th align="right">CPM_DMSO</th>
+<th align="right">CPM_Branaplam</th>
+<th align="right">CPM_Risdiplam</th>
+<th align="right">spearman_Branaplam</th>
+<th align="right">spearman_Risdiplam</th>
+<th align="left">SampleName_Branaplam</th>
+<th align="left">SampleName_Risdiplam</th>
+<th align="right">Log2FoldChange_Branaplam</th>
+<th align="right">Log2FoldChange_Risdiplam</th>
+<th align="left">Color</th>
+<th align="right">log2RatioOfSplicingED50</th>
+<th align="left">gene_names</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ENSG00000197386.12</td>
+<td align="right">7.892803</td>
+<td align="right">4.910666</td>
+<td align="right">7.186162</td>
+<td align="right">-0.8333333</td>
+<td align="right">-0.8666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-2.982138</td>
+<td align="right">-0.7066416</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.346746</td>
+<td align="left">HTT</td>
+</tr>
+</tbody>
+</table>
+<p>Ok that makes sense. Note that the CPM columns are actually log2CPM.
+We can see that HTT has a branaplam-specific effect. Let’s print the
+full table…</p>
+<pre class="r"><code>MoleculeSpecificEffects %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<colgroup>
+<col width="7%" />
+<col width="4%" />
+<col width="5%" />
+<col width="5%" />
+<col width="7%" />
+<col width="7%" />
+<col width="10%" />
+<col width="10%" />
+<col width="9%" />
+<col width="9%" />
+<col width="7%" />
+<col width="9%" />
+<col width="4%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Geneid</th>
+<th align="right">CPM_DMSO</th>
+<th align="right">CPM_Branaplam</th>
+<th align="right">CPM_Risdiplam</th>
+<th align="right">spearman_Branaplam</th>
+<th align="right">spearman_Risdiplam</th>
+<th align="left">SampleName_Branaplam</th>
+<th align="left">SampleName_Risdiplam</th>
+<th align="right">Log2FoldChange_Branaplam</th>
+<th align="right">Log2FoldChange_Risdiplam</th>
+<th align="left">Color</th>
+<th align="right">log2RatioOfSplicingED50</th>
+<th align="left">gene_names</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ENSG00000115239.24</td>
+<td align="right">4.3081982</td>
+<td align="right">4.1890728</td>
+<td align="right">4.3196633</td>
+<td align="right">-0.8166667</td>
+<td align="right">0.9000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1191255</td>
+<td align="right">0.0114651</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-30.837171</td>
+<td align="left">ASB3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000168137.18</td>
+<td align="right">6.0661148</td>
+<td align="right">6.1276722</td>
+<td align="right">6.2102237</td>
+<td align="right">-0.0166667</td>
+<td align="right">0.6333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0615575</td>
+<td align="right">0.1441089</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-15.702685</td>
+<td align="left">SETD5</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000253250.3</td>
+<td align="right">2.5719371</td>
+<td align="right">2.9005508</td>
+<td align="right">2.5340035</td>
+<td align="right">0.8000000</td>
+<td align="right">0.5166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.3286136</td>
+<td align="right">-0.0379337</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-8.128940</td>
+<td align="left">C8orf88</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000116701.15</td>
+<td align="right">5.4192338</td>
+<td align="right">5.5229186</td>
+<td align="right">5.5790500</td>
+<td align="right">-0.4000000</td>
+<td align="right">-0.1333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1036848</td>
+<td align="right">0.1598162</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-7.515091</td>
+<td align="left">NCF2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000088448.14</td>
+<td align="right">5.0353703</td>
+<td align="right">4.9280315</td>
+<td align="right">5.1069535</td>
+<td align="right">-0.2500000</td>
+<td align="right">0.8000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1073388</td>
+<td align="right">0.0715831</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-7.155299</td>
+<td align="left">ANKRD10</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000070190.13</td>
+<td align="right">5.7763049</td>
+<td align="right">4.3533232</td>
+<td align="right">3.9080913</td>
+<td align="right">-0.9666667</td>
+<td align="right">-0.9000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-1.4229816</td>
+<td align="right">-1.8682135</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-6.669824</td>
+<td align="left">DAPP1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000050748.17</td>
+<td align="right">5.2584252</td>
+<td align="right">5.3263748</td>
+<td align="right">5.3632371</td>
+<td align="right">-0.5333333</td>
+<td align="right">0.5500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0679496</td>
+<td align="right">0.1048119</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-6.577305</td>
+<td align="left">MAPK9</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000196792.12</td>
+<td align="right">3.7273769</td>
+<td align="right">4.0174847</td>
+<td align="right">4.0453431</td>
+<td align="right">0.9500000</td>
+<td align="right">0.8833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2901078</td>
+<td align="right">0.3179662</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-6.202894</td>
+<td align="left">STRN3</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000170476.16</td>
+<td align="right">8.4436025</td>
+<td align="right">8.1173012</td>
+<td align="right">8.3130122</td>
+<td align="right">-1.0000000</td>
+<td align="right">-0.9500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3263014</td>
+<td align="right">-0.1305903</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-5.524008</td>
+<td align="left">MZB1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000064933.18</td>
+<td align="right">4.6810344</td>
+<td align="right">2.2646238</td>
+<td align="right">2.5518368</td>
+<td align="right">-0.9833333</td>
+<td align="right">-1.0000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-2.4164106</td>
+<td align="right">-2.1291976</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-5.522988</td>
+<td align="left">PMS1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000087460.25</td>
+<td align="right">10.2499857</td>
+<td align="right">10.0997995</td>
+<td align="right">10.1649180</td>
+<td align="right">-0.9333333</td>
+<td align="right">-0.9166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1501862</td>
+<td align="right">-0.0850677</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.958655</td>
+<td align="left">GNAS</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000180198.16</td>
+<td align="right">7.0524244</td>
+<td align="right">9.6440401</td>
+<td align="right">7.2642243</td>
+<td align="right">0.9833333</td>
+<td align="right">0.9166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">2.5916157</td>
+<td align="right">0.2117999</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.819941</td>
+<td align="left">RCC1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000242125.3</td>
+<td align="right">4.9287895</td>
+<td align="right">3.2413027</td>
+<td align="right">4.5095734</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.9666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-1.6874868</td>
+<td align="right">-0.4192161</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.819941</td>
+<td align="left">SNHG3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000112739.17</td>
+<td align="right">6.2932301</td>
+<td align="right">6.3802628</td>
+<td align="right">6.2891568</td>
+<td align="right">-0.4333333</td>
+<td align="right">-0.2333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0870327</td>
+<td align="right">-0.0040733</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.813817</td>
+<td align="left">PRPF4B</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000205861.12</td>
+<td align="right">0.9774978</td>
+<td align="right">1.2937702</td>
+<td align="right">0.5553771</td>
+<td align="right">-0.1833333</td>
+<td align="right">-0.7500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.3162724</td>
+<td align="right">-0.4221207</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.744962</td>
+<td align="left">PCOTH</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000131981.16</td>
+<td align="right">5.6559843</td>
+<td align="right">5.6235088</td>
+<td align="right">5.7031307</td>
+<td align="right">0.2333333</td>
+<td align="right">0.7666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0324755</td>
+<td align="right">0.0471464</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.693610</td>
+<td align="left">LGALS3</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000078747.15</td>
+<td align="right">6.1734625</td>
+<td align="right">5.7468173</td>
+<td align="right">6.1599485</td>
+<td align="right">-0.8666667</td>
+<td align="right">-0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.4266451</td>
+<td align="right">-0.0135139</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.614054</td>
+<td align="left">ITCH</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000258724.1</td>
+<td align="right">-Inf</td>
+<td align="right">-6.1574410</td>
+<td align="right">-Inf</td>
+<td align="right">-0.1980295</td>
+<td align="right">0.2738613</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">Inf</td>
+<td align="right">NaN</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.608812</td>
+<td align="left">PINX1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000254093.9</td>
+<td align="right">3.9415665</td>
+<td align="right">3.6255573</td>
+<td align="right">3.8983668</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3160092</td>
+<td align="right">-0.0431996</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.608812</td>
+<td align="left">PINX1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000143569.19</td>
+<td align="right">7.7077429</td>
+<td align="right">7.2917077</td>
+<td align="right">7.0205834</td>
+<td align="right">-0.8666667</td>
+<td align="right">-0.9500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.4160352</td>
+<td align="right">-0.6871596</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.586487</td>
+<td align="left">UBAP2L</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000102921.8</td>
+<td align="right">6.1395411</td>
+<td align="right">6.0907831</td>
+<td align="right">6.1279102</td>
+<td align="right">0.3666667</td>
+<td align="right">0.0666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0487579</td>
+<td align="right">-0.0116309</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.428989</td>
+<td align="left">N4BP1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000100368.14</td>
+<td align="right">3.9931320</td>
+<td align="right">3.6222784</td>
+<td align="right">3.9677602</td>
+<td align="right">-0.9000000</td>
+<td align="right">-0.3833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3708536</td>
+<td align="right">-0.0253719</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.411832</td>
+<td align="left">CSF2RB</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000111237.19</td>
+<td align="right">5.9226823</td>
+<td align="right">5.1901804</td>
+<td align="right">5.8840081</td>
+<td align="right">-1.0000000</td>
+<td align="right">-0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.7325019</td>
+<td align="right">-0.0386742</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.338322</td>
+<td align="left">VPS29</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000172175.15</td>
+<td align="right">6.6152367</td>
+<td align="right">6.9167005</td>
+<td align="right">6.7481051</td>
+<td align="right">-0.1333333</td>
+<td align="right">0.3833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.3014638</td>
+<td align="right">0.1328683</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.278250</td>
+<td align="left">MALT1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000010270.13</td>
+<td align="right">5.7620132</td>
+<td align="right">5.9089846</td>
+<td align="right">5.7548570</td>
+<td align="right">0.9333333</td>
+<td align="right">0.8333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1469714</td>
+<td align="right">-0.0071562</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.248940</td>
+<td align="left">STARD3NL</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000090372.15</td>
+<td align="right">6.0804844</td>
+<td align="right">4.2989135</td>
+<td align="right">5.9960428</td>
+<td align="right">-0.9333333</td>
+<td align="right">-0.9333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-1.7815710</td>
+<td align="right">-0.0844417</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.199628</td>
+<td align="left">STRN4</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000176531.10</td>
+<td align="right">3.2001713</td>
+<td align="right">3.5516429</td>
+<td align="right">3.4279162</td>
+<td align="right">0.9000000</td>
+<td align="right">0.8000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.3514715</td>
+<td align="right">0.2277449</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-4.154132</td>
+<td align="left">PHLDB3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000000938.13</td>
+<td align="right">5.4668031</td>
+<td align="right">4.9207099</td>
+<td align="right">5.3181011</td>
+<td align="right">-0.5000000</td>
+<td align="right">-0.5000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.5460932</td>
+<td align="right">-0.1487020</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.990816</td>
+<td align="left">FGR</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000147905.17</td>
+<td align="right">5.5084515</td>
+<td align="right">5.2834282</td>
+<td align="right">5.3798056</td>
+<td align="right">-0.9500000</td>
+<td align="right">-0.2333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.2250233</td>
+<td align="right">-0.1286460</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.951407</td>
+<td align="left">ZCCHC7</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000153914.16</td>
+<td align="right">5.3992150</td>
+<td align="right">3.2561870</td>
+<td align="right">5.0795539</td>
+<td align="right">-0.8833333</td>
+<td align="right">-0.7833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-2.1430280</td>
+<td align="right">-0.3196611</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.940037</td>
+<td align="left">SREK1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000101639.18</td>
+<td align="right">4.9258571</td>
+<td align="right">5.0520124</td>
+<td align="right">4.8327785</td>
+<td align="right">-0.4333333</td>
+<td align="right">-0.8166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1261553</td>
+<td align="right">-0.0930786</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.934320</td>
+<td align="left">CEP192</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000163960.12</td>
+<td align="right">5.5158041</td>
+<td align="right">5.7377556</td>
+<td align="right">5.6465791</td>
+<td align="right">0.5666667</td>
+<td align="right">0.4500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2219515</td>
+<td align="right">0.1307750</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.872331</td>
+<td align="left">UBXN7</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000106268.15</td>
+<td align="right">4.9628095</td>
+<td align="right">5.2294993</td>
+<td align="right">5.0653461</td>
+<td align="right">0.4833333</td>
+<td align="right">-0.5833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2666898</td>
+<td align="right">0.1025367</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.805406</td>
+<td align="left">NUDT1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000102897.10</td>
+<td align="right">4.5736910</td>
+<td align="right">4.8807922</td>
+<td align="right">4.4613245</td>
+<td align="right">-0.1500000</td>
+<td align="right">-0.0500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.3071011</td>
+<td align="right">-0.1123666</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.734031</td>
+<td align="left">LYRM1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000110090.13</td>
+<td align="right">4.8495802</td>
+<td align="right">5.0761787</td>
+<td align="right">4.9416200</td>
+<td align="right">0.4666667</td>
+<td align="right">0.5333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2265985</td>
+<td align="right">0.0920398</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.648140</td>
+<td align="left">CPT1A</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000134882.16</td>
+<td align="right">5.1507778</td>
+<td align="right">4.3414083</td>
+<td align="right">4.6378393</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.9833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.8093695</td>
+<td align="right">-0.5129385</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.622183</td>
+<td align="left">UBAC2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000171530.14</td>
+<td align="right">6.4857089</td>
+<td align="right">5.8097853</td>
+<td align="right">6.3302933</td>
+<td align="right">-0.9666667</td>
+<td align="right">-0.3833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.6759236</td>
+<td align="right">-0.1554156</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.621325</td>
+<td align="left">TBCA</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000147439.13</td>
+<td align="right">5.1520551</td>
+<td align="right">5.0749800</td>
+<td align="right">5.0856878</td>
+<td align="right">-0.8833333</td>
+<td align="right">0.4833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0770752</td>
+<td align="right">-0.0663673</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.615688</td>
+<td align="left">BIN3</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000177565.18</td>
+<td align="right">5.4283368</td>
+<td align="right">5.4312737</td>
+<td align="right">5.6095957</td>
+<td align="right">-0.6666667</td>
+<td align="right">0.1000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0029369</td>
+<td align="right">0.1812589</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.588868</td>
+<td align="left">TBL1XR1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000064313.12</td>
+<td align="right">5.4381021</td>
+<td align="right">4.5840260</td>
+<td align="right">4.3196633</td>
+<td align="right">-0.8000000</td>
+<td align="right">-0.9000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.8540761</td>
+<td align="right">-1.1184388</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.576764</td>
+<td align="left">TAF2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000167491.17</td>
+<td align="right">6.6118164</td>
+<td align="right">6.6513222</td>
+<td align="right">6.6583563</td>
+<td align="right">-0.7166667</td>
+<td align="right">0.5000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0395057</td>
+<td align="right">0.0465399</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.547966</td>
+<td align="left">GATAD2A</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000080845.17</td>
+<td align="right">5.4454116</td>
+<td align="right">5.1250684</td>
+<td align="right">5.3773074</td>
+<td align="right">-0.8166667</td>
+<td align="right">0.6333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3203432</td>
+<td align="right">-0.0681042</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.535267</td>
+<td align="left">DLGAP4</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000151233.11</td>
+<td align="right">4.0694815</td>
+<td align="right">2.9167005</td>
+<td align="right">4.0148087</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.6833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-1.1527810</td>
+<td align="right">-0.0546728</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.487187</td>
+<td align="left">GXYLT1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000139116.18</td>
+<td align="right">5.2251809</td>
+<td align="right">5.1192651</td>
+<td align="right">5.2784859</td>
+<td align="right">-0.7166667</td>
+<td align="right">-0.5000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1059158</td>
+<td align="right">0.0533050</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.473336</td>
+<td align="left">KIF21A</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000108061.12</td>
+<td align="right">6.6597812</td>
+<td align="right">6.5503495</td>
+<td align="right">6.4688532</td>
+<td align="right">0.0666667</td>
+<td align="right">-0.6333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1094316</td>
+<td align="right">-0.1909279</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.422720</td>
+<td align="left">SHOC2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000130475.14</td>
+<td align="right">4.8883909</td>
+<td align="right">4.7554484</td>
+<td align="right">4.8709263</td>
+<td align="right">-0.9833333</td>
+<td align="right">0.3000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1329426</td>
+<td align="right">-0.0174646</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.391896</td>
+<td align="left">FCHO1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000166974.13</td>
+<td align="right">5.3297854</td>
+<td align="right">5.5865519</td>
+<td align="right">5.3556426</td>
+<td align="right">-0.1500000</td>
+<td align="right">0.9333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2567665</td>
+<td align="right">0.0258572</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.348989</td>
+<td align="left">MAPRE2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000197386.12</td>
+<td align="right">7.8928033</td>
+<td align="right">4.9106655</td>
+<td align="right">7.1861617</td>
+<td align="right">-0.8333333</td>
+<td align="right">-0.8666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-2.9821378</td>
+<td align="right">-0.7066416</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.346746</td>
+<td align="left">HTT</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000127554.13</td>
+<td align="right">4.9440687</td>
+<td align="right">4.9929410</td>
+<td align="right">5.0031897</td>
+<td align="right">-0.6666667</td>
+<td align="right">0.3333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0488723</td>
+<td align="right">0.0591209</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.315597</td>
+<td align="left">GFER</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000180901.11</td>
+<td align="right">5.3235507</td>
+<td align="right">5.3641595</td>
+<td align="right">5.4693225</td>
+<td align="right">-0.5833333</td>
+<td align="right">0.4500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0406088</td>
+<td align="right">0.1457718</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.297018</td>
+<td align="left">KCTD2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000132394.11</td>
+<td align="right">4.7444785</td>
+<td align="right">4.9776270</td>
+<td align="right">4.9637693</td>
+<td align="right">-0.4666667</td>
+<td align="right">-0.2333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2331485</td>
+<td align="right">0.2192908</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.285066</td>
+<td align="left">EEFSEC</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000107263.18</td>
+<td align="right">7.7481426</td>
+<td align="right">8.0216906</td>
+<td align="right">7.9613528</td>
+<td align="right">0.9333333</td>
+<td align="right">0.9666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2735480</td>
+<td align="right">0.2132102</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.249082</td>
+<td align="left">RAPGEF1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000135363.12</td>
+<td align="right">4.3804710</td>
+<td align="right">4.2886085</td>
+<td align="right">4.4726029</td>
+<td align="right">-0.3166667</td>
+<td align="right">-0.0333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0918626</td>
+<td align="right">0.0921319</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.238942</td>
+<td align="left">LMO2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000156642.17</td>
+<td align="right">5.8592412</td>
+<td align="right">5.9143566</td>
+<td align="right">5.8188535</td>
+<td align="right">0.9000000</td>
+<td align="right">0.6333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0551154</td>
+<td align="right">-0.0403877</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.206832</td>
+<td align="left">NPTN</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000126581.13</td>
+<td align="right">6.1942389</td>
+<td align="right">6.4487329</td>
+<td align="right">6.2525491</td>
+<td align="right">0.9833333</td>
+<td align="right">0.8333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2544940</td>
+<td align="right">0.0583102</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.183238</td>
+<td align="left">BECN1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000196843.17</td>
+<td align="right">6.6276038</td>
+<td align="right">6.6349427</td>
+<td align="right">6.6359595</td>
+<td align="right">-0.0166667</td>
+<td align="right">0.5666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0073389</td>
+<td align="right">0.0083558</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.167849</td>
+<td align="left">ARID5A</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000285733.1</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.141239</td>
+<td align="left">AL031315.1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000184465.16</td>
+<td align="right">0.7275724</td>
+<td align="right">0.3019907</td>
+<td align="right">0.5411633</td>
+<td align="right">-0.9166667</td>
+<td align="right">-0.5166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.4255818</td>
+<td align="right">-0.1864092</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.141239</td>
+<td align="left">WDR27</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000100281.14</td>
+<td align="right">4.6081853</td>
+<td align="right">4.5670729</td>
+<td align="right">4.6862757</td>
+<td align="right">-0.8333333</td>
+<td align="right">-0.6000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0411124</td>
+<td align="right">0.0780904</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.090861</td>
+<td align="left">HMGXB4</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000136732.16</td>
+<td align="right">6.2975339</td>
+<td align="right">6.1987359</td>
+<td align="right">6.1234450</td>
+<td align="right">-0.8500000</td>
+<td align="right">-0.6333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0987981</td>
+<td align="right">-0.1740889</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.077982</td>
+<td align="left">GYPC</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000126773.13</td>
+<td align="right">5.1310343</td>
+<td align="right">5.0410041</td>
+<td align="right">5.1415178</td>
+<td align="right">0.1500000</td>
+<td align="right">0.6833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0900302</td>
+<td align="right">0.0104835</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-3.013184</td>
+<td align="left">PCNX4</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000204899.6</td>
+<td align="right">4.8599721</td>
+<td align="right">4.6337219</td>
+<td align="right">4.8393279</td>
+<td align="right">-0.9333333</td>
+<td align="right">-0.6833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.2262502</td>
+<td align="right">-0.0206442</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.991499</td>
+<td align="left">MZT1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000163875.15</td>
+<td align="right">5.4606052</td>
+<td align="right">5.3918624</td>
+<td align="right">5.4006212</td>
+<td align="right">-0.7833333</td>
+<td align="right">0.4833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0687428</td>
+<td align="right">-0.0599841</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.964981</td>
+<td align="left">MEAF6</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000116473.14</td>
+<td align="right">7.6765605</td>
+<td align="right">7.6621394</td>
+<td align="right">7.5971973</td>
+<td align="right">-0.4500000</td>
+<td align="right">-0.8666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0144210</td>
+<td align="right">-0.0793632</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.956315</td>
+<td align="left">RAP1A</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000106028.11</td>
+<td align="right">6.8109793</td>
+<td align="right">6.0446829</td>
+<td align="right">6.7728359</td>
+<td align="right">-0.9333333</td>
+<td align="right">-0.7500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.7662965</td>
+<td align="right">-0.0381434</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.948600</td>
+<td align="left">SSBP1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000278845.5</td>
+<td align="right">6.0796456</td>
+<td align="right">6.1821307</td>
+<td align="right">6.0841568</td>
+<td align="right">0.9166667</td>
+<td align="right">0.7333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1024851</td>
+<td align="right">0.0045111</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.928467</td>
+<td align="left">MRPL45</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000175220.12</td>
+<td align="right">5.6868493</td>
+<td align="right">5.2503579</td>
+<td align="right">5.8641623</td>
+<td align="right">-0.9000000</td>
+<td align="right">-0.2333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.4364914</td>
+<td align="right">0.1773130</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.885549</td>
+<td align="left">ARHGAP1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000113558.19</td>
+<td align="right">6.6634023</td>
+<td align="right">6.1644871</td>
+<td align="right">6.6943265</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.3333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.4989152</td>
+<td align="right">0.0309241</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.876467</td>
+<td align="left">SKP1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000272772.1</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">-5.1170482</td>
+<td align="right">-0.1369306</td>
+<td align="right">-0.1460593</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">NaN</td>
+<td align="right">Inf</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.876467</td>
+<td align="left">AC104109.3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000138185.20</td>
+<td align="right">7.9964849</td>
+<td align="right">8.0054224</td>
+<td align="right">7.9008041</td>
+<td align="right">-0.3500000</td>
+<td align="right">-0.1500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0089375</td>
+<td align="right">-0.0956808</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.835834</td>
+<td align="left">ENTPD1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000118454.13</td>
+<td align="right">4.8260367</td>
+<td align="right">4.6132229</td>
+<td align="right">4.9503861</td>
+<td align="right">-0.9500000</td>
+<td align="right">0.1166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.2128138</td>
+<td align="right">0.1243494</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.807663</td>
+<td align="left">ANKRD13C</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000165025.15</td>
+<td align="right">7.1479192</td>
+<td align="right">7.0854354</td>
+<td align="right">7.2593485</td>
+<td align="right">-0.9666667</td>
+<td align="right">-0.5333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0624838</td>
+<td align="right">0.1114293</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.803027</td>
+<td align="left">SYK</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000126653.18</td>
+<td align="right">4.8593663</td>
+<td align="right">4.6659263</td>
+<td align="right">4.8114702</td>
+<td align="right">-0.9166667</td>
+<td align="right">0.4333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1934400</td>
+<td align="right">-0.0478962</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.798763</td>
+<td align="left">NSRP1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000065150.21</td>
+<td align="right">8.3889944</td>
+<td align="right">8.4050400</td>
+<td align="right">8.3266076</td>
+<td align="right">-0.4166667</td>
+<td align="right">-0.7166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0160456</td>
+<td align="right">-0.0623867</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.785237</td>
+<td align="left">IPO5</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000197150.12</td>
+<td align="right">5.2848027</td>
+<td align="right">4.8937680</td>
+<td align="right">5.4143332</td>
+<td align="right">-0.9000000</td>
+<td align="right">0.4500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3910347</td>
+<td align="right">0.1295306</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.783347</td>
+<td align="left">ABCB8</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000117419.16</td>
+<td align="right">5.3792829</td>
+<td align="right">5.4247010</td>
+<td align="right">5.3474975</td>
+<td align="right">-0.6666667</td>
+<td align="right">0.1333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0454181</td>
+<td align="right">-0.0317854</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.762573</td>
+<td align="left">ERI3</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000112851.14</td>
+<td align="right">6.0480217</td>
+<td align="right">5.4251715</td>
+<td align="right">6.1021203</td>
+<td align="right">-0.9333333</td>
+<td align="right">-0.5666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.6228502</td>
+<td align="right">0.0540986</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.751726</td>
+<td align="left">ERBIN</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000139826.6</td>
+<td align="right">4.2150254</td>
+<td align="right">4.1879643</td>
+<td align="right">4.1141730</td>
+<td align="right">-0.6833333</td>
+<td align="right">0.5166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0270611</td>
+<td align="right">-0.1008524</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.748700</td>
+<td align="left">ABHD13</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000130818.12</td>
+<td align="right">2.6949993</td>
+<td align="right">3.2434385</td>
+<td align="right">2.7686482</td>
+<td align="right">0.9166667</td>
+<td align="right">0.7500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.5484392</td>
+<td align="right">0.0736488</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.737337</td>
+<td align="left">ZNF426</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000197329.12</td>
+<td align="right">5.5318634</td>
+<td align="right">5.2577726</td>
+<td align="right">5.5384825</td>
+<td align="right">0.1500000</td>
+<td align="right">0.6000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.2740908</td>
+<td align="right">0.0066191</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.734313</td>
+<td align="left">PELI1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000170627.11</td>
+<td align="right">4.8964738</td>
+<td align="right">3.2305763</td>
+<td align="right">4.4556520</td>
+<td align="right">-0.9500000</td>
+<td align="right">-0.9833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-1.6658975</td>
+<td align="right">-0.4408218</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.732351</td>
+<td align="left">GTSF1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000125991.19</td>
+<td align="right">7.2077209</td>
+<td align="right">7.2163758</td>
+<td align="right">7.2842313</td>
+<td align="right">0.6500000</td>
+<td align="right">0.8000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0086549</td>
+<td align="right">0.0765104</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.711622</td>
+<td align="left">ERGIC3</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000070882.13</td>
+<td align="right">5.1022965</td>
+<td align="right">5.0162362</td>
+<td align="right">5.1308793</td>
+<td align="right">-0.8500000</td>
+<td align="right">-0.2833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0860603</td>
+<td align="right">0.0285828</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.711605</td>
+<td align="left">OSBPL3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000082146.13</td>
+<td align="right">4.0901520</td>
+<td align="right">4.3404109</td>
+<td align="right">4.0850756</td>
+<td align="right">-0.4166667</td>
+<td align="right">0.2666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2502589</td>
+<td align="right">-0.0050764</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.667072</td>
+<td align="left">STRADB</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000101109.12</td>
+<td align="right">7.1971436</td>
+<td align="right">7.1499022</td>
+<td align="right">7.3565307</td>
+<td align="right">0.2500000</td>
+<td align="right">0.5166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0472414</td>
+<td align="right">0.1593871</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.666348</td>
+<td align="left">STK4</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000197150.12</td>
+<td align="right">5.2848027</td>
+<td align="right">4.8937680</td>
+<td align="right">5.4143332</td>
+<td align="right">-0.9000000</td>
+<td align="right">0.4500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3910347</td>
+<td align="right">0.1295306</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.631513</td>
+<td align="left">ABCB8</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000100852.13</td>
+<td align="right">4.0440229</td>
+<td align="right">4.2487641</td>
+<td align="right">4.1201617</td>
+<td align="right">0.2333333</td>
+<td align="right">0.4666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2047412</td>
+<td align="right">0.0761389</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.547770</td>
+<td align="left">ARHGAP5</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000060237.17</td>
+<td align="right">7.9237791</td>
+<td align="right">8.0417713</td>
+<td align="right">8.0869115</td>
+<td align="right">-0.7166667</td>
+<td align="right">0.5333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1179922</td>
+<td align="right">0.1631324</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.540969</td>
+<td align="left">WNK1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000180628.15</td>
+<td align="right">6.6337140</td>
+<td align="right">6.8000239</td>
+<td align="right">6.7122781</td>
+<td align="right">0.8333333</td>
+<td align="right">0.6166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1663099</td>
+<td align="right">0.0785641</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.539899</td>
+<td align="left">PCGF5</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000120029.13</td>
+<td align="right">5.5698725</td>
+<td align="right">5.5713299</td>
+<td align="right">5.5790500</td>
+<td align="right">-0.6833333</td>
+<td align="right">-0.5833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0014574</td>
+<td align="right">0.0091774</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.535363</td>
+<td align="left">ARMH3</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000185009.12</td>
+<td align="right">6.6747080</td>
+<td align="right">6.5325570</td>
+<td align="right">6.6298859</td>
+<td align="right">-0.9000000</td>
+<td align="right">-0.5833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1421510</td>
+<td align="right">-0.0448221</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.534809</td>
+<td align="left">AP3M1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000106785.15</td>
+<td align="right">6.4574479</td>
+<td align="right">6.0040059</td>
+<td align="right">6.5449525</td>
+<td align="right">-0.9833333</td>
+<td align="right">0.8333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.4534420</td>
+<td align="right">0.0875046</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.522308</td>
+<td align="left">TRIM14</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000170627.11</td>
+<td align="right">4.8964738</td>
+<td align="right">3.2305763</td>
+<td align="right">4.4556520</td>
+<td align="right">-0.9500000</td>
+<td align="right">-0.9833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-1.6658975</td>
+<td align="right">-0.4408218</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.494362</td>
+<td align="left">GTSF1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000182628.13</td>
+<td align="right">5.7537633</td>
+<td align="right">5.5277458</td>
+<td align="right">5.6078919</td>
+<td align="right">-0.9500000</td>
+<td align="right">-0.8333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.2260175</td>
+<td align="right">-0.1458715</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.465174</td>
+<td align="left">SKA2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000116212.15</td>
+<td align="right">5.1342687</td>
+<td align="right">5.1684266</td>
+<td align="right">5.0390349</td>
+<td align="right">-0.5500000</td>
+<td align="right">-0.8833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0341580</td>
+<td align="right">-0.0952338</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.458638</td>
+<td align="left">LRRC42</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000154511.12</td>
+<td align="right">5.1856157</td>
+<td align="right">4.8842182</td>
+<td align="right">4.9868952</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.7666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3013975</td>
+<td align="right">-0.1987205</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.435005</td>
+<td align="left">DIPK1A</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000100979.15</td>
+<td align="right">3.3330269</td>
+<td align="right">3.2667253</td>
+<td align="right">3.2048799</td>
+<td align="right">0.6500000</td>
+<td align="right">0.7833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0663015</td>
+<td align="right">-0.1281470</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.429309</td>
+<td align="left">PLTP</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000116353.16</td>
+<td align="right">4.2802065</td>
+<td align="right">3.8425590</td>
+<td align="right">4.3165372</td>
+<td align="right">-0.9000000</td>
+<td align="right">-0.7333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.4376474</td>
+<td align="right">0.0363308</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.415464</td>
+<td align="left">MECR</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000165406.16</td>
+<td align="right">5.7545129</td>
+<td align="right">5.8927478</td>
+<td align="right">5.8762440</td>
+<td align="right">-0.4333333</td>
+<td align="right">0.8833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1382349</td>
+<td align="right">0.1217311</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.413024</td>
+<td align="left">MARCHF8</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000115084.15</td>
+<td align="right">3.5913508</td>
+<td align="right">3.6849094</td>
+<td align="right">3.9341607</td>
+<td align="right">-0.6166667</td>
+<td align="right">0.4666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0935586</td>
+<td align="right">0.3428099</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.381796</td>
+<td align="left">SLC35F5</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000178397.13</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">-6.1170482</td>
+<td align="right">NA</td>
+<td align="right">0.1369306</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">NaN</td>
+<td align="right">Inf</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.381226</td>
+<td align="left">FAM220A</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000286075.1</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.381226</td>
+<td align="left">AC009412.1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000147586.10</td>
+<td align="right">3.5316801</td>
+<td align="right">3.5007705</td>
+<td align="right">3.6692214</td>
+<td align="right">-0.7833333</td>
+<td align="right">-0.8500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0309096</td>
+<td align="right">0.1375413</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.342313</td>
+<td align="left">MRPS28</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000276418.5</td>
+<td align="right">-Inf</td>
+<td align="right">-6.1574410</td>
+<td align="right">-4.5320857</td>
+<td align="right">0.4500000</td>
+<td align="right">-0.3333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.342313</td>
+<td align="left">AC036214.3</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000196295.12</td>
+<td align="right">1.7486049</td>
+<td align="right">1.5840260</td>
+<td align="right">1.9436477</td>
+<td align="right">-0.9333333</td>
+<td align="right">0.3166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1645788</td>
+<td align="right">0.1950428</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.297164</td>
+<td align="left">GARS1-DT</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000008018.9</td>
+<td align="right">7.6105603</td>
+<td align="right">6.4940593</td>
+<td align="right">7.6388825</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.1833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-1.1165011</td>
+<td align="right">0.0283222</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.280594</td>
+<td align="left">PSMB1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000181007.9</td>
+<td align="right">1.9254386</td>
+<td align="right">2.3019907</td>
+<td align="right">1.8885763</td>
+<td align="right">0.8500000</td>
+<td align="right">0.8833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.3765520</td>
+<td align="right">-0.0368623</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.275857</td>
+<td align="left">ZFP82</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000064652.11</td>
+<td align="right">1.3213263</td>
+<td align="right">1.2604116</td>
+<td align="right">1.4679143</td>
+<td align="right">-0.4333333</td>
+<td align="right">0.1500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0609147</td>
+<td align="right">0.1465880</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.260318</td>
+<td align="left">SNX24</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000141068.14</td>
+<td align="right">5.8475194</td>
+<td align="right">6.0987677</td>
+<td align="right">6.1482738</td>
+<td align="right">0.6333333</td>
+<td align="right">0.3666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2512483</td>
+<td align="right">0.3007544</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.252941</td>
+<td align="left">KSR1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000189091.13</td>
+<td align="right">8.2776651</td>
+<td align="right">8.4029516</td>
+<td align="right">8.4148206</td>
+<td align="right">-0.5666667</td>
+<td align="right">-0.4666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1252865</td>
+<td align="right">0.1371555</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.251402</td>
+<td align="left">SF3B3</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000026751.17</td>
+<td align="right">9.1854115</td>
+<td align="right">8.8787327</td>
+<td align="right">8.9119370</td>
+<td align="right">-0.3000000</td>
+<td align="right">-0.0666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3066789</td>
+<td align="right">-0.2734746</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.246607</td>
+<td align="left">SLAMF7</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000122359.18</td>
+<td align="right">7.6498416</td>
+<td align="right">6.2896423</td>
+<td align="right">7.5345641</td>
+<td align="right">-0.9666667</td>
+<td align="right">-0.9500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-1.3601993</td>
+<td align="right">-0.1152775</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.240435</td>
+<td align="left">ANXA11</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000113719.16</td>
+<td align="right">7.5501986</td>
+<td align="right">7.5005473</td>
+<td align="right">7.4881998</td>
+<td align="right">-0.8500000</td>
+<td align="right">0.1333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0496512</td>
+<td align="right">-0.0619988</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.233131</td>
+<td align="left">ERGIC1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000138698.15</td>
+<td align="right">5.4944600</td>
+<td align="right">5.6202253</td>
+<td align="right">5.4513830</td>
+<td align="right">-0.4500000</td>
+<td align="right">-0.7833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1257654</td>
+<td align="right">-0.0430770</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.220561</td>
+<td align="left">RAP1GDS1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000189091.13</td>
+<td align="right">8.2776651</td>
+<td align="right">8.4029516</td>
+<td align="right">8.4148206</td>
+<td align="right">-0.5666667</td>
+<td align="right">-0.4666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1252865</td>
+<td align="right">0.1371555</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.209715</td>
+<td align="left">SF3B3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000115840.14</td>
+<td align="right">5.5526802</td>
+<td align="right">4.9379561</td>
+<td align="right">5.5799193</td>
+<td align="right">-0.9666667</td>
+<td align="right">-0.1500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.6147242</td>
+<td align="right">0.0272391</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.208868</td>
+<td align="left">SLC25A12</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000167081.18</td>
+<td align="right">5.3475640</td>
+<td align="right">5.0713777</td>
+<td align="right">5.1798680</td>
+<td align="right">-0.9000000</td>
+<td align="right">-0.9166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.2761862</td>
+<td align="right">-0.1676960</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.197212</td>
+<td align="left">PBX3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000180104.16</td>
+<td align="right">6.1625641</td>
+<td align="right">5.4927133</td>
+<td align="right">6.2344432</td>
+<td align="right">-0.9500000</td>
+<td align="right">-0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.6698509</td>
+<td align="right">0.0718791</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.126322</td>
+<td align="left">EXOC3</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000134852.15</td>
+<td align="right">3.8881696</td>
+<td align="right">3.8964849</td>
+<td align="right">3.8645191</td>
+<td align="right">0.0000000</td>
+<td align="right">0.7166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0083154</td>
+<td align="right">-0.0236505</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.103294</td>
+<td align="left">CLOCK</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000117228.10</td>
+<td align="right">6.2113174</td>
+<td align="right">6.2289605</td>
+<td align="right">6.3039646</td>
+<td align="right">0.8000000</td>
+<td align="right">0.8833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0176431</td>
+<td align="right">0.0926473</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.094464</td>
+<td align="left">GBP1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000176407.18</td>
+<td align="right">6.1227173</td>
+<td align="right">6.0800678</td>
+<td align="right">6.1379803</td>
+<td align="right">0.7166667</td>
+<td align="right">0.3666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0426495</td>
+<td align="right">0.0152631</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.092161</td>
+<td align="left">KCMF1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000142634.13</td>
+<td align="right">7.3680775</td>
+<td align="right">7.5167513</td>
+<td align="right">7.6087441</td>
+<td align="right">-0.3333333</td>
+<td align="right">0.0500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1486738</td>
+<td align="right">0.2406666</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.086733</td>
+<td align="left">EFHD2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000234127.9</td>
+<td align="right">7.2326711</td>
+<td align="right">7.3382892</td>
+<td align="right">7.3170587</td>
+<td align="right">1.0000000</td>
+<td align="right">0.9833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1056181</td>
+<td align="right">0.0843876</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.073400</td>
+<td align="left">TRIM26</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000047621.12</td>
+<td align="right">4.8199364</td>
+<td align="right">4.5481914</td>
+<td align="right">4.6830428</td>
+<td align="right">-0.9166667</td>
+<td align="right">-0.7166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.2717450</td>
+<td align="right">-0.1368936</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.068560</td>
+<td align="left">C12orf4</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000146757.14</td>
+<td align="right">4.2245115</td>
+<td align="right">4.2927393</td>
+<td align="right">3.9940874</td>
+<td align="right">0.7000000</td>
+<td align="right">0.0333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0682278</td>
+<td align="right">-0.2304240</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.056343</td>
+<td align="left">ZNF92</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000172469.16</td>
+<td align="right">5.5678175</td>
+<td align="right">5.2116111</td>
+<td align="right">5.3902509</td>
+<td align="right">-0.9500000</td>
+<td align="right">-0.7333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3562064</td>
+<td align="right">-0.1775666</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.016101</td>
+<td align="left">MANEA</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000185920.16</td>
+<td align="right">4.0582967</td>
+<td align="right">4.2551289</td>
+<td align="right">4.3434077</td>
+<td align="right">0.3000000</td>
+<td align="right">0.6333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1968322</td>
+<td align="right">0.2851109</td>
+<td align="left">Branaplam-specific</td>
+<td align="right">-2.013666</td>
+<td align="left">PTCH1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000107290.14</td>
+<td align="right">7.5088671</td>
+<td align="right">7.1713742</td>
+<td align="right">7.3764320</td>
+<td align="right">-0.7500000</td>
+<td align="right">-0.7333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3374929</td>
+<td align="right">-0.1324351</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.002415</td>
+<td align="left">SETX</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000123983.14</td>
+<td align="right">6.1040022</td>
+<td align="right">5.9942099</td>
+<td align="right">6.0578775</td>
+<td align="right">-0.8666667</td>
+<td align="right">-0.7333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1097923</td>
+<td align="right">-0.0461247</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.015697</td>
+<td align="left">ACSL3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000115415.20</td>
+<td align="right">10.4388782</td>
+<td align="right">9.7878886</td>
+<td align="right">9.3949206</td>
+<td align="right">-0.9333333</td>
+<td align="right">-0.9500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.6509896</td>
+<td align="right">-1.0439576</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.103504</td>
+<td align="left">STAT1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000100485.12</td>
+<td align="right">4.5238499</td>
+<td align="right">4.4526611</td>
+<td align="right">3.8429537</td>
+<td align="right">-0.7833333</td>
+<td align="right">-0.8500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0711888</td>
+<td align="right">-0.6808962</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.140344</td>
+<td align="left">SOS2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000160293.17</td>
+<td align="right">6.2055016</td>
+<td align="right">6.4723710</td>
+<td align="right">6.3220035</td>
+<td align="right">-0.2333333</td>
+<td align="right">-0.1500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2668694</td>
+<td align="right">0.1165019</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.252860</td>
+<td align="left">VAV2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000256646.7</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">-0.2738613</td>
+<td align="right">-0.2008316</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.261174</td>
+<td align="left">AC010132.3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000106588.11</td>
+<td align="right">2.4132009</td>
+<td align="right">2.1824090</td>
+<td align="right">2.4939766</td>
+<td align="right">0.4333333</td>
+<td align="right">-0.0500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.2307919</td>
+<td align="right">0.0807756</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.261174</td>
+<td align="left">PSMA2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000119402.17</td>
+<td align="right">5.7926703</td>
+<td align="right">6.0848400</td>
+<td align="right">5.9770295</td>
+<td align="right">0.5666667</td>
+<td align="right">-0.2833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2921696</td>
+<td align="right">0.1843591</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.268566</td>
+<td align="left">FBXW2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000112701.18</td>
+<td align="right">5.8132585</td>
+<td align="right">5.3349130</td>
+<td align="right">5.5127637</td>
+<td align="right">-0.9500000</td>
+<td align="right">-0.9333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.4783455</td>
+<td align="right">-0.3004948</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.295573</td>
+<td align="left">SENP6</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000069869.16</td>
+<td align="right">3.7094266</td>
+<td align="right">3.9353162</td>
+<td align="right">3.7883388</td>
+<td align="right">-0.3166667</td>
+<td align="right">0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2258896</td>
+<td align="right">0.0789122</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.300576</td>
+<td align="left">NEDD4</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000205268.11</td>
+<td align="right">5.8922730</td>
+<td align="right">5.9970607</td>
+<td align="right">6.0890504</td>
+<td align="right">-0.4833333</td>
+<td align="right">-0.0166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1047877</td>
+<td align="right">0.1967774</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.306077</td>
+<td align="left">PDE7A</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000164292.13</td>
+<td align="right">3.9204349</td>
+<td align="right">3.7821383</td>
+<td align="right">4.1821598</td>
+<td align="right">-0.8833333</td>
+<td align="right">0.8166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1382966</td>
+<td align="right">0.2617249</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.311566</td>
+<td align="left">RHOBTB3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000107263.18</td>
+<td align="right">7.7481426</td>
+<td align="right">8.0216906</td>
+<td align="right">7.9613528</td>
+<td align="right">0.9333333</td>
+<td align="right">0.9666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2735480</td>
+<td align="right">0.2132102</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.345126</td>
+<td align="left">RAPGEF1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000270800.3</td>
+<td align="right">-Inf</td>
+<td align="right">-6.1574410</td>
+<td align="right">-6.1170482</td>
+<td align="right">0.3729349</td>
+<td align="right">0.3168472</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.378209</td>
+<td align="left">RPS10-NUDT3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000124614.16</td>
+<td align="right">0.0729407</td>
+<td align="right">0.6627380</td>
+<td align="right">1.0225031</td>
+<td align="right">0.9500000</td>
+<td align="right">0.7833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.5897973</td>
+<td align="right">0.9495625</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.378209</td>
+<td align="left">RPS10</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000268790.5</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">-6.1170482</td>
+<td align="right">0.4107919</td>
+<td align="right">-0.4016632</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">NaN</td>
+<td align="right">Inf</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.396985</td>
+<td align="left">AC008764.4</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000214046.8</td>
+<td align="right">4.3300136</td>
+<td align="right">4.2001110</td>
+<td align="right">4.2547284</td>
+<td align="right">-0.8000000</td>
+<td align="right">-0.9333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1299025</td>
+<td align="right">-0.0752851</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.396985</td>
+<td align="left">SMIM7</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000079616.13</td>
+<td align="right">6.7642928</td>
+<td align="right">6.9745767</td>
+<td align="right">6.8425915</td>
+<td align="right">-0.3166667</td>
+<td align="right">-0.5666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2102839</td>
+<td align="right">0.0782987</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.405511</td>
+<td align="left">KIF22</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000188822.8</td>
+<td align="right">4.6854929</td>
+<td align="right">4.5525044</td>
+<td align="right">4.6168145</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.1666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1329885</td>
+<td align="right">-0.0686784</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.471255</td>
+<td align="left">CNR2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000158234.12</td>
+<td align="right">2.8341480</td>
+<td align="right">2.8924076</td>
+<td align="right">2.5729498</td>
+<td align="right">-0.2166667</td>
+<td align="right">-0.9833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0582596</td>
+<td align="right">-0.2611982</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.506330</td>
+<td align="left">FAIM</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000071189.21</td>
+<td align="right">4.3992788</td>
+<td align="right">4.0857330</td>
+<td align="right">4.3351930</td>
+<td align="right">-0.9666667</td>
+<td align="right">-0.7333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3135458</td>
+<td align="right">-0.0640858</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.546995</td>
+<td align="left">SNX13</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000092931.11</td>
+<td align="right">3.8965532</td>
+<td align="right">3.4124147</td>
+<td align="right">3.6724854</td>
+<td align="right">-0.9333333</td>
+<td align="right">-0.8500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.4841385</td>
+<td align="right">-0.2240678</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.582979</td>
+<td align="left">MFSD11</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000168310.11</td>
+<td align="right">6.6533029</td>
+<td align="right">6.5494867</td>
+<td align="right">6.4978916</td>
+<td align="right">-0.8833333</td>
+<td align="right">-0.7000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1038163</td>
+<td align="right">-0.1554113</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.602322</td>
+<td align="left">IRF2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000082996.19</td>
+<td align="right">5.1709045</td>
+<td align="right">5.2782293</td>
+<td align="right">5.0628609</td>
+<td align="right">0.7500000</td>
+<td align="right">0.6000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1073248</td>
+<td align="right">-0.1080436</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.641557</td>
+<td align="left">RNF13</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000135974.10</td>
+<td align="right">4.1454717</td>
+<td align="right">3.9510835</td>
+<td align="right">3.9637693</td>
+<td align="right">-0.1500000</td>
+<td align="right">0.1166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1943882</td>
+<td align="right">-0.1817024</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.664718</td>
+<td align="left">C2orf49</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000056097.16</td>
+<td align="right">6.9803244</td>
+<td align="right">7.1103699</td>
+<td align="right">7.0268133</td>
+<td align="right">0.9000000</td>
+<td align="right">0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1300455</td>
+<td align="right">0.0464889</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.686858</td>
+<td align="left">ZFR</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000144228.9</td>
+<td align="right">4.6371177</td>
+<td align="right">4.5966114</td>
+<td align="right">4.5703275</td>
+<td align="right">0.1000000</td>
+<td align="right">-0.4666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0405063</td>
+<td align="right">-0.0667902</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.688732</td>
+<td align="left">SPOPL</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000197694.18</td>
+<td align="right">7.6158650</td>
+<td align="right">7.8129346</td>
+<td align="right">7.7234347</td>
+<td align="right">-0.6166667</td>
+<td align="right">-0.5833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1970696</td>
+<td align="right">0.1075697</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.736914</td>
+<td align="left">SPTAN1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000164187.7</td>
+<td align="right">4.0948224</td>
+<td align="right">4.2034061</td>
+<td align="right">4.0641040</td>
+<td align="right">-0.6500000</td>
+<td align="right">-0.5833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1085837</td>
+<td align="right">-0.0307184</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.767962</td>
+<td align="left">LMBRD2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000145725.19</td>
+<td align="right">5.7507703</td>
+<td align="right">5.5334301</td>
+<td align="right">5.6332400</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.7000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.2173402</td>
+<td align="right">-0.1175302</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.820051</td>
+<td align="left">PPIP5K2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000126457.21</td>
+<td align="right">8.9964156</td>
+<td align="right">8.8587580</td>
+<td align="right">8.5408842</td>
+<td align="right">-0.8166667</td>
+<td align="right">-1.0000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1376577</td>
+<td align="right">-0.4555314</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.855578</td>
+<td align="left">PRMT1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000115942.9</td>
+<td align="right">4.9500416</td>
+<td align="right">4.9086482</td>
+<td align="right">4.8085062</td>
+<td align="right">-0.8666667</td>
+<td align="right">-0.8166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0413934</td>
+<td align="right">-0.1415354</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.872134</td>
+<td align="left">ORC2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000108651.10</td>
+<td align="right">6.0570631</td>
+<td align="right">6.1625134</td>
+<td align="right">6.0820106</td>
+<td align="right">-0.5166667</td>
+<td align="right">-0.5000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1054503</td>
+<td align="right">0.0249475</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.881977</td>
+<td align="left">UTP6</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000116095.11</td>
+<td align="right">4.1874370</td>
+<td align="right">4.3690583</td>
+<td align="right">4.3165372</td>
+<td align="right">0.9333333</td>
+<td align="right">0.9333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1816212</td>
+<td align="right">0.1291002</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.906637</td>
+<td align="left">PLEKHA3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000135677.11</td>
+<td align="right">6.2738119</td>
+<td align="right">6.4291643</td>
+<td align="right">6.2158275</td>
+<td align="right">-0.1833333</td>
+<td align="right">-0.7833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1553524</td>
+<td align="right">-0.0579844</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.925520</td>
+<td align="left">GNS</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000153310.19</td>
+<td align="right">6.6416164</td>
+<td align="right">6.4650685</td>
+<td align="right">6.4758759</td>
+<td align="right">-0.8000000</td>
+<td align="right">-0.9333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1765479</td>
+<td align="right">-0.1657405</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.929163</td>
+<td align="left">CYRIB</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000123066.8</td>
+<td align="right">4.5321318</td>
+<td align="right">4.3865575</td>
+<td align="right">4.5013373</td>
+<td align="right">-0.9166667</td>
+<td align="right">-0.6000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1455743</td>
+<td align="right">-0.0307945</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.939934</td>
+<td align="left">MED13L</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000138413.13</td>
+<td align="right">6.0595426</td>
+<td align="right">5.9872173</td>
+<td align="right">5.4322551</td>
+<td align="right">-0.8333333</td>
+<td align="right">-0.9333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0723253</td>
+<td align="right">-0.6272874</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.944458</td>
+<td align="left">IDH1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000145050.19</td>
+<td align="right">7.8300980</td>
+<td align="right">7.4571539</td>
+<td align="right">7.7066176</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.8833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3729441</td>
+<td align="right">-0.1234804</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.945036</td>
+<td align="left">MANF</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000083799.17</td>
+<td align="right">7.1540124</td>
+<td align="right">7.5326662</td>
+<td align="right">7.3407174</td>
+<td align="right">0.3333333</td>
+<td align="right">-0.2666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.3786538</td>
+<td align="right">0.1867050</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">2.991397</td>
+<td align="left">CYLD</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000093000.19</td>
+<td align="right">7.1753150</td>
+<td align="right">7.1531718</td>
+<td align="right">7.2170854</td>
+<td align="right">-0.2333333</td>
+<td align="right">-0.6166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0221432</td>
+<td align="right">0.0417704</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.049978</td>
+<td align="left">NUP50</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000047365.12</td>
+<td align="right">4.3533805</td>
+<td align="right">4.0299111</td>
+<td align="right">4.5141288</td>
+<td align="right">-0.2333333</td>
+<td align="right">-0.2166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.3234694</td>
+<td align="right">0.1607483</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.070286</td>
+<td align="left">ARAP2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000047056.16</td>
+<td align="right">4.0255494</td>
+<td align="right">4.0434576</td>
+<td align="right">4.1473944</td>
+<td align="right">-0.1000000</td>
+<td align="right">-0.0500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0179083</td>
+<td align="right">0.1218450</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.072126</td>
+<td align="left">WDR37</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000011376.12</td>
+<td align="right">6.1420513</td>
+<td align="right">6.0806652</td>
+<td align="right">6.1177692</td>
+<td align="right">-0.7833333</td>
+<td align="right">-0.7333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0613861</td>
+<td align="right">-0.0242821</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.127228</td>
+<td align="left">LARS2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000156469.9</td>
+<td align="right">4.4749894</td>
+<td align="right">4.2551289</td>
+<td align="right">3.9422962</td>
+<td align="right">-0.9000000</td>
+<td align="right">-0.9000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.2198605</td>
+<td align="right">-0.5326931</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.137840</td>
+<td align="left">MTERF3</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000112308.13</td>
+<td align="right">6.6352683</td>
+<td align="right">6.7454994</td>
+<td align="right">6.9682582</td>
+<td align="right">-0.3166667</td>
+<td align="right">0.9166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1102310</td>
+<td align="right">0.3329899</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.154727</td>
+<td align="left">C6orf62</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000105618.14</td>
+<td align="right">6.7530710</td>
+<td align="right">6.8565795</td>
+<td align="right">6.9014997</td>
+<td align="right">-0.4500000</td>
+<td align="right">-0.2500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1035086</td>
+<td align="right">0.1484288</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.184942</td>
+<td align="left">PRPF31</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000196116.8</td>
+<td align="right">5.4226531</td>
+<td align="right">5.3981068</td>
+<td align="right">5.3892594</td>
+<td align="right">0.5666667</td>
+<td align="right">0.0500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0245462</td>
+<td align="right">-0.0333937</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.242623</td>
+<td align="left">TDRD7</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000139626.16</td>
+<td align="right">8.4289367</td>
+<td align="right">8.5256085</td>
+<td align="right">8.7186075</td>
+<td align="right">-0.6833333</td>
+<td align="right">0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0966718</td>
+<td align="right">0.2896708</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.271285</td>
+<td align="left">ITGB7</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000103415.12</td>
+<td align="right">6.1555052</td>
+<td align="right">6.0952245</td>
+<td align="right">6.0569412</td>
+<td align="right">-0.8833333</td>
+<td align="right">-0.9000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0602808</td>
+<td align="right">-0.0985641</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.271732</td>
+<td align="left">HMOX2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000150753.12</td>
+<td align="right">8.7913377</td>
+<td align="right">8.8172873</td>
+<td align="right">8.7974771</td>
+<td align="right">-0.5333333</td>
+<td align="right">-0.7333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0259496</td>
+<td align="right">0.0061394</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.275364</td>
+<td align="left">CCT5</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000137878.17</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">0.2738613</td>
+<td align="right">0.7137184</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.275735</td>
+<td align="left">GCOM1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000255529.9</td>
+<td align="right">3.6339962</td>
+<td align="right">3.9019035</td>
+<td align="right">3.7393773</td>
+<td align="right">0.9166667</td>
+<td align="right">0.6500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2679073</td>
+<td align="right">0.1053811</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.275735</td>
+<td align="left">POLR2M</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000083720.13</td>
+<td align="right">6.8050233</td>
+<td align="right">6.7546999</td>
+<td align="right">6.7633006</td>
+<td align="right">-0.7666667</td>
+<td align="right">-0.7833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0503234</td>
+<td align="right">-0.0417228</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.340651</td>
+<td align="left">OXCT1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000133028.12</td>
+<td align="right">5.8801698</td>
+<td align="right">4.4636952</td>
+<td align="right">4.9901689</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.9833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-1.4164747</td>
+<td align="right">-0.8900010</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.386642</td>
+<td align="left">SCO1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000110075.14</td>
+<td align="right">6.7897693</td>
+<td align="right">6.7616086</td>
+<td align="right">6.7692199</td>
+<td align="right">-0.6666667</td>
+<td align="right">-0.7000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0281607</td>
+<td align="right">-0.0205493</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.407066</td>
+<td align="left">PPP6R3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000188352.12</td>
+<td align="right">6.2083491</td>
+<td align="right">6.1574255</td>
+<td align="right">5.8454863</td>
+<td align="right">-0.8500000</td>
+<td align="right">-0.8000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0509237</td>
+<td align="right">-0.3628628</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.444138</td>
+<td align="left">FOCAD</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000130159.14</td>
+<td align="right">5.6697893</td>
+<td align="right">5.7517021</td>
+<td align="right">5.7067171</td>
+<td align="right">0.2666667</td>
+<td align="right">0.0833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0819128</td>
+<td align="right">0.0369277</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.486950</td>
+<td align="left">ECSIT</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000134779.15</td>
+<td align="right">6.4030684</td>
+<td align="right">6.4744182</td>
+<td align="right">6.2912815</td>
+<td align="right">-0.1500000</td>
+<td align="right">-0.7833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0713497</td>
+<td align="right">-0.1117869</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.490282</td>
+<td align="left">TPGS2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000136908.17</td>
+<td align="right">5.4260049</td>
+<td align="right">5.3142343</td>
+<td align="right">5.2907506</td>
+<td align="right">-0.9333333</td>
+<td align="right">-0.7166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1117706</td>
+<td align="right">-0.1352542</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.562029</td>
+<td align="left">DPM2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000008083.14</td>
+<td align="right">4.9448917</td>
+<td align="right">5.3880062</td>
+<td align="right">5.1473944</td>
+<td align="right">-0.0833333</td>
+<td align="right">0.7833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.4431145</td>
+<td align="right">0.2025027</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.661699</td>
+<td align="left">JARID2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000102900.13</td>
+<td align="right">6.5508501</td>
+<td align="right">6.7217594</td>
+<td align="right">6.6187193</td>
+<td align="right">-0.3500000</td>
+<td align="right">-0.5833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1709092</td>
+<td align="right">0.0678692</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.739712</td>
+<td align="left">NUP93</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000235162.9</td>
+<td align="right">7.0215562</td>
+<td align="right">6.8476572</td>
+<td align="right">6.9780191</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.7333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1738990</td>
+<td align="right">-0.0435371</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.754437</td>
+<td align="left">C12orf75</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000146007.11</td>
+<td align="right">6.4357612</td>
+<td align="right">6.4700929</td>
+<td align="right">6.4008672</td>
+<td align="right">0.1166667</td>
+<td align="right">-0.7166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0343318</td>
+<td align="right">-0.0348940</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.761796</td>
+<td align="left">ZMAT2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000176142.13</td>
+<td align="right">4.9523113</td>
+<td align="right">4.8752936</td>
+<td align="right">5.0597483</td>
+<td align="right">-0.8000000</td>
+<td align="right">-0.4666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0770177</td>
+<td align="right">0.1074370</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.805878</td>
+<td align="left">TMEM39A</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000159063.13</td>
+<td align="right">5.2528677</td>
+<td align="right">5.1835218</td>
+<td align="right">4.7347008</td>
+<td align="right">-0.6666667</td>
+<td align="right">-0.9833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0693459</td>
+<td align="right">-0.5181668</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.900791</td>
+<td align="left">ALG8</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000168297.16</td>
+<td align="right">4.4572719</td>
+<td align="right">4.5264309</td>
+<td align="right">4.3976658</td>
+<td align="right">0.2000000</td>
+<td align="right">0.7000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0691590</td>
+<td align="right">-0.0596060</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">3.991608</td>
+<td align="left">PXK</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000079332.15</td>
+<td align="right">5.9944819</td>
+<td align="right">5.9859423</td>
+<td align="right">5.9895147</td>
+<td align="right">-0.3333333</td>
+<td align="right">-0.7000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0085396</td>
+<td align="right">-0.0049672</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">4.011891</td>
+<td align="left">SAR1A</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000119414.11</td>
+<td align="right">6.3319944</td>
+<td align="right">6.1776702</td>
+<td align="right">6.1881585</td>
+<td align="right">-0.7833333</td>
+<td align="right">-0.9500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1543241</td>
+<td align="right">-0.1438358</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">4.112416</td>
+<td align="left">PPP6C</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000111252.11</td>
+<td align="right">6.0629114</td>
+<td align="right">6.0055797</td>
+<td align="right">6.3426395</td>
+<td align="right">-0.9333333</td>
+<td align="right">0.2333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0573317</td>
+<td align="right">0.2797282</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">4.151962</td>
+<td align="left">SH2B3</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000122643.22</td>
+<td align="right">6.6406786</td>
+<td align="right">6.5065618</td>
+<td align="right">6.6123601</td>
+<td align="right">0.6166667</td>
+<td align="right">0.6833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1341168</td>
+<td align="right">-0.0283185</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">4.343214</td>
+<td align="left">NT5C3A</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000283398.1</td>
+<td align="right">-4.7981191</td>
+<td align="right">-4.5724785</td>
+<td align="right">-5.1170482</td>
+<td align="right">0.3166667</td>
+<td align="right">0.2666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2256407</td>
+<td align="right">-0.3189291</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">4.608559</td>
+<td align="left">AC114737.4</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000173064.13</td>
+<td align="right">5.4954924</td>
+<td align="right">5.4998775</td>
+<td align="right">5.7980842</td>
+<td align="right">-0.6666667</td>
+<td align="right">0.5833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0043851</td>
+<td align="right">0.3025919</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">4.671793</td>
+<td align="left">HECTD4</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000177885.15</td>
+<td align="right">8.4372479</td>
+<td align="right">8.7097412</td>
+<td align="right">8.6053858</td>
+<td align="right">0.9000000</td>
+<td align="right">0.4666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2724933</td>
+<td align="right">0.1681379</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">4.821942</td>
+<td align="left">GRB2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000112159.12</td>
+<td align="right">5.4312820</td>
+<td align="right">5.2391638</td>
+<td align="right">5.5182164</td>
+<td align="right">-0.8166667</td>
+<td align="right">-0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1921182</td>
+<td align="right">0.0869344</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">4.910025</td>
+<td align="left">MDN1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000118596.12</td>
+<td align="right">3.7831582</td>
+<td align="right">3.8467795</td>
+<td align="right">3.7898424</td>
+<td align="right">-0.5833333</td>
+<td align="right">-0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0636214</td>
+<td align="right">0.0066842</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">4.924104</td>
+<td align="left">SLC16A7</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000149089.13</td>
+<td align="right">5.2158789</td>
+<td align="right">5.3263748</td>
+<td align="right">5.1213565</td>
+<td align="right">0.2833333</td>
+<td align="right">-0.8166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1104960</td>
+<td align="right">-0.0945223</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">5.036669</td>
+<td align="left">APIP</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000135272.11</td>
+<td align="right">6.8400399</td>
+<td align="right">6.8520378</td>
+<td align="right">6.9162027</td>
+<td align="right">-0.1000000</td>
+<td align="right">0.2333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0119979</td>
+<td align="right">0.0761628</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">5.123147</td>
+<td align="left">MDFIC</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000268746.1</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">-Inf</td>
+<td align="right">-0.0456435</td>
+<td align="right">0.2738613</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">NaN</td>
+<td align="right">NaN</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">5.171954</td>
+<td align="left">AC010519.1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000063169.10</td>
+<td align="right">4.1399160</td>
+<td align="right">4.3233492</td>
+<td align="right">4.1473944</td>
+<td align="right">0.3833333</td>
+<td align="right">-0.2000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1834332</td>
+<td align="right">0.0074783</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">5.171954</td>
+<td align="left">BICRA</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000185019.17</td>
+<td align="right">3.5534098</td>
+<td align="right">3.6801870</td>
+<td align="right">3.6741147</td>
+<td align="right">-0.1166667</td>
+<td align="right">0.7333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1267772</td>
+<td align="right">0.1207049</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">5.180906</td>
+<td align="left">UBOX5</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000215251.4</td>
+<td align="right">5.7330058</td>
+<td align="right">5.6710923</td>
+<td align="right">5.5575854</td>
+<td align="right">0.1000000</td>
+<td align="right">-0.9000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0619135</td>
+<td align="right">-0.1754204</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">5.180906</td>
+<td align="left">FASTKD5</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000138182.14</td>
+<td align="right">5.4225883</td>
+<td align="right">5.3488666</td>
+<td align="right">5.1992333</td>
+<td align="right">-0.7000000</td>
+<td align="right">-0.8166667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0737216</td>
+<td align="right">-0.2233549</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">5.393297</td>
+<td align="left">KIF20B</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000184840.12</td>
+<td align="right">8.2545954</td>
+<td align="right">8.1966018</td>
+<td align="right">8.2168758</td>
+<td align="right">-0.9500000</td>
+<td align="right">-0.6500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0579936</td>
+<td align="right">-0.0377196</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">5.427913</td>
+<td align="left">TMED9</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000154001.14</td>
+<td align="right">6.1977946</td>
+<td align="right">6.3468815</td>
+<td align="right">6.2492740</td>
+<td align="right">0.7666667</td>
+<td align="right">0.6333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.1490869</td>
+<td align="right">0.0514794</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">5.687174</td>
+<td align="left">PPP2R5E</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000132383.12</td>
+<td align="right">7.7774015</td>
+<td align="right">7.6521262</td>
+<td align="right">7.6758437</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.8500000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1252753</td>
+<td align="right">-0.1015578</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">6.285142</td>
+<td align="left">RPA1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000102531.16</td>
+<td align="right">5.9941860</td>
+<td align="right">5.8126649</td>
+<td align="right">5.8716365</td>
+<td align="right">-0.9333333</td>
+<td align="right">-0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1815210</td>
+<td align="right">-0.1225495</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">6.386338</td>
+<td align="left">FNDC3A</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000033030.15</td>
+<td align="right">4.4037055</td>
+<td align="right">4.4378165</td>
+<td align="right">3.6692214</td>
+<td align="right">0.6833333</td>
+<td align="right">-0.9833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0341110</td>
+<td align="right">-0.7344841</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">6.732944</td>
+<td align="left">ZCCHC8</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000165806.21</td>
+<td align="right">4.8915779</td>
+<td align="right">4.7777241</td>
+<td align="right">4.7502305</td>
+<td align="right">-0.3333333</td>
+<td align="right">-0.8833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.1138538</td>
+<td align="right">-0.1413474</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">6.869295</td>
+<td align="left">CASP7</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000155324.10</td>
+<td align="right">3.4373384</td>
+<td align="right">3.6499140</td>
+<td align="right">3.7174228</td>
+<td align="right">-0.2666667</td>
+<td align="right">0.2666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.2125755</td>
+<td align="right">0.2800844</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">7.089980</td>
+<td align="left">GRAMD2B</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000162694.14</td>
+<td align="right">3.5415857</td>
+<td align="right">3.6140485</td>
+<td align="right">3.0850756</td>
+<td align="right">0.6000000</td>
+<td align="right">-0.8000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0724629</td>
+<td align="right">-0.4565101</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">7.608560</td>
+<td align="left">EXTL2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000196422.11</td>
+<td align="right">2.3726765</td>
+<td align="right">2.4535838</td>
+<td align="right">2.6773676</td>
+<td align="right">0.5833333</td>
+<td align="right">0.3333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0809074</td>
+<td align="right">0.3046912</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">10.672749</td>
+<td align="left">PPP1R26</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000243147.8</td>
+<td align="right">4.6638297</td>
+<td align="right">4.7517021</td>
+<td align="right">4.5141288</td>
+<td align="right">0.2833333</td>
+<td align="right">-0.7833333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0878724</td>
+<td align="right">-0.1497009</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">10.674744</td>
+<td align="left">MRPL33</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000163697.17</td>
+<td align="right">4.8469728</td>
+<td align="right">4.9073018</td>
+<td align="right">4.9280288</td>
+<td align="right">-0.5500000</td>
+<td align="right">-0.6333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.0603290</td>
+<td align="right">0.0810560</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">12.729286</td>
+<td align="left">APBB2</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000154864.12</td>
+<td align="right">6.4592491</td>
+<td align="right">5.8319535</td>
+<td align="right">6.0927097</td>
+<td align="right">-0.9000000</td>
+<td align="right">-0.8000000</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.6272956</td>
+<td align="right">-0.3665394</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">15.785807</td>
+<td align="left">PIEZO2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000070061.15</td>
+<td align="right">5.5878630</td>
+<td align="right">5.4909166</td>
+<td align="right">5.6378393</td>
+<td align="right">-0.7166667</td>
+<td align="right">-0.5333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-0.0969464</td>
+<td align="right">0.0499763</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">17.798155</td>
+<td align="left">ELP1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000165475.15</td>
+<td align="right">3.9468619</td>
+<td align="right">0.7373768</td>
+<td align="right">3.5375878</td>
+<td align="right">-0.9833333</td>
+<td align="right">-0.9333333</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">-3.2094851</td>
+<td align="right">-0.4092741</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">21.628056</td>
+<td align="left">CRYL1</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000144036.16</td>
+<td align="right">2.7150069</td>
+<td align="right">3.1486207</td>
+<td align="right">2.7347008</td>
+<td align="right">0.9833333</td>
+<td align="right">0.6666667</td>
+<td align="left">Branaplam_100_LCL_polyA_1</td>
+<td align="left">Risdiplam_316_LCL_polyA_1</td>
+<td align="right">0.4336138</td>
+<td align="right">0.0196939</td>
+<td align="left">Risdiplam-specific</td>
+<td align="right">24.606656</td>
+<td align="left">EXOC6B</td>
+</tr>
+</tbody>
+</table>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1183,18 +4773,19 @@ loaded via a namespace (and not attached):
  [9] backports_1.4.1  reprex_2.0.1     evaluate_0.15    highr_0.9       
 [13] httr_1.4.3       pillar_1.7.0     rlang_1.0.2      readxl_1.4.0    
 [17] rstudioapi_0.13  whisker_0.4      jquerylib_0.1.4  rmarkdown_2.14  
-[21] bit_4.0.4        munsell_0.5.0    broom_0.8.0      compiler_4.2.0  
-[25] httpuv_1.6.5     modelr_0.1.8     xfun_0.30        pkgconfig_2.0.3 
-[29] htmltools_0.5.2  tidyselect_1.1.2 workflowr_1.7.0  fansi_1.0.3     
-[33] crayon_1.5.1     tzdb_0.3.0       dbplyr_2.1.1     withr_2.5.0     
-[37] later_1.3.0      grid_4.2.0       jsonlite_1.8.0   gtable_0.3.0    
-[41] lifecycle_1.0.1  DBI_1.1.2        git2r_0.30.1     magrittr_2.0.3  
-[45] scales_1.2.0     vroom_1.5.7      cli_3.3.0        stringi_1.7.6   
-[49] farver_2.1.0     fs_1.5.2         promises_1.2.0.1 xml2_1.3.3      
-[53] bslib_0.3.1      ellipsis_0.3.2   generics_0.1.2   vctrs_0.4.1     
-[57] tools_4.2.0      bit64_4.0.5      glue_1.6.2       hms_1.1.1       
-[61] parallel_4.2.0   fastmap_1.1.0    yaml_2.3.5       colorspace_2.0-3
-[65] rvest_1.0.2      knitr_1.39       haven_2.5.0      sass_0.4.1      </code></pre>
+[21] labeling_0.4.2   bit_4.0.4        munsell_0.5.0    broom_0.8.0     
+[25] compiler_4.2.0   httpuv_1.6.5     modelr_0.1.8     xfun_0.30       
+[29] pkgconfig_2.0.3  htmltools_0.5.2  tidyselect_1.1.2 workflowr_1.7.0 
+[33] fansi_1.0.3      crayon_1.5.1     tzdb_0.3.0       dbplyr_2.1.1    
+[37] withr_2.5.0      later_1.3.0      grid_4.2.0       jsonlite_1.8.0  
+[41] gtable_0.3.0     lifecycle_1.0.1  DBI_1.1.2        git2r_0.30.1    
+[45] magrittr_2.0.3   scales_1.2.0     vroom_1.5.7      cli_3.3.0       
+[49] stringi_1.7.6    farver_2.1.0     fs_1.5.2         promises_1.2.0.1
+[53] xml2_1.3.3       bslib_0.3.1      ellipsis_0.3.2   generics_0.1.2  
+[57] vctrs_0.4.1      tools_4.2.0      bit64_4.0.5      glue_1.6.2      
+[61] hms_1.1.1        parallel_4.2.0   fastmap_1.1.0    yaml_2.3.5      
+[65] colorspace_2.0-3 rvest_1.0.2      knitr_1.39       haven_2.5.0     
+[69] sass_0.4.1      </code></pre>
 </div>
 </div>
 
