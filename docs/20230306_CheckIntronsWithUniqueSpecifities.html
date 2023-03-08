@@ -452,15 +452,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreea97c2eb77f216dfdf27c138ff3b12fdd5e780452targetblanka97c2eba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreee11b2825970e7130c2338d3b9556ee4da5cd37d3targetblanke11b282a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/a97c2eb77f216dfdf27c138ff3b12fdd5e780452" target="_blank">a97c2eb</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/e11b2825970e7130c2338d3b9556ee4da5cd37d3" target="_blank">e11b282</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreea97c2eb77f216dfdf27c138ff3b12fdd5e780452targetblanka97c2eba"
+id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreee11b2825970e7130c2338d3b9556ee4da5cd37d3targetblanke11b282a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -470,7 +470,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/a97c2eb77f216dfdf27c138ff3b12fdd5e780452" target="_blank">a97c2eb</a>.
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/e11b2825970e7130c2338d3b9556ee4da5cd37d3" target="_blank">e11b282</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -491,7 +491,6 @@ Ignored files:
     Ignored:    analysis/.RData
     Ignored:    analysis/.Rhistory
     Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
-    Ignored:    analysis/figure/
     Ignored:    code/.DS_Store
     Ignored:    code/._DOCK7.pdf
     Ignored:    code/._DOCK7_DMSO1.pdf
@@ -599,6 +598,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e11b2825970e7130c2338d3b9556ee4da5cd37d3/analysis/20230306_CheckIntronsWithUniqueSpecifities.Rmd" target="_blank">e11b282</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-08
+</td>
+<td>
+update nb
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/e11b2825970e7130c2338d3b9556ee4da5cd37d3/docs/20230306_CheckIntronsWithUniqueSpecifities.html" target="_blank">e11b282</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-08
+</td>
+<td>
+update nb
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1328,20 +1361,20 @@ Benjmain Fair
   filter(abs(log2Ratio)&gt;2) %&gt;%
   filter(!Color == &quot;Non significant&quot;) %&gt;%
   separate_rows(gene_names, gene_ids, sep=&#39;,&#39;) %&gt;%
-  dplyr::select(Color, log2Ratio, gene_names, gene_ids) %&gt;%
+  dplyr::select(Color, log2Ratio, gene_names, gene_ids, junc) %&gt;%
   # filter(gene_names == &quot;HTT&quot;) %&gt;%
   arrange(log2Ratio)
 
 head(SpecificEffects)</code></pre>
-<pre><code># A tibble: 6 × 4
-  Color              log2Ratio gene_names gene_ids          
-  &lt;chr&gt;                  &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;             
-1 Branaplam-specific    -30.8  ASB3       ENSG00000115239.24
-2 Branaplam-specific    -15.7  SETD5      ENSG00000168137.18
-3 Branaplam-specific     -8.13 C8orf88    ENSG00000253250.3 
-4 Branaplam-specific     -7.52 NCF2       ENSG00000116701.15
-5 Branaplam-specific     -7.16 ANKRD10    ENSG00000088448.14
-6 Branaplam-specific     -6.67 DAPP1      ENSG00000070190.13</code></pre>
+<pre><code># A tibble: 6 × 5
+  Color              log2Ratio gene_names gene_ids           junc               
+  &lt;chr&gt;                  &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;              &lt;chr&gt;              
+1 Branaplam-specific    -30.8  ASB3       ENSG00000115239.24 chr2:53765585:5378…
+2 Branaplam-specific    -15.7  SETD5      ENSG00000168137.18 chr3:9468615:94704…
+3 Branaplam-specific     -8.13 C8orf88    ENSG00000253250.3  chr8:90971594:9097…
+4 Branaplam-specific     -7.52 NCF2       ENSG00000116701.15 chr1:183564030:183…
+5 Branaplam-specific     -7.16 ANKRD10    ENSG00000088448.14 chr13:110905233:11…
+6 Branaplam-specific     -6.67 DAPP1      ENSG00000070190.13 chr4:99841827:9985…</code></pre>
 <p>Let’s also merge this with some gene expression data. For
 convenience, I’m just going to merge it with the spearman of the
 dose:response effect on expression, and also gather the FoldChange at
@@ -1426,21 +1459,22 @@ dose).</p>
 MoleculeSpecificEffects %&gt;%
   filter(gene_names == &quot;HTT&quot;) %&gt;%
   knitr::kable()</code></pre>
-<table style="width:100%;">
+<table>
 <colgroup>
-<col width="7%" />
+<col width="6%" />
 <col width="3%" />
-<col width="5%" />
-<col width="5%" />
-<col width="7%" />
-<col width="7%" />
-<col width="10%" />
-<col width="10%" />
-<col width="10%" />
-<col width="10%" />
-<col width="7%" />
-<col width="9%" />
 <col width="4%" />
+<col width="4%" />
+<col width="6%" />
+<col width="6%" />
+<col width="9%" />
+<col width="9%" />
+<col width="8%" />
+<col width="8%" />
+<col width="6%" />
+<col width="8%" />
+<col width="3%" />
+<col width="11%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1457,6 +1491,7 @@ MoleculeSpecificEffects %&gt;%
 <th align="left">Color</th>
 <th align="right">log2RatioOfSplicingED50</th>
 <th align="left">gene_names</th>
+<th align="left">junc</th>
 </tr>
 </thead>
 <tbody>
@@ -1474,6 +1509,7 @@ MoleculeSpecificEffects %&gt;%
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.346746</td>
 <td align="left">HTT</td>
+<td align="left">chr4:3213736:3213958:clu_9322_+</td>
 </tr>
 </tbody>
 </table>
@@ -1507,19 +1543,20 @@ that Jingxin used in the recent experiment of 52 molecules</p>
   knitr::kable()</code></pre>
 <table>
 <colgroup>
-<col width="7%" />
+<col width="6%" />
+<col width="3%" />
 <col width="4%" />
-<col width="5%" />
-<col width="5%" />
-<col width="7%" />
-<col width="7%" />
-<col width="10%" />
-<col width="10%" />
-<col width="9%" />
-<col width="9%" />
-<col width="7%" />
-<col width="9%" />
 <col width="4%" />
+<col width="6%" />
+<col width="6%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="6%" />
+<col width="8%" />
+<col width="4%" />
+<col width="13%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1536,6 +1573,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <th align="left">Color</th>
 <th align="right">log2RatioOfSplicingED50</th>
 <th align="left">gene_names</th>
+<th align="left">junc</th>
 </tr>
 </thead>
 <tbody>
@@ -1553,6 +1591,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-30.837171</td>
 <td align="left">ASB3</td>
+<td align="left">chr2:53765585:53782217:clu_4400_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000168137.18</td>
@@ -1568,6 +1607,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-15.702685</td>
 <td align="left">SETD5</td>
+<td align="left">chr3:9468615:9470459:clu_6956_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000253250.3</td>
@@ -1583,6 +1623,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-8.128940</td>
 <td align="left">C8orf88</td>
+<td align="left">chr8:90971594:90978579:clu_16756_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000116701.15</td>
@@ -1598,6 +1639,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-7.515091</td>
 <td align="left">NCF2</td>
+<td align="left">chr1:183564030:183565154:clu_1624_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000088448.14</td>
@@ -1613,6 +1655,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-7.155299</td>
 <td align="left">ANKRD10</td>
+<td align="left">chr13:110905233:110906033:clu_25920_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000070190.13</td>
@@ -1628,6 +1671,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-6.669824</td>
 <td align="left">DAPP1</td>
+<td align="left">chr4:99841827:99853218:clu_9719_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000050748.17</td>
@@ -1643,6 +1687,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-6.577305</td>
 <td align="left">MAPK9</td>
+<td align="left">chr5:180250701:180261684:clu_12460_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000196792.12</td>
@@ -1658,6 +1703,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-6.202894</td>
 <td align="left">STRN3</td>
+<td align="left">chr14:30919106:30929201:clu_26459_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000170476.16</td>
@@ -1673,6 +1719,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-5.524008</td>
 <td align="left">MZB1</td>
+<td align="left">chr5:139388131:139388461:clu_12222_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000064933.18</td>
@@ -1688,6 +1735,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-5.522988</td>
 <td align="left">PMS1</td>
+<td align="left">chr2:189818829:189843964:clu_6477_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000087460.25</td>
@@ -1703,6 +1751,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.958655</td>
 <td align="left">GNAS</td>
+<td align="left">chr20:58895684:58898941:clu_37372_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000180198.16</td>
@@ -1718,6 +1767,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.819941</td>
 <td align="left">RCC1</td>
+<td align="left">chr1:28508901:28529858:clu_2419_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000242125.3</td>
@@ -1733,6 +1783,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.819941</td>
 <td align="left">SNHG3</td>
+<td align="left">chr1:28508901:28529858:clu_2419_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000112739.17</td>
@@ -1748,6 +1799,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.813817</td>
 <td align="left">PRPF4B</td>
+<td align="left">chr6:4021466:4027691:clu_12493_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000205861.12</td>
@@ -1763,6 +1815,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.744962</td>
 <td align="left">PCOTH</td>
+<td align="left">chr13:23889553:23890000:clu_25976_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000131981.16</td>
@@ -1778,6 +1831,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.693610</td>
 <td align="left">LGALS3</td>
+<td align="left">chr14:55129647:55137370:clu_27175_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000078747.15</td>
@@ -1793,6 +1847,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.614054</td>
 <td align="left">ITCH</td>
+<td align="left">chr20:34392914:34393791:clu_37125_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000258724.1</td>
@@ -1808,6 +1863,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.608812</td>
 <td align="left">PINX1</td>
+<td align="left">chr8:10765916:10820210:clu_16442_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000254093.9</td>
@@ -1823,6 +1879,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.608812</td>
 <td align="left">PINX1</td>
+<td align="left">chr8:10765916:10820210:clu_16442_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000143569.19</td>
@@ -1838,6 +1895,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.586487</td>
 <td align="left">UBAP2L</td>
+<td align="left">chr1:154262202:154263103:clu_3309_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000102921.8</td>
@@ -1853,6 +1911,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.428989</td>
 <td align="left">N4BP1</td>
+<td align="left">chr16:48562444:48570182:clu_30578_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000100368.14</td>
@@ -1868,6 +1927,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.411832</td>
 <td align="left">CSF2RB</td>
+<td align="left">chr22:36934738:36935351:clu_38681_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000111237.19</td>
@@ -1883,6 +1943,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.338322</td>
 <td align="left">VPS29</td>
+<td align="left">chr12:110498859:110499535:clu_24109_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000172175.15</td>
@@ -1898,6 +1959,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.278250</td>
 <td align="left">MALT1</td>
+<td align="left">chr18:58747300:58747405:clu_33627_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000010270.13</td>
@@ -1913,6 +1975,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.248940</td>
 <td align="left">STARD3NL</td>
+<td align="left">chr7:38184562:38207447:clu_15662_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000090372.15</td>
@@ -1928,6 +1991,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.199628</td>
 <td align="left">STRN4</td>
+<td align="left">chr19:46733236:46733807:clu_34931_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000176531.10</td>
@@ -1943,6 +2007,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-4.154132</td>
 <td align="left">PHLDB3</td>
+<td align="left">chr19:43487123:43497118:clu_34828_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000000938.13</td>
@@ -1958,6 +2023,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.990816</td>
 <td align="left">FGR</td>
+<td align="left">chr1:27619173:27621559:clu_435_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000147905.17</td>
@@ -1973,6 +2039,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.951407</td>
 <td align="left">ZCCHC7</td>
+<td align="left">chr9:37331433:37349357:clu_18867_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000153914.16</td>
@@ -1988,6 +2055,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.940037</td>
 <td align="left">SREK1</td>
+<td align="left">chr5:66158230:66158809:clu_11012_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000101639.18</td>
@@ -2003,6 +2071,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.934320</td>
 <td align="left">CEP192</td>
+<td align="left">chr18:13038579:13040830:clu_33475_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000163960.12</td>
@@ -2018,6 +2087,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.872331</td>
 <td align="left">UBXN7</td>
+<td align="left">chr3:196393619:196407246:clu_9186_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000106268.15</td>
@@ -2033,6 +2103,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.805406</td>
 <td align="left">NUDT1</td>
+<td align="left">chr7:2242975:2244563:clu_15466_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000102897.10</td>
@@ -2048,6 +2119,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.734031</td>
 <td align="left">LYRM1</td>
+<td align="left">chr16:20900889:20902486:clu_29410_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000110090.13</td>
@@ -2063,6 +2135,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.648140</td>
 <td align="left">CPT1A</td>
+<td align="left">chr11:68759661:68760256:clu_21705_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000134882.16</td>
@@ -2078,6 +2151,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.622183</td>
 <td align="left">UBAC2</td>
+<td align="left">chr13:99237454:99238427:clu_26229_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000171530.14</td>
@@ -2093,6 +2167,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.621325</td>
 <td align="left">TBCA</td>
+<td align="left">chr5:77708347:77774185:clu_11981_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000147439.13</td>
@@ -2108,6 +2183,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.615688</td>
 <td align="left">BIN3</td>
+<td align="left">chr8:22636962:22643652:clu_16481_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000177565.18</td>
@@ -2123,6 +2199,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.588868</td>
 <td align="left">TBL1XR1</td>
+<td align="left">chr3:177098541:177147522:clu_9068_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000064313.12</td>
@@ -2138,6 +2215,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.576764</td>
 <td align="left">TAF2</td>
+<td align="left">chr8:119744393:119744881:clu_16886_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000167491.17</td>
@@ -2153,6 +2231,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.547966</td>
 <td align="left">GATAD2A</td>
+<td align="left">chr19:19474167:19492306:clu_35739_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000080845.17</td>
@@ -2168,6 +2247,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.535267</td>
 <td align="left">DLGAP4</td>
+<td align="left">chr20:36499321:36499588:clu_37170_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000151233.11</td>
@@ -2183,6 +2263,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.487187</td>
 <td align="left">GXYLT1</td>
+<td align="left">chr12:42087947:42095151:clu_23541_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000139116.18</td>
@@ -2198,6 +2279,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.473336</td>
 <td align="left">KIF21A</td>
+<td align="left">chr12:39370261:39441962:clu_23535_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000108061.12</td>
@@ -2213,6 +2295,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.422720</td>
 <td align="left">SHOC2</td>
+<td align="left">chr10:110952323:110964125:clu_20120_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000130475.14</td>
@@ -2228,6 +2311,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.391896</td>
 <td align="left">FCHO1</td>
+<td align="left">chr19:17772714:17774239:clu_35675_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000166974.13</td>
@@ -2243,6 +2327,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.348989</td>
 <td align="left">MAPRE2</td>
+<td align="left">chr18:35135191:35140295:clu_33544_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000197386.12</td>
@@ -2258,6 +2343,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.346746</td>
 <td align="left">HTT</td>
+<td align="left">chr4:3213736:3213958:clu_9322_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000127554.13</td>
@@ -2273,6 +2359,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.315597</td>
 <td align="left">GFER</td>
+<td align="left">chr16:1985262:1985866:clu_29158_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000180901.11</td>
@@ -2288,6 +2375,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.297018</td>
 <td align="left">KCTD2</td>
+<td align="left">chr17:75060221:75062120:clu_33161_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000132394.11</td>
@@ -2303,6 +2391,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.285066</td>
 <td align="left">EEFSEC</td>
+<td align="left">chr3:128391145:128408069:clu_7629_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000107263.18</td>
@@ -2318,6 +2407,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.249082</td>
 <td align="left">RAPGEF1</td>
+<td align="left">chr9:131643417:131647635:clu_18483_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000135363.12</td>
@@ -2333,6 +2423,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.238942</td>
 <td align="left">LMO2</td>
+<td align="left">chr11:33864817:33866992:clu_21326_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000156642.17</td>
@@ -2348,6 +2439,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.206832</td>
 <td align="left">NPTN</td>
+<td align="left">chr15:73592137:73597022:clu_28832_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000126581.13</td>
@@ -2363,6 +2455,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.183238</td>
 <td align="left">BECN1</td>
+<td align="left">chr17:42810928:42811292:clu_31645_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000196843.17</td>
@@ -2378,6 +2471,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.167849</td>
 <td align="left">ARID5A</td>
+<td align="left">chr2:96549459:96549753:clu_6009_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000285733.1</td>
@@ -2393,6 +2487,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.141239</td>
 <td align="left">AL031315.1</td>
+<td align="left">chr6:169660766:169661703:clu_14487_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000184465.16</td>
@@ -2408,6 +2503,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.141239</td>
 <td align="left">WDR27</td>
+<td align="left">chr6:169660766:169661703:clu_14487_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000100281.14</td>
@@ -2423,6 +2519,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.090861</td>
 <td align="left">HMGXB4</td>
+<td align="left">chr22:35267514:35283962:clu_38658_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000136732.16</td>
@@ -2438,6 +2535,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.077982</td>
 <td align="left">GYPC</td>
+<td align="left">chr2:126663569:126690255:clu_6174_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000126773.13</td>
@@ -2453,6 +2551,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-3.013184</td>
 <td align="left">PCNX4</td>
+<td align="left">chr14:60124310:60125637:clu_27223_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000204899.6</td>
@@ -2468,6 +2567,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.991499</td>
 <td align="left">MZT1</td>
+<td align="left">chr13:72719097:72725642:clu_25814_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000163875.15</td>
@@ -2483,6 +2583,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.964981</td>
 <td align="left">MEAF6</td>
+<td align="left">chr1:37493814:37494140:clu_580_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000116473.14</td>
@@ -2498,6 +2599,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.956315</td>
 <td align="left">RAP1A</td>
+<td align="left">chr1:111627526:111691334:clu_3075_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000106028.11</td>
@@ -2513,6 +2615,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.948600</td>
 <td align="left">SSBP1</td>
+<td align="left">chr7:141741459:141742169:clu_16288_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000278845.5</td>
@@ -2528,6 +2631,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.928467</td>
 <td align="left">MRPL45</td>
+<td align="left">chr17:38312661:38318687:clu_32705_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000175220.12</td>
@@ -2543,6 +2647,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.885549</td>
 <td align="left">ARHGAP1</td>
+<td align="left">chr11:46696156:46697021:clu_21372_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000113558.19</td>
@@ -2558,6 +2663,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.876467</td>
 <td align="left">SKP1</td>
+<td align="left">chr5:134174514:134175284:clu_12180_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000272772.1</td>
@@ -2573,6 +2679,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.876467</td>
 <td align="left">AC104109.3</td>
+<td align="left">chr5:134174514:134175284:clu_12180_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000138185.20</td>
@@ -2588,6 +2695,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.835834</td>
 <td align="left">ENTPD1</td>
+<td align="left">chr10:95756776:95823237:clu_19972_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000118454.13</td>
@@ -2603,6 +2711,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.807663</td>
 <td align="left">ANKRD13C</td>
+<td align="left">chr1:70270956:70274781:clu_878_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000165025.15</td>
@@ -2618,6 +2727,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.803027</td>
 <td align="left">SYK</td>
+<td align="left">chr9:90826767:90843858:clu_18994_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000126653.18</td>
@@ -2633,6 +2743,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.798763</td>
 <td align="left">NSRP1</td>
+<td align="left">chr17:30183823:30184615:clu_32603_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000065150.21</td>
@@ -2648,6 +2759,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.785237</td>
 <td align="left">IPO5</td>
+<td align="left">chr13:97985520:97989062:clu_26220_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000197150.12</td>
@@ -2663,6 +2775,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.783347</td>
 <td align="left">ABCB8</td>
+<td align="left">chr7:151031291:151032844:clu_16345_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000117419.16</td>
@@ -2678,6 +2791,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.762573</td>
 <td align="left">ERI3</td>
+<td align="left">chr1:44313228:44318141:clu_682_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000112851.14</td>
@@ -2693,6 +2807,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.751726</td>
 <td align="left">ERBIN</td>
+<td align="left">chr5:66051538:66053406:clu_11009_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000139826.6</td>
@@ -2708,6 +2823,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.748700</td>
 <td align="left">ABHD13</td>
+<td align="left">chr13:108218659:108221329:clu_26257_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000130818.12</td>
@@ -2723,6 +2839,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.737337</td>
 <td align="left">ZNF426</td>
+<td align="left">chr19:9533966:9534239:clu_34286_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000197329.12</td>
@@ -2738,6 +2855,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.734313</td>
 <td align="left">PELI1</td>
+<td align="left">chr2:64108379:64112563:clu_4503_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000170627.11</td>
@@ -2753,6 +2871,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.732351</td>
 <td align="left">GTSF1</td>
+<td align="left">chr12:54463297:54468825:clu_23735_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000125991.19</td>
@@ -2768,6 +2887,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.711622</td>
 <td align="left">ERGIC3</td>
+<td align="left">chr20:35554386:35555044:clu_37148_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000070882.13</td>
@@ -2783,6 +2903,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.711605</td>
 <td align="left">OSBPL3</td>
+<td align="left">chr7:24892621:24898513:clu_14672_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000082146.13</td>
@@ -2798,6 +2919,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.667072</td>
 <td align="left">STRADB</td>
+<td align="left">chr2:201471111:201472955:clu_6553_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000101109.12</td>
@@ -2813,6 +2935,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.666348</td>
 <td align="left">STK4</td>
+<td align="left">chr20:44979965:44981829:clu_37255_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000197150.12</td>
@@ -2828,6 +2951,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.631513</td>
 <td align="left">ABCB8</td>
+<td align="left">chr7:151031291:151033605:clu_16345_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000100852.13</td>
@@ -2843,6 +2967,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.547770</td>
 <td align="left">ARHGAP5</td>
+<td align="left">chr14:32150566:32152423:clu_27094_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000060237.17</td>
@@ -2858,6 +2983,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.540969</td>
 <td align="left">WNK1</td>
+<td align="left">chr12:895196:896071:clu_24436_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000180628.15</td>
@@ -2873,6 +2999,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.539899</td>
 <td align="left">PCGF5</td>
+<td align="left">chr10:91236063:91240484:clu_19925_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000120029.13</td>
@@ -2888,6 +3015,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.535363</td>
 <td align="left">ARMH3</td>
+<td align="left">chr10:101847620:101848400:clu_20869_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000185009.12</td>
@@ -2903,6 +3031,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.534809</td>
 <td align="left">AP3M1</td>
+<td align="left">chr10:74124524:74126126:clu_20670_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000106785.15</td>
@@ -2918,6 +3047,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.522308</td>
 <td align="left">TRIM14</td>
+<td align="left">chr9:98095029:98095320:clu_18214_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000170627.11</td>
@@ -2933,6 +3063,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.494362</td>
 <td align="left">GTSF1</td>
+<td align="left">chr12:54465167:54468825:clu_23735_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000182628.13</td>
@@ -2948,6 +3079,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.465174</td>
 <td align="left">SKA2</td>
+<td align="left">chr17:59112345:59119396:clu_31885_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000116212.15</td>
@@ -2963,6 +3095,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.458638</td>
 <td align="left">LRRC42</td>
+<td align="left">chr1:53947981:53951986:clu_2767_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000154511.12</td>
@@ -2978,6 +3111,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.435005</td>
 <td align="left">DIPK1A</td>
+<td align="left">chr1:92876430:92907900:clu_992_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000100979.15</td>
@@ -2993,6 +3127,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.429309</td>
 <td align="left">PLTP</td>
+<td align="left">chr20:45910070:45911152:clu_36765_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000116353.16</td>
@@ -3008,6 +3143,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.415464</td>
 <td align="left">MECR</td>
+<td align="left">chr1:29206905:29211124:clu_462_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000165406.16</td>
@@ -3023,6 +3159,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.413024</td>
 <td align="left">MARCHF8</td>
+<td align="left">chr10:45533289:45534787:clu_20491_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000115084.15</td>
@@ -3038,6 +3175,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.381796</td>
 <td align="left">SLC35F5</td>
+<td align="left">chr2:113725537:113728025:clu_4856_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000178397.13</td>
@@ -3053,6 +3191,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.381226</td>
 <td align="left">FAM220A</td>
+<td align="left">chr7:6331235:6347587:clu_14603_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000286075.1</td>
@@ -3068,6 +3207,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.381226</td>
 <td align="left">AC009412.1</td>
+<td align="left">chr7:6331235:6347587:clu_14603_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000147586.10</td>
@@ -3083,6 +3223,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.342313</td>
 <td align="left">MRPS28</td>
+<td align="left">chr8:79940504:80002999:clu_16719_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000276418.5</td>
@@ -3098,6 +3239,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.342313</td>
 <td align="left">AC036214.3</td>
+<td align="left">chr8:79940504:80002999:clu_16719_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000196295.12</td>
@@ -3113,6 +3255,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.297164</td>
 <td align="left">GARS1-DT</td>
+<td align="left">chr7:30585479:30586244:clu_14706_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000008018.9</td>
@@ -3128,6 +3271,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.280594</td>
 <td align="left">PSMB1</td>
+<td align="left">chr6:170543730:170544321:clu_14498_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000181007.9</td>
@@ -3143,6 +3287,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.275857</td>
 <td align="left">ZFP82</td>
+<td align="left">chr19:36394110:36400285:clu_34677_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000064652.11</td>
@@ -3158,6 +3303,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.260318</td>
 <td align="left">SNX24</td>
+<td align="left">chr5:122898236:122936734:clu_11310_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000141068.14</td>
@@ -3173,6 +3319,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.252941</td>
 <td align="left">KSR1</td>
+<td align="left">chr17:27608630:27609196:clu_32556_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000189091.13</td>
@@ -3188,6 +3335,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.251402</td>
 <td align="left">SF3B3</td>
+<td align="left">chr16:70544249:70544438:clu_29930_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000026751.17</td>
@@ -3203,6 +3351,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.246607</td>
 <td align="left">SLAMF7</td>
+<td align="left">chr1:160751423:160752186:clu_3431_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000122359.18</td>
@@ -3218,6 +3367,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.240435</td>
 <td align="left">ANXA11</td>
+<td align="left">chr10:80155912:80156378:clu_20706_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000113719.16</td>
@@ -3233,6 +3383,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.233131</td>
 <td align="left">ERGIC1</td>
+<td align="left">chr5:172837337:172888699:clu_11596_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000138698.15</td>
@@ -3248,6 +3399,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.220561</td>
 <td align="left">RAP1GDS1</td>
+<td align="left">chr4:98328826:98343139:clu_9700_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000189091.13</td>
@@ -3263,6 +3415,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.209715</td>
 <td align="left">SF3B3</td>
+<td align="left">chr16:70527429:70528873:clu_29929_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000115840.14</td>
@@ -3278,6 +3431,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.208868</td>
 <td align="left">SLC25A12</td>
+<td align="left">chr2:171787947:171790741:clu_5068_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000167081.18</td>
@@ -3293,6 +3447,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.197212</td>
 <td align="left">PBX3</td>
+<td align="left">chr9:125964198:125965831:clu_19202_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000180104.16</td>
@@ -3308,6 +3463,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.126322</td>
 <td align="left">EXOC3</td>
+<td align="left">chr5:466552:466727:clu_10796_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000134852.15</td>
@@ -3323,6 +3479,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.103294</td>
 <td align="left">CLOCK</td>
+<td align="left">chr4:55482828:55484224:clu_10284_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000117228.10</td>
@@ -3338,6 +3495,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.094464</td>
 <td align="left">GBP1</td>
+<td align="left">chr1:89063253:89064701:clu_961_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000176407.18</td>
@@ -3353,6 +3511,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.092161</td>
 <td align="left">KCMF1</td>
+<td align="left">chr2:85034167:85035016:clu_5943_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000142634.13</td>
@@ -3368,6 +3527,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.086733</td>
 <td align="left">EFHD2</td>
+<td align="left">chr1:15426830:15427150:clu_2238_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000234127.9</td>
@@ -3383,6 +3543,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.073400</td>
 <td align="left">TRIM26</td>
+<td align="left">chr6:30201138:30203828:clu_13671_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000047621.12</td>
@@ -3398,6 +3559,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.068560</td>
 <td align="left">C12orf4</td>
+<td align="left">chr12:4536219:4537380:clu_23341_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000146757.14</td>
@@ -3413,6 +3575,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.056343</td>
 <td align="left">ZNF92</td>
+<td align="left">chr7:65390943:65398341:clu_15756_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000172469.16</td>
@@ -3428,6 +3591,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.016101</td>
 <td align="left">MANEA</td>
+<td align="left">chr6:95581911:95586402:clu_13187_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000185920.16</td>
@@ -3443,6 +3607,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Branaplam-specific</td>
 <td align="right">-2.013666</td>
 <td align="left">PTCH1</td>
+<td align="left">chr9:95447451:95447869:clu_18182_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000107290.14</td>
@@ -3458,6 +3623,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.002415</td>
 <td align="left">SETX</td>
+<td align="left">chr9:132281574:132283219:clu_18490_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000123983.14</td>
@@ -3473,6 +3639,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.015697</td>
 <td align="left">ACSL3</td>
+<td align="left">chr2:222878159:222887830:clu_6716_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000115415.20</td>
@@ -3488,6 +3655,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.103504</td>
 <td align="left">STAT1</td>
+<td align="left">chr2:190977025:190978528:clu_5141_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000100485.12</td>
@@ -3503,6 +3671,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.140344</td>
 <td align="left">SOS2</td>
+<td align="left">chr14:50130762:50133808:clu_26550_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000160293.17</td>
@@ -3518,6 +3687,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.252860</td>
 <td align="left">VAV2</td>
+<td align="left">chr9:133833378:133834272:clu_18541_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000256646.7</td>
@@ -3533,6 +3703,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.261174</td>
 <td align="left">AC010132.3</td>
+<td align="left">chr7:42927459:42927968:clu_14760_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000106588.11</td>
@@ -3548,6 +3719,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.261174</td>
 <td align="left">PSMA2</td>
+<td align="left">chr7:42927459:42927968:clu_14760_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000119402.17</td>
@@ -3563,6 +3735,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.268566</td>
 <td align="left">FBXW2</td>
+<td align="left">chr9:120772840:120775492:clu_18315_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000112701.18</td>
@@ -3578,6 +3751,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.295573</td>
 <td align="left">SENP6</td>
+<td align="left">chr6:75621625:75621927:clu_13126_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000069869.16</td>
@@ -3593,6 +3767,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.300576</td>
 <td align="left">NEDD4</td>
+<td align="left">chr15:55830586:55831834:clu_28648_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000205268.11</td>
@@ -3608,6 +3783,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.306077</td>
 <td align="left">PDE7A</td>
+<td align="left">chr8:65719495:65721255:clu_16666_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000164292.13</td>
@@ -3623,6 +3799,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.311566</td>
 <td align="left">RHOBTB3</td>
+<td align="left">chr5:95760746:95763508:clu_11187_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000107263.18</td>
@@ -3638,6 +3815,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.345126</td>
 <td align="left">RAPGEF1</td>
+<td align="left">chr9:131602149:131603961:clu_18482_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000270800.3</td>
@@ -3653,6 +3831,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.378209</td>
 <td align="left">RPS10-NUDT3</td>
+<td align="left">chr6:34417547:34417798:clu_13830_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000124614.16</td>
@@ -3668,6 +3847,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.378209</td>
 <td align="left">RPS10</td>
+<td align="left">chr6:34417547:34417798:clu_13830_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000268790.5</td>
@@ -3683,6 +3863,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.396985</td>
 <td align="left">AC008764.4</td>
+<td align="left">chr19:16654125:16655238:clu_34507_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000214046.8</td>
@@ -3698,6 +3879,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.396985</td>
 <td align="left">SMIM7</td>
+<td align="left">chr19:16654125:16655238:clu_34507_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000079616.13</td>
@@ -3713,6 +3895,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.405511</td>
 <td align="left">KIF22</td>
+<td align="left">chr16:29797582:29798374:clu_29534_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000188822.8</td>
@@ -3728,6 +3911,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.471255</td>
 <td align="left">CNR2</td>
+<td align="left">chr1:23875662:23909367:clu_390_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000158234.12</td>
@@ -3743,6 +3927,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.506330</td>
 <td align="left">FAIM</td>
+<td align="left">chr3:138616664:138619711:clu_7716_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000071189.21</td>
@@ -3758,6 +3943,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.546995</td>
 <td align="left">SNX13</td>
+<td align="left">chr7:17834865:17838294:clu_14629_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000092931.11</td>
@@ -3773,6 +3959,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.582979</td>
 <td align="left">MFSD11</td>
+<td align="left">chr17:76744466:76745393:clu_33223_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000168310.11</td>
@@ -3788,6 +3975,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.602322</td>
 <td align="left">IRF2</td>
+<td align="left">chr4:184429070:184449329:clu_10752_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000082996.19</td>
@@ -3803,6 +3991,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.641557</td>
 <td align="left">RNF13</td>
+<td align="left">chr3:149955649:149960056:clu_7765_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000135974.10</td>
@@ -3818,6 +4007,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.664718</td>
 <td align="left">C2orf49</td>
+<td align="left">chr2:105344358:105345315:clu_6075_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000056097.16</td>
@@ -3833,6 +4023,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.686858</td>
 <td align="left">ZFR</td>
+<td align="left">chr5:32420103:32421631:clu_11763_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000144228.9</td>
@@ -3848,6 +4039,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.688732</td>
 <td align="left">SPOPL</td>
+<td align="left">chr2:138552357:138552554:clu_6236_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000197694.18</td>
@@ -3863,6 +4055,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.736914</td>
 <td align="left">SPTAN1</td>
+<td align="left">chr9:128621998:128624328:clu_19270_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000164187.7</td>
@@ -3878,6 +4071,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.767962</td>
 <td align="left">LMBRD2</td>
+<td align="left">chr5:36109551:36109945:clu_11785_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000145725.19</td>
@@ -3893,6 +4087,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.820051</td>
 <td align="left">PPIP5K2</td>
+<td align="left">chr5:103157244:103158188:clu_11234_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000126457.21</td>
@@ -3908,6 +4103,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.855578</td>
 <td align="left">PRMT1</td>
+<td align="left">chr19:49685639:49686093:clu_36267_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000115942.9</td>
@@ -3923,6 +4119,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.872134</td>
 <td align="left">ORC2</td>
+<td align="left">chr2:200913413:200913828:clu_5198_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000108651.10</td>
@@ -3938,6 +4135,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.881977</td>
 <td align="left">UTP6</td>
+<td align="left">chr17:31880754:31882666:clu_31456_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000116095.11</td>
@@ -3953,6 +4151,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.906637</td>
 <td align="left">PLEKHA3</td>
+<td align="left">chr2:178489645:178490659:clu_6415_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000135677.11</td>
@@ -3968,6 +4167,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.925520</td>
 <td align="left">GNS</td>
+<td align="left">chr12:64752757:64752845:clu_23876_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000153310.19</td>
@@ -3983,6 +4183,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.929163</td>
 <td align="left">CYRIB</td>
+<td align="left">chr8:129903350:129925548:clu_16927_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000123066.8</td>
@@ -3998,6 +4199,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.939934</td>
 <td align="left">MED13L</td>
+<td align="left">chr12:115980938:115981539:clu_24180_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000138413.13</td>
@@ -4013,6 +4215,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.944458</td>
 <td align="left">IDH1</td>
+<td align="left">chr2:208240003:208240239:clu_5250_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000145050.19</td>
@@ -4028,6 +4231,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.945036</td>
 <td align="left">MANF</td>
+<td align="left">chr3:51388522:51388905:clu_7328_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000083799.17</td>
@@ -4043,6 +4247,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">2.991397</td>
 <td align="left">CYLD</td>
+<td align="left">chr16:50775855:50776179:clu_29701_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000093000.19</td>
@@ -4058,6 +4263,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.049978</td>
 <td align="left">NUP50</td>
+<td align="left">chr22:45176244:45178238:clu_38833_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000047365.12</td>
@@ -4073,6 +4279,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.070286</td>
 <td align="left">ARAP2</td>
+<td align="left">chr4:36083450:36087571:clu_10183_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000047056.16</td>
@@ -4088,6 +4295,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.072126</td>
 <td align="left">WDR37</td>
+<td align="left">chr10:1102577:1102856:clu_19482_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000011376.12</td>
@@ -4103,6 +4311,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.127228</td>
 <td align="left">LARS2</td>
+<td align="left">chr3:45399692:45400245:clu_7222_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000156469.9</td>
@@ -4118,6 +4327,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.137840</td>
 <td align="left">MTERF3</td>
+<td align="left">chr8:96251095:96251582:clu_16790_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000112308.13</td>
@@ -4133,6 +4343,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.154727</td>
 <td align="left">C6orf62</td>
+<td align="left">chr6:24708911:24709324:clu_13621_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000105618.14</td>
@@ -4148,6 +4359,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.184942</td>
 <td align="left">PRPF31</td>
+<td align="left">chr19:54128805:54129057:clu_36359_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000196116.8</td>
@@ -4163,6 +4375,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.242623</td>
 <td align="left">TDRD7</td>
+<td align="left">chr9:97414385:97428460:clu_19043_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000139626.16</td>
@@ -4178,6 +4391,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.271285</td>
 <td align="left">ITGB7</td>
+<td align="left">chr12:53201194:53205722:clu_23706_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000103415.12</td>
@@ -4193,6 +4407,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.271732</td>
 <td align="left">HMOX2</td>
+<td align="left">chr16:4488742:4505484:clu_29248_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000150753.12</td>
@@ -4208,6 +4423,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.275364</td>
 <td align="left">CCT5</td>
+<td align="left">chr5:10264548:10264656:clu_10840_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000137878.17</td>
@@ -4223,6 +4439,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.275735</td>
 <td align="left">GCOM1</td>
+<td align="left">chr15:57706955:57707467:clu_27933_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000255529.9</td>
@@ -4238,6 +4455,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.275735</td>
 <td align="left">POLR2M</td>
+<td align="left">chr15:57706955:57707467:clu_27933_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000083720.13</td>
@@ -4253,6 +4471,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.340651</td>
 <td align="left">OXCT1</td>
+<td align="left">chr5:41731770:41734575:clu_11838_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000133028.12</td>
@@ -4268,6 +4487,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.386642</td>
 <td align="left">SCO1</td>
+<td align="left">chr17:10695446:10695741:clu_31238_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000110075.14</td>
@@ -4283,6 +4503,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.407066</td>
 <td align="left">PPP6R3</td>
+<td align="left">chr11:68602155:68603342:clu_22849_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000188352.12</td>
@@ -4298,6 +4519,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.444138</td>
 <td align="left">FOCAD</td>
+<td align="left">chr9:20933250:20944627:clu_18769_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000130159.14</td>
@@ -4313,6 +4535,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.486950</td>
 <td align="left">ECSIT</td>
+<td align="left">chr19:11519193:11523185:clu_34366_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000134779.15</td>
@@ -4328,6 +4551,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.490282</td>
 <td align="left">TPGS2</td>
+<td align="left">chr18:36805502:36805992:clu_33857_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000136908.17</td>
@@ -4343,6 +4567,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.562029</td>
 <td align="left">DPM2</td>
+<td align="left">chr9:127935780:127936160:clu_18414_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000008083.14</td>
@@ -4358,6 +4583,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.661699</td>
 <td align="left">JARID2</td>
+<td align="left">chr6:15508186:15508340:clu_12557_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000102900.13</td>
@@ -4373,6 +4599,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.739712</td>
 <td align="left">NUP93</td>
+<td align="left">chr16:56750374:56758538:clu_29738_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000235162.9</td>
@@ -4388,6 +4615,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.754437</td>
 <td align="left">C12orf75</td>
+<td align="left">chr12:105339289:105348602:clu_25254_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000146007.11</td>
@@ -4403,6 +4631,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.761796</td>
 <td align="left">ZMAT2</td>
+<td align="left">chr5:140701912:140702006:clu_11430_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000176142.13</td>
@@ -4418,6 +4647,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.805878</td>
 <td align="left">TMEM39A</td>
+<td align="left">chr3:119438103:119444873:clu_8706_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000159063.13</td>
@@ -4433,6 +4663,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.900791</td>
 <td align="left">ALG8</td>
+<td align="left">chr11:78106946:78108970:clu_21818_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000168297.16</td>
@@ -4448,6 +4679,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">3.991608</td>
 <td align="left">PXK</td>
+<td align="left">chr3:58335452:58365874:clu_7408_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000079332.15</td>
@@ -4463,6 +4695,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">4.011891</td>
 <td align="left">SAR1A</td>
+<td align="left">chr10:70161931:70166276:clu_20604_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000119414.11</td>
@@ -4478,6 +4711,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">4.112416</td>
 <td align="left">PPP6C</td>
+<td align="left">chr9:125149921:125152231:clu_18381_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000111252.11</td>
@@ -4493,6 +4727,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">4.151962</td>
 <td align="left">SH2B3</td>
+<td align="left">chr12:111419288:111446753:clu_25326_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000122643.22</td>
@@ -4508,6 +4743,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">4.343214</td>
 <td align="left">NT5C3A</td>
+<td align="left">chr7:33024108:33024481:clu_14717_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000283398.1</td>
@@ -4523,6 +4759,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">4.608559</td>
 <td align="left">AC114737.4</td>
+<td align="left">chr7:76965967:76968399:clu_15875_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000173064.13</td>
@@ -4538,6 +4775,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">4.671793</td>
 <td align="left">HECTD4</td>
+<td align="left">chr12:112319742:112335777:clu_24159_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000177885.15</td>
@@ -4553,6 +4791,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">4.821942</td>
 <td align="left">GRB2</td>
+<td align="left">chr17:75332797:75387905:clu_32044_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000112159.12</td>
@@ -4568,6 +4807,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">4.910025</td>
 <td align="left">MDN1</td>
+<td align="left">chr6:89655968:89656376:clu_14100_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000118596.12</td>
@@ -4583,6 +4823,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">4.924104</td>
 <td align="left">SLC16A7</td>
+<td align="left">chr12:59618477:59655152:clu_25000_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000149089.13</td>
@@ -4598,6 +4839,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">5.036669</td>
 <td align="left">APIP</td>
+<td align="left">chr11:34895110:34911973:clu_21332_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000135272.11</td>
@@ -4613,6 +4855,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">5.123147</td>
 <td align="left">MDFIC</td>
+<td align="left">chr7:114960429:114979506:clu_16148_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000268746.1</td>
@@ -4628,6 +4871,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">5.171954</td>
 <td align="left">AC010519.1</td>
+<td align="left">chr19:47698067:47698634:clu_36191_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000063169.10</td>
@@ -4643,6 +4887,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">5.171954</td>
 <td align="left">BICRA</td>
+<td align="left">chr19:47698067:47698634:clu_36191_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000185019.17</td>
@@ -4658,6 +4903,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">5.180906</td>
 <td align="left">UBOX5</td>
+<td align="left">chr20:3149260:3155865:clu_36520_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000215251.4</td>
@@ -4673,6 +4919,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">5.180906</td>
 <td align="left">FASTKD5</td>
+<td align="left">chr20:3149260:3155865:clu_36520_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000138182.14</td>
@@ -4688,6 +4935,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">5.393297</td>
 <td align="left">KIF20B</td>
+<td align="left">chr10:89719706:89719788:clu_19913_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000184840.12</td>
@@ -4703,6 +4951,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">5.427913</td>
 <td align="left">TMED9</td>
+<td align="left">chr5:177595102:177595267:clu_11649_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000154001.14</td>
@@ -4718,6 +4967,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">5.687174</td>
 <td align="left">PPP2R5E</td>
+<td align="left">chr14:63453885:63539292:clu_26656_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000132383.12</td>
@@ -4733,6 +4983,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">6.285142</td>
 <td align="left">RPA1</td>
+<td align="left">chr17:1841833:1842803:clu_32269_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000102531.16</td>
@@ -4748,6 +4999,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">6.386338</td>
 <td align="left">FNDC3A</td>
+<td align="left">chr13:49130167:49131137:clu_26127_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000033030.15</td>
@@ -4763,6 +5015,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">6.732944</td>
 <td align="left">ZCCHC8</td>
+<td align="left">chr12:122478292:122478664:clu_24289_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000165806.21</td>
@@ -4778,6 +5031,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">6.869295</td>
 <td align="left">CASP7</td>
+<td align="left">chr10:113717753:113721032:clu_20133_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000155324.10</td>
@@ -4793,6 +5047,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">7.089980</td>
 <td align="left">GRAMD2B</td>
+<td align="left">chr5:126466336:126469677:clu_11318_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000162694.14</td>
@@ -4808,6 +5063,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">7.608560</td>
 <td align="left">EXTL2</td>
+<td align="left">chr1:100877903:100878394:clu_1036_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000196422.11</td>
@@ -4823,6 +5079,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">10.672749</td>
 <td align="left">PPP1R26</td>
+<td align="left">chr9:135484289:135484449:clu_19406_+</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000243147.8</td>
@@ -4838,6 +5095,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">10.674744</td>
 <td align="left">MRPL33</td>
+<td align="left">chr2:27773647:27774424:clu_5580_+</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000163697.17</td>
@@ -4853,6 +5111,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">12.729286</td>
 <td align="left">APBB2</td>
+<td align="left">chr4:41014398:41032584:clu_10225_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000154864.12</td>
@@ -4868,6 +5127,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">15.785807</td>
 <td align="left">PIEZO2</td>
+<td align="left">chr18:10773629:10774006:clu_33760_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000070061.15</td>
@@ -4883,6 +5143,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">17.798155</td>
 <td align="left">ELP1</td>
+<td align="left">chr9:108931201:108933271:clu_18237_-</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000165475.15</td>
@@ -4898,6 +5159,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">21.628056</td>
 <td align="left">CRYL1</td>
+<td align="left">chr13:20404741:20405904:clu_25569_-</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000144036.16</td>
@@ -4913,6 +5175,7 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 <td align="left">Risdiplam-specific</td>
 <td align="right">24.606656</td>
 <td align="left">EXOC6B</td>
+<td align="left">chr2:72179461:72182894:clu_4568_-</td>
 </tr>
 </tbody>
 </table>
@@ -4920,9 +5183,9 @@ that Jingxin used in the recent experiment of 52 molecules</p>
 investigate why.</p>
 <pre class="r"><code>SpecificEffects %&gt;%
   filter(gene_names %in% c(&quot;FOXM1&quot;, &quot;LRRK2&quot;))</code></pre>
-<pre><code># A tibble: 0 × 4
-# … with 4 variables: Color &lt;chr&gt;, log2Ratio &lt;dbl&gt;, gene_names &lt;chr&gt;,
-#   gene_ids &lt;chr&gt;</code></pre>
+<pre><code># A tibble: 0 × 5
+# … with 5 variables: Color &lt;chr&gt;, log2Ratio &lt;dbl&gt;, gene_names &lt;chr&gt;,
+#   gene_ids &lt;chr&gt;, junc &lt;chr&gt;</code></pre>
 <pre class="r"><code>GA.GT.Introns %&gt;%
   separate_rows(gene_names, gene_ids, sep=&#39;,&#39;) %&gt;%
   filter(gene_names %in% c(&quot;FOXM1&quot;, &quot;LRRK2&quot;, &quot;HTT&quot;, &quot;STAT1&quot;))</code></pre>
@@ -4961,6 +5224,43 @@ GeneExpressionData.tidy %&gt;%
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=3)) +
   labs(title=&quot;Dose response effects on gene expression genes of interest&quot;)</code></pre>
 <p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e11b2825970e7130c2338d3b9556ee4da5cd37d3/docs/figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-11-1.png" target="_blank">e11b282</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>…oops, with the x-axis in nanomolar units its kind of annoying to
 interpret. Let’s just plot the x-axis dose rank, instead of nanomolar
 units, since each of the titration curves cover similar effective
@@ -4976,6 +5276,43 @@ dosages.</p>
   theme_bw() +
   labs(title=&quot;Dose response effects on gene expression genes of interest&quot;)</code></pre>
 <p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
+Past versions of unnamed-chunk-12-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e11b2825970e7130c2338d3b9556ee4da5cd37d3/docs/figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-12-1.png" target="_blank">e11b282</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>SplicingData.tidy &lt;- read_tsv(&quot;../code/DoseResponseData/LCL/TidySplicingDoseData.txt.gz&quot;)
 
 SplicingData.tidy %&gt;%
@@ -4991,6 +5328,43 @@ SplicingData.tidy %&gt;%
   theme(strip.text.x = element_text(size = 5)) +
   labs(title=&quot;All GAGT introns in genes of interest&quot;, y=&quot;Intronic PSI&quot;)</code></pre>
 <p><img src="figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-2">
+Past versions of unnamed-chunk-12-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e11b2825970e7130c2338d3b9556ee4da5cd37d3/docs/figure/20230306_CheckIntronsWithUniqueSpecifities.Rmd/unnamed-chunk-12-2.png" target="_blank">e11b282</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-03-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Ok, so I can see the dose response gene expression effects on those
 genes. And also here are the dose response splicing effects for all the
 detected GAGT introns (and passed default leafcutter cluster filters) in

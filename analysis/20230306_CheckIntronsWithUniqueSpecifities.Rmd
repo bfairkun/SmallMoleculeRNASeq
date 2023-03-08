@@ -124,7 +124,7 @@ SpecificEffects <- P1.dat %>%
   filter(abs(log2Ratio)>2) %>%
   filter(!Color == "Non significant") %>%
   separate_rows(gene_names, gene_ids, sep=',') %>%
-  dplyr::select(Color, log2Ratio, gene_names, gene_ids) %>%
+  dplyr::select(Color, log2Ratio, gene_names, gene_ids, junc) %>%
   # filter(gene_names == "HTT") %>%
   arrange(log2Ratio)
 
