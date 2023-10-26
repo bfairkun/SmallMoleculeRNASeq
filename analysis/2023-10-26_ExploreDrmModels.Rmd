@@ -68,6 +68,8 @@ expression.dat <- fread(f_in) %>%
     TRUE ~ dose.nM
   ))
 
+expression.dat %>%
+  distinct(doseInRisdiscale, treatment)
 ```
 
 Plot dose response data for some genes of intrest
@@ -78,9 +80,10 @@ GenesToHighlight <- c("STAT1", "HTT", "MYB",  "TRIM11", "TRAFD1", "VEGFA", "FBXW
 expression.dat %>%
   mutate(treatment = factor(treatment)) %>%
   filter(hgnc_symbol %in% GenesToHighlight) %>%
-  ggplot(aes(x=doseRank, y=log2FC, color=treatment)) +
+  ggplot(aes(x=doseInRisdiscale, y=log2FC, color=treatment)) +
   geom_point() +
   geom_line() +
+  scale_x_continuous(trans="log1p", breaks=c(10000, 1000,  100,  10,  0), labels=c("10K", "1K", "100", "10", "0")) +
   facet_wrap(~hgnc_symbol, scale="free_y")
 ```
 
@@ -106,7 +109,7 @@ for (gene in GenesToHighlight){
     summary(fit.LL.4.Fixed.d)
   },
   error=function(e){
-      cat("ERROR:", gene, " model LL.4 fixed upper limit\n", conditionMessage(e))
+      cat("ERROR:", gene, " model LL.4 fixed upper limit\n", conditionMessage(e), "\n")
     }
   )
 
@@ -123,7 +126,7 @@ for (gene in GenesToHighlight){
     summary(fit.LL.4.Fixed.c)
   },
   error=function(e){
-      cat("ERROR:", gene, " model LL.4 fixed lower limit\n", conditionMessage(e))
+      cat("ERROR:", gene, " model LL.4 fixed lower limit\n", conditionMessage(e), "\n")
     }
   )
   
@@ -140,7 +143,7 @@ for (gene in GenesToHighlight){
     summary(fit.LL.3)
   },
   error=function(e){
-      cat("ERROR:", gene, " model LL.3\n", conditionMessage(e))
+      cat("ERROR:", gene, " model LL.3\n", conditionMessage(e), "\n")
     }
   )
 }
