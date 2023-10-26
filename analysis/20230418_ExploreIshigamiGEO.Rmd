@@ -1,0 +1,82 @@
+---
+title: "ExploreIshigami"
+output: html_document
+date: '2023-04-18'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Intro
+
+Exploring data from [Ishigami](https://www.biorxiv.org/content/10.1101/2022.12.30.522303v1.full.pdf) et al
+
+```{r}
+library(tidyverse)
+library(gplots)
+
+dat.elp1 <- read_csv("../code/Ishigami/GSE221868_elp1_psi.csv.gz")
+dat.smn2 <- read_csv("../code/Ishigami/GSE221868_smn2_psi.csv.gz")
+
+
+dat.exonskipping.RNAseq <- read_csv("../code/Ishigami/GSE221868_exon_skipping.filtered.psi.csv.gz")
+dat.RNAseq <- read_tsv("../code/Ishigami/GSE221868_SE.MATS.JC.txt.gz")
+
+dat.RNAseq %>%
+  filter(!is.na(PValue))
+```
+
+```{r}
+dat.smn2 %>%
+  column_to_rownames("ss") %>%
+  cor(method='s') %>%
+  heatmap.2(trace='none', cexRow=0.5, cexCol=0.5)
+
+dat.elp1 %>%
+  dplyr::select(-elp1_nvs_lib2_rep1) %>%
+  column_to_rownames("ss") %>%
+  cor(method='s', use="pairwise.complete.obs") %>%
+  heatmap.2(trace='none', cexRow=0.5, cexCol=0.5)
+```
+
+Here I was just getting a sense of the MPRA data - the correlation between replicates, treatments... Just based on this I think the elp1 data is really poor quality, and also the lib3 in the smn2 mrpa.
+ Now let's calculate the deltaPSI compared to DMSO
+
+```{r}
+dat.smn2.tidy <- dat.smn2 %>%
+  gather("Sample", "PSI", -ss) %>%
+  separate(Sample, into=c("Minigene", "Treatment", "Lib", "Rep"), sep="_", remove=F)
+
+dat.smn2.DeltaPSI <- inner_join(
+  dat.smn2.tidy %>%
+    filter(Treatment == "dmso") %>%
+    dplyr::select(ss, Lib, Rep, PSI),
+  dat.smn2.tidy %>%
+    filter(!Treatment == "dmso") %>%
+    dplyr::select(ss, Treatment, Lib, Rep, PSI),
+  by=c("ss", "Lib", "Rep"),
+  suffix=c(".DMSO", ".Treatment")
+) %>%
+  mutate(DeltaPSI = PSI.Treatment - PSI.DMSO)
+
+dat.smn2.DeltaPSI %>%
+  mutate(Group = paste(Lib, Rep)) %>%
+  ggplot(aes(x=PSI.DMSO, color=Lib)) +
+  stat_ecdf(aes(group=Group)) +
+  labs(title="Lib changes basal DMSO PSI")
+
+dat.smn2.DeltaPSI %>%
+  group_by(ss, Treatment) %>%
+  summarise(DeltaPSI = mean(DeltaPSI)) %>%
+  mutate(IsGAGT = if_else(str_detect(ss, "^\\w{2}GAGT"), "GAGT", "!GAGT")) %>%
+  ggplot(aes(x=DeltaPSI)) +
+  geom_histogram() +
+  facet_grid(Treatment ~ IsGAGT, scales="free")
+
+
+```
+
+This data is definitely tricky to normalize to properly analyze.
+
+

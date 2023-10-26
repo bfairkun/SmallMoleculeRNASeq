@@ -1,0 +1,148 @@
+---
+title: "2023-10-26_ExploreDrmModels"
+output: html_document
+date: '2023-10-26'
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Load libs
+```{r}
+library(tidyverse)
+library(RColorBrewer)
+library(data.table)
+library(drc)
+library(ggrepel)
+
+theme_set(
+  theme_classic() +
+  theme(text=element_text(size=16,  family="Helvetica")))
+```
+
+## Intro
+
+There are many ways to fit models with `drc::drm`... See [this tutorial](https://rstats4ag.org/dose-response-curves.html)...
+
+I have noticed some funny things, in that depending on exactly how you call the `drm` function, the lower and upper limits estimates are sometimes switched (with corresponding sign change in slope parameter), and sometimes you get wildly different estimates... I kind of know what I am looking for inuitively, and I think I have an idea of how exactly I want to call `drm` to fit dose response curves to gene expression. I'm going to demonstrate some of these nuances here... But first for some terminology.... the 4 parameter log logistic model has for parameters: b, c, d, and e...
+
+- b is the "slope" parameter
+- c is the lower limit parameter. This may correspond to the limit when dose=0, or the limit when dose=Infinity.
+- d is the upper limit parameter. Again, this is just the "other" limit compared to c... The same model can be specificied by swapping c and d, and also changing the sign of b
+- e is the ED50 parameter.
+
+When I fit dose response curves to gene expression, I figured the following details would make the model most useful and easily interpretable:
+
+Response is in units of log2FC relative to DMSO... So I will use the $log2CPM_d - mean(log2CPM_{DMSO})$ as the response metric (where $log2CPM_d$ denotes the log2 CountsPerMillion for a gene at dose $d$). Thus, one of the limit parameters should be fixed at 0. For best modelling, it makes sense to limit parameters when reasonable, so I will also fit each treatment simultaneously such that I can limit the other limit parameter to be the same amongst all 3 treatments. The ED50 and slope parameter can freely vary between treatments, as I want to capture examples like HTT manual/eyeball interpretation of the dose response data looks like the slope is similar between all three treatments, but the ED50 is shifted. And in the HSD17B4 example, the slope looks clearly different between treatments, and the underlying reason makes sense (in that at the splicing level, there are either 2  or 1 poison exons depending on the treatment, and the gene expression response is logically sort of like the complement of the product of the poison exon dose response curves). Also, for simplicity/interpretability, rather than use the actual nanomolar dose for each treatment, I will rescale the doses of branaplam and C2C5 to be in units that are roughly functionally equivalent to the nanomolar dose for risdiplam. For example, since C2C5 is about 10x more potent than risdiplam, I will use 10*nanomolarDose for C2C5.
+
+## Analysis
+
+Below, I will use some example data and show what happens when I try to fit these models different ways. In theory, a lot of these models should converge to the same thing, but for whatever reason they don't.
+
+
+
+```{r}
+f_in <-"../code/DoseResponseData/LCL/TidyExpressionDoseData_logFCTransformedAndAllDMSORepsInEachSeries.txt.gz"
+
+sample_n_of <- function(data, size, ...) {
+  dots <- quos(...)
+
+  group_ids <- data %>%
+    group_by(!!! dots) %>%
+    group_indices()
+
+  sampled_groups <- sample(unique(group_ids), size)
+
+  data %>%
+    filter(group_ids %in% sampled_groups)
+}
+
+expression.dat <- fread(f_in) %>%
+  group_by(treatment) %>%
+  mutate(doseRank = dense_rank(dose.nM)) %>%
+  ungroup() %>%
+  as_tibble() %>%
+  mutate(doseInRisdiscale = case_when(
+    treatment == "C2C5" ~ dose.nM * 10,
+    treatment == "Branaplam" ~ dose.nM * sqrt(10),
+    TRUE ~ dose.nM
+  ))
+
+```
+
+Plot dose response data for some genes of intrest
+
+```{r}
+GenesToHighlight <- c("STAT1", "HTT", "MYB",  "TRIM11", "TRAFD1", "VEGFA", "FBXW11", "HSD17B4")
+
+expression.dat %>%
+  mutate(treatment = factor(treatment)) %>%
+  filter(hgnc_symbol %in% GenesToHighlight) %>%
+  ggplot(aes(x=doseRank, y=log2FC, color=treatment)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~hgnc_symbol, scale="free_y")
+```
+
+Now fit models for each of these in three ways, which should all in effect be identical:
+
+```{r}
+
+for (gene in GenesToHighlight){
+  print("#######################################################################")
+  data <- expression.dat %>%
+    mutate(treatment = factor(treatment)) %>%
+    filter(hgnc_symbol == gene)
+  print(paste("Fitting", gene, "model with LL.4, fix upper limit"))
+  tryCatch(expr={
+    fit.LL.4.Fixed.d <- drm(formula = log2FC ~ doseInRisdiscale,
+                 data = data,
+                 fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"), fixed=c(NA,NA,0,NA)),
+                 curveid = treatment,
+                 pmodels=data.frame(treatment, 1, treatment, treatment),
+                 robust = "mean")
+    message("Successfully fitted model:")
+    plot(fit.LL.4.Fixed.d)
+    summary(fit.LL.4.Fixed.d)
+  },
+  error=function(e){
+      cat("ERROR:", gene, " model LL.4 fixed upper limit\n", conditionMessage(e))
+    }
+  )
+
+  print(paste("Fitting", gene, "model with LL.4, fix lower limit"))
+  tryCatch(expr={
+    fit.LL.4.Fixed.c <- drm(formula = log2FC ~ doseInRisdiscale,
+                 data = data,
+                 fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"), fixed=c(NA,0,NA,NA)),
+                 curveid = treatment,
+                 pmodels=data.frame(treatment, treatment, 1, treatment),
+                 robust = "mean")
+    message("Successfully fitted model.")
+    plot(fit.LL.4.Fixed.c)
+    summary(fit.LL.4.Fixed.c)
+  },
+  error=function(e){
+      cat("ERROR:", gene, " model LL.4 fixed lower limit\n", conditionMessage(e))
+    }
+  )
+  
+  print(paste("Fitting", gene, "model with LL.3"))
+  tryCatch(expr={
+    fit.LL.3 <- drm(formula = log2FC ~ doseInRisdiscale,
+                 data = data,
+                 fct = LL.3(names=c("Steepness", "UpperLimit", "ED50"), fixed=c(NA,NA,NA)),
+                 curveid = treatment,
+                 pmodels=data.frame(treatment, 1, treatment),
+                 robust = "mean")
+    message("Successfully fitted model.")
+    plot(fit.LL.3)
+    summary(fit.LL.3)
+  },
+  error=function(e){
+      cat("ERROR:", gene, " model LL.3\n", conditionMessage(e))
+    }
+  )
+}
+```
+

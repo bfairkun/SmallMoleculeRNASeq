@@ -1,0 +1,34 @@
+---
+title: "20231006_IdentifyCausalSpliceJuncs"
+output: html_document
+date: '2023-10-06'
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Load libs
+```{r}
+library(tidyverse)
+library(RColorBrewer)
+library(data.table)
+library(drc)
+library(ggrepel)
+
+theme_set(
+  theme_classic() +
+  theme(text=element_text(size=16,  family="Helvetica")))
+```
+
+## Intro
+
+Given the previous evidence that there are many cases where risdiplam induces U1 binding without activating 5'ss... I want a way to capture the causal splice isoforms that drive NMD without relying on GA|GU.
+
+
+Here is one approach:
+
+Find junctions with strong/significant dose response where the PSI approaches 100%... Then search for GA|GU motif (not junction) in both strands... First check that I see enrichment on the appropriate strand. Then look at all those examples and think more...
+
+Find genes with negative dose-response. Then find splice juncs with an opposite sign dose-response who deltaPSI value is above some threshold. For this I probably want an interpretable PSI metric (ie where 100% can be interpretted as 100% exon inclusion)... That is, I might start with leafcutter intron excusion ratio (IER) and divide by within-cluster-max.

@@ -1,0 +1,496 @@
+---
+title: "UnbiasedActivatedMotifSearch"
+output: html_document
+date: '2023-10-13'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Load libs
+```{r}
+library(tidyverse)
+library(RColorBrewer)
+library(data.table)
+library(drc)
+library(ggrepel)
+library(Biostrings)
+library(ggseqlogo)
+library(viridis)
+library(ggnewscale)
+
+
+theme_set(
+  theme_classic() +
+  theme(text=element_text(size=16,  family="Helvetica")))
+```
+
+## Intro
+
+I have found in our data that GA|GT introns are activated genome-wide, and to a lesser extent GT|GT introns... And I could also find preferences at the -3 and -4 position that explain differences between risdiplam and branaplam... But these findings were in part made from hypothesis informed by previous literature... The GA|GU bulge repair mechanism was already known. I would like to know if any more exotic bulges or 5'ss motifs can similarly be repaired by risdiplam, even if only by a little since that could serve as the basis to screen for new analogs with different preferences. So I want an unbiased way to process our data for sets of 5'ss that are activated. Thus far I have been defining the 5'ss as the -4 to +7 position, since this is the extent of potential U1::pre-mRNA base pairing with a bulged -1 nucleotide. One approach to finding other things is to look for other 12mer sequences (or clusters of similar 12mers) that are activated. We can gain power by considering sequences together that share sequence similarity (ie considering NNGA|GT instead of AGGA|GT 5'ss), but we need to consider the sequences together in a reasonable way... I want to lump things together only if they share some sequence similarity, and also activation similarity... Basically, I want a way to cluster sequences based on sequence similarity as well as similar functional profiles. I could not find such a method in the literature, but I figure that I could easily implement something basic that could get the job done:
+
+Create a distance matrix for hierachal clustering that is the sum of two distance matrices: 
+
+- A distance matrix based on sequence similarity (e.g., edit distance) between each potential 12mer 5'ss
+- A distnace matrix based on mean activation of the splice site
+
+We may have to scale the two matrices thoughtfully before adding them (e.g., multiplying one of the matrices by a constant scaling factor) to "tune" how strongly to rely on the functional activation metric, versus the sequence similarity metric.
+
+
+Let's explore these ideas with some data:
+
+```{r}
+splicing.dat <- read_tsv("../code/SplicingAnalysis/TidyDoseData.txt.gz")
+
+
+splicing.dat.summarized <- splicing.dat %>%
+  distinct(treatment, junc, .keep_all=T)
+
+DonorSeq.Summarised <- 
+  splicing.dat.summarized %>%
+  filter(treatment == "Risdiplam") %>%
+  group_by(seq) %>%
+  summarise(meanSpearman = mean(spearman, na.rm=T)) %>%
+  ungroup() %>%
+  drop_na() %>%
+  column_to_rownames("seq")
+
+head(DonorSeq.Summarised)
+
+Functional.DistMat.test <- DonorSeq.Summarised %>%
+  head() %>%
+  dist()
+
+
+Functional.DistMat.test
+
+Functional.DistMat.test %>% scale(center=F)
+
+Sequence.DistMat.test <- DonorSeq.Summarised %>%
+  head() %>%
+  rownames() %>%
+  stringDist()
+
+(Functional.DistMat.test*2 + Sequence.DistMat.test) %>%
+  hclust()
+
+
+Clust <- (as.dist(scale(Functional.DistMat.test*2, center=F)) + as.dist(scale(Sequence.DistMat.test, center=F))) %>%
+  hclust()
+
+plot(Clust)
+
+```
+
+```{r}
+
+Functional.DistMat.test
+
+Sequence.DistMat.test
+
+(Functional.DistMat.test*2 + Sequence.DistMat.test) %>%
+  hclust()
+
+(Functional.DistMat.test*2 + Sequence.DistMat.test) %>%
+  hclust()
+
+# (Functional.DistMat.test, center=F)*2 + scale(Sequence.DistMat.test, center=F)) %>%
+#   hclust()
+
+Functional.DistMat.test %>%
+  scale(center=F) %>%
+  hclust()
+
+
+Functional.DistMat.test %>% mean()
+```
+
+Ok that's a toy example that works syntactically... Let's do a more real example with some positive and negative controls: A whole bunch of GA|GT donor sequences, a bunch of AG|GT donor sequences, and a bunch of GT|GT sequences...
+
+In this case, I'll randomly select 200 GA|GT, 200 GT|GT, 200 AG|GT, and 200 other sequences.
+
+Then I'll perform hierachal clustering (using default parameters with `hclust`) using a distnace matrix $D$ to compare the distnace between each 12mer sequence:
+
+$D = (w)D_s + (w-1)D_a$
+
+where $D_a$ is a scaled distance matrix (divide by standard dev) based on the mean activation of each 12mer, $D_s$ is a scaled distance matrix based on the sequence edit distances between each 12mer, and $w$ is a scaling factor that I can tinker with, the relative weight of each matrix before summing. After performing the hiearchial clustering, I will split the observations into $k$ discrete clusters, and try to interpret each cluster.
+
+```{r}
+DonorSeq.Summarised.testSet <- DonorSeq.Summarised %>%
+  rownames_to_column("seq") %>%
+  mutate(IntronClass = case_when(
+    str_detect(seq, "^\\w{2}GAGT") ~ "GAGT",
+    str_detect(seq, "^\\w{2}GTGT") ~ "GTGT",
+    str_detect(seq, "^\\w{2}AGGT") ~ "AGGT",
+    TRUE ~ "Other"
+  )) %>%
+  group_by(IntronClass) %>%
+  sample_n(200) %>%
+  ungroup()
+
+Functional.DistMat.test <- DonorSeq.Summarised.testSet %>%
+  dplyr::select(seq, meanSpearman) %>%
+  column_to_rownames("seq") %>%
+  dist() %>%
+  scale(center=F) %>%
+  as.dist()
+
+Sequence.DistMat.test <- DonorSeq.Summarised.testSet %>%
+  pull(seq) %>%
+  stringDist() %>%
+  scale(center=F) %>%
+  as.dist()
+
+
+w <- 0.5
+Cluster.Results <- ( Functional.DistMat.test*(1-w) + Sequence.DistMat.test*w) %>%
+  hclust()
+
+plot(Cluster.Results)
+
+k_clusters <- cutree(Cluster.Results, 4)
+
+k_clusters %>%
+  as.data.frame() %>%
+  rownames_to_column("seq") %>%
+  dplyr::rename("Cluster"=".") %>%
+  add_count(Cluster) %>%
+  mutate(Cluster = str_glue("Cluster_{Cluster}; n={n}")) %>%
+  separate(seq, into=as.character(c(-4:-1, 1:7)), sep=1:10) %>%
+  gather(key="position", value="nucleotide", -Cluster, -n) %>%
+  mutate(position = factor(position, levels=as.character(c(-4:-1, 1:7)))) %>%
+  ggplot(aes(x=position, fill=nucleotide)) + 
+  scale_y_continuous(expand=c(0,0)) +
+  geom_bar(position="fill") +
+  facet_wrap(~Cluster) +
+  theme_classic() +
+  theme(strip.text.y = element_text(size = 4.2)) +
+  labs(title="Molecule-specific GA|GT 5'splice site preferences", y="Frequency", x="Position relative to 5'ss")
+
+
+data(ggseqlogo_sample)
+
+seqs_dna
+
+PullSeq <- function(df){
+  df %>%
+    pull(seq) %>%
+    return()
+}
+
+dat <- k_clusters %>%
+  as.data.frame() %>%
+  rownames_to_column("seq") %>%
+  dplyr::rename("Cluster"=".") %>%
+  add_count(Cluster) %>%
+  mutate(Cluster = str_glue("Cluster_{Cluster}; n={n}")) %>%
+  dplyr::select(-n) %>%
+  group_by(Cluster) %>%
+  split(f = as.factor(.$Cluster)) %>%
+  lapply(PullSeq)
+
+ggseqlogo(dat)
+
+
+```
+Ok, that's nice results... But how is it influenced by the choice of k, and the scaling constant... 
+
+
+Let's wrap some of this work into a function and systematically repeat with a few different combinations of $k$ and $c$ (scaling constant)...
+
+
+First write a function and test it...
+
+```{r}
+ClusterMotifsByActivationAndSequence <- function(df, SeqColumnName = "seq", ActivationColumnName="meanSpearman", k=4, w=0.5){
+  # bigger w puts more weight on sequence distance 
+  df <- df %>%
+    dplyr::select(SeqColumnName, ActivationColumnName) %>%
+    mutate(rowname = paste(row_number(), seq, sep="_"))
+  D_a <- df %>%
+    column_to_rownames("rowname") %>%
+    dist() %>%
+    scale(center=F) %>%
+    as.dist()
+  D_s <- df %>%
+    pull(SeqColumnName) %>%
+    stringDist() %>%
+    scale(center=F) %>%
+    as.dist()
+  D <- (D_a*(1-w) + D_s*w )
+  k_clusters <- hclust(D) %>% cutree(k) %>%
+    as.data.frame() %>%
+    rownames_to_column("rowname") %>%
+    dplyr::rename("Cluster"=".") %>%
+    add_count(Cluster) %>%
+    mutate(Cluster = str_glue("Cluster_{Cluster}; n={n}")) %>%
+    dplyr::select(-n) %>%
+    left_join(df) %>%
+    separate(rowname, into=c("rownumber", "seq"), sep="_") %>%
+    dplyr::rename("activation"=ActivationColumnName)
+  PlotLogos <- k_clusters %>%
+    dplyr::select(seq, Cluster) %>%
+    group_by(Cluster) %>%
+    split(f = as.factor(.$Cluster)) %>%
+    lapply(PullSeq) %>%
+    ggseqlogo()
+  PlotActivation <- ggplot(k_clusters, aes(group=Cluster, x=activation)) +
+    geom_vline(xintercept = 0, linetype='dashed') +
+    geom_vline(data = . %>%
+                group_by(Cluster) %>%
+                summarise(median = median(activation, na.rm=T)),
+               aes(xintercept=median), color='red') +
+    stat_ecdf() +
+    geom_text(data = . %>%
+                group_by(Cluster) %>%
+                summarise(p = paste0("P:", format.pval(wilcox.test(activation)$p.value))),
+              aes(label=p),
+              x=-Inf,y=Inf, hjust=-0.1, vjust=1.1) +
+    coord_cartesian(xlim=c(-0.5, 0.5)) +
+    facet_wrap(~Cluster) +
+    labs(y='ecdf', x='Activation')
+  PlotCombined <- 
+    bind_rows(
+      k_clusters,
+      k_clusters %>%
+        mutate(Cluster="ALL")
+      ) %>%
+    mutate(seq_group=Cluster) %>%
+    group_by(seq_group) %>%
+    summarise(median = median(activation, na.rm=T),
+              p = format.pval(wilcox.test(activation)$p.value)) %>%
+    mutate(ClippedMedian = case_when(
+      median > 0.5 ~ 0.5,
+      median < -0.5 ~ -0.5,
+      TRUE ~ median
+    )) %>%
+    mutate(RoundedMedian = round(median, 2)) %>%
+    mutate(label = str_glue("P:{p}\nMedian:{RoundedMedian}")) %>%
+    ggplot() +
+    geom_rect(
+      aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill=ClippedMedian),
+      alpha=0.1) +
+    scale_fill_gradient2(name="Median activation", limits=c(-0.5, 0.5), breaks=c(-0.5, -0.25, 0, 0.25, 0.5), labels=c("<-0.5","-0.25", "0","0.25", ">0.5"))  +
+    new_scale_fill() +
+    geom_logo(
+      data =  bind_rows(
+          k_clusters,
+          k_clusters %>%
+            mutate(Cluster="ALL")
+          ) %>%
+        dplyr::select(seq, Cluster) %>%
+        group_by(Cluster) %>%
+        split(f = as.factor(.$Cluster)) %>%
+        lapply(PullSeq)) +
+    geom_text(aes(label=label), x=-Inf,y=Inf, hjust=-0.1, vjust=1.1) +
+    theme_logo() + 
+    facet_wrap(~seq_group, scales='free_x') +
+    labs(fill="Median activation")
+  return(list(D_a=D_a, D_s=D_s, D=D, k_clusters=k_clusters, PlotLogos=PlotLogos, PlotActivation=PlotActivation, PlotCombined=PlotCombined))
+}
+
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=5, w=0.8)
+
+Results$k_clusters
+Results$PlotLogos
+Results$PlotActivation
+Results$PlotCombined
+
+
+```
+
+Now try some different values of w and k
+
+```{r}
+# some different w values
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=4, w=1)
+Results$PlotCombined
+
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=4, w=0.99)
+Results$PlotCombined
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=4, w=0.98)
+Results$PlotCombined
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=4, w=0.95)
+Results$PlotCombined
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=4, w=0.94)
+Results$PlotCombined
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=4, w=0.9)
+Results$PlotCombined
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=4, w=0.85)
+Results$PlotCombined
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=4, w=0)
+Results$PlotCombined
+
+# some different k values
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=5, w=0.8)
+Results$PlotCombined
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=3, w=0.8)
+Results$PlotCombined
+
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=3, w=0.8)
+Results$PlotCombined
+
+```
+
+Thus far I think a w of 0.9-0.98 5 might be best, and i think k just needs to be sufficiently large to not lump too many things.
+
+Now let's more systematically try different values of c and k in combination...
+
+```{r}
+k_TestValues <- c(3,4,5,6)
+w_TestValues <- c(0, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1)
+
+Results <- list()
+for (k in k_TestValues){
+  for (w in w_TestValues){
+    print(paste(w, k))
+    Results[[paste(w,k)]] <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.testSet, k=k, w=w)$k_clusters
+  }
+}
+
+Results <- bind_rows(Results, .id="w_k") %>%
+  separate(w_k, into=c("w", "k"), sep=" ")
+
+Results %>%
+  mutate(Cluster_n= str_replace(Cluster, "^Cluster_(.+?);.+$", "\\1")) %>%
+  group_by(w,k,Cluster_n) %>%
+  summarise(
+            median = median(activation),
+            p = format.pval(wilcox.test(activation)$p.value, 2),
+            n = n()) %>%
+  mutate(label = str_glue("{p};  {n}")) %>%
+  ggplot(aes(x=Cluster_n, y=interaction(w,k), fill=median)) +
+  geom_raster() +
+  geom_text(aes(label=label), size=3) +
+  scale_fill_gradient2(name="Median activation")
+  
+
+Results %>%
+  mutate(Cluster_n= str_replace(Cluster, "^Cluster_(.+?);.+$", "\\1")) %>%
+  group_by(c,k,Cluster_n)
+```
+
+Ok, I'm assuming the brightest spots are the GA|GT groups... I think it's just important to not make k too small, cause in this case it won't even pick up the GA|GT effect, and also to make sure c is between 0.6 to 0.9... Cause 1 and 0 for c seems to also not pick up on GA|GT effect...
+
+## Trying on whole dataset... 
+
+### Trying each motif as average activation...
+
+```{r}
+DonorSeq.Summarised.ForClustering <- DonorSeq.Summarised %>%
+  rownames_to_column("seq") %>%
+  sample_n(3000)
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.ForClustering, k=4, w=0.98)
+Results$PlotCombined
+Results$PlotActivation
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.ForClustering, k=4, w=0.5)
+Results$PlotCombined
+
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.ForClustering, k=5, w=0.98)
+Results$PlotCombined
+Results$PlotActivation
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.ForClustering, k=6, w=0.98)
+Results$PlotCombined
+Results$PlotActivation
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.Summarised.ForClustering, k=7, w=0.98)
+Results$PlotCombined
+Results$PlotActivation
+```
+
+I give up on this idea for now... It's not picking out GA|GT in any obvious way, so there is no hope to pick up lesser signals.
+
+### Trying each 5'ss differently.
+Let's again construct an artificial set for testing... then try on all.
+
+```{r}
+
+DonorSeq.testSet.NonGrouped <- 
+  splicing.dat.summarized %>%
+  filter(treatment == "Risdiplam") %>%
+  dplyr::select(meanSpearman=spearman, seq) %>%
+  mutate(IntronClass = case_when(
+    str_detect(seq, "^\\w{2}GAGT") ~ "GAGT",
+    str_detect(seq, "^\\w{2}GTGT") ~ "GTGT",
+    str_detect(seq, "^\\w{2}AGGT") ~ "AGGT",
+    TRUE ~ "Other"
+  )) %>%
+  group_by(IntronClass) %>%
+  sample_n(400) %>%
+  ungroup()
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.testSet.NonGrouped, k=4, w=1)
+Results$PlotCombined
+
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.testSet.NonGrouped, k=4, w=0.99)
+Results$PlotCombined
+Results$PlotActivation
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.testSet.NonGrouped, k=4, w=0.98)
+Results$PlotCombined
+Results$PlotActivation
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.testSet.NonGrouped, k=4, w=0.95)
+Results$PlotCombined
+Results$PlotActivation
+
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.testSet.NonGrouped, k=4, w=0.94)
+Results$PlotCombined
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.testSet.NonGrouped, k=4, w=0.9)
+Results$PlotCombined
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.testSet.NonGrouped, k=4, w=0.85)
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.testSet.NonGrouped, k=4, w=0)
+Results$PlotCombined
+
+
+```
+
+Let's go with w=0.98 and try with whole dataset...
+
+```{r}
+DonorSeq.FullSet.NonGrouped <- 
+  splicing.dat.summarized %>%
+  filter(treatment == "Risdiplam") %>%
+  dplyr::select(meanSpearman=spearman, seq)
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.FullSet.NonGrouped, k=3, w=0.98)
+Results$PlotCombined
+Results$PlotActivation
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.FullSet.NonGrouped, k=4, w=0.98)
+Results$PlotCombined
+Results$PlotActivation
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.FullSet.NonGrouped, k=5, w=0.98)
+Results$PlotCombined
+Results$PlotActivation
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.FullSet.NonGrouped, k=6, w=0.98)
+Results$PlotCombined
+Results$PlotActivation
+
+Results <- ClusterMotifsByActivationAndSequence(DonorSeq.FullSet.NonGrouped, k=7, w=0.98)
+Results$PlotCombined
+Results$PlotActivation
+```
+

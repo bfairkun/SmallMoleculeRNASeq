@@ -1,0 +1,172 @@
+---
+title: "PCAPlotsForYang"
+output: html_document
+date: '2023-05-02'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+
+## Intro
+
+Yang asked me to make some plots for a grant or something.
+
+```{r}
+library(tidyverse)
+library(RColorBrewer)
+library(data.table)
+
+theme_set(
+  theme_classic() +
+  theme(text=element_text(size=16,  family="Helvetica")))
+```
+
+PCA with experiment of 52, also including dose response data projected
+
+```{r}
+Metadata.ExpOf52 <- read_tsv("../code/config/samples.52MoleculeExperiment.tsv") %>%
+  mutate(cell.type = "LCL", libType="polyA", rep=BioRep, old.sample.name=SampleID, dose.nM=NA) %>%
+  mutate(treatment = if_else(Treatment=="DMSO", "DMSO", paste0("W", Treatment))) %>%
+  dplyr::select(treatment, cell.type, dose.nM, libType, rep, old.sample.name) %>%
+  mutate(SampleName = paste(treatment, dose.nM, cell.type, libType, rep, sep = "_"))
+
+Metadata.PreviousExperiments <- read_tsv("../code/bigwigs/BigwigList.tsv",col_names = c("SampleName", "bigwig", "group", "strand")) %>%
+  filter(strand==".") %>%
+  dplyr::select(-strand) %>%
+  mutate(old.sample.name = str_replace(bigwig, "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw", "\\1")) %>%
+  separate(SampleName, into=c("treatment", "dose.nM", "cell.type", "libType", "rep"), convert=T, remove=F, sep="_") %>%
+  left_join(
+    read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names = c("group", "color", "bed", "supergroup")),
+    by="group"
+  )
+
+FullMetadata <- bind_rows(Metadata.ExpOf52, Metadata.PreviousExperiments) %>%
+  mutate(Experiment = case_when(
+    cell.type == "Fibroblast" ~ "Single high dose fibroblast",
+    startsWith(old.sample.name, "TitrationExp") ~ "Dose response titration",
+    startsWith(old.sample.name, "chRNA") ~ "nascent RNA profiling",
+    startsWith(old.sample.name, "NewMolecule") ~ "Single high dose LCL"
+  )) %>%
+  mutate(color = case_when(
+    treatment == "DMSO" ~ "#969696",
+    Experiment == "Single high dose LCL" ~ "#252525",
+    TRUE ~ color
+  )) %>%
+  mutate(leafcutter.name = str_replace_all(old.sample.name, "-", "."))
+
+
+PSI <- fread("../code/SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numers.bed.gz", sep = '\t' ) %>%
+  dplyr::select(-"NewMolecule.C04.2")
+
+leafcutter.sig <- Sys.glob("../code/SplicingAnalysis/leafcutter/differential_splicing/ExpOf52_*_cluster_significance.txt") %>%
+  setNames(str_replace(., "../code/SplicingAnalysis/leafcutter/differential_splicing/ExpOf52_(.+?)_cluster_significance.txt", "W\\1")) %>%
+  lapply(fread) %>%
+  bind_rows(.id="treatment")
+
+leafcutter.effects <- Sys.glob("../code/SplicingAnalysis/leafcutter/differential_splicing/ExpOf52_*_effect_sizes.txt") %>%
+  setNames(str_replace(., "../code/SplicingAnalysis/leafcutter/differential_splicing/ExpOf52_(.+?)_effect_sizes.txt", "W\\1")) %>%
+  lapply(fread, col.names=c("intron", "logef", "treatment_PSI", "DMSO_PSI", "deltapsi")) %>%
+  bind_rows(.id="treatment") %>%
+  mutate(name = str_replace(intron, "(.+?):(.+?):(.+?):clu.+([+-])", "\\1_\\2_\\3_\\4")) %>%
+  mutate(deltapsi = deltapsi * -1, logef=logef*-1) %>%
+  mutate(cluster = str_replace(intron, "(.+?):.+?:.+?:(clu.+[+-])", "\\1:\\2"))
+
+
+Introns <- fread("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz", col.names = c("name", "seq", "score")) %>%
+  separate(name, into=c("name", "pos"), sep = "::")
+
+Introns.annotations <- fread("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz") %>%
+  mutate(name = paste(chrom, start, end, strand, sep = "_")) %>%
+  left_join(Introns, by="name")
+
+TreatmentColorsForLabels.FibroblastColorsAdded <-
+FullMetadata %>%
+  group_by(treatment) %>%
+  filter(dose.nM == max(dose.nM) | treatment == "DMSO" | cell.type=="Fibroblast") %>%
+  ungroup() %>%
+  distinct(treatment, .keep_all=T) %>%
+  arrange(dose.nM) %>%
+  mutate(vjust=row_number()*1.2)
+
+TreatmentColorsLabels.Layer.FibroblastColorsAdded <- geom_text(
+    data = TreatmentColorsForLabels.FibroblastColorsAdded, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=Inf, hjust=1.05
+  )
+```
+
+```{r}
+IntronsToInclude <- leafcutter.sig %>%
+  filter(p.adjust < 0.1) %>%
+  inner_join(leafcutter.effects, by=c("treatment", "cluster")) %>%
+  filter(logef > 0) %>%
+  distinct(name, .keep_all=T) %>%
+  inner_join(Introns.annotations, by='name') %>%
+  filter(str_detect(seq, "^\\w\\wGAGT")) %>%
+  pull(intron)
+
+PSI.IntronsToInclude <- PSI %>%
+  filter(junc %in% IntronsToInclude) %>%
+  dplyr::select(junc, A10.1:NewMolecule.E07.6) %>%
+  drop_na()
+
+
+SamplesToInclude <- FullMetadata %>%
+  filter(Experiment %in% c("Single high dose LCL")) %>%
+  filter(!old.sample.name == "NewMolecule.C04-2") %>%
+  pull(leafcutter.name)
+
+
+pca.results <- PSI.IntronsToInclude %>%
+  dplyr::select(junc, all_of(SamplesToInclude)) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+
+pca.results.to.plot <- pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="leafcutter.name")
+
+SamplesToProject <- FullMetadata %>%
+  filter(Experiment %in% c("Dose response titration")) %>%
+  filter(!treatment=="C2C5") %>%
+  group_by(treatment) %>%
+  mutate(dose.rank = dense_rank(dose.nM)) %>%
+  # filter(dose.rank < 7) %>%
+  pull(leafcutter.name)
+
+pca.results.to.plot_AdditionProjections <- PSI.IntronsToInclude %>%
+  dplyr::select(junc, all_of(SamplesToProject)) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% predict(pca.results, .) %>%
+  as.data.frame() %>%
+  rownames_to_column("leafcutter.name") %>%
+  dplyr::select(leafcutter.name, PC1:PC6) %>%
+  left_join(FullMetadata, by="leafcutter.name")
+
+TreatmentColorsLabels.Layer <- geom_text(
+    data = TreatmentColorsForLabels.FibroblastColorsAdded %>%
+      filter(treatment %in% c("Risdiplam", "Branaplam", "DMSO")) %>%
+      add_row(treatment = "New molecule", color="black") %>%
+      mutate(order = c(3,2,1,4)) %>%
+      arrange(order) %>%
+      mutate(vjust=row_number()*1.2), 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=-Inf, hjust=0
+  )
+  
+P <- ggplot(pca.results.to.plot, aes(x=PC1, y=PC2, color=color)) +
+  geom_point(size=2) +
+  geom_point(data = pca.results.to.plot_AdditionProjections, size=3) +
+  TreatmentColorsLabels.Layer +
+  scale_color_identity() +
+  theme_classic()
+P
+
+ggsave("../code/scratch/PCA_ForYang_WithHighDoses.pdf", height=3, width=3)
+```
+

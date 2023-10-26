@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Session genome="hg38" locus="chr6:106307985-106309069" nextAutoscaleGroup="10" version="8">
+    <Resources>
+        <Resource path="../code/DonorMotifSearches/DonorHits.fimo.bed.gz" type="bed"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpBran-5.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpRis-6.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpDMSO-1.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_17.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpRis-1.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_21.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_20.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpBran-6.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpRis-7.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_1.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_13.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpDMSO-2.bw" type="bw"/>
+        <Resource path="SperamanCoeffs.MaxJuncForEach.GAGTDonors.bed" type="bed"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpRis-8.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_2.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpBran-7.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_18.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_14.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_10.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpRis-4.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpBran-3.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_19.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpDMSO-3.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpBran-2.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpRis-3.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_3.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_15.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpBran-8.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpRis-5.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_16.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_11.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpBran-4.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpBran-1.bw" type="bw"/>
+        <Resource path="../code/bigwigs/unstranded/TitrationExpRis-2.bw" type="bw"/>
+        <Resource path="../code/Branaplam_Risdiplam_specific_introns.bed.gz" type="bed"/>
+        <Resource path="../code/bigwigs/unstranded/chRNA_12.bw" type="bw"/>
+    </Resources>
+    <Panel height="174" name="DataPanel" width="1349">
+        <Track attributeKey="Refseq Genes" clazz="org.broad.igv.track.FeatureTrack" fontSize="10" groupByStrand="false" id="https://s3.amazonaws.com/igv.org.genomes/hg38/ncbiRefSeq.txt.gz" name="Refseq Genes" visible="true"/>
+        <Track attributeKey="Reference sequence" clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" sequenceTranslationStrandValue="POSITIVE" shouldShowTranslation="false" visible="true"/>
+        <Track attributeKey="Branaplam_Risdiplam_specific_introns.bed.gz" clazz="org.broad.igv.track.FeatureTrack" featureVisibilityWindow="2147483647" fontSize="10" groupByStrand="false" id="/Volumes/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/Branaplam_Risdiplam_specific_introns.bed.gz" name="GA|GU induced juncs" visible="true"/>
+        <Track altColor="255,0,51" attributeKey="DonorHits.fimo.bed.gz" clazz="org.broad.igv.track.FeatureTrack" featureVisibilityWindow="16900707" fontSize="10" groupByStrand="false" id="/Volumes/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/DonorMotifSearches/DonorHits.fimo.bed.gz" name="GA|GU Donor motifs (red for minus)" visible="true"/>
+        <Track attributeKey="SperamanCoeffs.MaxJuncForEach.GAGTDonors.bed" clazz="org.broad.igv.track.FeatureTrack" fontSize="10" groupByStrand="false" id="/Volumes/project2/yangili1/bjf79/20211209_JingxinRNAseq/output/SperamanCoeffs.MaxJuncForEach.GAGTDonors.bed" name="All GA|GU donors (with spearman)" visible="true"/>
+    </Panel>
+    <Panel height="365" name="FeaturePanel" width="1349">
+        <Track attributeKey="Overlay" autoScale="false" autoscaleGroup="8" clazz="org.broad.igv.track.MergedTracks" fontSize="10" height="180" id="7f63fabd-d30f-4794-b2c5-2ef81306edae" name="steady state: 8 doses" visible="true">
+            <Track altColor="150,150,150" attributeKey="" autoScale="false" autoscaleGroup="8" color="150,150,150" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpDMSO-1.bw" name="DMSO_NA_LCL_polyA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="150,150,150" attributeKey="" autoScale="false" autoscaleGroup="8" color="150,150,150" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpDMSO-2.bw" name="DMSO_NA_LCL_polyA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="150,150,150" attributeKey="" autoScale="false" autoscaleGroup="8" color="150,150,150" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpDMSO-3.bw" name="DMSO_NA_LCL_polyA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="247,252,245" attributeKey="" autoScale="false" autoscaleGroup="8" color="247,252,245" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpBran-8.bw" name="Branaplam_1_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="229,245,224" attributeKey="" autoScale="false" autoscaleGroup="8" color="229,245,224" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpBran-7.bw" name="Branaplam_3.16_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="199,233,192" attributeKey="" autoScale="false" autoscaleGroup="8" color="199,233,192" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpBran-6.bw" name="Branaplam_10_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="161,217,155" attributeKey="" autoScale="false" autoscaleGroup="8" color="161,217,155" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpBran-5.bw" name="Branaplam_31.6_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="116,196,118" attributeKey="" autoScale="false" autoscaleGroup="8" color="116,196,118" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpBran-4.bw" name="Branaplam_100_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="65,171,93" attributeKey="" autoScale="false" autoscaleGroup="8" color="65,171,93" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpBran-3.bw" name="Branaplam_316_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="35,139,69" attributeKey="" autoScale="false" autoscaleGroup="8" color="35,139,69" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpBran-2.bw" name="Branaplam_1000_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="0,90,50" attributeKey="" autoScale="false" autoscaleGroup="8" color="0,90,50" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpBran-1.bw" name="Branaplam_3160_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="247,251,255" attributeKey="" autoScale="false" autoscaleGroup="8" color="247,251,255" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpRis-8.bw" name="Risdiplam_3.16_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="222,235,247" attributeKey="" autoScale="false" autoscaleGroup="8" color="222,235,247" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpRis-7.bw" name="Risdiplam_10_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="198,219,239" attributeKey="" autoScale="false" autoscaleGroup="8" color="198,219,239" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpRis-6.bw" name="Risdiplam_31.6_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="158,202,225" attributeKey="" autoScale="false" autoscaleGroup="8" color="158,202,225" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpRis-5.bw" name="Risdiplam_100_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="107,174,214" attributeKey="" autoScale="false" autoscaleGroup="8" color="107,174,214" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpRis-4.bw" name="Risdiplam_316_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="66,146,198" attributeKey="" autoScale="false" autoscaleGroup="8" color="66,146,198" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpRis-3.bw" name="Risdiplam_1000_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="33,113,181" attributeKey="" autoScale="false" autoscaleGroup="8" color="33,113,181" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpRis-2.bw" name="Risdiplam_3160_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="8,69,148" attributeKey="" autoScale="false" autoscaleGroup="8" color="8,69,148" fontSize="10" height="15" id="bigwigs/unstranded/TitrationExpRis-1.bw" name="Risdiplam_10000_LCL_polyA_u  (1) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="756.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track attributeKey="Overlay" autoScale="false" autoscaleGroup="7" clazz="org.broad.igv.track.MergedTracks" fontSize="10" height="180" id="06408862-eb3d-4251-93c2-8b90ade79046" name="naRNA: DMSO, low, high" visible="true">
+            <Track altColor="150,150,150" attributeKey="" autoScale="false" autoscaleGroup="7" color="150,150,150" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_1.bw" name="DMSO_NA_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="150,150,150" attributeKey="" autoScale="false" autoscaleGroup="7" color="150,150,150" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_2.bw" name="DMSO_NA_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="150,150,150" attributeKey="" autoScale="false" autoscaleGroup="7" color="150,150,150" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_3.bw" name="DMSO_NA_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="161,217,155" attributeKey="" autoScale="false" autoscaleGroup="7" color="161,217,155" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_19.bw" name="Branaplam_31.6_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="161,217,155" attributeKey="" autoScale="false" autoscaleGroup="7" color="161,217,155" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_20.bw" name="Branaplam_31.6_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="161,217,155" attributeKey="" autoScale="false" autoscaleGroup="7" color="161,217,155" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_21.bw" name="Branaplam_31.6_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="35,139,69" attributeKey="" autoScale="false" autoscaleGroup="7" color="35,139,69" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_16.bw" name="Branaplam_1000_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="35,139,69" attributeKey="" autoScale="false" autoscaleGroup="7" color="35,139,69" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_17.bw" name="Branaplam_1000_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="35,139,69" attributeKey="" autoScale="false" autoscaleGroup="7" color="35,139,69" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_18.bw" name="Branaplam_1000_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="158,202,225" attributeKey="" autoScale="false" autoscaleGroup="7" color="158,202,225" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_13.bw" name="Risdiplam_100_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="158,202,225" attributeKey="" autoScale="false" autoscaleGroup="7" color="158,202,225" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_14.bw" name="Risdiplam_100_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="158,202,225" attributeKey="" autoScale="false" autoscaleGroup="7" color="158,202,225" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_15.bw" name="Risdiplam_100_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="33,113,181" attributeKey="" autoScale="false" autoscaleGroup="7" color="33,113,181" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_10.bw" name="Risdiplam_3160_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="33,113,181" attributeKey="" autoScale="false" autoscaleGroup="7" color="33,113,181" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_11.bw" name="Risdiplam_3160_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <Track altColor="33,113,181" attributeKey="" autoScale="false" autoscaleGroup="7" color="33,113,181" fontSize="10" height="15" id="bigwigs/unstranded/chRNA_12.bw" name="Risdiplam_3160_LCL_chRNA_u  (3) ." renderer="LINE_PLOT" visible="true" windowFunction="mean"/>
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="1772.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+    </Panel>
+    <PanelLayout dividerFractions="0.29523809523809524"/>
+    <HiddenAttributes>
+        <Attribute name="DATA FILE"/>
+        <Attribute name="DATA TYPE"/>
+        <Attribute name="NAME"/>
+    </HiddenAttributes>
+</Session>

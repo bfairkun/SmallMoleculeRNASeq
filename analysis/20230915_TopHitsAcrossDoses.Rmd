@@ -1,0 +1,607 @@
+---
+title: "TopHitsAcrossDoses"
+output: html_document
+date: '2023-09-15'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+## Load libs
+```{r}
+library(tidyverse)
+library(RColorBrewer)
+library(data.table)
+library(drc)
+library(ggrepel)
+
+theme_set(
+  theme_classic() +
+  theme(text=element_text(size=16,  family="Helvetica")))
+```
+
+## Intro
+
+a recurring question about these experiments is to what the top hits change upon different doses of risdiplam/branaplam. We have data to answer this, but presenting the data in a way that gives a good intuition is tricky. here ill explore some plots with this in mind...
+
+First thing that comes to mind is to plot dose-response curves for a bunch of genes on the same plot, but have the y-axis be log2FC relative to DMSO (rather than log2CPM), with the line fit forced to start at 0, then look for intersections between the various genewise dose response curves... in other words, is there a dose where geneA has a larger log2FC than geneB, and also a dose where the opposite is true, necessitating that the curves intersect.
+
+(use `fixed=c(NA, 0, NA, NA)`) paramter in `drm`
+
+The more detailed approach: pre-process data so all values are on log2FC scale, relative to the DMSO mean set at 0. Fit model, fixing the left limit (at DMSO; dose=0 set to log2FC=0). Unfortunately, I think you can only set a lower limit or an upper limit, not a left limit. So one solution is to just fit a model, without fixing any parameters, and then in a second pass refit the model, fixing either the lower or upper limit depending on the sign of the slope parameter to determine which limit (lower or upper) corresponds to the left. I will simulatenously fit models for all three drugs (risdiplam, branaplam, C2C5). For exploratory purposes, I think i should implement this both with and without constraining the slope parameter to be the same between drugs. Before going into all this model fitting... Let's just manually investigate the dose response curves for a bunch of genes.
+
+```{r}
+Expression.tidy <- read_tsv("../code/DoseResponseData/LCL/TidyExpressionDoseData.txt.gz") %>%
+  group_by(treatment) %>%
+  mutate(doseRank = dense_rank(dose.nM)) %>%
+  ungroup()
+
+Symbols <- read_tsv("../data/Genes.list.txt")
+
+Expression.tidy %>%
+  distinct(dose.nM, treatment, old.sample.name)
+
+sample.list <- read_tsv("../code/bigwigs/BigwigList.tsv",
+                        col_names = c("SampleName", "bigwig", "group", "strand")) %>%
+  filter(strand==".") %>%
+  dplyr::select(-strand) %>%
+  mutate(old.sample.name = str_replace(bigwig, "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw", "\\1")) %>%
+  separate(SampleName, into=c("treatment", "dose.nM", "cell.type", "libType", "rep"), convert=T, remove=F, sep="_") %>%
+  left_join(
+    read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names = c("group", "color", "bed", "supergroup")),
+    by="group"
+  )
+```
+
+
+Quick something for Carlos to upload to GEO
+```{r}
+
+
+MetadataForCarlos <- bind_rows(
+  read_tsv("../code/config/samples.chRNAPilotSequencing.tsv"),
+  read_tsv("../code/config/samples.titrationseries.tsv")) %>%
+  inner_join(
+    sample.list %>%
+    filter(treatment %in% c("Risdiplam", "DMSO")) %>%
+    filter(cell.type == "LCL") %>%
+    # filter(libType == "polyA") %>%
+    dplyr::select(sample = old.sample.name, dose.nM, treatment,libType)
+  )
+
+MetadataForCarlos %>%
+  write_tsv("../code/scratch/MetadataForFastqForCarlos.tsv")
+
+```
+
+```{r}
+DMSO.samples <- 
+  Expression.tidy %>%
+  filter(dose.nM == 0)
+
+DMSO.samples.tidy <- bind_rows(
+  DMSO.samples %>%
+    mutate(treatment = "C2C5"),
+  DMSO.samples %>%
+    mutate(treatment = "Branaplam"),
+  DMSO.samples %>%
+    mutate(treatment = "Risdiplam")
+)
+
+DMSO.samples$CPM %>% hist()
+
+DMSO.samples$CPM %>% log2() %>% hist()
+
+GenesToKeep <- DMSO.samples %>%
+  mutate(log2CPM = log2(CPM)) %>%
+  group_by(Geneid) %>%
+  filter(all(CPM)>0) %>%
+  summarise(Mean = mean(log2CPM)) %>%
+  filter(Mean > 1)
+
+Log2FC.tidy <-
+  bind_rows(
+    DMSO.samples.tidy,
+    Expression.tidy %>%
+      filter(!dose.nM == 0)) %>%
+  filter(Geneid %in% GenesToKeep$Geneid) %>%
+  mutate(log2CPM = log2(CPM+1E-6)) %>%
+  inner_join(
+    GenesToKeep
+  ) %>%
+  mutate(log2FC = log2CPM - Mean) %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+)\\..+$", "\\1")) %>%
+  left_join(Symbols)
+
+  
+Expression.tidy$libType %>% unique()
+
+GenesToHighlight <- c("FOXM1", "STAT1", "HTT", "GALC", "ATG5", "MYB", "SOS2", "PIEZO2", "ANXA11", "CRYL1", "MLLT10", "DENND5A", "CNG4A", "FHOD3", "PDXDC1", "ZCCHC8", "HSD17B4")
+
+Log2FC.tidy %>%
+  filter(hgnc_symbol %in% GenesToHighlight) %>%
+  group_by(Geneid, treatment) %>%
+  mutate(TopDose = dose.nM == max(dose.nM)) %>%
+  ungroup() %>%
+  ggplot(aes(x=doseRank, y=log2FC, color=hgnc_symbol)) +
+  geom_line() +
+  geom_text( data = . %>%
+               filter(TopDose),
+             aes(label=hgnc_symbol), x=Inf, hjust=1
+               ) +
+  facet_wrap(~treatment, ncol = 1, scales="free_x")
+
+
+Log2FC.tidy %>%
+  filter(hgnc_symbol %in% GenesToHighlight) %>%
+  group_by(Geneid, treatment) %>%
+  mutate(TopDose = dose.nM == max(dose.nM)) %>%
+  ungroup() %>%
+  ggplot(aes(x=dose.nM, y=log2FC, color=hgnc_symbol)) +
+  geom_line() +
+  geom_text( data = . %>%
+               filter(TopDose),
+             aes(label=hgnc_symbol), x=Inf, hjust=1
+               ) +
+  scale_x_continuous(trans='log10', expand=c(0, 0.1)) +
+  facet_wrap(~treatment, ncol = 1, scales="free_x")
+
+```
+
+Let's actually plot as scatter at a low dose (roughly approximating clinical doses, or the doses used in the experiment of 52), versus some relevant high dose (like the dose used in the 'high dose' naRNA experiments)
+
+```{r}
+
+doseRanksToHighlight <- c(4,7)
+
+Log2FC.tidy %>%
+  filter(hgnc_symbol %in% GenesToHighlight) %>%
+  group_by(Geneid, treatment) %>%
+  mutate(TopDose = dose.nM == max(dose.nM)) %>%
+  ungroup() %>%
+  filter(doseRank %in% doseRanksToHighlight) %>%
+  pivot_wider(names_from = "doseRank", values_from="log2FC", id_cols = c("hgnc_symbol", "Geneid", "treatment")) %>%
+  ggplot(aes(x=`7`, y=`4`, label=hgnc_symbol)) +
+  geom_point() +
+  geom_text_repel() +
+  facet_wrap(~treatment, scales="free") +
+  labs(x="very high dose", y="low (roughly clinical) dose", title="log2FC for select genes")
+
+
+Log2FC.tidy %>%
+  # filter(hgnc_symbol %in% GenesToHighlight) %>%
+  group_by(Geneid, treatment) %>%
+  mutate(TopDose = dose.nM == max(dose.nM)) %>%
+  ungroup() %>%
+  filter(doseRank %in% doseRanksToHighlight) %>%
+  pivot_wider(names_from = "doseRank", values_from="log2FC", id_cols = c("hgnc_symbol", "Geneid", "treatment")) %>%
+  mutate(IsGeneOfInterest = hgnc_symbol %in% GenesToHighlight) %>%
+  ggplot(aes(x=`7`, y=`4`)) +
+  geom_point(alpha=0.1) +
+  geom_point(data = . %>%
+               filter(IsGeneOfInterest),
+             color='red') +
+  facet_wrap(~treatment) +
+  labs(x="very high dose", y="low (roughly clinical) dose", title="log2FC for all genes")
+
+```
+Plotting data from fit models would probably 'de-noise' these plots a bit, but even so my conclusion from these is that the correlation between low dose and high dose (for the subset of high confidence direct targets that I highlighted) is decent, such that imo what we learn at high dose will apply to low doses and we should do most subsequent experiments at high doses, at least until we are close to a suitable 'lead' compount with a target in mind and what might have stronger concerns about off-target toxicity at high dose.
+
+I don't think it's even worth my time to go through repeating this process from fitted models, since I have already come to the conclusion with this less-conservative approach.
+
+
+```{r}
+#Model genes
+PointsToPredict <- Log2FC.tidy %>%
+  distinct(doseRank, dose.nM, treatment) %>%
+  filter(doseRank %in% doseRanksToHighlight) %>%
+  mutate(treatment = factor(treatment)) %>%
+  dplyr::select(dose.nM, treatment) %>%
+  as.data.frame()
+
+
+model.dat.df.CPM.StandardNormFactors <- Log2FC.tidy %>%
+  mutate(treatment = factor(treatment)) %>%
+  filter(hgnc_symbol %in% GenesToHighlight) %>%
+  nest(data=-c("Geneid"))
+
+fit <- model.dat.df.CPM.StandardNormFactors %>%
+  filter(Geneid == "ENSG00000184014.8") %>%
+  unnest() %>%
+  drm(formula = log2FC ~ dose.nM,
+                  data = .,
+                  fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"), fixed=c(NA,NA,0,NA)),
+                  curveid = treatment,
+                  pmodels=data.frame(treatment, 1, 1, treatment),
+                  robust="mean")
+
+predict(fit, data.frame(dose.nM=c(0, 100, 100, 0, 100, 1000), treatment=c("Branaplam","Branaplam","Branaplam", "Risdiplam","Risdiplam","Risdiplam")))
+
+Results <- list()
+Results.models <- list()
+for(i in 1:nrow(model.dat.df.CPM.StandardNormFactors)) {
+# for(i in 1:100) {
+  tryCatch(
+    expr = {
+      Geneid <- model.dat.df.CPM.StandardNormFactors$Geneid[i]
+      data <- model.dat.df.CPM.StandardNormFactors$data[i] %>% as.data.frame()
+      fit <- drm(formula = log2FC ~ dose.nM,
+                  data = data,
+                  fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"), fixed=c(NA,NA,0,NA)),
+                  curveid = treatment,
+                  # pmodels=data.frame(1, 1, treatment, treatment),
+                  pmodels=data.frame(treatment, 1, treatment, treatment),
+                  robust = "mean"
+                  )
+      df.out <-
+        bind_rows(
+        #   coef(summary(fit)) %>%
+        #     as.data.frame() %>%
+        #     rownames_to_column("param") %>%
+        #     dplyr::select(param, Estimate, SE=`Std. Error`),
+          predict(fit, PointsToPredict, se.fit = T) %>%
+            as.data.frame() %>%
+            dplyr::rename("Estimate"="Prediction") %>%
+            cbind(PointsToPredict)
+        )
+      # print(df.out)
+      Results[[Geneid]] <- df.out
+      Results.models[[Geneid]] <- fit
+      message("Successfully fitted model.")
+    },
+    error=function(e){
+      if (i < 100){
+        cat("ERROR :",conditionMessage(e), Geneid, "\n")
+      }
+      })
+}
+
+lseq <- function(from=1, to=100000, length.out=6) {
+  # logarithmic spaced sequence
+  # blatantly stolen from library("emdbook"), because need only this
+  exp(seq(log(from), log(to), length.out = length.out))
+}
+
+PointsToPlot <- Log2FC.tidy %>%
+  distinct(doseRank, dose.nM, treatment) %>%
+  filter(doseRank %in% c(2, 9)) %>%
+  group_by(treatment) %>%
+  complete(dose.nM = lseq(from=min(dose.nM), to=max(dose.nM), length.out=100)) %>%
+  # filter(!dose.nM == max(dose.nM) ) %>%
+  ungroup() %>%
+  mutate(treatment = factor(treatment)) %>%
+  dplyr::select(dose.nM, treatment) %>%
+  as.data.frame()
+
+hist(log10(PointsToPlot$dose.nM))
+hist(log10(PointsToPredict$dose.nM))
+
+
+GetPredictions <- function(fit, Points){
+  predict(fit, Points, se.fit = T) %>%
+            as.data.frame() %>%
+            dplyr::rename("Estimate"="Prediction") %>%
+            cbind(Points) %>%
+    return()
+}
+
+
+
+
+PointsToPredict
+predict(fit, PointsToPlot)
+predict(fit, data.frame(dose.nM=c(0.1123, 1, 10, 1000, 0.1), treatment=c("Risdiplam", "Risdiplam", "Risdiplam", "Risdiplam", "Risdiplam")))
+predict(fit, PointsToPlot %>%
+          filter(treatment == "Risdiplam"))
+
+
+ModelFits.Coefficients <- bind_rows(Results, .id="Geneid")
+
+ModelFits.Coefficients %>%
+  group_by(treatment) %>%
+  mutate(doseRank = dense_rank(dose.nM)) %>%
+  pivot_wider(names_from = "doseRank", values_from="Estimate", id_cols = c("Geneid", "treatment")) %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+)\\..+$", "\\1")) %>%
+  left_join(Symbols) %>%
+  ggplot(aes(x=`2`, y=`1`, label=hgnc_symbol)) +
+  geom_point() +
+  geom_text_repel() +
+  facet_wrap(~treatment, scales="free") +
+  labs(x="very high dose", y="low (roughly clinical) dose", title="log2FC for select genes, from fit model")
+
+
+lapply(Results.models, GetPredictions, PointsToPlot ) %>%
+  bind_rows(.id="Geneid") %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+)\\..+$", "\\1")) %>%
+  left_join(Symbols) %>%
+  group_by(treatment) %>%
+  mutate(TopDose = dose.nM == max(dose.nM)) %>%
+  ungroup() %>%
+  dplyr::rename(log2FC=Estimate) %>%
+  ggplot(aes(x=dose.nM, y=log2FC, color=hgnc_symbol)) +
+  geom_line() +
+  geom_line(
+    data = Log2FC.tidy %>%
+      filter(hgnc_symbol %in% GenesToHighlight),
+    linetype="dashed"
+  ) +
+  geom_text( data = . %>%
+               filter(TopDose),
+             aes(label=hgnc_symbol), hjust=0
+               ) +
+  scale_x_continuous(trans="log1p", breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), expand=c(0,1)) +
+  facet_wrap(~treatment, scales="free") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  labs(caption="Model fit (solid) and real data (dashed)", x="[Concentration] (nM)")
+
+
+
+```
+
+Replot, just risdiplam facet for lab meeting...
+
+```{r}
+ModelFits.Coefficients %>%
+  group_by(treatment) %>%
+  mutate(doseRank = dense_rank(dose.nM)) %>%
+  pivot_wider(names_from = "doseRank", values_from="Estimate", id_cols = c("Geneid", "treatment")) %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+)\\..+$", "\\1")) %>%
+  left_join(Symbols) %>%
+  filter(treatment == "Risdiplam") %>%
+  ggplot(aes(x=`2`, y=`1`, label=hgnc_symbol)) +
+  geom_point() +
+  geom_text_repel() +
+  labs(x="1000nM Risdiplam\n(log2FC)", y="31nM Risdiplam\n(log2FC)")
+
+ModelFits.Coefficients %>%
+  group_by(treatment) %>%
+  mutate(doseRank = dense_rank(dose.nM)) %>%
+  pivot_wider(names_from = "doseRank", values_from="Estimate", id_cols = c("Geneid", "treatment")) %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+)\\..+$", "\\1")) %>%
+  left_join(Symbols) %>%
+  filter(treatment == "Risdiplam") %>%
+  cor.test(~`2`+`1`, data=., method='s')
+```
+
+
+Replot dose response for HTT and STAT1 for risdiplam and branaplam for lab meeting:
+
+```{r}
+lapply(Results.models, GetPredictions, PointsToPlot ) %>%
+  bind_rows(.id="Geneid") %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+)\\..+$", "\\1")) %>%
+  left_join(Symbols) %>%
+  group_by(treatment) %>%
+  mutate(TopDose = dose.nM == max(dose.nM)) %>%
+  ungroup() %>%
+  filter(treatment %in% c("Risdiplam", "Branaplam")) %>%
+  filter(hgnc_symbol %in% c("STAT1", "FHOD3", "HSD17B4")) %>%
+  dplyr::rename(log2FC=Estimate) %>%
+  ggplot(aes(x=dose.nM, y=log2FC, color=hgnc_symbol)) +
+  geom_line() +
+  geom_line(
+    data = Log2FC.tidy %>%
+      filter(treatment %in% c("Risdiplam", "Branaplam")) %>%
+      filter(hgnc_symbol %in% c("STAT1", "FHOD3", "HSD17B4")),
+  linetype="dashed"
+  ) +
+  geom_text( data = . %>%
+               filter(TopDose),
+             aes(label=hgnc_symbol), hjust=0
+               ) +
+  scale_x_continuous(trans="log1p", breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), expand = expansion(mult = c(0, .30))) +
+  facet_wrap(~treatment, scales="free") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  labs(caption="Model fit (solid) and real data (dashed)", x="[Concentration] (nM)")
+
+
+lapply(Results.models, GetPredictions, PointsToPlot ) %>%
+  bind_rows(.id="Geneid") %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+)\\..+$", "\\1")) %>%
+  left_join(Symbols) %>%
+  group_by(treatment) %>%
+  mutate(TopDose = dose.nM == max(dose.nM)) %>%
+  ungroup() %>%
+  filter(treatment %in% c("Risdiplam", "Branaplam")) %>%
+  filter(hgnc_symbol %in% c("STAT1", "FHOD3", "HSD17B4")) %>%
+  mutate(hgnc_symbol = factor(hgnc_symbol, levels=c("STAT1", "FHOD3", "HSD17B4"))) %>%
+  dplyr::rename(log2FC=Estimate) %>%
+  mutate(doseInRisdiscale = case_when(
+    treatment == "C2C5" ~ dose.nM * 10,
+    treatment == "Branaplam" ~ dose.nM * sqrt(10),
+    TRUE ~ dose.nM
+  )) %>%
+  ggplot(aes(x=doseInRisdiscale, y=log2FC, color=treatment)) +
+  geom_line() +
+  geom_line(
+    data = Log2FC.tidy %>%
+      filter(treatment %in% c("Risdiplam", "Branaplam")) %>%
+      filter(hgnc_symbol %in% c("STAT1", "FHOD3", "HSD17B4")) %>%
+      mutate(hgnc_symbol = factor(hgnc_symbol, levels=c("STAT1", "FHOD3", "HSD17B4"))) %>%
+      mutate(doseInRisdiscale = case_when(
+        treatment == "C2C5" ~ dose.nM * 10,
+        treatment == "Branaplam" ~ dose.nM * sqrt(10),
+        TRUE ~ dose.nM
+      )),
+  linetype="dashed"
+  ) +
+  scale_x_continuous(trans="log1p", breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~hgnc_symbol, scales="free") +
+  scale_color_manual(values=c("Branaplam"="#005A32", "Risdiplam"="#084594")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  labs(caption="Model fit (solid) and real data (dashed)", x="dose\n(equivalent to Risdiplam nM)", y="Gene expression response\nlog2FC")
+  
+```
+
+HSD17B is another example, because the slope and (maybe the limit) are different... Branaplam has a single poison exon.. Risdiplam has two good poison exons.
+
+Maybe a more relevant question is to look at the branaplam vs risdiplam effects, and how those differ at different doses...
+
+```{r}
+lapply(Results.models, GetPredictions, PointsToPlot ) %>%
+  bind_rows(.id="Geneid") %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+)\\..+$", "\\1")) %>%
+  left_join(Symbols) %>%
+  group_by(treatment) %>%
+  mutate(TopDose = dose.nM == max(dose.nM)) %>%
+  ungroup() %>%
+  dplyr::rename(log2FC=Estimate) %>%
+  dplyr::select(-SE) %>%
+  filter(treatment %in% c("Branaplam", "Risdiplam")) %>% 
+  group_by(treatment) %>%
+  mutate(doseRank = dense_rank(dose.nM)) %>%
+  ungroup() %>%
+  pivot_wider(names_from="treatment", values_from = "log2FC", id_cols = c("doseRank", "Geneid", "hgnc_symbol")) %>%
+  mutate(Diff = Branaplam - Risdiplam) %>%
+  drop_na() %>%
+  ggplot(aes(x=doseRank, y=Diff, color=hgnc_symbol)) +
+  geom_line() +
+  geom_text( data = . %>%
+               filter(doseRank == max(doseRank)),
+             aes(label=hgnc_symbol), hjust=0
+               ) +
+  scale_x_continuous(expand=c(0,10)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  labs(caption="Branaplam/Risdiplam", x="log[Concentration] (au)", y="Predicted log2 Branaplam/Risdiplam")
+```
+
+Ok, so because different genes saturate their effect at different doses, there is no one optimal dose for distinguishing branaplam from risdiplam effects, with the caveat that there is more affected genes at high doses.
+
+I like this plot... i'm going to repeat some of these analysis for all risdiplam/branaplam/c2c5 affected genes with identifiable cryptic GAGU splice site.
+
+I think the way to go about this will be to include a script in the snakemake that makes all these models and saves them as a R object (RDS) file for future processing.
+
+## Compare to fibroblast DE
+
+```{r}
+SM2.DE <- read_tsv("../code/DE_testing/Results.txt.gz") %>%
+  filter(treatment == "SM2") %>%
+  separate(Geneid, into=c("EnsemblID", "symbol"), sep="_")
+
+ModelFits.Coefficients %>%
+  group_by(treatment) %>%
+  mutate(doseRank = dense_rank(dose.nM)) %>%
+  ungroup() %>%
+  pivot_wider(names_from = "doseRank", values_from="Estimate", id_cols = c("Geneid", "treatment")) %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+)\\..+$", "\\1")) %>%
+  left_join(Symbols) %>%
+  filter(treatment == "Branaplam") %>%
+  dplyr::select(HighDose = `2`, symbol=hgnc_symbol) %>%
+  left_join(SM2.DE) %>%
+  # filter(FDR<0.1) %>%
+  ggplot(aes(x=logFC, y=HighDose)) +
+  geom_point() +
+  geom_text_repel(aes(label=symbol)) +
+  geom_abline() +
+  labs(x="SM2 Effect in fibroblast\n(log2FC)", y="Branaplam effect in LCLs\n(log2FC)")
+
+ModelFits.Coefficients %>%
+  group_by(treatment) %>%
+  mutate(doseRank = dense_rank(dose.nM)) %>%
+  ungroup() %>%
+  pivot_wider(names_from = "doseRank", values_from="Estimate", id_cols = c("Geneid", "treatment")) %>%
+  mutate(ensembl_gene_id = str_replace(Geneid, "^(.+)\\..+$", "\\1")) %>%
+  left_join(Symbols) %>%
+  filter(treatment == "Branaplam") %>%
+  dplyr::select(HighDose = `2`, symbol=hgnc_symbol) %>%
+  left_join(SM2.DE) %>%
+  cor.test(~ logFC + HighDose, data=., method='s')
+```
+For lab meeting. break down dose response for two genes:
+HTT and STAT1
+
+## Splicing spearman data
+
+```{r}
+splicing.dat <- read_tsv("../code/SplicingAnalysis/TidyDoseData.txt.gz")
+
+
+splicing.dat %>%
+  distinct(seq)
+
+splicing.dat %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  mutate(UpstreamOfDonor2BaseSeq = substr(seq, 3, 4)) %>%
+  mutate(UpstreamOfDonor2BaseSeqColor = case_when(
+    UpstreamOfDonor2BaseSeq %in% c("AG", "GA", "GT") ~ UpstreamOfDonor2BaseSeq,
+    TRUE ~ "Other"
+  )) %>%
+  ggplot(aes(x=spearman, group=UpstreamOfDonor2BaseSeq, color=UpstreamOfDonor2BaseSeqColor)) +
+  stat_ecdf() +
+  coord_cartesian(xlim=c(-0.5, 1)) +
+  facet_wrap(~treatment, nrow=3) +
+  theme_bw()
+
+splicing.dat %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  mutate(UpstreamOfDonor2BaseSeq = substr(seq, 3, 4)) %>%
+  mutate(UpstreamOfDonor2BaseSeqColor = case_when(
+    UpstreamOfDonor2BaseSeq %in% c("AG", "GA", "GT") ~ UpstreamOfDonor2BaseSeq,
+    TRUE ~ "Other"
+  )) %>%
+  add_count(UpstreamOfDonor2BaseSeq) %>%
+  mutate(UpstreamOfDonor2BaseSeq = paste0(UpstreamOfDonor2BaseSeq, "; n=", round(n/3))) %>%
+  ggplot(aes(x=spearman, color=treatment)) +
+  geom_vline(xintercept=0) +
+  geom_vline(data = . %>%
+              group_by(treatment, UpstreamOfDonor2BaseSeq) %>%
+              summarise(median=median(spearman, na.rm=T)),
+             aes(xintercept=median, color=treatment), linetype='dashed') +
+  stat_ecdf() +
+  facet_wrap(~UpstreamOfDonor2BaseSeq, nrow=4) +
+  theme_bw() +
+  labs(x="Dose:response spearman coefficient", y="Cumulative fraction", title="distribution of dose:response effects for NN|GU introns")
+```
+
+### Splice juncs for HSD17B4 gene example (two separate poison exons)
+
+```{r}
+splicing.dat %>%
+  filter(gene_names == "HSD17B4") %>%
+  filter(treatment %in% c("Risdiplam", "Branaplam")) %>%
+  group_by(treatment) %>%
+  mutate(doseRank = dense_rank(dose.nM)/2) %>%
+  ungroup() %>%
+  group_by(gid, SampleName) %>%
+  mutate(PSI_transformed = PSI/max(PSI, na.rm=T)*100) %>%
+  ungroup() %>%
+  filter(str_detect(seq, "^A[AT]GAGT.+$")) %>%
+  filter(junc %in% c("chr5:119457368:119471636:clu_11299_+", "chr5:119528601:119529894:clu_11302_+")) %>%
+  mutate(junc = recode(junc, "chr5:119457368:119471636:clu_11299_+"="Risdiplam/Branaplam\nresponsive\npoison exon", "chr5:119528601:119529894:clu_11302_+"="Risidplam-specific\npoison exon")) %>%
+  # distinct(junc, spearman, treatment) %>%
+  # arrange(junc, treatment)
+  ggplot(aes(x=doseRank, y=PSI_transformed, color=treatment)) +
+  geom_line(linetype='solid', size=2) +
+  scale_color_manual(values=c("Branaplam"="#005A32", "Risdiplam"="#084594")) +
+  theme_classic() +
+  facet_wrap(~junc) +
+  labs(y="Splicing response, PSI", x="log10 dose (a factor of nanomolar)")
+
+# ggsave("../code/scratch/HSD17B4_SpliceJuncs.DoseResponseData.pdf", width=4.5, height=3)
+
+```
+
+
+## scratch for drc
+
+```{r}
+plot(ryegrass$conc, ryegrass$rootl)
+
+ryegrass2 <- ryegrass %>%
+  
+
+ggplot(ryegrass, aes(x=conc, y=rootl)) +
+  geom_point() +
+  # geom_smooth(method=)
+  scale_x_continuous(trans='log1p')
+
+ryegrass.model1 <- drm(rootl ~ conc, data = ryegrass, fct = LL.3u())
+summary(ryegrass.model1)
+plot(ryegrass.model1)
+```
+

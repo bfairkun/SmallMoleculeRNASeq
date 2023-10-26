@@ -14,6 +14,7 @@ include: "rules/RNASeqProcessing.smk"
 include: "rules/ProcessTitrationSeries.smk"
 include: "rules/Process_chRNA.smk"
 include: "rules/Process_ExpOf52.smk"
+include: "rules/ExploreIshigami.smk"
 
 
 

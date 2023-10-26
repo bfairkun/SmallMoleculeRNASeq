@@ -1,0 +1,151 @@
+---
+title: "AGT5_MechanismSearch"
+output: html_document
+date: '2023-09-27'
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(RColorBrewer)
+library(data.table)
+library(drc)
+library(ggrepel)
+
+theme_set(
+  theme_classic() +
+  theme(text=element_text(size=16,  family="Helvetica")))
+```
+
+## Intro
+
+AGT5 has an induced skipped exon and no GA|GT 5'ss in the cluster... Rather, the skipped 3'ss is ~20bp downstream of a risdiplam 5'ss motif match that doesn't get used (no observed splice junctions using that 5'ss motif instance), but likely binds U1 and inhibits the 3'ss from being used. How pervasive is this?
+
+Let's search the genome for matches to this risdiplam 5'ss, and see how many are within close proximity to a down-regulated 3'ss.
+
+start with all the GA|GT introns that are induced, to determine a motif
+
+```{r}
+dat <- read_tsv("../output/EC50Estimtes.FromPSI.txt.gz")
+
+BranaplamAndRisdiplamDonorSequences <- dat %>%
+  filter(!is.na(Steepness)) %>%
+  filter(EC.Ratio.Test.Estimate.FDR_Branaplam.Risdiplam < 0.1) %>%
+  mutate(BranaplamOrRisdiplamSite = if_else(ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam > 1, "RisdiplamSpecific", "BranaplamSpecific")) %>%
+  # count(BranaplamOrRisdiplamSite) %>%
+  dplyr::select(BranaplamOrRisdiplamSite, seq, junc)
+  
+
+BranaplamAndRisdiplamDonorSequences %>%
+  dplyr::select(-junc) %>%
+  separate(seq, into=as.character(c(-4:-1, 1:7)), sep=1:10) %>%
+  gather(key="position", value="nucleotide", -BranaplamOrRisdiplamSite) %>%
+  mutate(position = factor(position, levels=as.character(c(-4:-1, 1:7)))) %>%
+  ggplot(aes(x=position, fill=nucleotide)) + 
+  scale_y_continuous(expand=c(0,0)) +
+  geom_bar(position="fill") +
+  facet_wrap(~BranaplamOrRisdiplamSite) +
+  theme_classic() +
+  theme(strip.text.y = element_text(size = 4.2)) +
+  labs(title="Molecule-specific GA|GT 5'splice site preferences", y="Frequency", x="Position relative to 5'ss")
+
+BranaplamAndRisdiplamDonorSequences
+
+ColorMap <- brewer.pal(11, "Spectral")
+
+dat.long <- dat %>%
+  dplyr::select(junc, SpliceDonor, spearman.coef.Branaplam, spearman.coef.C2C5, spearman.coef.Risdiplam) %>%
+  pivot_longer(contains("spearman")) %>%
+  mutate(ValueDiscrete = cut(value, 11, ordered_result=T))
+
+ColorMapNamedVector <- dat.long %>%
+  distinct(ValueDiscrete) %>%
+  arrange(desc(ValueDiscrete)) %>%
+  drop_na() %>%
+  mutate(Color = ColorMap) %>%
+  deframe()
+
+dat.long <- dat.long %>%
+  mutate(Hex = recode(ValueDiscrete, !!!ColorMapNamedVector)) %>%
+  mutate(RgbCol = apply(col2rgb(Hex), 2, paste, collapse=','))
+
+dat.long %>%
+  group_by(SpliceDonor, name) %>%
+  filter(value== max(value)) %>%
+  ungroup() %>%
+  separate(SpliceDonor, into=c("chrom", "pos", "strand"), sep="\\.", convert=T) %>%
+  mutate(start = case_when(
+    strand == "-" ~ as.numeric(pos - 2),
+    strand == "+" ~ as.numeric(pos)
+  )) %>%
+  mutate(end = case_when(
+    strand == "-" ~ as.numeric(pos-1),
+    strand == "+" ~ as.numeric(pos + 1)
+  )) %>%
+  mutate(thickStart = start) %>%
+  mutate(thickEnd = end) %>%
+  mutate(treatment = str_replace(name, "spearman.coef.(.+?)$", "\\1")) %>%
+  mutate(name = paste0(treatment, "_", junc)) %>%
+  dplyr::select(chrom, start, end, name, value, strand, thickStart, thickEnd, RgbCol) %>%
+  arrange(chrom, start, end) %>%
+  write_tsv("../output/SperamanCoeffs.MaxJuncForEach.GAGTDonors.bed", col_names = F)
+```
+
+Maybe the next step is to serach for cases just like ATG5... 
+
+```{r}
+all.spearman.cors <- fread("../code/DoseResponseData/LCL/TidySplicingDoseData.txt.gz")
+
+leafcutter.ds.effects <- read_tsv("../code/SplicingAnalysis/MergedExp52_Contrast/_effect_sizes.txt") %>%
+  mutate(cluster = str_replace(intron, "^(.+?):.+?:(clu_.+$)", "\\1:\\2")) %>%
+  inner_join(
+    read_tsv("../code/SplicingAnalysis/MergedExp52_Contrast/_cluster_significance.txt")
+  ) %>%
+  mutate(logef = logef*-1)
+
+leafcutter.ds.effects %>%
+  filter(p.adjust < 0.01)
+
+GAGT.Ints.Matched <- all.spearman.cors %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  mutate(IsGAGT = str_detect(seq, "^\\w{2}GAGT")) %>%
+  filter(IsGAGT) %>%
+  mutate(intron = str_replace(junc, "(^.+?):clu.+$", "\\1")) %>%
+  inner_join(
+    leafcutter.ds.effects %>%
+      filter(p.adjust < 0.01) %>%
+      mutate(intron = str_replace(intron, "(^.+?):clu.+$", "\\1")),
+    by="intron"
+  )
+
+GAGT.Ints.Matched
+
+JuncsOfInterest <- all.spearman.cors %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  mutate(IsGAGT = str_detect(seq, "^\\w{2}GAGT")) %>%
+  mutate(intron = str_replace(junc, "(^.+?):clu.+$", "\\1")) %>%
+  group_by(gid) %>%
+  mutate(ClusterHasInducedGAGT = any(IsGAGT & spearman>0.5)) %>%
+  ungroup() %>%
+  filter(abs(spearman > 0.7) & !ClusterHasInducedGAGT) %>%
+  arrange(desc(spearman)) %>%
+  mutate(Pos = str_replace(junc, "^(.+?):(.+?):(.+?):clu.+$", "\\1:\\2-\\3")) %>%
+  dplyr::select(Pos,spearman, everything())  %>%
+  inner_join(
+    leafcutter.ds.effects %>%
+      filter(p.adjust < 0.01) %>%
+      mutate(intron = str_replace(intron, "(^.+?):clu.+$", "\\1")),
+    by="intron"
+  )
+
+JuncsOfInterest %>%
+  filter(str_detect(gene_names, "ATG"))
+
+JuncsOfInterest %>%
+  group_by(gene_names) %>%
+  filter(logef == max(logef)) %>%
+  ungroup() %>%
+  separate(Pos, into=c("chrom", "start", "end")) %>%
+  dplyr::select(chrom, start, end, IntronType,p, strand) %>%
+  write_tsv("../code/scratch/JuncsToCheck.bed", col_names = F)
+```
+

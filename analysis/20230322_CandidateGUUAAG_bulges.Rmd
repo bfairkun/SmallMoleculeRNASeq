@@ -1,0 +1,174 @@
+---
+title: "20230322_CandidateGUUAAG_bulges"
+output: html_document
+date: '2023-03-22'
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+
+## Intro
+
+I previously found in both the fibroblast experiment and the LCL dose titration experiment that 5'ss with ag|guUaag sequence are upregulated after treatment, suggesting these molecules may also have some potential to stabilize this novel +3U bulge. Granted, there are only 20 or so detected 5'ss with this sequence. So while it is quite rare in the genome, I think it is still exciting that these molecules may stabilize bulges at other positions, which opens the door to target different sets of splice sites, and by extension, different sets of genes, and the effects and specificity for these different sets might be chemically optimizeable. Let's inspect the dose response curves a bit closer on these sets of ag|guUaag 5'ss, and identify candidate up-regulated splice junctions that Dylan can verify by qPCR.
+
+
+## Analysis
+
+Let's start by first inspecting the dose response curves 
+
+```{r}
+library(tidyverse)
+
+# read in sample metadata
+sample.list <- read_tsv("../code/bigwigs/BigwigList.tsv",
+                        col_names = c("SampleName", "bigwig", "group", "strand")) %>%
+  filter(strand==".") %>%
+  dplyr::select(-strand) %>%
+  mutate(old.sample.name = str_replace(bigwig, "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw", "\\1")) %>%
+  separate(SampleName, into=c("treatment", "dose.nM", "cell.type", "libType", "rep"), convert=T, remove=F, sep="_") %>%
+  left_join(
+    read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names = c("group", "color", "bed", "supergroup")),
+    by="group"
+  )
+
+TreatmentColorsForLabels <- sample.list %>%
+  group_by(treatment) %>%
+  filter(dose.nM == max(dose.nM) | treatment == "DMSO") %>%
+  ungroup() %>%
+  distinct(treatment, .keep_all=T) %>%
+  arrange(dose.nM) %>%
+  mutate(vjust=row_number()*1.2)
+
+TreatmentColorsForLabelsKey <- TreatmentColorsForLabels %>%
+  filter(!treatment=="DMSO") %>%
+  dplyr::select(treatment, color) %>% deframe()
+
+TreatmentColorsLabels.Layer <- geom_text(
+    data = TreatmentColorsForLabels, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=Inf, hjust=1.05
+  )
+
+#Read in PSI
+PSI.tidy <- read_tsv("../code/DoseResponseData/LCL/TidySplicingDoseData.txt.gz")
+```
+
+First let's reproduce that heatmap of bulges that I manually defined.
+
+```{r}
+PSI.tidy %>%
+  distinct(junc, treatment, .keep_all=T) %>%
+  select(intron=junc, treatment, spearman, DonorSeq=seq) %>%
+  mutate(
+    `11_nnng|guUaag` = str_detect(DonorSeq, "^\\w\\w\\wGGTTAAG"),
+    `2_nngA|gunnnn` = str_detect(DonorSeq, "^\\w\\wGAGT"),
+    `3_nngA|guaagn` = str_detect(DonorSeq, "^\\w\\wGAGTAAG"),
+    `4_nagA|guaagn` = str_detect(DonorSeq, "^\\wAGAGTAAG\\w"),
+    `5_nGgA|guaagn` = str_detect(DonorSeq, "^\\wGGAGTAAG\\w"),
+    `6_nCgA|guaagn` = str_detect(DonorSeq, "^\\wCGAGTAAG\\w"),
+    `7_nUgA|guaagn` = str_detect(DonorSeq, "^\\wTGAGTAAG\\w"),
+    `7.2_nagC|guaagn` = str_detect(DonorSeq, "^\\wGACGTAAG\\w"),
+    `7.3_nagG|guaagn` = str_detect(DonorSeq, "^\\wGAGGTAAG\\w"),
+    `8_nngU|guaagn` = str_detect(DonorSeq, "^\\w\\wGTGTAAG"),
+    `9_nagU|guaagn` = str_detect(DonorSeq, "^\\wAGTGTAAG"),
+    `1_nnag|guaagn` = str_detect(DonorSeq, "^\\w\\wAGGTAAG\\w"),
+    `10_nnng|guVaag` = str_detect(DonorSeq, "^\\w\\w\\wGGT[ACG]AAG"),
+    `12_nnng|guUrng` = str_detect(DonorSeq, "^\\w\\w\\wGGTT[AG]\\wG"),
+    `13_nnng|guUang` = str_detect(DonorSeq, "^\\w\\w\\wGGTTA\\wG"),
+    `14_nnng|guUnag` = str_detect(DonorSeq, "^\\w\\w\\wGGTT\\wAG"),
+    `15_nnng|guNnng` = str_detect(DonorSeq, "^\\w\\w\\wGGT\\w\\w\\wG"),
+    `9.5_nnnn|guaaHg` = str_detect(DonorSeq, "^\\w\\w\\w\\wGTAA[ACT]G")
+  ) %>%
+  filter_at(vars(-c("intron", "treatment", "spearman", "DonorSeq")), any_vars(. == T)) %>%
+  gather(key="Pattern", value="IsMatch", -c("intron", "treatment", "spearman", "DonorSeq")) %>%
+  filter(IsMatch) %>%
+  group_by(Pattern, treatment) %>%
+  summarise(median = median(spearman, na.rm = T),
+            p = wilcox.test(spearman, alternative="greater")$p.value,
+            n = sum(IsMatch)) %>%
+  ungroup() %>%
+  separate(Pattern, into = c("PlotOrder", "Pattern"), sep = "_", convert=T) %>%
+  arrange(PlotOrder) %>%
+  ggplot(aes(x=reorder(Pattern, desc(PlotOrder)), y=treatment, fill=median)) +
+  # geom_point(aes(size=-log10(p), color=median)) +
+  geom_tile() +
+  geom_text(aes(label=paste0("p=",format.pval(p, digits=2), "\nn=", n) ), size=3) +
+  # scale_fill_viridis_c(option = "E", limits = c(-1.3, 1.3)) +
+  # scale_fill_distiller(palette = "Spectral", limits = c(-1.3, 1.3)) +
+  scale_fill_gradient2(name="Median spearman") +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  xlab("5'Splice Site Pattern,\npredicted bulges and mismatches capitalized") +
+  coord_flip() +
+  theme_classic() +
+  theme(axis.text.y=element_text(size=16,  family="mono")) +
+  theme(legend.position="bottom") +
+  ggtitle("Summary heatmap of median effects by 5'ss pattern")
+```
+
+
+Not let's plot dose response effect for all junctions with  g|guUaag 5' splice site.
+
+```{r}
+PSI.tidy %>%
+  filter(str_detect(seq, "^\\w\\w\\wGGTTAAG")) %>%
+  distinct(junc)
+
+PSI.tidy %>%
+  filter(str_detect(seq, "^\\w\\w\\wGGTTAAG")) %>%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), labels=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = "free_y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5)) +
+  labs(title='26 g|guUaag introns')
+
+```
+Wow, there's only a few of those juncs that even look believable. Let's more carefully look at the most believable ones.
+Ok, let's just focus on those with a high spearman correlation coefficient for dose:response
+
+```{r}
+PSI.tidy %>%
+  filter(str_detect(seq, "^\\w\\w\\wGGTTAAG")) %>%
+  group_by(junc) %>%
+  filter(any(spearman > 0.6) & all(spearman > .2)) %>%
+  ungroup() %>%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), labels=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = "free_y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5), strip.text.x = element_text(size=4)) +
+  labs(caption = 'spearman > 0.6 in at least one treatment, >0.2 in all treatment')
+```
+
+Ok, there are maybe four believable effects. Let's single out those and look at them more carefully in IGV.
+
+```{r}
+PSI.tidy %>%
+  filter(str_detect(seq, "^\\w\\w\\wGGTTAAG")) %>%
+  group_by(junc) %>%
+  filter(any(spearman > 0.6) & all(spearman > .2)) %>%
+  ungroup() %>%
+  distinct(junc)
+
+juncsOfInterest <- c("chr1:89107052:89108023:clu_962_-", "chr10:72213331:72215782:clu_20614_-", "chr7:23521840:23522132:clu_14659_-", "chr7:155643604:155643941:clu_15423_-")
+
+PSI.tidy %>%
+  filter(junc %in% juncsOfInterest) %>%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans="log1p", limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), labels=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = "free_y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5), strip.text.x = element_text(size=5)) +
+  labs(caption = 'spearman > 0.6 in at least one treatment, >0.2 in all treatment')
+```
+Manually looking at those examples in IGV didn't look so promising. The induced guUaag splice site doesn't always make as much sense as clean examples like poison cassette exon in HTT.

@@ -10,8 +10,9 @@
 
 
 
+<meta name="date" content="2023-03-22" />
 
-<title>Home</title>
+<title>20230322_CandidateGUUAAG_bulges</title>
 
 <script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -276,15 +277,22 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Home</h1>
+<h1 class="title toc-ignore">20230322_CandidateGUUAAG_bulges</h1>
+<h4 class="date">2023-03-22</h4>
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#intro" id="toc-intro">Intro</a></li>
+<li><a href="#analysis" id="toc-analysis">Analysis</a></li>
+</ul>
+</div>
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -295,8 +303,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -305,13 +313,13 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-10-26
+<strong>Last updated:</strong> 2023-03-22
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 2
 </p>
 <p>
 <strong>Knit directory:</strong>
@@ -335,18 +343,21 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
@@ -422,30 +433,56 @@ run.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
 </p>
 </div>
-<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! Using relative paths to the files within your workflowr
-project makes it easier to run your code on other machines.</p>
+<p>
+Using absolute paths to the files within your workflowr project makes it
+difficult for you and others to run your code on a different machine.
+Change the absolute path(s) below to the suggested relative path(s) to
+make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw
+</td>
+<td style="text-align:left;">
+../code/bigwigs/unstranded/(.+?).bw
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree08a7b6662ac0b2c862f4e9dd4d1cfc6fd390fa7atargetblank08a7b66a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreec3a42e31ee9d4e949fa6f9ea4e1a9773bac73efetargetblankc3a42e3a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/08a7b6662ac0b2c862f4e9dd4d1cfc6fd390fa7a" target="_blank">08a7b66</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/c3a42e31ee9d4e949fa6f9ea4e1a9773bac73efe" target="_blank">c3a42e3</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree08a7b6662ac0b2c862f4e9dd4d1cfc6fd390fa7atargetblank08a7b66a"
+id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreec3a42e31ee9d4e949fa6f9ea4e1a9773bac73efetargetblankc3a42e3a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -455,7 +492,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/08a7b6662ac0b2c862f4e9dd4d1cfc6fd390fa7a" target="_blank">08a7b66</a>.
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/c3a42e31ee9d4e949fa6f9ea4e1a9773bac73efe" target="_blank">c3a42e3</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -497,13 +534,10 @@ Ignored files:
     Ignored:    code/DE_tests.mat.counts.gz
     Ignored:    code/DE_tests.txt.gz
     Ignored:    code/DataNotToCommit/
-    Ignored:    code/DonorMotifSearches/
     Ignored:    code/DoseResponseData/
     Ignored:    code/Fastq/
     Ignored:    code/FastqFastp/
-    Ignored:    code/FivePrimeSpliceSites.txt
     Ignored:    code/FragLenths/
-    Ignored:    code/Ishigami/
     Ignored:    code/Meme/
     Ignored:    code/Multiqc/
     Ignored:    code/OMIM/
@@ -511,7 +545,6 @@ Ignored files:
     Ignored:    code/PhyloP/
     Ignored:    code/QC/
     Ignored:    code/ReferenceGenomes/
-    Ignored:    code/Rplots.pdf
     Ignored:    code/Session.vim
     Ignored:    code/Session2.vim
     Ignored:    code/SplicingAnalysis/
@@ -519,7 +552,6 @@ Ignored files:
     Ignored:    code/bigwigs/
     Ignored:    code/featureCounts/
     Ignored:    code/figs/
-    Ignored:    code/fimo_out/
     Ignored:    code/geena/
     Ignored:    code/hg38ToMm39.over.chain.gz
     Ignored:    code/igv_session.template.xml
@@ -527,7 +559,6 @@ Ignored files:
     Ignored:    code/log
     Ignored:    code/logs/
     Ignored:    code/rstudio-server.job
-    Ignored:    code/rules/.RNASeqProcessing.smk.swp
     Ignored:    code/scratch/
     Ignored:    code/test.txt.gz
     Ignored:    code/testPlottingWithMyScript.ForJingxin.sh
@@ -535,10 +566,12 @@ Ignored files:
     Ignored:    code/testPlottingWithMyScript.ForJingxin3.sh
     Ignored:    code/testPlottingWithMyScript.ForJingxin4.sh
     Ignored:    code/testPlottingWithMyScript.sh
-    Ignored:    code/tracks.with_chRNA.RisdiBrana.xml
-    Ignored:    code/tracks.with_chRNA.RisdiBranaWithExtras.xml
     Ignored:    code/tracks.xml
     Ignored:    data/~$52CompoundsTempPlateLayoutForPipettingConvenience.xlsx
+    Ignored:    output/._PioritizedIntronTargets.pdf
+
+Untracked files:
+    Untracked:  analysis/20230322_CandidateGUUAAG_bulges.Rmd
 
 Unstaged changes:
     Modified:   code/scripts/GenometracksByGenotype
@@ -556,355 +589,197 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were
-made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML
-(<code>docs/index.html</code>) files. If you’ve configured a remote Git
-repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
-in the table below to view the files as they were in that past version.
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
 </p>
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-File
-</th>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-<th>
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/ea36e65d3d24bcefa896febc6457716cfc0c3f13/docs/index.html" target="_blank">ea36e65</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2023-03-07
-</td>
-<td>
-added igv session
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/a8c9152c8020689603208f678ef53d6864f0077c/docs/index.html" target="_blank">a8c9152</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2023-02-23
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/index.html" target="_blank">272cd76</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-26
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/index.html" target="_blank">7144e91</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-21
-</td>
-<td>
-added chRNA notebook
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/22476105f2a7d2618d3f38a3e01a91a0df15b8e2/docs/index.html" target="_blank">2247610</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-19
-</td>
-<td>
-fix index
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/d9999f1a431074b84fd1277f854d1c45b22ddec1/docs/index.html" target="_blank">d9999f1</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-13
-</td>
-<td>
-added more EC50 estimation with PSI
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/b2a3c34c9237c53696332969b8e0a3f0f1732dc4/docs/index.html" target="_blank">b2a3c34</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-12
-</td>
-<td>
-update site with branaplsm-specific analysis
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0d59720620fd3a949578040a4634edcb76629a20/analysis/index.Rmd" target="_blank">0d59720</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-08
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/0d59720620fd3a949578040a4634edcb76629a20/docs/index.html" target="_blank">0d59720</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-08
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/db9a4f02945a058f7c991284a3c04d3f0b005ed5/analysis/index.Rmd" target="_blank">db9a4f0</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-08-01
-</td>
-<td>
-big update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/db9a4f02945a058f7c991284a3c04d3f0b005ed5/docs/index.html" target="_blank">db9a4f0</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-08-01
-</td>
-<td>
-big update
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/4a410f53106f7a31fb71081b46c401f9fa7b7992/analysis/index.Rmd" target="_blank">4a410f5</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-03-08
-</td>
-<td>
-initial commit
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/4a410f53106f7a31fb71081b46c401f9fa7b7992/docs/index.html" target="_blank">4a410f5</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-03-08
-</td>
-<td>
-initial commit
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <hr>
 </div>
 </div>
 </div>
-<p>Welcome to my research website dealing with small molecule splicing
-stuff.</p>
-<div id="links-to-relevant-notebooks-by-description"
-class="section level2">
-<h2>Links to relevant notebooks by description:</h2>
-<p><a href="20211216_DifferentialSplicing.html">Splicing analysis
-notebook entry</a></p>
-<p><a href="20220629_FirstGlanceTitrationSeries.html">first glance at
-tiration series data notebook entry</a></p>
-<p><a href="20220707_TitrationSeries_DE_testing.html">DE testing and
-fitting curves to dose-response data</a></p>
-<p><a href="20220712_FitDoseResponseModels.html">fitting curves to
-dose-response data bit more carefully</a></p>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>I previously found in both the fibroblast experiment and the LCL dose
+titration experiment that 5’ss with ag|guUaag sequence are upregulated
+after treatment, suggesting these molecules may also have some potential
+to stabilize this novel +3U bulge. Granted, there are only 20 or so
+detected 5’ss with this sequence. So while it is quite rare in the
+genome, I think it is still exciting that these molecules may stabilize
+bulges at other positions, which opens the door to target different sets
+of splice sites, and by extension, different sets of genes, and the
+effects and specificity for these different sets might be chemically
+optimizeable. Let’s inspect the dose response curves a bit closer on
+these sets of ag|guUaag 5’ss, and identify candidate up-regulated splice
+junctions that Dylan can verify by qPCR.</p>
 </div>
-<div id="full-listing-of-all-rmarkdown-notebooks-by-file-name"
-class="section level2">
-<h2>Full listing of all Rmarkdown notebooks by file name:</h2>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
-<pre><code>✔ ggplot2 3.3.6     ✔ purrr   0.3.4
-✔ tibble  3.1.7     ✔ dplyr   1.0.9
-✔ tidyr   1.2.0     ✔ stringr 1.4.0
-✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
-<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>rmds &lt;- list.files(path = &quot;../analysis/&quot;, pattern=&quot;^\\d+.+&quot;)
-rmd_htmls &lt;- str_replace(rmds, &quot;Rmd$&quot;, &quot;html&quot;)
-for(i in rmd_htmls){
-  cat(&quot;[&quot;, i, &quot;](&quot;, i,&quot;)\n\n&quot;, sep=&quot;&quot;)
-}</code></pre>
-<p><a
-href="20211216_DifferentialSplicing.html">20211216_DifferentialSplicing.html</a></p>
-<p><a
-href="20220221_ExploreExpOf52.html">20220221_ExploreExpOf52.html</a></p>
-<p><a
-href="20220629_FirstGlanceTitrationSeries.html">20220629_FirstGlanceTitrationSeries.html</a></p>
-<p><a
-href="20220707_TitrationSeries_DE_testing.html">20220707_TitrationSeries_DE_testing.html</a></p>
-<p><a
-href="20220707_TitrationSeries_DE_testing.nb.html">20220707_TitrationSeries_DE_testing.nb.html</a></p>
-<p><a
-href="20220712_FitDoseResponseModels.html">20220712_FitDoseResponseModels.html</a></p>
-<p><a
-href="20220726_Check_chRNATestSeq.html">20220726_Check_chRNATestSeq.html</a></p>
-<p><a
-href="20220804_MakeBigwigListTsv.html">20220804_MakeBigwigListTsv.html</a></p>
-<p><a href="20220809_geena.html">20220809_geena.html</a></p>
-<p><a href="20220822_Check_chRNA.html">20220822_Check_chRNA.html</a></p>
-<p><a
-href="20220907_IdentifyTargetsForVerification.html">20220907_IdentifyTargetsForVerification.html</a></p>
-<p><a
-href="20220908_IdentifyTargetsForVerification2.html">20220908_IdentifyTargetsForVerification2.html</a></p>
-<p><a
-href="20220913_TidyDataForJingxin.html">20220913_TidyDataForJingxin.html</a></p>
-<p><a
-href="20220915_ExploreDoseResponseCryptic3ss.html">20220915_ExploreDoseResponseCryptic3ss.html</a></p>
-<p><a
-href="20220915_ExploreSpliceQOutput.html">20220915_ExploreSpliceQOutput.html</a></p>
-<p><a
-href="20220916_CompareDE_LCL_Fibroblast.html">20220916_CompareDE_LCL_Fibroblast.html</a></p>
-<p><a
-href="20220919_chRNA_IntronRetention.html">20220919_chRNA_IntronRetention.html</a></p>
-<p><a
-href="20220922_ExploreSubparRNAseq.html">20220922_ExploreSubparRNAseq.html</a></p>
-<p><a
-href="20220923_ExploreSpecificityEstimates.html">20220923_ExploreSpecificityEstimates.html</a></p>
-<p><a
-href="20221108_MakeFigsFor10minPresentation.html">20221108_MakeFigsFor10minPresentation.html</a></p>
-<p><a
-href="2023-10-26_ExploreDrmModels.html">2023-10-26_ExploreDrmModels.html</a></p>
-<p><a
-href="20230214_MakeSampesConfigFor52MoleculeExperiment.html">20230214_MakeSampesConfigFor52MoleculeExperiment.html</a></p>
-<p><a
-href="20230223_PlotPCA_WithStructures.html">20230223_PlotPCA_WithStructures.html</a></p>
-<p><a
-href="20230306_CheckIntronsWithUniqueSpecifities.html">20230306_CheckIntronsWithUniqueSpecifities.html</a></p>
-<p><a
-href="20230322_CandidateGUUAAG_bulges.html">20230322_CandidateGUUAAG_bulges.html</a></p>
-<p><a
-href="20230418_ExploreIshigamiGEO.html">20230418_ExploreIshigamiGEO.html</a></p>
-<p><a
-href="20230502_PCAPlotsForYang.html">20230502_PCAPlotsForYang.html</a></p>
-<p><a
-href="20230915_TopHitsAcrossDoses.html">20230915_TopHitsAcrossDoses.html</a></p>
-<p><a
-href="20230927_AGT_MechanismSearch.html">20230927_AGT_MechanismSearch.html</a></p>
-<p><a
-href="20231006_SearchForCausalJuncs.html">20231006_SearchForCausalJuncs.html</a></p>
-<p><a
-href="20231013_UnbiasedMotifSearch.html">20231013_UnbiasedMotifSearch.html</a></p>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<p>Let’s start by first inspecting the dose response curves</p>
+<pre class="r"><code>library(tidyverse)
+
+# read in sample metadata
+sample.list &lt;- read_tsv(&quot;../code/bigwigs/BigwigList.tsv&quot;,
+                        col_names = c(&quot;SampleName&quot;, &quot;bigwig&quot;, &quot;group&quot;, &quot;strand&quot;)) %&gt;%
+  filter(strand==&quot;.&quot;) %&gt;%
+  dplyr::select(-strand) %&gt;%
+  mutate(old.sample.name = str_replace(bigwig, &quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw&quot;, &quot;\\1&quot;)) %&gt;%
+  separate(SampleName, into=c(&quot;treatment&quot;, &quot;dose.nM&quot;, &quot;cell.type&quot;, &quot;libType&quot;, &quot;rep&quot;), convert=T, remove=F, sep=&quot;_&quot;) %&gt;%
+  left_join(
+    read_tsv(&quot;../code/bigwigs/BigwigList.groups.tsv&quot;, col_names = c(&quot;group&quot;, &quot;color&quot;, &quot;bed&quot;, &quot;supergroup&quot;)),
+    by=&quot;group&quot;
+  )
+
+TreatmentColorsForLabels &lt;- sample.list %&gt;%
+  group_by(treatment) %&gt;%
+  filter(dose.nM == max(dose.nM) | treatment == &quot;DMSO&quot;) %&gt;%
+  ungroup() %&gt;%
+  distinct(treatment, .keep_all=T) %&gt;%
+  arrange(dose.nM) %&gt;%
+  mutate(vjust=row_number()*1.2)
+
+TreatmentColorsForLabelsKey &lt;- TreatmentColorsForLabels %&gt;%
+  filter(!treatment==&quot;DMSO&quot;) %&gt;%
+  dplyr::select(treatment, color) %&gt;% deframe()
+
+TreatmentColorsLabels.Layer &lt;- geom_text(
+    data = TreatmentColorsForLabels, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=Inf, hjust=1.05
+  )
+
+#Read in PSI
+PSI.tidy &lt;- read_tsv(&quot;../code/DoseResponseData/LCL/TidySplicingDoseData.txt.gz&quot;)</code></pre>
+<p>First let’s reproduce that heatmap of bulges that I manually
+defined.</p>
+<pre class="r"><code>PSI.tidy %&gt;%
+  distinct(junc, treatment, .keep_all=T) %&gt;%
+  select(intron=junc, treatment, spearman, DonorSeq=seq) %&gt;%
+  mutate(
+    `11_nnng|guUaag` = str_detect(DonorSeq, &quot;^\\w\\w\\wGGTTAAG&quot;),
+    `2_nngA|gunnnn` = str_detect(DonorSeq, &quot;^\\w\\wGAGT&quot;),
+    `3_nngA|guaagn` = str_detect(DonorSeq, &quot;^\\w\\wGAGTAAG&quot;),
+    `4_nagA|guaagn` = str_detect(DonorSeq, &quot;^\\wAGAGTAAG\\w&quot;),
+    `5_nGgA|guaagn` = str_detect(DonorSeq, &quot;^\\wGGAGTAAG\\w&quot;),
+    `6_nCgA|guaagn` = str_detect(DonorSeq, &quot;^\\wCGAGTAAG\\w&quot;),
+    `7_nUgA|guaagn` = str_detect(DonorSeq, &quot;^\\wTGAGTAAG\\w&quot;),
+    `7.2_nagC|guaagn` = str_detect(DonorSeq, &quot;^\\wGACGTAAG\\w&quot;),
+    `7.3_nagG|guaagn` = str_detect(DonorSeq, &quot;^\\wGAGGTAAG\\w&quot;),
+    `8_nngU|guaagn` = str_detect(DonorSeq, &quot;^\\w\\wGTGTAAG&quot;),
+    `9_nagU|guaagn` = str_detect(DonorSeq, &quot;^\\wAGTGTAAG&quot;),
+    `1_nnag|guaagn` = str_detect(DonorSeq, &quot;^\\w\\wAGGTAAG\\w&quot;),
+    `10_nnng|guVaag` = str_detect(DonorSeq, &quot;^\\w\\w\\wGGT[ACG]AAG&quot;),
+    `12_nnng|guUrng` = str_detect(DonorSeq, &quot;^\\w\\w\\wGGTT[AG]\\wG&quot;),
+    `13_nnng|guUang` = str_detect(DonorSeq, &quot;^\\w\\w\\wGGTTA\\wG&quot;),
+    `14_nnng|guUnag` = str_detect(DonorSeq, &quot;^\\w\\w\\wGGTT\\wAG&quot;),
+    `15_nnng|guNnng` = str_detect(DonorSeq, &quot;^\\w\\w\\wGGT\\w\\w\\wG&quot;),
+    `9.5_nnnn|guaaHg` = str_detect(DonorSeq, &quot;^\\w\\w\\w\\wGTAA[ACT]G&quot;)
+  ) %&gt;%
+  filter_at(vars(-c(&quot;intron&quot;, &quot;treatment&quot;, &quot;spearman&quot;, &quot;DonorSeq&quot;)), any_vars(. == T)) %&gt;%
+  gather(key=&quot;Pattern&quot;, value=&quot;IsMatch&quot;, -c(&quot;intron&quot;, &quot;treatment&quot;, &quot;spearman&quot;, &quot;DonorSeq&quot;)) %&gt;%
+  filter(IsMatch) %&gt;%
+  group_by(Pattern, treatment) %&gt;%
+  summarise(median = median(spearman, na.rm = T),
+            p = wilcox.test(spearman, alternative=&quot;greater&quot;)$p.value,
+            n = sum(IsMatch)) %&gt;%
+  ungroup() %&gt;%
+  separate(Pattern, into = c(&quot;PlotOrder&quot;, &quot;Pattern&quot;), sep = &quot;_&quot;, convert=T) %&gt;%
+  arrange(PlotOrder) %&gt;%
+  ggplot(aes(x=reorder(Pattern, desc(PlotOrder)), y=treatment, fill=median)) +
+  # geom_point(aes(size=-log10(p), color=median)) +
+  geom_tile() +
+  geom_text(aes(label=paste0(&quot;p=&quot;,format.pval(p, digits=2), &quot;\nn=&quot;, n) ), size=3) +
+  # scale_fill_viridis_c(option = &quot;E&quot;, limits = c(-1.3, 1.3)) +
+  # scale_fill_distiller(palette = &quot;Spectral&quot;, limits = c(-1.3, 1.3)) +
+  scale_fill_gradient2(name=&quot;Median spearman&quot;) +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  xlab(&quot;5&#39;Splice Site Pattern,\npredicted bulges and mismatches capitalized&quot;) +
+  coord_flip() +
+  theme_classic() +
+  theme(axis.text.y=element_text(size=16,  family=&quot;mono&quot;)) +
+  theme(legend.position=&quot;bottom&quot;) +
+  ggtitle(&quot;Summary heatmap of median effects by 5&#39;ss pattern&quot;)</code></pre>
+<p><img src="figure/20230322_CandidateGUUAAG_bulges.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Not let’s plot dose response effect for all junctions with g|guUaag
+5’ splice site.</p>
+<pre class="r"><code>PSI.tidy %&gt;%
+  filter(str_detect(seq, &quot;^\\w\\w\\wGGTTAAG&quot;)) %&gt;%
+  distinct(junc)</code></pre>
+<pre><code># A tibble: 26 × 1
+   junc                                 
+   &lt;chr&gt;                                
+ 1 chr1:89107052:89108023:clu_962_-     
+ 2 chr10:72213331:72215782:clu_20614_-  
+ 3 chr10:110901612:110907680:clu_20928_-
+ 4 chr11:33869586:33869710:clu_21327_-  
+ 5 chr11:118910015:118911399:clu_22006_-
+ 6 chr12:30665306:30665729:clu_23504_-  
+ 7 chr12:30665309:30665729:clu_23504_-  
+ 8 chr12:108525609:108525776:clu_24071_-
+ 9 chr12:109939247:109945260:clu_24100_-
+10 chr2:96529849:96532227:clu_4720_-    
+# … with 16 more rows</code></pre>
+<pre class="r"><code>PSI.tidy %&gt;%
+  filter(str_detect(seq, &quot;^\\w\\w\\wGGTTAAG&quot;)) %&gt;%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), labels=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5)) +
+  labs(title=&#39;26 g|guUaag introns&#39;)</code></pre>
+<p><img src="figure/20230322_CandidateGUUAAG_bulges.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" />
+Wow, there’s only a few of those juncs that even look believable. Let’s
+more carefully look at the most believable ones. Ok, let’s just focus on
+those with a high spearman correlation coefficient for dose:response</p>
+<pre class="r"><code>PSI.tidy %&gt;%
+  filter(str_detect(seq, &quot;^\\w\\w\\wGGTTAAG&quot;)) %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(spearman &gt; 0.6) &amp; all(spearman &gt; .2)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), labels=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5), strip.text.x = element_text(size=4)) +
+  labs(caption = &#39;spearman &gt; 0.6 in at least one treatment, &gt;0.2 in all treatment&#39;)</code></pre>
+<p><img src="figure/20230322_CandidateGUUAAG_bulges.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, there are maybe four believable effects. Let’s single out those
+and look at them more carefully in IGV.</p>
+<pre class="r"><code>PSI.tidy %&gt;%
+  filter(str_detect(seq, &quot;^\\w\\w\\wGGTTAAG&quot;)) %&gt;%
+  group_by(junc) %&gt;%
+  filter(any(spearman &gt; 0.6) &amp; all(spearman &gt; .2)) %&gt;%
+  ungroup() %&gt;%
+  distinct(junc)</code></pre>
+<pre><code># A tibble: 6 × 1
+  junc                                
+  &lt;chr&gt;                               
+1 chr1:89107052:89108023:clu_962_-    
+2 chr10:72213331:72215782:clu_20614_- 
+3 chr2:199961872:199963733:clu_6517_+ 
+4 chr7:23521840:23522132:clu_14659_-  
+5 chr7:155643604:155643941:clu_15423_-
+6 chr9:125341955:125342219:clu_19195_+</code></pre>
+<pre class="r"><code>juncsOfInterest &lt;- c(&quot;chr1:89107052:89108023:clu_962_-&quot;, &quot;chr10:72213331:72215782:clu_20614_-&quot;, &quot;chr7:23521840:23522132:clu_14659_-&quot;, &quot;chr7:155643604:155643941:clu_15423_-&quot;)
+
+PSI.tidy %&gt;%
+  filter(junc %in% juncsOfInterest) %&gt;%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans=&quot;log1p&quot;, limits=c(0, 10000), breaks=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0), labels=c(10000, 3160, 1000, 316, 100, 31.6, 10, 3.16, 1, 0.316, 0)) +
+  facet_wrap(~junc, scales = &quot;free_y&quot;) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, size=5), strip.text.x = element_text(size=5)) +
+  labs(caption = &#39;spearman &gt; 0.6 in at least one treatment, &gt;0.2 in all treatment&#39;)</code></pre>
+<p><img src="figure/20230322_CandidateGUUAAG_bulges.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" />
+Manually looking at those examples in IGV didn’t look so promising. The
+induced guUaag splice site doesn’t always make as much sense as clean
+examples like poison cassette exon in HTT.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -939,19 +814,20 @@ loaded via a namespace (and not attached):
  [1] Rcpp_1.0.8.3     lubridate_1.8.0  assertthat_0.2.1 rprojroot_2.0.3 
  [5] digest_0.6.29    utf8_1.2.2       R6_2.5.1         cellranger_1.1.0
  [9] backports_1.4.1  reprex_2.0.1     evaluate_0.15    httr_1.4.3      
-[13] pillar_1.7.0     rlang_1.0.2      readxl_1.4.0     rstudioapi_0.13 
-[17] whisker_0.4      jquerylib_0.1.4  rmarkdown_2.14   munsell_0.5.0   
-[21] broom_0.8.0      compiler_4.2.0   httpuv_1.6.5     modelr_0.1.8    
-[25] xfun_0.30        pkgconfig_2.0.3  htmltools_0.5.2  tidyselect_1.1.2
-[29] workflowr_1.7.0  fansi_1.0.3      crayon_1.5.1     tzdb_0.3.0      
-[33] dbplyr_2.1.1     withr_2.5.0      later_1.3.0      grid_4.2.0      
-[37] jsonlite_1.8.0   gtable_0.3.0     lifecycle_1.0.1  DBI_1.1.2       
-[41] git2r_0.30.1     magrittr_2.0.3   scales_1.2.0     cli_3.3.0       
-[45] stringi_1.7.6    fs_1.5.2         promises_1.2.0.1 xml2_1.3.3      
-[49] bslib_0.3.1      ellipsis_0.3.2   generics_0.1.2   vctrs_0.4.1     
-[53] tools_4.2.0      glue_1.6.2       hms_1.1.1        fastmap_1.1.0   
-[57] yaml_2.3.5       colorspace_2.0-3 rvest_1.0.2      knitr_1.39      
-[61] haven_2.5.0      sass_0.4.1      </code></pre>
+[13] highr_0.9        pillar_1.7.0     rlang_1.0.2      readxl_1.4.0    
+[17] rstudioapi_0.13  jquerylib_0.1.4  rmarkdown_2.14   labeling_0.4.2  
+[21] bit_4.0.4        munsell_0.5.0    broom_0.8.0      compiler_4.2.0  
+[25] httpuv_1.6.5     modelr_0.1.8     xfun_0.30        pkgconfig_2.0.3 
+[29] htmltools_0.5.2  tidyselect_1.1.2 workflowr_1.7.0  fansi_1.0.3     
+[33] crayon_1.5.1     tzdb_0.3.0       dbplyr_2.1.1     withr_2.5.0     
+[37] later_1.3.0      grid_4.2.0       jsonlite_1.8.0   gtable_0.3.0    
+[41] lifecycle_1.0.1  DBI_1.1.2        git2r_0.30.1     magrittr_2.0.3  
+[45] scales_1.2.0     vroom_1.5.7      cli_3.3.0        stringi_1.7.6   
+[49] farver_2.1.0     fs_1.5.2         promises_1.2.0.1 xml2_1.3.3      
+[53] bslib_0.3.1      ellipsis_0.3.2   generics_0.1.2   vctrs_0.4.1     
+[57] tools_4.2.0      bit64_4.0.5      glue_1.6.2       hms_1.1.1       
+[61] parallel_4.2.0   fastmap_1.1.0    yaml_2.3.5       colorspace_2.0-3
+[65] rvest_1.0.2      knitr_1.39       haven_2.5.0      sass_0.4.1      </code></pre>
 </div>
 </div>
 

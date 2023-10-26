@@ -93,6 +93,10 @@ ReadsPerDataset <- ggplot(counts.plot.dat, aes(x=SampleName, y=ChromosomalReads/
   labs(title="RNA-seq datasets", y="Read count (M)")
 ReadsPerDataset
 
+```
+
+```{r, eval=F}
+
 dir.create("../code/scratch/PlotForPresentation")
 ggsave("../code/scratch/PlotForPresentation/ReadsPerDataset.pdf", ReadsPerDataset, width=6, height=3.5)
 ```
@@ -100,6 +104,11 @@ ggsave("../code/scratch/PlotForPresentation/ReadsPerDataset.pdf", ReadsPerDatase
 ## ED50 scatter, with FDR<0.05 highlighted
 
 ```{r}
+
+GA.GT.Introns <- read_tsv("../output/EC50Estimtes.FromPSI.txt.gz")
+
+GA.GT.Introns %>%
+  filter(str_detect(gene_names, "ATG5"))
 
 TreatmentColorsForLabels
 
@@ -166,7 +175,7 @@ Expression.tidy <- read_tsv("../code/DoseResponseData/LCL/TidyExpressionDoseData
 #gene names
 gene_list <- read_tsv("../data/Genes.list.txt")
 
-GenesOfInterest <- c("FOXM1", "STAT1", "HTT", "TRIM14","TPGS2","TNRC6B")
+GenesOfInterest <- c("FOXM1", "STAT1", "HTT", "TRIM14","TPGS2","TNRC6B", "ATG5")
 
 
 gene_list %>%
@@ -347,6 +356,82 @@ ggsave("../code/scratch/PlotForPresentation/TNRC6B_Expression.pdf", GeneDoseResp
 
 ```
 
+### Check for ATG5 intron
+
+```{r}
+splicing.tidy %>%
+  filter(str_detect(gene_names, "ATG5")) %>%
+  filter(str_detect(seq, "^\\w{2}GAGT"))
+
+splicing.tidy %>%
+  filter(str_detect(gene_names, "ATG5")) %>%
+  distinct(junc)
+
+splicing.tidy %>%
+  filter(str_detect(gene_names, "ATG5")) %>%
+  mutate(label = paste(junc, IntronType, sep='\n')) %>%
+  ggplot(aes(x=dose.nM, y=PSI, color=treatment)) +
+  geom_line() +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  scale_x_continuous(trans='log10') +
+  # scale_y_continuous(trans='log10') +
+  facet_wrap(~label, scales = "free_y") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  theme(legend.position="none") +
+  labs(y="PSI", x="dose") +
+  theme(strip.text.x = element_text(size = 8))
+
+splicing.tidy %>%
+  filter(junc=="chr6:106293106:106308364:clu_14164_-") %>%
+  distinct(junc, .keep_all=T) %>%
+  dplyr::select(junc, seq)
+
+splicing.tidy %>%
+  distinct(junc, .keep_all=T) %>%
+  filter(IntronType=="Annotated") %>%
+  ggplot(aes(x=Donor.score)) +
+  geom_histogram() +
+  geom_vline(xintercept = 8.683362)
+```
+
+Ok so this is an intersesting case where branaplam clearly induces exon skipping at an exon. The exon is part of the functional annotated transcript, and it is not a multiple of three, so accordingly we see down-regulation of gene. But since branaplam is inducing exon skipping (rather than exon-inclusion) it wasn't immediately clear what was going on. At first I thought maybe there is some other competing GAGT intron in a complex leafcutter cluster (not just simple cassette exon). However, leafcutter didn't find any GAGT introns in the gene. But when I look closer at downstream 5'ss by the skipped exon, it does have a unique sequence:
+Looks like there is a competing GAGT U1 binding site that overlaps the normal GTGAGTG 5'ss in a different register. This competing U1 binding site doesn't seem to get actually activated in any observable amount, but seems to influence the annotated splice site. Let's look for more annotated GTGAGTG splice sites that may be affected...
+
+```{r}
+splicing.tidy %>%
+  # filter(str_detect(seq, "^\\w{3}GGTGAGTG")) %>%
+  # filter(IntronType == "Annotated") %>%
+  # filter(str_detect(gene_names, "ATG5")) %>%
+  distinct(treatment, junc, .keep_all=T) %>%
+  mutate(IntronSeq = case_when(
+    str_detect(seq, "^\\w{4}GTGAGTA") ~ "NNNN|GTGAGTA",
+    # str_detect(seq, "\\w{2}GAGTGAAT") ~ "NNGA|GTGAA",
+    str_detect(seq, "^A\\wGAGT") ~ "ANGA|GT",
+    str_detect(seq, "^\\wAGAGT") ~ "NAGA|GT",
+    str_detect(seq, "^[GCT]{2}GAGT") ~ "BBGA|GT",
+    str_detect(seq, "\\w{2}GTGT") ~ "NNGT|GT",
+    TRUE ~ "Other",
+  )) %>%
+  # filter(!IntronSeq=="Other") %>%
+  add_count(IntronSeq) %>%
+  mutate(n=n/3) %>%
+  mutate(label = paste0(IntronSeq, "\nn=",n)) %>%
+  ggplot(aes(x=spearman, color=treatment)) +
+  geom_vline(xintercept=0, linestyle='dashed') +
+  stat_ecdf() +
+  geom_vline(data = . %>%
+               group_by(label, treatment) %>%
+               summarise(median=median(spearman, na.rm = T)) %>%
+               ungroup(),
+             aes(xintercept=median, color=treatment),
+            linestyle='dashed') +
+  facet_wrap(~label) +
+  scale_color_manual(values=TreatmentColorsForLabelsKey) +
+  labs(y="ecdf", x="dose:response spearman")
+
+```
+
 
 ## PCA
 
@@ -420,6 +505,81 @@ pca.results$x %>%
 ggsave("../code/scratch/PlotForPresentation/PCA.pdf", width=4, height=3)
 ```
 
+## PCA without transpose
+
+```{r}
+pca.results <- all.samples.PSI %>%
+  inner_join(
+    dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)
+    ) %>%
+  drop_na() %>%
+  dplyr::select(1:6, contains("LCL")) %>%
+  dplyr::select(1:6, contains("polyA")) %>%
+  dplyr::select(junc, contains("LCL")) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% t() %>% prcomp(scale=F)
+
+summary(pca.results)
+
+# Then plot original samples
+pca.results$rotation %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleName") %>%
+  dplyr::select(SampleName, PC1, PC2, PC3) %>%
+  left_join(sample.list, by="SampleName") %>%
+  ggplot(aes(x=PC1, y=PC2, color=color)) +
+  geom_text(
+    data = TreatmentColorsForLabels, 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=-Inf, hjust=-0.1
+  ) +
+  geom_point(size=3) +
+  scale_color_identity() +
+  scale_x_reverse() +
+  theme_bw() +
+  labs(title = "Visualize transcriptome after\ndimensionality reduction", x="PC1\n52% variance explained", y="PC2\n15% variance explained")
+```
+
+
+## PCA with just branaplam and risdiplam
+
+```{r}
+pca.results <- all.samples.PSI %>%
+  inner_join(
+    dplyr::select(All.GA.GT, `#Chrom`=chrom, start, end=stop, strand)
+    ) %>%
+  drop_na() %>%
+  dplyr::select(1:6, contains("LCL")) %>%
+  dplyr::select(1:6, contains("polyA")) %>%
+  dplyr::select(junc, contains("LCL")) %>%
+  dplyr::select(junc, !contains("C2C5")) %>%
+  column_to_rownames("junc") %>%
+  scale() %>% t() %>% prcomp(scale=T)
+
+summary(pca.results)
+
+# Then plot original samples
+pca.results$x %>%
+  as.data.frame() %>%
+  rownames_to_column("SampleName") %>%
+  dplyr::select(SampleName, PC1, PC2, PC3) %>%
+  left_join(sample.list, by="SampleName") %>%
+  ggplot(aes(x=PC1, y=PC2, color=color)) +
+  geom_text(
+    data = TreatmentColorsForLabels %>% filter(!treatment=="C2C5"), 
+    aes(label=treatment, color=color, vjust=vjust),
+    y=Inf, x=-Inf, hjust=-0.1
+  ) +
+  geom_point(size=5) +
+  scale_color_identity() +
+  scale_x_reverse() +
+  theme_classic() +
+  labs(title = "Visualize transcriptome after\ndimensionality reduction", x="PC1\n54% variance explained", y="PC2\n13% variance explained")
+ggsave("../code/scratch/PlotForPresentation/PCA_ForYang.pdf", width=4, height=3)
+
+```
+
+
 ## PCA with more molecules addded
 ```{r}
 FirboblastDat <- all.samples.PSI %>%
@@ -484,6 +644,41 @@ bind_rows(
 ```{r, eval=F}
 ggsave("../code/scratch/PlotForPresentation/PCA_FibroblastsAdded.pdf",PCA.FibroblastsAdded, width=4, height=3)
 
+```
+
+## Ordered list of risdi/branaplam-specific sequences
+
+```{r, fig.width=3, fig.height=49}
+library(ggnewscale)
+
+GA.GT.Introns %>%
+  filter(EC.Ratio.Test.Estimate.FDR_Branaplam.Risdiplam < 0.1) %>%
+  mutate(Specificity = log2(ECRatio.ComparedToGenomewideMedian_Branaplam.Risdiplam)) %>%
+  arrange(Specificity) %>%
+  mutate(rank = dense_rank(Specificity)) %>%
+  dplyr::select(rank, Specificity, seq) %>%
+  # sample_n(10) %>%
+  # slice(which(row_number() %% 5 == 1)) %>%
+  # separate(seq, into = as.character(c(-4:-1, 1:7)), sep=1:10, remove=F) %>%
+  mutate(Specificity = case_when(
+    Specificity < -3 ~ -3,
+    Specificity > 3 ~ 3,
+    TRUE ~ Specificity
+  )) %>%
+  separate(seq, into = as.character(c(1:11)), sep=1:11, remove=F) %>%
+  gather("Pos","Nucleotide", -c(1:3)) %>%
+  mutate(Pos = factor(Pos, levels=c(0:11))) %>%
+  # filter(!Pos==10) %>%
+  ggplot(aes(y=rank)) +
+    geom_text(aes(x=Pos, label=Nucleotide, color=Nucleotide, size=0.3)) +
+  scale_y_continuous(expand=c(0,0)) +
+  new_scale_color() +
+  geom_point(data = . %>%
+               mutate(x=0),
+               # mutate(x=factor(0, levels=c(0:11))),
+             aes(x=x, color=Specificity, y=rank), size=3) +
+  scale_color_gradient2(low = "#005824", high="#034e7b", mid="#ffffff")
+#ggsave("../code/scratch/PlotForPresentation/BranaplamRisdiplamSpecific5ss.pdf", width=3, height=49)
 ```
 
 

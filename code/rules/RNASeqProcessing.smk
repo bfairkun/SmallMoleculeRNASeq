@@ -409,6 +409,25 @@ rule TidyDoseResponseData:
         Rscript scripts/TidyAndSpearmanCorTitrationData.R &> {log}
         """
 
+rule TidyDoseResponseData_2:
+    """
+    Splicing data expressed as more interpretable PSI (PSI/PSImax), and expression data as log2FC. Use all three DMSO datapoints for each treatment series. Recalculate spearman.
+    """
+    input:
+        "DoseResponseData/LCL/TidySplicingDoseData.txt.gz",
+        "DoseResponseData/LCL/TidyExpressionDoseData.txt.gz",
+    output:
+        "DoseResponseData/LCL/TidyExpressionDoseData_logFCTransformedAndAllDMSORepsInEachSeries.txt.gz",
+        "DoseResponseData/LCL/TidySplicingDoseData_PSITransformedAndAllDMSORepsInEachSeries.txt.gz",
+    conda:
+        "../envs/r_essentials.yml"
+    log:
+        "logs/TidyDoseResponseData_2.log"
+    shell:
+        """
+        Rscript scripts/TidyAndSpearmanCorTitrationData_2.R &> {log}
+        """
+
 rule DownloadMouseAnnotation:
     output:
         gtf = "ReferenceGenomes/Mouse_M30/Mouse_M30.gtf",
@@ -440,6 +459,22 @@ use rule featurecounts as featureCounts_ALLSAMPLES_basic with:
         "logs/featureCounts_ALLSAMPLES_basic.log"
     output:
         "featureCounts/AllSamples_Counts.txt"
+
+rule FitDoseResponseCurvesExpression_SaveAsR_Object:
+    input:
+        "DoseResponseData/LCL/TidyExpressionDoseData_logFCTransformedAndAllDMSORepsInEachSeries.txt.gz"
+    output:
+        "DoseResponseData/LCL/Models/Expression.Rdata"
+    conda:
+        "../envs/r_2.yml"
+    resources:
+        mem_mb = 24000
+    log:
+        "logs/FitDoseResponseCurvesExpression_SaveAsR_Object.log"
+    shell:
+        """
+        Rscript scripts/Fit_GeneExpressionModels.R {input} {output} &> {log}
+        """
 
 ## Check how ClinVar splice site annotations relate to splice sites:
 # zcat ClinVar/PangolinResults.tsv.gz | grep 'splice_donor' | awk -v OFS='\t' '{print "chr"$1, $2, $2+1}' | sort -u | bedtools sort -i - | bedtools closest -a - -b <( bedtools flank -g /project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Fasta/GRCh38.primary_assembly.genome.fa.fai  -i <(zcat SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.gz | awk -v OFS='\t' 'NR>1 {print $1,$2,$3,".",".",$6}' ) -l 1 -r 0 | sort -u | bedtools sort -i -  ) -D b | less -S
