@@ -15,6 +15,7 @@ include: "rules/ProcessTitrationSeries.smk"
 include: "rules/Process_chRNA.smk"
 include: "rules/Process_ExpOf52.smk"
 include: "rules/ExploreIshigami.smk"
+include: "rules/ExpMoleculesOfInterest.smk"
 
 
 
@@ -29,7 +30,8 @@ localrules:
     DE_testing,
     GatherEditings,
     CopyAndMergeFastq_chRNA,
-    CopyAndMergeFastq_ExpOf52
+    CopyAndMergeFastq_ExpOf52,
+    CopyAndMergeFastq_Exp_3MoleculesOfInterest
 
 # Instead of using samples.tsv file, a quick/dirty way to apply rules over grob of existing files is this:
 # IDS, = glob_wildcards("Path/To/{MyFileNames}.bed.gz")
@@ -50,7 +52,8 @@ rule all:
         "SplicingAnalysis/leafcutter/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz",
         "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz",
         "../output/ClinVar.PangolinResults.tsv.gz",
-        rules.GatherChRNAResults.input
+        rules.GatherChRNAResults.input,
+        rules.GatherExpMoleculesOfInterest.input
 
         # expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam",sample=AllSamples),
         # 'RE_Results/EditLevel/GatheredEditingLevels.bed'

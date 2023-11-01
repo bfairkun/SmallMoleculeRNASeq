@@ -21,12 +21,13 @@ rule CopyAndMergeFastq:
         cat {input.R2} > {output.R2}
         """
 
+
 use rule fastp as fastp_input_fn_from_wildcards with:
     input:
         R1 = "Fastq/{sample}.R1.fastq.gz",
         R2 = "Fastq/{sample}.R2.fastq.gz",
     wildcard_constraints:
-        sample = "|".join(pd.concat([titration_series_samples, chRNA_samples, ExpOf52_samples]).index)
+        sample = "|".join(pd.concat([titration_series_samples, chRNA_samples, ExpOf52_samples, Exp_202310_3MoleculesOfInterest_samples]).index)
 
 
 use rule featurecounts as featurecounts_titrationseries with:

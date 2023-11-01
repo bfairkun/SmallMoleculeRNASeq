@@ -137,6 +137,7 @@ use rule leafcutter_cluster as leafcutter_cluster_all with:
     log:
         "logs/leafcutter_cluster_all.log"
 
+
 rule MakeGroupsFiles:
     output:
         "SplicingAnalysis/leafcutter/groupsfiles/{treatment}.txt"
@@ -452,8 +453,8 @@ rule GetPhyloP_All5ssPositions:
 
 use rule featurecounts as featureCounts_ALLSAMPLES_basic with:
     input:
-        bam = expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam", sample= AllSamples),
-        bai = expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam.bai", sample= AllSamples),
+        bam = expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam", sample= AllSamples_202310),
+        bai = expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam.bai", sample= AllSamples_202310),
         Comprehensive_gtf = "/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Annotations/gencode.v34.chromasomal.basic.annotation.gtf",
     log:
         "logs/featureCounts_ALLSAMPLES_basic.log"

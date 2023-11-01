@@ -1,6 +1,8 @@
 ---
 title: "2023-10-26_ExploreDrmModels"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 date: '2023-10-26'
 ---
 ```{r setup, include=FALSE}
@@ -33,7 +35,7 @@ I have noticed some funny things, in that depending on exactly how you call the 
 
 When I fit dose response curves to gene expression, I figured the following details would make the model most useful and easily interpretable:
 
-Response is in units of log2FC relative to DMSO... So I will use the $log2CPM_d - mean(log2CPM_{DMSO})$ as the response metric (where $log2CPM_d$ denotes the log2 CountsPerMillion for a gene at dose $d$). Thus, one of the limit parameters should be fixed at 0. For best modelling, it makes sense to limit parameters when reasonable, so I will also fit each treatment simultaneously such that I can limit the other limit parameter to be the same amongst all 3 treatments. The ED50 and slope parameter can freely vary between treatments, as I want to capture examples like HTT manual/eyeball interpretation of the dose response data looks like the slope is similar between all three treatments, but the ED50 is shifted. And in the HSD17B4 example, the slope looks clearly different between treatments, and the underlying reason makes sense (in that at the splicing level, there are either 2  or 1 poison exons depending on the treatment, and the gene expression response is logically sort of like the complement of the product of the poison exon dose response curves). Also, for simplicity/interpretability, rather than use the actual nanomolar dose for each treatment, I will rescale the doses of branaplam and C2C5 to be in units that are roughly functionally equivalent to the nanomolar dose for risdiplam. For example, since C2C5 is about 10x more potent than risdiplam, I will use 10*nanomolarDose for C2C5.
+Response is in units of log2FC relative to DMSO... So I will use the $log2CPM_d - mean(log2CPM_{DMSO})$ as the response metric (where $log2CPM_d$ denotes the log2 CountsPerMillion for a gene at dose $d$). Thus, one of the limit parameters should be fixed at 0. For best modelling, it makes sense to limit parameters when reasonable, so I will also fit each treatment simultaneously such that I can limit the other limit parameter to be the same amongst all 3 treatments. The ED50 and slope parameter can freely vary between treatments, as I want to capture examples like HTT manual/eyeball interpretation of the dose response data looks like the slope is similar between all three treatments, but the ED50 is shifted. And in the HSD17B4 example, the slope looks clearly different between treatments, and the underlying reason makes sense (in that at the splicing level, there are either 2  or 1 poison exons depending on the treatment, and the gene expression response is logically sort of like the complement of the product of the poison exon dose response curves). Also, for simplicity/interpretability, rather than use the actual nanomolar dose for each treatment, I will rescale the doses of branaplam and C2C5 to be in units that are roughly functionally equivalent to the nanomolar dose for risdiplam. For example, since C2C5 is about 10x more potent than risdiplam, I will use 10*nanomolarDose for C2C5. Also I know that the steepness parameter should be constrained... sometimes the fit converges to something really ridiculous with a unrealistically steep dose. Since b is scaled by the limits, it as actually reasonable imo to just set the same limits across all genes... something like $abs(c)<5$
 
 ## Analysis
 
@@ -87,63 +89,161 @@ expression.dat %>%
   facet_wrap(~hgnc_symbol, scale="free_y")
 ```
 
-Now fit models for each of these in three ways, which should all in effect be identical:
+Now plot some random genes...
+
+```{r, fig.height=10, fig.width=12}
+set.seed(0)
+expression.dat %>%
+  filter(!is.na(spearman) & !is.na(log2FC)) %>%
+  add_count(Geneid) %>%
+  filter(n==33) %>%
+  sample_n_of(40, hgnc_symbol) %>%
+  ggplot(aes(x=doseRank, y=log2FC, color=treatment)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~hgnc_symbol, scale="free_y")
+```
+
+Let's handpick a couple of those, to add to the gene list of interest to more carefully try fitting models...
 
 ```{r}
+GenesToHighlight <- c(GenesToHighlight, c("BTG2", "B9D1", "ZIK1", "POLN", "TOMM20P4", "CRYBB1", "EIF2AK4"))
+```
+
+
+Now fit models for each of these in three ways, which should all in effect be identical:
+
+## Without contraining slope
+
+```{r, results='asis'}
+SlopeAbsValueLimit <- 4.5
+control <- drmc(maxIt=5000)
 
 for (gene in GenesToHighlight){
-  print("#######################################################################")
+  cat("\n## ", gene, "\n")
   data <- expression.dat %>%
     mutate(treatment = factor(treatment)) %>%
     filter(hgnc_symbol == gene)
-  print(paste("Fitting", gene, "model with LL.4, fix upper limit"))
+  
+  P <- ggplot(data, aes(x=doseInRisdiscale, y=log2FC, color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans="log1p", breaks=c(10000, 1000,  100,  10,  0), labels=c("10K", "1K", "100", "10", "0"))
+  print(P)
+  cat("\n")
+  
+  cat("\n### LL.4, fix upper limit\n\n")
   tryCatch(expr={
-    fit.LL.4.Fixed.d <- drm(formula = log2FC ~ doseInRisdiscale,
+    fit <- drm(formula = log2FC ~ doseInRisdiscale,
                  data = data,
                  fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"), fixed=c(NA,NA,0,NA)),
                  curveid = treatment,
                  pmodels=data.frame(treatment, 1, treatment, treatment),
+                 control = control,
+                 # lowerl = c(-5, -Inf,  -Inf),
+                 # upperl = c(5, Inf,  Inf),
                  robust = "mean")
-    message("Successfully fitted model:")
-    plot(fit.LL.4.Fixed.d)
-    summary(fit.LL.4.Fixed.d)
+    message("\n\nSuccessfully fitted model:\n\n")
+    plot(fit)
+    as.data.frame(fit$coefficients) %>% knitr::kable() %>% print()
   },
   error=function(e){
       cat("ERROR:", gene, " model LL.4 fixed upper limit\n", conditionMessage(e), "\n")
     }
   )
 
-  print(paste("Fitting", gene, "model with LL.4, fix lower limit"))
+  cat("\n### LL.4, fix lower limit\n")
   tryCatch(expr={
-    fit.LL.4.Fixed.c <- drm(formula = log2FC ~ doseInRisdiscale,
+    fit <- drm(formula = log2FC ~ doseInRisdiscale,
                  data = data,
                  fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"), fixed=c(NA,0,NA,NA)),
                  curveid = treatment,
-                 pmodels=data.frame(treatment, treatment, 1, treatment),
+                 pmodels=data.frame(treatment, 1, treatment, treatment),# Dunno why this is parameterized as is... but this seems to work
+                 # lowerl = c(-5, -Inf,  -Inf),
+                 # upperl = c(5, Inf,  Inf),
                  robust = "mean")
-    message("Successfully fitted model.")
-    plot(fit.LL.4.Fixed.c)
-    summary(fit.LL.4.Fixed.c)
+    message("\n\nSuccessfully fitted model:\n\n")
+    plot(fit)
+    as.data.frame(fit$coefficients) %>% knitr::kable() %>% print()
   },
   error=function(e){
       cat("ERROR:", gene, " model LL.4 fixed lower limit\n", conditionMessage(e), "\n")
     }
   )
-  
-  print(paste("Fitting", gene, "model with LL.3"))
+
+  cat("\n### LL.3\n")
   tryCatch(expr={
-    fit.LL.3 <- drm(formula = log2FC ~ doseInRisdiscale,
+    fit <- drm(formula = log2FC ~ doseInRisdiscale,
                  data = data,
                  fct = LL.3(names=c("Steepness", "UpperLimit", "ED50"), fixed=c(NA,NA,NA)),
                  curveid = treatment,
                  pmodels=data.frame(treatment, 1, treatment),
+                 # lowerl = c(-5, -Inf,  -Inf),
+                 # upperl = c(5, Inf,  Inf),
                  robust = "mean")
-    message("Successfully fitted model.")
-    plot(fit.LL.3)
-    summary(fit.LL.3)
+    message("\n\nSuccessfully fitted model:\n\n")
+    plot(fit)
+    as.data.frame(fit$coefficients) %>% knitr::kable() %>% print()
   },
   error=function(e){
       cat("ERROR:", gene, " model LL.3\n", conditionMessage(e), "\n")
+    }
+  )
+  
+    cat("\n### LL.4, fix upper limit, limit, limit slope\n\n")
+  tryCatch(expr={
+    fit <- drm(formula = log2FC ~ doseInRisdiscale,
+                 data = data,
+                 fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"), fixed=c(NA,NA,0,NA)),
+                 curveid = treatment,
+                 pmodels=data.frame(treatment, 1, treatment, treatment),
+                 lowerl = c(-SlopeAbsValueLimit, -Inf,  -Inf),
+                 upperl = c(SlopeAbsValueLimit, Inf,  Inf),
+                 robust = "mean")
+    message("\n\nSuccessfully fitted model:\n\n")
+    plot(fit)
+    as.data.frame(fit$coefficients) %>% knitr::kable() %>% print()
+  },
+  error=function(e){
+      cat("ERROR:", gene, " model LL.4 fixed upper limit, limit slope\n", conditionMessage(e), "\n")
+    }
+  )
+
+  cat("\n### LL.4, fix lower limit, limit slope\n")
+  tryCatch(expr={
+    fit <- drm(formula = log2FC ~ doseInRisdiscale,
+                 data = data,
+                 fct = LL.4(names=c("Steepness", "LowerLimit", "UpperLimit", "ED50"), fixed=c(NA,0,NA,NA)),
+                 curveid = treatment,
+                 pmodels=data.frame(treatment, 1, treatment, treatment),# Dunno why this is parameterized as is... but this seems to work
+                 lowerl = c(-SlopeAbsValueLimit, -Inf,  -Inf),
+                 upperl = c(SlopeAbsValueLimit, Inf,  Inf),
+                 robust = "mean")
+    message("\n\nSuccessfully fitted model:\n\n")
+    plot(fit)
+    as.data.frame(fit$coefficients) %>% knitr::kable() %>% print()
+  },
+  error=function(e){
+      cat("ERROR:", gene, " model LL.4 fixed lower limit, limit slope\n", conditionMessage(e), "\n")
+    }
+  )
+
+  cat("\n### LL.3, limit slope\n")
+  tryCatch(expr={
+    fit <- drm(formula = log2FC ~ doseInRisdiscale,
+                 data = data,
+                 fct = LL.3(names=c("Steepness", "UpperLimit", "ED50"), fixed=c(NA,NA,NA)),
+                 curveid = treatment,
+                 pmodels=data.frame(treatment, 1, treatment),
+                 lowerl = c(-SlopeAbsValueLimit, -Inf,  -Inf),
+                 upperl = c(SlopeAbsValueLimit, Inf,  Inf),
+                 robust = "mean")
+    message("\n\nSuccessfully fitted model:\n\n")
+    plot(fit)
+    as.data.frame(fit$coefficients) %>% knitr::kable() %>% print()
+  },
+  error=function(e){
+      cat("ERROR:", gene, " model LL.3, limit slope\n", conditionMessage(e), "\n")
     }
   )
 }

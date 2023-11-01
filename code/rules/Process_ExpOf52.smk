@@ -130,13 +130,13 @@ rule MakePSITable:
 
 rule bgzip_and_tabix_bed:
     input:
-        PSI = "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numers.bed",
-        counts ="SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numersJunctionCounts.bed" 
+        PSI = "SplicingAnalysis/leafcutter_all_samples{w}/leafcutter_perind_numers.bed",
+        counts ="SplicingAnalysis/leafcutter_all_samples{w}/leafcutter_perind_numersJunctionCounts.bed" 
     output:
-        PSI = "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numers.bed.gz",
-        counts ="SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numersJunctionCounts.bed.gz" ,
-        PSI_tab = "SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numers.bed.gz.tbi",
-        counts_tab ="SplicingAnalysis/leafcutter_all_samples/leafcutter_perind_numersJunctionCounts.bed.gz.tbi" 
+        PSI = "SplicingAnalysis/leafcutter_all_samples{w}/leafcutter_perind_numers.bed.gz",
+        counts ="SplicingAnalysis/leafcutter_all_samples{w}/leafcutter_perind_numersJunctionCounts.bed.gz" ,
+        PSI_tab = "SplicingAnalysis/leafcutter_all_samples{w}/leafcutter_perind_numers.bed.gz.tbi",
+        counts_tab ="SplicingAnalysis/leafcutter_all_samples{w}/leafcutter_perind_numersJunctionCounts.bed.gz.tbi" 
     shell:
         """
         bgzip {input.PSI}
