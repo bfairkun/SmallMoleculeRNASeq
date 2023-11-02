@@ -2,7 +2,8 @@
 rule GatherExpMoleculesOfInterest:
     input:
         "SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.counts.gz",
-        "featureCounts/AllSamples_Counts.txt"
+        "featureCounts/AllSamples_Counts.txt",
+        expand("SplicingAnalysis/Exp202310_3Molecules_Contrasts/{ContrastName}_cluster_significance.txt", ContrastName=Exp_202310_3MoleculesOfInterest_contrasts.index)
 
 rule CopyAndMergeFastq_Exp_3MoleculesOfInterest:
     """
@@ -50,3 +51,32 @@ use rule MakePSITable as MakePSITable_202310 with:
         Prefix = "SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers"
     log:
         "logs/MakePSITable_202310.log"
+
+rule MakeGroupsFiles_ExpOf3:
+    output:
+        expand("SplicingAnalysis/Exp202310_3Molecules_Contrasts/{ContrastName}.groups.tsv", ContrastName = Exp_202310_3MoleculesOfInterest_contrasts.index)
+    conda:
+        "../envs/r_2.yml"
+    shell:
+        """
+        Rscript scripts/Exp202310_MakeLeafcutterContrasts.R
+        """
+
+use rule leafcutter_ds as leafcutter_ds_ExpOf3 with:
+    input:
+        groupfile = "SplicingAnalysis/Exp202310_3Molecules_Contrasts/{treatment}.groups.tsv",
+        numers = "SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.counts.gz",
+        Rscript = "scripts/leafcutter/scripts/leafcutter_ds.R"
+    output:
+        "SplicingAnalysis/Exp202310_3Molecules_Contrasts/{treatment}_effect_sizes.txt",
+        "SplicingAnalysis/Exp202310_3Molecules_Contrasts/{treatment}_cluster_significance.txt"
+    wildcard_constraints:
+        ContrastName = "|".join(Exp_202310_3MoleculesOfInterest_contrasts.index)
+    params:
+        Prefix = "SplicingAnalysis/Exp202310_3Molecules_Contrasts/",
+        ExtraParams = "-i 2 -g 2"
+    log:
+        "logs/leafcutter_ds_ExpOf3/{treatment}.log"
+
+# rule TidyDoseResponseData_ExpOf3:
+#     input:

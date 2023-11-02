@@ -20,6 +20,7 @@ titration_series_samples = pd.read_csv("config/samples.titrationseries.tsv", sep
 chRNA_samples = pd.read_csv("config/samples.chRNAPilotSequencing.tsv", sep='\t', index_col=0)
 ExpOf52_samples = pd.read_csv("config/samples.52MoleculeExperiment.tsv", sep='\t', index_col=0)
 Exp_202310_3MoleculesOfInterest_samples = pd.read_csv("config/samples.3MoleculesOfInterestExperiment.tsv", sep='\t', index_col=0)
+Exp_202310_3MoleculesOfInterest_contrasts = pd.read_csv("config/samples.3MoleculesOfInterestExperiment.Contrasts.tsv", sep='\t', index_col=0)
 
 ExpOf52_samples_Treatments = ExpOf52_samples['Treatment'].unique()
 ExpOf52_samples_NonControlTreatments = [i for i in ExpOf52_samples_Treatments if i != 'DMSO'] 

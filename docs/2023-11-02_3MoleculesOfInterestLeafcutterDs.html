@@ -10,8 +10,9 @@
 
 
 
+<meta name="date" content="2023-11-02" />
 
-<title>Home</title>
+<title>2023-11-02_3MoleculesOfInterestLeafcutterDs</title>
 
 <script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -276,15 +277,22 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Home</h1>
+<h1 class="title toc-ignore">2023-11-02_3MoleculesOfInterestLeafcutterDs</h1>
+<h4 class="date">2023-11-02</h4>
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#intro" id="toc-intro">Intro</a></li>
+<li><a href="#analysis" id="toc-analysis">Analysis</a></li>
+</ul>
+</div>
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -295,8 +303,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -309,9 +317,9 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong>
@@ -335,18 +343,21 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
@@ -565,376 +576,188 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were
-made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML
-(<code>docs/index.html</code>) files. If you’ve configured a remote Git
-repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
-in the table below to view the files as they were in that past version.
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
 </p>
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-File
-</th>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-<th>
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/b3b009e4ec70b1a498d4e523e073501a9b3c01c7/docs/index.html" target="_blank">b3b009e</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2023-10-26
-</td>
-<td>
-lots of updates
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/ea36e65d3d24bcefa896febc6457716cfc0c3f13/docs/index.html" target="_blank">ea36e65</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2023-03-07
-</td>
-<td>
-added igv session
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/a8c9152c8020689603208f678ef53d6864f0077c/docs/index.html" target="_blank">a8c9152</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2023-02-23
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/272cd7602a7f90fe4cf35c8919e39787aa3c8d38/docs/index.html" target="_blank">272cd76</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-26
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/7144e91a4c8cc1841aa792882b8089324408f2fe/docs/index.html" target="_blank">7144e91</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-21
-</td>
-<td>
-added chRNA notebook
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/22476105f2a7d2618d3f38a3e01a91a0df15b8e2/docs/index.html" target="_blank">2247610</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-19
-</td>
-<td>
-fix index
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/d9999f1a431074b84fd1277f854d1c45b22ddec1/docs/index.html" target="_blank">d9999f1</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-13
-</td>
-<td>
-added more EC50 estimation with PSI
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/b2a3c34c9237c53696332969b8e0a3f0f1732dc4/docs/index.html" target="_blank">b2a3c34</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-12
-</td>
-<td>
-update site with branaplsm-specific analysis
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/0d59720620fd3a949578040a4634edcb76629a20/analysis/index.Rmd" target="_blank">0d59720</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-08
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/0d59720620fd3a949578040a4634edcb76629a20/docs/index.html" target="_blank">0d59720</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-09-08
-</td>
-<td>
-update site
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/db9a4f02945a058f7c991284a3c04d3f0b005ed5/analysis/index.Rmd" target="_blank">db9a4f0</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-08-01
-</td>
-<td>
-big update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/db9a4f02945a058f7c991284a3c04d3f0b005ed5/docs/index.html" target="_blank">db9a4f0</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-08-01
-</td>
-<td>
-big update
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/4a410f53106f7a31fb71081b46c401f9fa7b7992/analysis/index.Rmd" target="_blank">4a410f5</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-03-08
-</td>
-<td>
-initial commit
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/4a410f53106f7a31fb71081b46c401f9fa7b7992/docs/index.html" target="_blank">4a410f5</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2022-03-08
-</td>
-<td>
-initial commit
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <hr>
 </div>
 </div>
 </div>
-<p>Welcome to my research website dealing with small molecule splicing
-stuff.</p>
-<div id="links-to-relevant-notebooks-by-description"
-class="section level2">
-<h2>Links to relevant notebooks by description:</h2>
-<p><a href="20211216_DifferentialSplicing.html">Splicing analysis
-notebook entry</a></p>
-<p><a href="20220629_FirstGlanceTitrationSeries.html">first glance at
-tiration series data notebook entry</a></p>
-<p><a href="20220707_TitrationSeries_DE_testing.html">DE testing and
-fitting curves to dose-response data</a></p>
-<p><a href="20220712_FitDoseResponseModels.html">fitting curves to
-dose-response data bit more carefully</a></p>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>I’ve processed each of three doses for each of three molecules as a
+leafcutter contrast with 5 DMSO samples… Previously in the firboblast
+experiment, I noticed a correlation between effect size and different
+types of NN in NNGA|GT introns… I will similarly look for that here with
+these three new molecules.</p>
 </div>
-<div id="full-listing-of-all-rmarkdown-notebooks-by-file-name"
-class="section level2">
-<h2>Full listing of all Rmarkdown notebooks by file name:</h2>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
-<pre><code>✔ ggplot2 3.3.6     ✔ purrr   0.3.4
-✔ tibble  3.1.7     ✔ dplyr   1.0.9
-✔ tidyr   1.2.0     ✔ stringr 1.4.0
-✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
-<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>rmds &lt;- list.files(path = &quot;../analysis/&quot;, pattern=&quot;^\\d+.+&quot;)
-rmd_htmls &lt;- str_replace(rmds, &quot;Rmd$&quot;, &quot;html&quot;)
-for(i in rmd_htmls){
-  cat(&quot;[&quot;, i, &quot;](&quot;, i,&quot;)\n\n&quot;, sep=&quot;&quot;)
-}</code></pre>
-<p><a
-href="20211216_DifferentialSplicing.html">20211216_DifferentialSplicing.html</a></p>
-<p><a
-href="20220221_ExploreExpOf52.html">20220221_ExploreExpOf52.html</a></p>
-<p><a
-href="20220629_FirstGlanceTitrationSeries.html">20220629_FirstGlanceTitrationSeries.html</a></p>
-<p><a
-href="20220707_TitrationSeries_DE_testing.html">20220707_TitrationSeries_DE_testing.html</a></p>
-<p><a
-href="20220707_TitrationSeries_DE_testing.nb.html">20220707_TitrationSeries_DE_testing.nb.html</a></p>
-<p><a
-href="20220712_FitDoseResponseModels.html">20220712_FitDoseResponseModels.html</a></p>
-<p><a
-href="20220726_Check_chRNATestSeq.html">20220726_Check_chRNATestSeq.html</a></p>
-<p><a
-href="20220804_MakeBigwigListTsv.html">20220804_MakeBigwigListTsv.html</a></p>
-<p><a href="20220809_geena.html">20220809_geena.html</a></p>
-<p><a href="20220822_Check_chRNA.html">20220822_Check_chRNA.html</a></p>
-<p><a
-href="20220907_IdentifyTargetsForVerification.html">20220907_IdentifyTargetsForVerification.html</a></p>
-<p><a
-href="20220908_IdentifyTargetsForVerification2.html">20220908_IdentifyTargetsForVerification2.html</a></p>
-<p><a
-href="20220913_TidyDataForJingxin.html">20220913_TidyDataForJingxin.html</a></p>
-<p><a
-href="20220915_ExploreDoseResponseCryptic3ss.html">20220915_ExploreDoseResponseCryptic3ss.html</a></p>
-<p><a
-href="20220915_ExploreSpliceQOutput.html">20220915_ExploreSpliceQOutput.html</a></p>
-<p><a
-href="20220916_CompareDE_LCL_Fibroblast.html">20220916_CompareDE_LCL_Fibroblast.html</a></p>
-<p><a
-href="20220919_chRNA_IntronRetention.html">20220919_chRNA_IntronRetention.html</a></p>
-<p><a
-href="20220922_ExploreSubparRNAseq.html">20220922_ExploreSubparRNAseq.html</a></p>
-<p><a
-href="20220923_ExploreSpecificityEstimates.html">20220923_ExploreSpecificityEstimates.html</a></p>
-<p><a
-href="20221108_MakeFigsFor10minPresentation.html">20221108_MakeFigsFor10minPresentation.html</a></p>
-<p><a
-href="2023-10-26_ExploreDrmModels.html">2023-10-26_ExploreDrmModels.html</a></p>
-<p><a
-href="2023-10-31_Explore3MoleculesOfInterest.html">2023-10-31_Explore3MoleculesOfInterest.html</a></p>
-<p><a
-href="2023-11-02_3MoleculesOfInterestLeafcutterDs.html">2023-11-02_3MoleculesOfInterestLeafcutterDs.html</a></p>
-<p><a
-href="20230214_MakeSampesConfigFor52MoleculeExperiment.html">20230214_MakeSampesConfigFor52MoleculeExperiment.html</a></p>
-<p><a
-href="20230223_PlotPCA_WithStructures.html">20230223_PlotPCA_WithStructures.html</a></p>
-<p><a
-href="20230306_CheckIntronsWithUniqueSpecifities.html">20230306_CheckIntronsWithUniqueSpecifities.html</a></p>
-<p><a
-href="20230322_CandidateGUUAAG_bulges.html">20230322_CandidateGUUAAG_bulges.html</a></p>
-<p><a
-href="20230418_ExploreIshigamiGEO.html">20230418_ExploreIshigamiGEO.html</a></p>
-<p><a
-href="20230502_PCAPlotsForYang.html">20230502_PCAPlotsForYang.html</a></p>
-<p><a
-href="20230915_TopHitsAcrossDoses.html">20230915_TopHitsAcrossDoses.html</a></p>
-<p><a
-href="20230927_AGT_MechanismSearch.html">20230927_AGT_MechanismSearch.html</a></p>
-<p><a
-href="20231006_SearchForCausalJuncs.html">20231006_SearchForCausalJuncs.html</a></p>
-<p><a
-href="20231013_UnbiasedMotifSearch.html">20231013_UnbiasedMotifSearch.html</a></p>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<p>load libs</p>
+<pre class="r"><code>library(tidyverse)
+library(RColorBrewer)
+library(data.table)
+library(gplots)
+library(ggrepel)
+
+# define some useful funcs
+sample_n_of &lt;- function(data, size, ...) {
+  dots &lt;- quos(...)
+  
+  group_ids &lt;- data %&gt;% 
+    group_by(!!! dots) %&gt;% 
+    group_indices()
+  
+  sampled_groups &lt;- sample(unique(group_ids), size)
+  
+  data %&gt;% 
+    filter(group_ids %in% sampled_groups)
+}
+
+
+# Set theme
+theme_set(
+  theme_classic() +
+  theme(text=element_text(size=16,  family=&quot;Helvetica&quot;)))
+
+# I use layer a lot, to rotate long x-axis labels
+Rotate_x_labels &lt;- theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))</code></pre>
+<p>Read in data</p>
+<pre class="r"><code>juncs &lt;- fread(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz&quot;) %&gt;%
+  mutate(Junc = paste(chrom, start, end, strand, sep=&quot;_&quot;))
+donors &lt;- fread(&quot;../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz&quot;, col.names = c(&quot;Junc.Donor&quot;, &quot;seq&quot;, &quot;DonorScore&quot;)) %&gt;%
+  separate(Junc.Donor, into=c(&quot;Junc&quot;, &quot;Donor&quot;), sep=&quot;::&quot;)
+
+Cluster_sig &lt;- 
+  Sys.glob(&quot;../code/SplicingAnalysis/Exp202310_3Molecules_Contrasts/*_cluster_significance.txt&quot;) %&gt;%
+  setNames(str_replace(., &quot;../code/SplicingAnalysis/Exp202310_3Molecules_Contrasts/(.+?)_cluster_significance.txt&quot;, &quot;\\1&quot;)) %&gt;%
+  append(
+    Sys.glob(&quot;../code/SplicingAnalysis/leafcutter/differential_splicing/*_cluster_significance.txt&quot;) %&gt;%
+      grep(&quot;ExpOf52&quot;, ., invert=T, value=T) %&gt;%
+      setNames(str_replace(., &quot;../code/SplicingAnalysis/leafcutter/differential_splicing/(.+?)_cluster_significance.txt&quot;, &quot;\\1&quot;))
+  ) %&gt;%
+  lapply(fread) %&gt;%
+  bind_rows(.id=&quot;Contrast&quot;)
+
+effect_sizes &lt;- Sys.glob(&quot;../code/SplicingAnalysis/Exp202310_3Molecules_Contrasts/*_effect_sizes.txt&quot;) %&gt;%
+  setNames(str_replace(., &quot;../code/SplicingAnalysis/Exp202310_3Molecules_Contrasts/(.+?)_effect_sizes.txt&quot;, &quot;\\1&quot;)) %&gt;%
+  append(
+    Sys.glob(&quot;../code/SplicingAnalysis/leafcutter/differential_splicing/*_effect_sizes.txt&quot;) %&gt;%
+      grep(&quot;ExpOf52&quot;, ., invert=T, value=T) %&gt;%
+      setNames(str_replace(., &quot;../code/SplicingAnalysis/leafcutter/differential_splicing/(.+?)_effect_sizes.txt&quot;, &quot;\\1&quot;))
+  ) %&gt;%
+  lapply(fread, col.names=c(&quot;intron&quot;, &quot;logef&quot;, &quot;DMSO&quot;, &quot;treatment&quot;, &quot;deltapsi&quot;)) %&gt;%
+  bind_rows(.id=&quot;Contrast&quot;) %&gt;%
+  mutate(Junc = str_replace(intron, &quot;^(.+?):(.+?):(.+?):clu_.+?_([+-])$&quot;, &quot;\\1_\\2_\\3_\\4&quot;)) %&gt;%
+  mutate(cluster = str_replace(intron, &quot;^(.+?):.+?:.+?:(clu_.+?_[+-])$&quot;, &quot;\\1:\\2&quot;)) %&gt;%
+  inner_join(
+    inner_join(juncs, donors)
+  ) %&gt;%
+  inner_join(Cluster_sig) %&gt;%
+  mutate(CellType = if_else(str_detect(Contrast, &quot;_&quot;), &quot;LCL&quot;, &quot;Fibroblast&quot;)) %&gt;%
+  mutate(logef = if_else(CellType==&quot;Fibroblast&quot;, -1*logef, logef)) %&gt;%
+  mutate(logef = if_else(CellType==&quot;Fibroblast&quot;, -1*deltapsi, deltapsi)) %&gt;%
+  mutate(NN__GU = str_extract(seq, &quot;^\\w{2}&quot;)) %&gt;%
+  mutate(NNGU = substr(seq, 3, 4)) </code></pre>
+<pre class="r"><code>effect_sizes %&gt;%
+  filter(p.adjust &lt; 0.01) %&gt;%
+  ggplot(aes(x=logef, color=Contrast)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  geom_vline(
+    data = . %&gt;%
+      group_by(NNGU, Contrast) %&gt;%
+      summarise(med=median(logef, na.rm=T)),
+    aes(xintercept=med, color=Contrast),
+    linetype=&#39;dashed&#39;
+  ) +
+  coord_cartesian(xlim=c(-0.5, 0.5)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~NNGU) +
+  theme_light() +
+  ggtitle(&quot;Effect sizes for NN|GT introns, grouped by NN&quot;) +
+  labs(caption=&quot;Only included introns in FDR&lt;0.01 significant clusters&quot;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>effect_sizes %&gt;%
+  # filter(p.adjust &lt; 0.01) %&gt;%
+  filter(NNGU==&quot;GA&quot;) %&gt;%
+  ggplot(aes(x=logef, color=Contrast)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  geom_vline(
+    data = . %&gt;%
+      group_by(NN__GU, Contrast) %&gt;%
+      summarise(med=median(logef, na.rm=T)),
+    aes(xintercept=med, color=Contrast),
+    linetype=&#39;dashed&#39;
+  ) +
+  coord_cartesian(xlim=c(-0.5, 0.5)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~NN__GU) +
+  theme_light() +
+  ggtitle(&quot;Effect sizes for NNGA|GT introns, grouped by NN&quot;) +
+  labs(caption=&quot;All tested GA|GU&quot;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Make same plot with less samples… There’s a lot of clutter…</p>
+<pre class="r"><code>Colors &lt;- effect_sizes %&gt;%
+  distinct(Contrast) %&gt;%
+  mutate(Colors = recode(Contrast, SMSM27_3000=&quot;#3182bd&quot;, SMSM27_600=&quot;#9ecae1&quot;, SMSM27_120=&quot;#deebf7&quot;, SMSM32_120=&quot;#fee0d2&quot;, SMSM32_3000=&quot;#de2d26&quot;, SMSM32_600=&quot;#fc9272&quot;, SMSM6_10000=&quot;#a65628&quot;, SMSM6_2000=&quot;#a65628&quot;, SMSM6_50000=&quot;#a65628&quot;, A10=&quot;#7fc97f&quot;, C2=&quot;#beaed4&quot;, CUOME=&quot;#fdc086&quot;, SM2=&quot;#ffff99&quot;)) %&gt;%
+  dplyr::select(Contrast, Colors) %&gt;% deframe()
+
+Colors.Subset &lt;- effect_sizes %&gt;%
+  distinct(Contrast) %&gt;%
+  filter(Contrast %in% c(&quot;SM2&quot;, &quot;C2&quot;, &quot;SMSM27_3000&quot;, &quot;SMSM27_600&quot;, &quot;SMSM32_3000&quot;, &quot;SMSM32_600&quot;, &quot;SMSM6_50000&quot;)) %&gt;%
+  mutate(Colors = recode(Contrast, SMSM6_50000=&quot;#b15928&quot;, SMSM27_3000=&quot;#e31a1c&quot;, SMSM27_600=&quot;#fb9a99&quot;, SMSM32_3000=&quot;#ff7f00&quot;, SMSM32_600=&quot;#fdbf6f&quot;, C2=&quot;#377eb8&quot;, SM2=&quot;#4daf4a&quot;)) %&gt;%
+  dplyr::select(Contrast, Colors) %&gt;% deframe()
+
+effect_sizes %&gt;%
+  # filter(p.adjust &lt; 0.01) %&gt;%
+  filter(Contrast %in% names(Colors.Subset)) %&gt;%
+  filter(NNGU==&quot;GA&quot;) %&gt;%
+  group_by(NN__GU) %&gt;%
+  mutate(Unique_Elements = n_distinct(intron)) %&gt;%   # Now summarise with unique elements per group
+  ungroup() %&gt;%
+  mutate(FacetGroup = str_glue(&quot;{NN__GU}; n={Unique_Elements}&quot;)) %&gt;%
+  ggplot(aes(x=logef, color=Contrast)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  geom_vline(
+    data = . %&gt;%
+      group_by(FacetGroup, Contrast) %&gt;%
+      summarise(med=median(logef, na.rm=T)),
+    aes(xintercept=med, color=Contrast),
+    linetype=&#39;dashed&#39;
+  ) +
+  scale_color_manual(values=Colors.Subset, drop=T) +
+  coord_cartesian(xlim=c(-0.1, 0.1)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~FacetGroup) +
+  theme_light() +
+  ggtitle(&quot;Effect sizes for NNGA|GT introns, grouped by NN&quot;) +
+  labs(caption=&quot;All leafcutter-tested GA|GU&quot;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>So first recall this plot I have made in the past, where the x-axis
+is the spearman dose:PSI correlation coefficient, sort of a proxy for
+effects on different NN sub-categories of NNGA|GU introns. branaplam has
+stronger effects on GA, CA, and TA… but AA looks more or less the same
+between risdiplam/branaplam… AT maybe looks a bit risdiplam specific…
+This btw is the same sequence in that risdiplam-specific sequence in
+HSD17B4 which has two poison exons. In any case, now look at the second
+plot, where the x-axis is the logef (from leafcutter) for introns with
+these different groups… I also included some data from the fibroblast
+experiment: SM2 (colored green, because it is a branaplam scaffold) and
+C2 (colored blue because it is a risdiplam scaffold). Again just looking
+at SM2 and C2, the relative effects between classes are mostly
+consistent with the dose titration experiment with risdiplam and
+branaplam… Anyway, now looking at SMSM27 and SMSM32 (the red and
+orange), the effects look stronger than C2 for the GA and CA facets…
+Again, its tricky to compare, because the effective genome-wide dose
+isn’t exactly the same between experiments, and the cell type is
+different… But I figure that by looking across different facets you can
+sort of control for those things. So from that, I do feel in some ways
+these molecules do have some slight branaplam-like-character moreso than
+risdiplam.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -961,27 +784,30 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] forcats_0.5.1   stringr_1.4.0   dplyr_1.0.9     purrr_0.3.4    
-[5] readr_2.1.2     tidyr_1.2.0     tibble_3.1.7    ggplot2_3.3.6  
-[9] tidyverse_1.3.1
+ [1] ggrepel_0.9.1      gplots_3.1.3       data.table_1.14.2  RColorBrewer_1.1-3
+ [5] forcats_0.5.1      stringr_1.4.0      dplyr_1.0.9        purrr_0.3.4       
+ [9] readr_2.1.2        tidyr_1.2.0        tibble_3.1.7       ggplot2_3.3.6     
+[13] tidyverse_1.3.1   
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.8.3     lubridate_1.8.0  assertthat_0.2.1 rprojroot_2.0.3 
- [5] digest_0.6.29    utf8_1.2.2       R6_2.5.1         cellranger_1.1.0
- [9] backports_1.4.1  reprex_2.0.1     evaluate_0.15    httr_1.4.3      
-[13] pillar_1.7.0     rlang_1.0.2      readxl_1.4.0     rstudioapi_0.13 
-[17] whisker_0.4      jquerylib_0.1.4  rmarkdown_2.14   munsell_0.5.0   
-[21] broom_0.8.0      compiler_4.2.0   httpuv_1.6.5     modelr_0.1.8    
-[25] xfun_0.30        pkgconfig_2.0.3  htmltools_0.5.2  tidyselect_1.1.2
-[29] workflowr_1.7.0  fansi_1.0.3      crayon_1.5.1     tzdb_0.3.0      
-[33] dbplyr_2.1.1     withr_2.5.0      later_1.3.0      grid_4.2.0      
-[37] jsonlite_1.8.0   gtable_0.3.0     lifecycle_1.0.1  DBI_1.1.2       
-[41] git2r_0.30.1     magrittr_2.0.3   scales_1.2.0     cli_3.3.0       
-[45] stringi_1.7.6    fs_1.5.2         promises_1.2.0.1 xml2_1.3.3      
-[49] bslib_0.3.1      ellipsis_0.3.2   generics_0.1.2   vctrs_0.4.1     
-[53] tools_4.2.0      glue_1.6.2       hms_1.1.1        fastmap_1.1.0   
-[57] yaml_2.3.5       colorspace_2.0-3 rvest_1.0.2      knitr_1.39      
-[61] haven_2.5.0      sass_0.4.1      </code></pre>
+ [1] httr_1.4.3         sass_0.4.1         jsonlite_1.8.0     R.utils_2.11.0    
+ [5] modelr_0.1.8       gtools_3.9.2       bslib_0.3.1        assertthat_0.2.1  
+ [9] highr_0.9          cellranger_1.1.0   yaml_2.3.5         pillar_1.7.0      
+[13] backports_1.4.1    glue_1.6.2         digest_0.6.29      promises_1.2.0.1  
+[17] rvest_1.0.2        colorspace_2.0-3   htmltools_0.5.2    httpuv_1.6.5      
+[21] R.oo_1.24.0        pkgconfig_2.0.3    broom_0.8.0        haven_2.5.0       
+[25] scales_1.2.0       later_1.3.0        tzdb_0.3.0         git2r_0.30.1      
+[29] generics_0.1.2     farver_2.1.0       ellipsis_0.3.2     withr_2.5.0       
+[33] cli_3.3.0          magrittr_2.0.3     crayon_1.5.1       readxl_1.4.0      
+[37] evaluate_0.15      R.methodsS3_1.8.1  fs_1.5.2           fansi_1.0.3       
+[41] xml2_1.3.3         tools_4.2.0        hms_1.1.1          lifecycle_1.0.1   
+[45] munsell_0.5.0      reprex_2.0.1       compiler_4.2.0     jquerylib_0.1.4   
+[49] caTools_1.18.2     rlang_1.0.2        grid_4.2.0         rstudioapi_0.13   
+[53] bitops_1.0-7       labeling_0.4.2     rmarkdown_2.14     gtable_0.3.0      
+[57] DBI_1.1.2          R6_2.5.1           lubridate_1.8.0    knitr_1.39        
+[61] fastmap_1.1.0      utf8_1.2.2         workflowr_1.7.0    rprojroot_2.0.3   
+[65] KernSmooth_2.23-20 stringi_1.7.6      Rcpp_1.0.8.3       vctrs_0.4.1       
+[69] dbplyr_2.1.1       tidyselect_1.1.2   xfun_0.30         </code></pre>
 </div>
 </div>
 

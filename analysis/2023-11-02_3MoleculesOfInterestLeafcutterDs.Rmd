@@ -1,0 +1,177 @@
+---
+title: "2023-11-02_3MoleculesOfInterestLeafcutterDs"
+output: html_document
+date: '2023-11-02'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+
+## Intro
+
+I've processed each of three doses for each of three molecules as a leafcutter contrast with 5 DMSO samples... Previously in the firboblast experiment, I noticed a correlation between effect size and different types of NN in NNGA|GT introns... I will similarly look for that here with these three new molecules.
+
+## Analysis
+
+load libs
+
+```{r}
+library(tidyverse)
+library(RColorBrewer)
+library(data.table)
+library(gplots)
+library(ggrepel)
+
+# define some useful funcs
+sample_n_of <- function(data, size, ...) {
+  dots <- quos(...)
+  
+  group_ids <- data %>% 
+    group_by(!!! dots) %>% 
+    group_indices()
+  
+  sampled_groups <- sample(unique(group_ids), size)
+  
+  data %>% 
+    filter(group_ids %in% sampled_groups)
+}
+
+
+# Set theme
+theme_set(
+  theme_classic() +
+  theme(text=element_text(size=16,  family="Helvetica")))
+
+# I use layer a lot, to rotate long x-axis labels
+Rotate_x_labels <- theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+```
+
+Read in data
+
+```{r}
+juncs <- fread("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.gz") %>%
+  mutate(Junc = paste(chrom, start, end, strand, sep="_"))
+donors <- fread("../code/SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz", col.names = c("Junc.Donor", "seq", "DonorScore")) %>%
+  separate(Junc.Donor, into=c("Junc", "Donor"), sep="::")
+
+Cluster_sig <- 
+  Sys.glob("../code/SplicingAnalysis/Exp202310_3Molecules_Contrasts/*_cluster_significance.txt") %>%
+  setNames(str_replace(., "../code/SplicingAnalysis/Exp202310_3Molecules_Contrasts/(.+?)_cluster_significance.txt", "\\1")) %>%
+  append(
+    Sys.glob("../code/SplicingAnalysis/leafcutter/differential_splicing/*_cluster_significance.txt") %>%
+      grep("ExpOf52", ., invert=T, value=T) %>%
+      setNames(str_replace(., "../code/SplicingAnalysis/leafcutter/differential_splicing/(.+?)_cluster_significance.txt", "\\1"))
+  ) %>%
+  lapply(fread) %>%
+  bind_rows(.id="Contrast")
+
+effect_sizes <- Sys.glob("../code/SplicingAnalysis/Exp202310_3Molecules_Contrasts/*_effect_sizes.txt") %>%
+  setNames(str_replace(., "../code/SplicingAnalysis/Exp202310_3Molecules_Contrasts/(.+?)_effect_sizes.txt", "\\1")) %>%
+  append(
+    Sys.glob("../code/SplicingAnalysis/leafcutter/differential_splicing/*_effect_sizes.txt") %>%
+      grep("ExpOf52", ., invert=T, value=T) %>%
+      setNames(str_replace(., "../code/SplicingAnalysis/leafcutter/differential_splicing/(.+?)_effect_sizes.txt", "\\1"))
+  ) %>%
+  lapply(fread, col.names=c("intron", "logef", "DMSO", "treatment", "deltapsi")) %>%
+  bind_rows(.id="Contrast") %>%
+  mutate(Junc = str_replace(intron, "^(.+?):(.+?):(.+?):clu_.+?_([+-])$", "\\1_\\2_\\3_\\4")) %>%
+  mutate(cluster = str_replace(intron, "^(.+?):.+?:.+?:(clu_.+?_[+-])$", "\\1:\\2")) %>%
+  inner_join(
+    inner_join(juncs, donors)
+  ) %>%
+  inner_join(Cluster_sig) %>%
+  mutate(CellType = if_else(str_detect(Contrast, "_"), "LCL", "Fibroblast")) %>%
+  mutate(logef = if_else(CellType=="Fibroblast", -1*logef, logef)) %>%
+  mutate(logef = if_else(CellType=="Fibroblast", -1*deltapsi, deltapsi)) %>%
+  mutate(NN__GU = str_extract(seq, "^\\w{2}")) %>%
+  mutate(NNGU = substr(seq, 3, 4)) 
+
+```
+
+```{r}
+effect_sizes %>%
+  filter(p.adjust < 0.01) %>%
+  ggplot(aes(x=logef, color=Contrast)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype="dashed") +
+  geom_vline(
+    data = . %>%
+      group_by(NNGU, Contrast) %>%
+      summarise(med=median(logef, na.rm=T)),
+    aes(xintercept=med, color=Contrast),
+    linetype='dashed'
+  ) +
+  coord_cartesian(xlim=c(-0.5, 0.5)) +
+  ylab("CumulativeFraction") +
+  facet_wrap(~NNGU) +
+  theme_light() +
+  ggtitle("Effect sizes for NN|GT introns, grouped by NN") +
+  labs(caption="Only included introns in FDR<0.01 significant clusters")
+
+effect_sizes %>%
+  # filter(p.adjust < 0.01) %>%
+  filter(NNGU=="GA") %>%
+  ggplot(aes(x=logef, color=Contrast)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype="dashed") +
+  geom_vline(
+    data = . %>%
+      group_by(NN__GU, Contrast) %>%
+      summarise(med=median(logef, na.rm=T)),
+    aes(xintercept=med, color=Contrast),
+    linetype='dashed'
+  ) +
+  coord_cartesian(xlim=c(-0.5, 0.5)) +
+  ylab("CumulativeFraction") +
+  facet_wrap(~NN__GU) +
+  theme_light() +
+  ggtitle("Effect sizes for NNGA|GT introns, grouped by NN") +
+  labs(caption="All tested GA|GU")
+```
+
+Make same plot with less samples... There's a lot of clutter...
+
+```{r}
+Colors <- effect_sizes %>%
+  distinct(Contrast) %>%
+  mutate(Colors = recode(Contrast, SMSM27_3000="#3182bd", SMSM27_600="#9ecae1", SMSM27_120="#deebf7", SMSM32_120="#fee0d2", SMSM32_3000="#de2d26", SMSM32_600="#fc9272", SMSM6_10000="#a65628", SMSM6_2000="#a65628", SMSM6_50000="#a65628", A10="#7fc97f", C2="#beaed4", CUOME="#fdc086", SM2="#ffff99")) %>%
+  dplyr::select(Contrast, Colors) %>% deframe()
+
+Colors.Subset <- effect_sizes %>%
+  distinct(Contrast) %>%
+  filter(Contrast %in% c("SM2", "C2", "SMSM27_3000", "SMSM27_600", "SMSM32_3000", "SMSM32_600", "SMSM6_50000")) %>%
+  mutate(Colors = recode(Contrast, SMSM6_50000="#b15928", SMSM27_3000="#e31a1c", SMSM27_600="#fb9a99", SMSM32_3000="#ff7f00", SMSM32_600="#fdbf6f", C2="#377eb8", SM2="#4daf4a")) %>%
+  dplyr::select(Contrast, Colors) %>% deframe()
+
+effect_sizes %>%
+  # filter(p.adjust < 0.01) %>%
+  filter(Contrast %in% names(Colors.Subset)) %>%
+  filter(NNGU=="GA") %>%
+  group_by(NN__GU) %>%
+  mutate(Unique_Elements = n_distinct(intron)) %>%   # Now summarise with unique elements per group
+  ungroup() %>%
+  mutate(FacetGroup = str_glue("{NN__GU}; n={Unique_Elements}")) %>%
+  ggplot(aes(x=logef, color=Contrast)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype="dashed") +
+  geom_vline(
+    data = . %>%
+      group_by(FacetGroup, Contrast) %>%
+      summarise(med=median(logef, na.rm=T)),
+    aes(xintercept=med, color=Contrast),
+    linetype='dashed'
+  ) +
+  scale_color_manual(values=Colors.Subset, drop=T) +
+  coord_cartesian(xlim=c(-0.1, 0.1)) +
+  ylab("CumulativeFraction") +
+  facet_wrap(~FacetGroup) +
+  theme_light() +
+  ggtitle("Effect sizes for NNGA|GT introns, grouped by NN") +
+  labs(caption="All leafcutter-tested GA|GU")
+```
+
+So first recall this plot I have made in the past, where the x-axis is the spearman dose:PSI correlation coefficient, sort of a proxy for effects on different NN sub-categories of NNGA|GU introns. branaplam has stronger effects on GA, CA, and TA... but AA looks more or less the same between risdiplam/branaplam... AT maybe looks a bit risdiplam specific... This btw is the same sequence in that risdiplam-specific sequence in HSD17B4 which has two poison exons.
+In any case, now look at the second plot, where the x-axis is the logef (from leafcutter) for introns with these different groups... I also included some data from the fibroblast experiment: SM2 (colored green, because it is a branaplam scaffold) and C2 (colored blue because it is a risdiplam scaffold). Again just looking at SM2 and C2, the relative effects between classes are mostly consistent with the dose titration experiment with risdiplam and branaplam... Anyway, now looking at SMSM27 and SMSM32 (the red and orange), the effects look stronger than C2 for the GA and CA facets... Again, its tricky to compare, because the effective genome-wide dose isn't exactly the same between experiments, and the cell type is different... But I figure that by looking across different facets you can sort of control for those things. So from that, I do feel in some ways these molecules do have some slight branaplam-like-character moreso than risdiplam.
