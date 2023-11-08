@@ -7,8 +7,8 @@ rule fastp:
         R1 = lambda wildcards: samples.loc[wildcards.sample]['R1'],
         R2 = lambda wildcards: samples.loc[wildcards.sample]['R2']
     output:
-        R1 = "FastqFastp/{sample}.R1.fastq.gz",
-        R2 = "FastqFastp/{sample}.R2.fastq.gz",
+        R1 = temp("FastqFastp/{sample}.R1.fastq.gz"),
+        R2 = temp("FastqFastp/{sample}.R2.fastq.gz"),
         html = "FastqFastp/{sample}.fastp.html",
         json = "FastqFastp/{sample}.fastp.json"
     params:

@@ -286,6 +286,12 @@ $(document).ready(function () {
 <ul>
 <li><a href="#intro" id="toc-intro">Intro</a></li>
 <li><a href="#analysis" id="toc-analysis">Analysis</a></li>
+<li><a href="#differential-expression"
+id="toc-differential-expression">Differential expression</a>
+<ul>
+<li><a href="#make-igv-session" id="toc-make-igv-session">Make IGV
+session</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -313,13 +319,13 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-11-02
+<strong>Last updated:</strong> 2023-11-08
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 1
+aria-hidden="true"></span> 2
 </p>
 <p>
 <strong>Knit directory:</strong>
@@ -352,10 +358,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown is untracked by Git. To know which version of the R
-Markdown file created these results, you’ll want to first commit it to
-the Git repo. If you’re still working on the analysis, you can ignore
-this warning. When you’re finished, you can run
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -433,30 +439,72 @@ run.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
 </p>
 </div>
-<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! Using relative paths to the files within your workflowr
-project makes it easier to run your code on other machines.</p>
+<p>
+Using absolute paths to the files within your workflowr project makes it
+difficult for you and others to run your code on a different machine.
+Change the absolute path(s) below to the suggested relative path(s) to
+make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/
+</td>
+<td style="text-align:left;">
+../code/bigwigs/unstranded
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz
+</td>
+<td style="text-align:left;">
+../code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/
+</td>
+<td style="text-align:left;">
+../code
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree3c2aa401dcb108044b2382821578f792b0b42897targetblank3c2aa40a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree5dce412b8afc794d5b52530bc8ce46ccb0ad85c2targetblank5dce412a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/3c2aa401dcb108044b2382821578f792b0b42897" target="_blank">3c2aa40</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2" target="_blank">5dce412</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree3c2aa401dcb108044b2382821578f792b0b42897targetblank3c2aa40a"
+id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree5dce412b8afc794d5b52530bc8ce46ccb0ad85c2targetblank5dce412a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -466,7 +514,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/3c2aa401dcb108044b2382821578f792b0b42897" target="_blank">3c2aa40</a>.
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2" target="_blank">5dce412</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -487,6 +535,7 @@ Ignored files:
     Ignored:    analysis/.RData
     Ignored:    analysis/.Rhistory
     Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
+    Ignored:    analysis/figure/
     Ignored:    code/.DS_Store
     Ignored:    code/._DOCK7.pdf
     Ignored:    code/._DOCK7_DMSO1.pdf
@@ -510,6 +559,9 @@ Ignored files:
     Ignored:    code/DataNotToCommit/
     Ignored:    code/DonorMotifSearches/
     Ignored:    code/DoseResponseData/
+    Ignored:    code/Exp202310_tracks.xml
+    Ignored:    code/Exp202310_tracks_e.xml
+    Ignored:    code/Exp202310_tracks_overlaid.xml
     Ignored:    code/Fastq/
     Ignored:    code/FastqFastp/
     Ignored:    code/FivePrimeSpliceSites.txt
@@ -538,7 +590,6 @@ Ignored files:
     Ignored:    code/log
     Ignored:    code/logs/
     Ignored:    code/rstudio-server.job
-    Ignored:    code/rules/.ExpMoleculesOfInterest.smk.swp
     Ignored:    code/scratch/
     Ignored:    code/temp/
     Ignored:    code/test.txt.gz
@@ -553,14 +604,16 @@ Ignored files:
     Ignored:    data/~$52CompoundsTempPlateLayoutForPipettingConvenience.xlsx
 
 Untracked files:
-    Untracked:  analysis/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd
-    Untracked:  code/config/samples.3MoleculesOfInterestExperiment.Contrasts.tsv
-    Untracked:  code/scripts/Exp202310_MakeLeafcutterContrasts.R
+    Untracked:  code/scripts/DE_edgeR_ExpOf3.R
+    Untracked:  data/202310_FullMetadata.tsv.gz
 
 Unstaged changes:
-    Modified:   analysis/2023-10-31_Explore3MoleculesOfInterest.Rmd
+    Modified:   analysis/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd
+    Modified:   code/Snakefile
     Modified:   code/rules/ExpMoleculesOfInterest.smk
-    Modified:   code/rules/common.smk
+    Modified:   code/rules/ProcessTitrationSeries.smk
+    Modified:   code/rules/Process_chRNA.smk
+    Modified:   code/rules/RNASeqProcessing.smk
     Modified:   code/scripts/GenometracksByGenotype
 
 </code></pre>
@@ -576,10 +629,76 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown
+(<code>analysis/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd</code>)
+and HTML
+(<code>docs/2023-11-02_3MoleculesOfInterestLeafcutterDs.html</code>)
+files. If you’ve configured a remote Git repository (see
+<code>?wflow_git_remote</code>), click on the hyperlinks in the table
+below to view the files as they were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2/analysis/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd" target="_blank">5dce412</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-02
+</td>
+<td>
+updated nb
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2/docs/2023-11-02_3MoleculesOfInterestLeafcutterDs.html" target="_blank">5dce412</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-02
+</td>
+<td>
+updated nb
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
@@ -600,6 +719,8 @@ library(RColorBrewer)
 library(data.table)
 library(gplots)
 library(ggrepel)
+library(GGally)
+library(edgeR)
 
 # define some useful funcs
 sample_n_of &lt;- function(data, size, ...) {
@@ -679,6 +800,43 @@ effect_sizes &lt;- Sys.glob(&quot;../code/SplicingAnalysis/Exp202310_3Molecules_
   ggtitle(&quot;Effect sizes for NN|GT introns, grouped by NN&quot;) +
   labs(caption=&quot;Only included introns in FDR&lt;0.01 significant clusters&quot;)</code></pre>
 <p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-1">
+Past versions of unnamed-chunk-3-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2/docs/figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-3-1.png" target="_blank">5dce412</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>effect_sizes %&gt;%
   # filter(p.adjust &lt; 0.01) %&gt;%
   filter(NNGU==&quot;GA&quot;) %&gt;%
@@ -699,6 +857,43 @@ effect_sizes &lt;- Sys.glob(&quot;../code/SplicingAnalysis/Exp202310_3Molecules_
   ggtitle(&quot;Effect sizes for NNGA|GT introns, grouped by NN&quot;) +
   labs(caption=&quot;All tested GA|GU&quot;)</code></pre>
 <p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-3-2">
+Past versions of unnamed-chunk-3-2.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-3-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2/docs/figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-3-2.png" target="_blank">5dce412</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Make same plot with less samples… There’s a lot of clutter…</p>
 <pre class="r"><code>Colors &lt;- effect_sizes %&gt;%
   distinct(Contrast) %&gt;%
@@ -737,27 +932,549 @@ effect_sizes %&gt;%
   ggtitle(&quot;Effect sizes for NNGA|GT introns, grouped by NN&quot;) +
   labs(caption=&quot;All leafcutter-tested GA|GU&quot;)</code></pre>
 <p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>So first recall this plot I have made in the past, where the x-axis
-is the spearman dose:PSI correlation coefficient, sort of a proxy for
-effects on different NN sub-categories of NNGA|GU introns. branaplam has
-stronger effects on GA, CA, and TA… but AA looks more or less the same
-between risdiplam/branaplam… AT maybe looks a bit risdiplam specific…
-This btw is the same sequence in that risdiplam-specific sequence in
-HSD17B4 which has two poison exons. In any case, now look at the second
-plot, where the x-axis is the logef (from leafcutter) for introns with
-these different groups… I also included some data from the fibroblast
-experiment: SM2 (colored green, because it is a branaplam scaffold) and
-C2 (colored blue because it is a risdiplam scaffold). Again just looking
-at SM2 and C2, the relative effects between classes are mostly
-consistent with the dose titration experiment with risdiplam and
-branaplam… Anyway, now looking at SMSM27 and SMSM32 (the red and
-orange), the effects look stronger than C2 for the GA and CA facets…
-Again, its tricky to compare, because the effective genome-wide dose
-isn’t exactly the same between experiments, and the cell type is
-different… But I figure that by looking across different facets you can
-sort of control for those things. So from that, I do feel in some ways
-these molecules do have some slight branaplam-like-character moreso than
-risdiplam.</p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2/docs/figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-4-1.png" target="_blank">5dce412</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>So first recall a similar plot I have made in the past (in this
+notebook: <a
+href="https://bfairkun.github.io/SmallMoleculeRNASeq/20220923_ExploreSpecificityEstimates.html">https://bfairkun.github.io/SmallMoleculeRNASeq/20220923_ExploreSpecificityEstimates.html</a>),
+where the x-axis is the spearman dose:PSI correlation coefficient, sort
+of a proxy for effects on different NN sub-categories of NNGA|GU
+introns. branaplam has stronger effects on GA, CA, and TA… but AA looks
+more or less the same between risdiplam/branaplam… AT maybe looks a bit
+risdiplam specific… This btw is the same sequence in that
+risdiplam-specific sequence in HSD17B4 which has two poison exons. In
+any case, now look at the second plot, where the x-axis is the logef
+(from leafcutter) for introns with these different groups… I also
+included some data from the fibroblast experiment: SM2 (colored green,
+because it is a branaplam scaffold) and C2 (colored blue because it is a
+risdiplam scaffold). Again just looking at SM2 and C2, the relative
+effects between classes are mostly consistent with the dose titration
+experiment with risdiplam and branaplam… Anyway, now looking at SMSM27
+and SMSM32 (the red and orange), the effects look stronger than C2 for
+the GA and CA facets… Again, its tricky to compare, because the
+effective genome-wide dose isn’t exactly the same between experiments,
+and the cell type is different… But I figure that by looking across
+different facets you can sort of control for those things. So from that,
+I do feel in some ways these molecules do have some slight
+branaplam-like-character moreso than risdiplam.</p>
+</div>
+<div id="differential-expression" class="section level2">
+<h2>Differential expression</h2>
+<p>I used edge to make contrasts for each treatment:dose vs DMSO… I will
+look at the results, with a particular focus on identifying any totally
+novel genes for now, that don’t have any apparent effect in
+risdiplam/branaplam…</p>
+<pre class="r"><code>DE.results &lt;- 
+  bind_rows(
+    fread(&quot;../code/DE_testing/ExpOf3_Results.txt.gz&quot;) %&gt;%
+      mutate(CellType = &quot;LCL&quot;) %&gt;%
+      mutate(treatment = str_replace(treatment, &quot;^group&quot;, &quot;&quot;)),
+    fread(&quot;../code/DE_testing/Results.txt.gz&quot;) %&gt;%
+      mutate(CellType = &quot;Fibroblast&quot;)
+  )
+
+DE.results %&gt;%
+  ggplot(aes(x=logFC, y=-log10(FDR), color=FDR&lt;0.01)) +
+  geom_point(alpha=0.01) +
+  facet_wrap(~treatment)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>DE.results %&gt;%
+  dplyr::select(treatment, logCPM, Geneid) %&gt;%
+  pivot_wider(names_from=&quot;treatment&quot;, values_from=&quot;logCPM&quot;) %&gt;%
+  column_to_rownames(&quot;Geneid&quot;) %&gt;%
+  drop_na() %&gt;%
+  cor(method=&#39;s&#39;)</code></pre>
+<pre><code>            SMSM27_120 SMSM27_3000 SMSM27_600 SMSM32_120 SMSM32_3000 SMSM32_600
+SMSM27_120   1.0000000   1.0000000  1.0000000  1.0000000   1.0000000  1.0000000
+SMSM27_3000  1.0000000   1.0000000  1.0000000  1.0000000   1.0000000  1.0000000
+SMSM27_600   1.0000000   1.0000000  1.0000000  1.0000000   1.0000000  1.0000000
+SMSM32_120   1.0000000   1.0000000  1.0000000  1.0000000   1.0000000  1.0000000
+SMSM32_3000  1.0000000   1.0000000  1.0000000  1.0000000   1.0000000  1.0000000
+SMSM32_600   1.0000000   1.0000000  1.0000000  1.0000000   1.0000000  1.0000000
+SMSM6_10000  1.0000000   1.0000000  1.0000000  1.0000000   1.0000000  1.0000000
+SMSM6_2000   1.0000000   1.0000000  1.0000000  1.0000000   1.0000000  1.0000000
+SMSM6_50000  1.0000000   1.0000000  1.0000000  1.0000000   1.0000000  1.0000000
+C2           0.6718307   0.6718307  0.6718307  0.6718307   0.6718307  0.6718307
+CUOME        0.6718307   0.6718307  0.6718307  0.6718307   0.6718307  0.6718307
+SM2          0.6718307   0.6718307  0.6718307  0.6718307   0.6718307  0.6718307
+A10          0.6718307   0.6718307  0.6718307  0.6718307   0.6718307  0.6718307
+            SMSM6_10000 SMSM6_2000 SMSM6_50000        C2     CUOME       SM2
+SMSM27_120    1.0000000  1.0000000   1.0000000 0.6718307 0.6718307 0.6718307
+SMSM27_3000   1.0000000  1.0000000   1.0000000 0.6718307 0.6718307 0.6718307
+SMSM27_600    1.0000000  1.0000000   1.0000000 0.6718307 0.6718307 0.6718307
+SMSM32_120    1.0000000  1.0000000   1.0000000 0.6718307 0.6718307 0.6718307
+SMSM32_3000   1.0000000  1.0000000   1.0000000 0.6718307 0.6718307 0.6718307
+SMSM32_600    1.0000000  1.0000000   1.0000000 0.6718307 0.6718307 0.6718307
+SMSM6_10000   1.0000000  1.0000000   1.0000000 0.6718307 0.6718307 0.6718307
+SMSM6_2000    1.0000000  1.0000000   1.0000000 0.6718307 0.6718307 0.6718307
+SMSM6_50000   1.0000000  1.0000000   1.0000000 0.6718307 0.6718307 0.6718307
+C2            0.6718307  0.6718307   0.6718307 1.0000000 1.0000000 1.0000000
+CUOME         0.6718307  0.6718307   0.6718307 1.0000000 1.0000000 1.0000000
+SM2           0.6718307  0.6718307   0.6718307 1.0000000 1.0000000 1.0000000
+A10           0.6718307  0.6718307   0.6718307 1.0000000 1.0000000 1.0000000
+                  A10
+SMSM27_120  0.6718307
+SMSM27_3000 0.6718307
+SMSM27_600  0.6718307
+SMSM32_120  0.6718307
+SMSM32_3000 0.6718307
+SMSM32_600  0.6718307
+SMSM6_10000 0.6718307
+SMSM6_2000  0.6718307
+SMSM6_50000 0.6718307
+C2          1.0000000
+CUOME       1.0000000
+SM2         1.0000000
+A10         1.0000000</code></pre>
+<p>Ok, so it is clear that the logCPM column probably refers to the DMSO
+expression, or maybe the mean expession, and as it is the same value for
+amongst each contrast in the group of contrasts… I am anticipating
+looking for things that are significant and strong effect size in LCL,
+and further filtering out the genes for which that may be the case
+because there is lower expression and therefore likely less power in
+LCLs.</p>
+<pre class="r"><code>GenesHigherExpressedInLCLs &lt;- DE.results %&gt;%
+  distinct(CellType, Geneid, logCPM) %&gt;%
+  pivot_wider(names_from=&quot;CellType&quot;, values_from=&quot;logCPM&quot;) %&gt;%
+  filter(LCL &gt; Fibroblast) %&gt;%
+  pull(Geneid)
+
+diag_limitrange &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_density(...) + 
+    # coord_cartesian(xlim = c(1, 1E7)) +
+    theme_bw()
+}
+
+upper_point &lt;- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_hex(...) + 
+    geom_abline() +
+    theme_bw()
+}
+
+my_fn &lt;- function(data, mapping, method=&quot;s&quot;, use=&quot;everything&quot;, ...){
+              # grab data
+              x &lt;- eval_data_col(data, mapping$x)
+              y &lt;- eval_data_col(data, mapping$y)
+              # calculate correlation
+              corr &lt;- cor(x, y, method=method, use=use)
+              # calculate colour based on correlation value
+              # Here I have set a correlation of minus one to blue, 
+              # zero to white, and one to red 
+              # Change this to suit: possibly extend to add as an argument of `my_fn`
+              colFn &lt;- colorRampPalette(c(&quot;blue&quot;, &quot;white&quot;, &quot;red&quot;), interpolate =&#39;spline&#39;)
+              fill &lt;- colFn(100)[findInterval(corr, seq(-1, 1, length=100))]
+              ggally_cor(data = data, mapping = mapping, ...) + 
+                theme_void() +
+                theme(panel.background = element_rect(fill=fill) + theme_classic())
+}
+
+DE.results %&gt;%
+  dplyr::select(treatment, logFC, Geneid) %&gt;%
+  # filter(Geneid %in% GenesHigherExpressedInLCLs) %&gt;%
+  pivot_wider(names_from=&quot;treatment&quot;, values_from=&quot;logFC&quot;) %&gt;%
+  dplyr::select(-Geneid) %&gt;%
+  drop_na() %&gt;%
+  ggpairs(
+    title=&quot;log2FC across contrasts&quot;,
+    # upper=list(continuous = my_fn),
+    upper=list(continuous = wrap(&quot;cor&quot;, method = &quot;spearman&quot;, hjust=0.7)),
+    lower=list(continuous = upper_point),
+    diag=list(continuous = diag_limitrange)) +
+  theme_classic()</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>DE.results %&gt;%
+  dplyr::select(treatment, logFC, Geneid) %&gt;%
+  # filter(Geneid %in% GenesHigherExpressedInLCLs) %&gt;%
+  pivot_wider(names_from=&quot;treatment&quot;, values_from=&quot;logFC&quot;) %&gt;%
+  drop_na() %&gt;%
+  column_to_rownames(&quot;Geneid&quot;) %&gt;%
+  cor(method=&#39;s&#39;) %&gt;%
+  heatmap.2(trace=&#39;none&#39;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Let’s find some genes that are DE in SMSM27 or SMSM32, but not in SM2
+or C2, and then check for their dose response curve in
+branaplam/risdiplam…</p>
+<pre class="r"><code>GenesSignificantInFibroblast &lt;- DE.results %&gt;%
+  filter(CellType == &quot;Fibroblast&quot;) %&gt;%
+  filter(FDR &lt; 0.01 &amp; abs(logFC) &gt; 0.5) %&gt;%
+  filter(treatment %in% c(&quot;C2&quot;, &quot;SM2&quot;)) %&gt;%
+  distinct(Geneid) %&gt;% pull(Geneid)
+
+DE.results %&gt;%
+  filter(CellType == &quot;LCL&quot;) %&gt;%
+  filter(FDR &lt; 0.01 &amp; abs(logFC) &gt; 1) %&gt;%
+  filter(!Geneid %in% GenesSignificantInFibroblast) %&gt;%
+  filter(!Geneid %in% GenesHigherExpressedInLCLs) %&gt;%
+  ggplot(aes(x=logFC, y=-log10(FDR))) +
+  geom_point(alpha=0.1) +
+  facet_wrap(~treatment)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>DE.results %&gt;%
+  filter(CellType == &quot;LCL&quot;) %&gt;%
+  filter(FDR &lt; 0.01 &amp; abs(logFC) &gt; 1) %&gt;%
+  filter(!Geneid %in% GenesSignificantInFibroblast) %&gt;%
+  filter(!Geneid %in% GenesHigherExpressedInLCLs) </code></pre>
+<pre><code>        treatment                     Geneid     logFC     logCPM        F
+   1:  SMSM27_120   ENSG00000133063.16_CHIT1  2.052872  2.0811621 99.63585
+   2:  SMSM27_120   ENSG00000130032.17_PRRG3  6.983977 -0.1006592 44.53688
+   3:  SMSM27_120   ENSG00000204822.7_MRPL53  1.334302  2.6444511 34.40114
+   4:  SMSM27_120       ENSG00000263264.2_NA -1.069657  1.5626708 25.81330
+   5:  SMSM27_120 ENSG00000079337.16_RAPGEF3 -1.569852  0.2900860 25.81021
+  ---                                                                     
+1159: SMSM6_50000   ENSG00000101443.18_WFDC2 -1.788250 -0.7560406 10.28984
+1160: SMSM6_50000     ENSG00000080823.23_MOK  1.080904 -0.4729347 10.25412
+1161: SMSM6_50000   ENSG00000184786.6_DYNLT2 -2.522072 -1.6502297 10.16735
+1162: SMSM6_50000   ENSG00000089505.17_CMTM1 -1.453388 -0.9389790 10.16304
+1163: SMSM6_50000   ENSG00000185561.10_TLCD2  1.713482 -0.8396798 10.14342
+            PValue          FDR CellType
+   1: 1.087421e-11 6.396874e-09      LCL
+   2: 1.106004e-07 9.845675e-06      LCL
+   3: 1.240318e-06 5.484152e-05      LCL
+   4: 1.314963e-05 2.924082e-04      LCL
+   5: 1.316161e-05 2.924082e-04      LCL
+  ---                                   
+1159: 2.892821e-03 8.756121e-03      LCL
+1160: 2.936126e-03 8.869342e-03      LCL
+1161: 3.044220e-03 9.140766e-03      LCL
+1162: 3.049700e-03 9.151131e-03      LCL
+1163: 3.074773e-03 9.207986e-03      LCL</code></pre>
+<p>So I have a list of genes that are pretty meaningfully DE in SMSM27
+or SMSM32 and not in SM2 or C2… Let’s check their dose response curve in
+branaplam/risdiplam…</p>
+<pre class="r"><code>FullMetadata &lt;- read_tsv(&#39;../data/202310_FullMetadata.tsv.gz&#39;)
+
+doseResponse.ColorKey &lt;- FullMetadata %&gt;%
+  group_by(treatment) %&gt;%
+  filter(dose.nM == max(dose.nM)) %&gt;%
+  ungroup() %&gt;%
+  filter(treatment %in% c(&quot;Risdiplam&quot;, &quot;Branaplam&quot;, &quot;C2C5&quot;, &quot;SMSM6&quot;, &quot;SMSM32&quot;, &quot;SMSM27&quot;)) %&gt;%
+  distinct(treatment, color) %&gt;%
+  add_row(treatment = &quot;Old.DMSO&quot;, color = &quot;#cccccc&quot;) %&gt;%
+  add_row(treatment = &quot;New.DMSO&quot;, color = &quot;#252525&quot;)
+
+
+gene.counts &lt;- read_tsv(&quot;../code/featureCounts/AllSamples_Counts.txt&quot;, comment = &quot;#&quot;) %&gt;%
+  rename_with(~ str_replace(.x, &quot;Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam&quot;, &quot;\\1&quot;), contains(&quot;Alignments&quot;)) %&gt;%
+  dplyr::select(-c(2:6)) %&gt;%
+  column_to_rownames(&quot;Geneid&quot;) %&gt;%
+  DGEList() %&gt;%
+  calcNormFactors()
+
+CPM.mat &lt;- cpm(gene.counts, prior.count = 0.1, log = T)
+
+symbols &lt;- read_tsv(&quot;../data/Genes.list.txt&quot;)
+
+PotentialNewMoleculeSpecificDEGenes &lt;- DE.results %&gt;%
+  filter(CellType == &quot;LCL&quot;) %&gt;%
+  filter(FDR &lt; 0.01 &amp; abs(logFC) &gt; 2) %&gt;%
+  filter(!Geneid %in% GenesSignificantInFibroblast) %&gt;%
+  filter(!Geneid %in% GenesHigherExpressedInLCLs) %&gt;%
+  separate(Geneid, into=c(&quot;ensembl_id&quot;, &quot;hgnc_symbol&quot;), sep=&quot;_&quot;)
+
+set.seed(0)
+CPM.mat %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column() %&gt;%
+  mutate(ensembl_gene_id = str_replace_all(rowname, &quot;\\..+$&quot;, &quot;&quot;)) %&gt;%
+  as_tibble() %&gt;%
+  left_join(symbols) %&gt;%
+  filter(hgnc_symbol %in% PotentialNewMoleculeSpecificDEGenes$hgnc_symbol) %&gt;%
+  sample_n_of(size = 25, hgnc_symbol) %&gt;%
+  dplyr::select(-rowname) %&gt;%
+  pivot_longer(names_to = &quot;old.sample.name&quot;, values_to = &quot;log2CPM&quot;, -c(&quot;hgnc_symbol&quot;, &quot;ensembl_gene_id&quot;)) %&gt;%
+  left_join(FullMetadata) %&gt;%
+  filter(Experiment %in% c(&quot;Dose response titration&quot;, &quot;Exp090823&quot;)) %&gt;%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == &quot;Risdiplam&quot; ~ dose.nM,
+    treatment == &quot;C2C5&quot; ~ dose.nM * 10,
+    treatment == &quot;Branaplam&quot; ~ dose.nM * sqrt(10),
+    treatment == &quot;DMSO&quot; ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %&gt;%
+  mutate(treatment = case_when(
+    treatment == &quot;DMSO&quot; &amp; Experiment == &quot;Dose response titration&quot; ~ &quot;Old.DMSO&quot;,
+    treatment == &quot;DMSO&quot; &amp; Experiment == &quot;Exp090823&quot; ~ &quot;New.DMSO&quot;,
+    TRUE ~ treatment
+  )) %&gt;%
+  ggplot(aes(x=doseInApproxRisdiscale, y=log2CPM, group=interaction(rep, treatment), color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~hgnc_symbol, scales=&quot;free&quot;) +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
+  Rotate_x_labels +
+  labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;) +
+  theme(legend.position=&#39;bottom&#39;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-8-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>Most don’t seem all that unique. Here is a few cherry picked example
+that does look unique… It’d be nice to find the unproductive splice site
+for this.</p>
+<pre class="r"><code>CPM.mat %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column() %&gt;%
+  mutate(ensembl_gene_id = str_replace_all(rowname, &quot;\\..+$&quot;, &quot;&quot;)) %&gt;%
+  as_tibble() %&gt;%
+  left_join(symbols) %&gt;%
+  filter(hgnc_symbol %in% c(&quot;ACTL8&quot;, &quot;TERT&quot;, &quot;ADAMTSL2&quot;, &quot;IL2B&quot;, &quot;DECR2&quot;)) %&gt;%
+  dplyr::select(-rowname) %&gt;%
+  pivot_longer(names_to = &quot;old.sample.name&quot;, values_to = &quot;log2CPM&quot;, -c(&quot;hgnc_symbol&quot;, &quot;ensembl_gene_id&quot;)) %&gt;%
+  left_join(FullMetadata) %&gt;%
+  filter(Experiment %in% c(&quot;Dose response titration&quot;, &quot;Exp090823&quot;)) %&gt;%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == &quot;Risdiplam&quot; ~ dose.nM,
+    treatment == &quot;C2C5&quot; ~ dose.nM * 10,
+    treatment == &quot;Branaplam&quot; ~ dose.nM * sqrt(10),
+    treatment == &quot;DMSO&quot; ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %&gt;%
+  mutate(treatment = case_when(
+    treatment == &quot;DMSO&quot; &amp; Experiment == &quot;Dose response titration&quot; ~ &quot;Old.DMSO&quot;,
+    treatment == &quot;DMSO&quot; &amp; Experiment == &quot;Exp090823&quot; ~ &quot;New.DMSO&quot;,
+    TRUE ~ treatment
+  )) %&gt;%
+  ggplot(aes(x=doseInApproxRisdiscale, y=log2CPM, group=interaction(rep, treatment), color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~hgnc_symbol, scales=&quot;free&quot;) +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
+  Rotate_x_labels +
+  labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;) +
+  theme(legend.position=&#39;bottom&#39;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Let’s go about this a different way: Look for DE genes in this LCL
+experiment that have a low dose:response spearman correlation
+coefficient in the titration series experiment.</p>
+<pre class="r"><code>doseResponseExperimentDat &lt;- fread(&quot;../code/DoseResponseData/LCL/TidyExpressionDoseData_logFCTransformedAndAllDMSORepsInEachSeries.txt.gz&quot;)
+
+DE.results$treatment %&gt;% unique()</code></pre>
+<pre><code> [1] &quot;SMSM27_120&quot;  &quot;SMSM27_3000&quot; &quot;SMSM27_600&quot;  &quot;SMSM32_120&quot;  &quot;SMSM32_3000&quot;
+ [6] &quot;SMSM32_600&quot;  &quot;SMSM6_10000&quot; &quot;SMSM6_2000&quot;  &quot;SMSM6_50000&quot; &quot;C2&quot;         
+[11] &quot;CUOME&quot;       &quot;SM2&quot;         &quot;A10&quot;        </code></pre>
+<pre class="r"><code>DE.results %&gt;%
+  filter(CellType == &quot;LCL&quot;) %&gt;%
+  filter(treatment %in% c(&quot;C2&quot;, &quot;SM2&quot;, &quot;SMSM6_50000&quot;, &quot;SMSM27_3000&quot;, &quot;SMSM32_3000&quot;)) %&gt;%
+  group_by(Geneid) %&gt;%
+  filter(any(FDR &lt; 0.01 &amp; abs(logFC) &gt; 2)) %&gt;%
+  ungroup() %&gt;%
+  separate(Geneid, into=c(&quot;Geneid&quot;, &quot;hgnc_symbol&quot;), sep=&quot;_&quot;) %&gt;%
+  inner_join(
+    doseResponseExperimentDat %&gt;%
+    distinct(treatment, Geneid, spearman, .keep_all=T),
+    by=c(&quot;Geneid&quot;, &quot;hgnc_symbol&quot;)
+  ) %&gt;%
+  mutate(label = case_when(
+    hgnc_symbol %in% c(&quot;HTT&quot;, &quot;MYB&quot;, &quot;STAT1&quot;, &quot;HSD17B4&quot;, &quot;CRYL1&quot;, &quot;ATG5&quot;, &quot;BTG2&quot;) ~ hgnc_symbol,
+    log2FC &lt; -1.5 &amp; spearman &gt; -0.3 ~ hgnc_symbol,
+    TRUE ~ NA_character_
+  )) %&gt;%
+  ggplot(aes(x=spearman, y=log2FC)) +
+  geom_point(alpha=0.1) +
+  geom_point(
+    data = . %&gt;% filter(!is.na(label)),
+    color=&#39;red&#39;) +
+  geom_text_repel(aes(label=label), max.overlaps=Inf) +
+  facet_grid(treatment.x~treatment.y) +
+  labs(title=&quot;High correlation between spearman and high dose log2FC&quot;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Okay let’s manually inspect some of those genes in dose respnse
+curves…</p>
+<pre class="r"><code>CPM.mat %&gt;%
+  as.data.frame() %&gt;%
+  rownames_to_column() %&gt;%
+  mutate(ensembl_gene_id = str_replace_all(rowname, &quot;\\..+$&quot;, &quot;&quot;)) %&gt;%
+  as_tibble() %&gt;%
+  left_join(symbols) %&gt;%
+  filter(hgnc_symbol %in% c(&quot;ASIC1&quot;, &quot;LEXM&quot;, &quot;CCR4&quot;, &quot;ORG6&quot;, &quot;GNS&quot;, &quot;PAX9&quot;, &quot;GPR25&quot;, &quot;HDAC5&quot;, &quot;CSF3&quot;, &quot;FBXO9&quot;, &quot;CDC40&quot;, &quot;PHEX&quot;, &quot;MBOAT2&quot;, &quot;PPP3CA&quot;, &quot;MYEOV&quot;, &quot;TERT&quot;, &quot;ADAMTSL2&quot;, &quot;ACTL8&quot;)) %&gt;%
+  dplyr::select(-rowname) %&gt;%
+  pivot_longer(names_to = &quot;old.sample.name&quot;, values_to = &quot;log2CPM&quot;, -c(&quot;hgnc_symbol&quot;, &quot;ensembl_gene_id&quot;)) %&gt;%
+  left_join(FullMetadata) %&gt;%
+  filter(Experiment %in% c(&quot;Dose response titration&quot;, &quot;Exp090823&quot;)) %&gt;%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == &quot;Risdiplam&quot; ~ dose.nM,
+    treatment == &quot;C2C5&quot; ~ dose.nM * 10,
+    treatment == &quot;Branaplam&quot; ~ dose.nM * sqrt(10),
+    treatment == &quot;DMSO&quot; ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %&gt;%
+  mutate(treatment = case_when(
+    treatment == &quot;DMSO&quot; &amp; Experiment == &quot;Dose response titration&quot; ~ &quot;Old.DMSO&quot;,
+    treatment == &quot;DMSO&quot; &amp; Experiment == &quot;Exp090823&quot; ~ &quot;New.DMSO&quot;,
+    TRUE ~ treatment
+  )) %&gt;%
+  ggplot(aes(x=doseInApproxRisdiscale, y=log2CPM, group=interaction(rep, treatment), color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~hgnc_symbol, scales=&quot;free&quot;) +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
+  Rotate_x_labels +
+  labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;) +
+  theme(legend.position=&#39;bottom&#39;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>All of these are very very lowly expressed (eg ASIC1, PAX9, MYEOV),
+which I don’t think I trust these to reproduce, or they do have clear
+effects in one treatment but maybe the spearman coef is smaller in
+another (eg FBXO9, HDAC5 has obvious effect in branaplam, and maybe less
+so in risdi)… None of these have a convincing effect that wouldn’t be
+found in high dose of risdiplam/branaplam experiment.</p>
+<p>Nonetheless, I think to help me to better understand this experiment
+by manually browse coverage plots, I ought to make an IGV session with
+the help of my script that requires a metadata table.</p>
+<div id="make-igv-session" class="section level3">
+<h3>Make IGV session</h3>
+<p>Rewrites files that are read in this block. be careful not to rerun
+without thinking</p>
+<pre class="r"><code>MetadataForHelperScript &lt;- read_tsv(&quot;../code/bigwigs/BigwigList.tsv&quot;, col_names=c(&quot;SampleName&quot;, &quot;filepath&quot;, &quot;Group&quot;, &quot;Strand&quot;))
+
+MetadataForHelperScript %&gt;%
+  filter(Strand == &quot;.&quot;)
+
+Exp090823.Metadata &lt;- FullMetadata %&gt;%
+  filter(Experiment == &quot;Exp090823&quot;) %&gt;%
+  mutate(Group = case_when(
+    treatment == &quot;DMSO&quot; ~ paste(Experiment, treatment, dose.nM, cell.type, libType, rep, &quot;u&quot;, sep=&quot;_&quot;),
+    TRUE ~ paste(Experiment, treatment, dose.nM, cell.type, libType, &quot;u&quot;, sep=&quot;_&quot;))
+    ) %&gt;%
+  mutate(filepath = paste0(&quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/&quot; ,old.sample.name, &quot;.bw&quot;)) %&gt;%
+  mutate(Strand = &quot;.&quot;) %&gt;%
+  mutate(Supergroup = case_when(
+    old.sample.name %in% c(&quot;Exp090823_DMSO_NA_1&quot;, &quot;Exp090823_DMSO_NA_2&quot;) ~ &quot;SMSM27_titration_u&quot;,
+    old.sample.name %in% c(&quot;Exp090823_DMSO_NA_3&quot;, &quot;Exp090823_DMSO_NA_4&quot;) ~ &quot;SMSM32_titration_u&quot;,
+    old.sample.name %in% c(&quot;Exp090823_DMSO_NA_5&quot;) ~ &quot;SMSM6_titration_u&quot; ,
+    TRUE ~ paste(treatment, &quot;titration_u&quot;, sep=&quot;_&quot;)
+  )) %&gt;%
+  mutate(Color = case_when(
+    str_detect(old.sample.name, &quot;SMSM27_120&quot;) ~ &quot;#fee0d2&quot;,
+    str_detect(old.sample.name, &quot;SMSM27_600&quot;) ~ &quot;#fc9272&quot;,
+    str_detect(old.sample.name, &quot;SMSM27_3000&quot;) ~ &quot;#de2d26&quot;,
+
+    str_detect(old.sample.name, &quot;SMSM32_120&quot;) ~ &quot;#fee6ce&quot;,
+    str_detect(old.sample.name, &quot;SMSM32_600&quot;) ~ &quot;#fdae6b&quot;,
+    str_detect(old.sample.name, &quot;SMSM32_3000&quot;) ~ &quot;#e6550d&quot;,
+
+    str_detect(old.sample.name, &quot;SMSM6&quot;) ~ &quot;#b15928&quot;,
+    str_detect(old.sample.name, &quot;DMSO&quot;) ~ &quot;#969696&quot;,
+    TRUE ~ &quot;color&quot;
+  ))
+
+ColorsForTitration &lt;- 
+    FullMetadata %&gt;%
+      filter(treatment %in% c(&quot;C2C5&quot;, &quot;Risdiplam&quot;, &quot;Branaplam&quot;)) %&gt;%
+      distinct(dose.nM, treatment) %&gt;%
+      arrange(treatment, dose.nM) %&gt;%
+      mutate(TitrationColor = c(brewer.pal(8, &quot;Greens&quot;), brewer.pal(8, &quot;Purples&quot;), brewer.pal(8, &quot;Blues&quot;)))
+
+ColorsForTitration %&gt;%
+  filter(treatment %in% c(&quot;C2C5&quot;, &quot;Risdiplam&quot;, &quot;Branaplam&quot;)) %&gt;%
+  group_by(treatment) %&gt;%
+  mutate(doseRank = dense_rank(dose.nM)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=doseRank, y=treatment, fill=TitrationColor)) +
+  geom_raster() +
+  scale_fill_identity()
+
+Exp090823.Metadata$Supergroup %&gt;% unique()
+
+FullBwList &lt;- Exp090823.Metadata %&gt;%
+  dplyr::select(SampleName = old.sample.name, filepath, Group, Strand, Supergroup, color=Color) %&gt;%
+  bind_rows(
+    FullMetadata %&gt;%
+      filter(!is.na(bigwig)) %&gt;%
+      filter(!str_detect(old.sample.name, &quot;Exp090823&quot;)) %&gt;%
+      mutate(Strand = &quot;.&quot;) %&gt;%
+      dplyr::select(SampleName, filepath=bigwig, Group=group, Strand, Supergroup=supergroup, color)
+    ) %&gt;%
+  distinct()
+
+FullBwList %&gt;%
+  dplyr::select(-Supergroup, -color) %&gt;%
+  write_tsv(&quot;../code/bigwigs/BigwigList.tsv&quot;)
+
+FullBwList %&gt;%
+  mutate(bed = &quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz&quot;) %&gt;%
+  dplyr::select(Group, color, bed, Supergroup) %&gt;%
+  distinct() %&gt;%
+  write_tsv(&quot;../code/bigwigs/BigwigList.groups.tsv&quot;)
+  
+# GroupsFile &lt;- read_tsv(&quot;../code/bigwigs/BigwigList.groups.tsv&quot;)
+
+# FullMetadata %&gt;%
+#   filter(!is.na(bigwig)) %&gt;%
+#   filter(!str_detect(old.sample.name, &quot;Exp090823&quot;)) %&gt;%
+#   mutate(Strand = &quot;.&quot;) %&gt;%
+#   dplyr::select(SampleName, filepath=bigwig, Group=group)
+# 
+# Exp090823.Metadata %&gt;%
+#   # dplyr::select(SampleName = old.sample.name, filepath, Group, Strand) %&gt;%
+#   bind_rows(MetadataForHelperScript) %&gt;%
+#   distinct(Group, color, Supergroup, .keep_all=T) %&gt;%
+#   group_by()
+#   # mutate color, supergroup
+#   mutate(bed = &quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz&quot;) %&gt;%
+#   dplyr::select(name = SampleName, color)
+# 
+# # bind_rows(
+# #   GroupsFile,
+# #   Exp090823.Metadata %&gt;%
+# #     distinct(Group, Color, Supergroup) %&gt;%
+# #     mutate(PSI = &quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz&quot;)) %&gt;%
+# #   filter(!Group==&quot;Exp090823_DMSO_NA_LCL_polyA_u&quot;) %&gt;%
+# #   drop_na() %&gt;%
+# #   distinct(Group, Color, Supergroup) %&gt;%
+# #   write_tsv(&quot;../code/bigwigs/BigwigList.groups.tsv&quot;)
+
+
+
+read_tsv(&quot;../code/bigwigs/BigwigList.tsv&quot;) %&gt;%
+  mutate(filepath = str_replace_all(filepath, &quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/&quot;, &quot;&quot;)) %&gt;%
+  write_tsv(&quot;../code/bigwigs/BigwigList.relativepaths.tsv&quot;)</code></pre>
+<p>Now create the session</p>
+<pre class="bash"><code>cd /project2/yangili1/bjf79/20211209_JingxinRNAseq/code
+conda activate GenometracksByGenotype
+python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile &lt;(awk &#39;$1 ~ /_u$/&#39;
+bigwigs/BigwigList.groups.tsv | grep &#39;LCL&#39; | grep -e &#39;SMSM32&#39; -e &#39;SMSM27&#39; -e &#39;SMSM6&#39; -e &#39;Risdiplam&#39; -e &#39;Branaplam&#39; -e &#39;DMSO&#39; | awk -v OFS=&#39;\t&#39; &#39;BEGIN {print &quot;name&quot;, &quot;color&quot;, &quot;bed&quot;, &quot;supergroup&quot;} {print}&#39;) --BigwigList bigwigs/BigwigList.relativepaths.tsv --Normalization WholeGenome --Region chr2:190968033-191021960 --BigwigListType KeyFile --OutputPrefix scratch/Exp202310_  --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz  --NoSashimi --IGVSessionOutput --IGVSessionTemplate scripts/GenometracksByGenotype/tracks_templates/PlotAllOriginalBigwigs.xml
+
+mv scratch/Exp202310_tracks.xml ./
+</code></pre>
+<p>Then open the xml session file in IGV</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -784,30 +1501,34 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] ggrepel_0.9.1      gplots_3.1.3       data.table_1.14.2  RColorBrewer_1.1-3
- [5] forcats_0.5.1      stringr_1.4.0      dplyr_1.0.9        purrr_0.3.4       
- [9] readr_2.1.2        tidyr_1.2.0        tibble_3.1.7       ggplot2_3.3.6     
-[13] tidyverse_1.3.1   
+ [1] edgeR_3.38.4       limma_3.52.4       GGally_2.1.2       ggrepel_0.9.1     
+ [5] gplots_3.1.3       data.table_1.14.2  RColorBrewer_1.1-3 forcats_0.5.1     
+ [9] stringr_1.4.0      dplyr_1.0.9        purrr_0.3.4        readr_2.1.2       
+[13] tidyr_1.2.0        tibble_3.1.7       ggplot2_3.3.6      tidyverse_1.3.1   
 
 loaded via a namespace (and not attached):
- [1] httr_1.4.3         sass_0.4.1         jsonlite_1.8.0     R.utils_2.11.0    
- [5] modelr_0.1.8       gtools_3.9.2       bslib_0.3.1        assertthat_0.2.1  
- [9] highr_0.9          cellranger_1.1.0   yaml_2.3.5         pillar_1.7.0      
-[13] backports_1.4.1    glue_1.6.2         digest_0.6.29      promises_1.2.0.1  
-[17] rvest_1.0.2        colorspace_2.0-3   htmltools_0.5.2    httpuv_1.6.5      
-[21] R.oo_1.24.0        pkgconfig_2.0.3    broom_0.8.0        haven_2.5.0       
-[25] scales_1.2.0       later_1.3.0        tzdb_0.3.0         git2r_0.30.1      
-[29] generics_0.1.2     farver_2.1.0       ellipsis_0.3.2     withr_2.5.0       
-[33] cli_3.3.0          magrittr_2.0.3     crayon_1.5.1       readxl_1.4.0      
-[37] evaluate_0.15      R.methodsS3_1.8.1  fs_1.5.2           fansi_1.0.3       
-[41] xml2_1.3.3         tools_4.2.0        hms_1.1.1          lifecycle_1.0.1   
-[45] munsell_0.5.0      reprex_2.0.1       compiler_4.2.0     jquerylib_0.1.4   
-[49] caTools_1.18.2     rlang_1.0.2        grid_4.2.0         rstudioapi_0.13   
-[53] bitops_1.0-7       labeling_0.4.2     rmarkdown_2.14     gtable_0.3.0      
-[57] DBI_1.1.2          R6_2.5.1           lubridate_1.8.0    knitr_1.39        
-[61] fastmap_1.1.0      utf8_1.2.2         workflowr_1.7.0    rprojroot_2.0.3   
-[65] KernSmooth_2.23-20 stringi_1.7.6      Rcpp_1.0.8.3       vctrs_0.4.1       
-[69] dbplyr_2.1.1       tidyselect_1.1.2   xfun_0.30         </code></pre>
+ [1] bitops_1.0-7       fs_1.5.2           bit64_4.0.5        lubridate_1.8.0   
+ [5] httr_1.4.3         rprojroot_2.0.3    tools_4.2.0        backports_1.4.1   
+ [9] bslib_0.3.1        utf8_1.2.2         R6_2.5.1           KernSmooth_2.23-20
+[13] DBI_1.1.2          colorspace_2.0-3   withr_2.5.0        tidyselect_1.1.2  
+[17] bit_4.0.4          compiler_4.2.0     git2r_0.30.1       cli_3.3.0         
+[21] rvest_1.0.2        xml2_1.3.3         labeling_0.4.2     sass_0.4.1        
+[25] caTools_1.18.2     scales_1.2.0       hexbin_1.28.3      digest_0.6.29     
+[29] rmarkdown_2.14     R.utils_2.11.0     pkgconfig_2.0.3    htmltools_0.5.2   
+[33] dbplyr_2.1.1       fastmap_1.1.0      highr_0.9          rlang_1.0.2       
+[37] readxl_1.4.0       rstudioapi_0.13    jquerylib_0.1.4    generics_0.1.2    
+[41] farver_2.1.0       jsonlite_1.8.0     vroom_1.5.7        gtools_3.9.2      
+[45] R.oo_1.24.0        magrittr_2.0.3     Rcpp_1.0.8.3       munsell_0.5.0     
+[49] fansi_1.0.3        lifecycle_1.0.1    R.methodsS3_1.8.1  stringi_1.7.6     
+[53] whisker_0.4        yaml_2.3.5         plyr_1.8.7         grid_4.2.0        
+[57] parallel_4.2.0     promises_1.2.0.1   crayon_1.5.1       lattice_0.20-45   
+[61] haven_2.5.0        hms_1.1.1          locfit_1.5-9.7     knitr_1.39        
+[65] pillar_1.7.0       reprex_2.0.1       glue_1.6.2         evaluate_0.15     
+[69] modelr_0.1.8       vctrs_0.4.1        tzdb_0.3.0         httpuv_1.6.5      
+[73] cellranger_1.1.0   gtable_0.3.0       reshape_0.8.9      assertthat_0.2.1  
+[77] xfun_0.30          broom_0.8.0        later_1.3.0        workflowr_1.7.0   
+[81] ellipsis_0.3.2    </code></pre>
+</div>
 </div>
 </div>
 

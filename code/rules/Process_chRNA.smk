@@ -16,8 +16,8 @@ use rule CopyAndMergeFastq as CopyAndMergeFastq_chRNA with:
         R1 = lambda wildcards: chRNA_samples.loc[wildcards.sample]['R1'],
         R2 = lambda wildcards: chRNA_samples.loc[wildcards.sample]['R2'],
     output:
-        R1 = "Fastq/{sample}.R1.fastq.gz",
-        R2 = "Fastq/{sample}.R2.fastq.gz",
+        R1 = temp("Fastq/{sample}.R1.fastq.gz"),
+        R2 = temp("Fastq/{sample}.R2.fastq.gz"),
     wildcard_constraints:
         sample = "|".join(chRNA_samples.index)
 
@@ -142,6 +142,6 @@ use rule MakeBigwigs_NormalizedToEdgeRFeatureCounts as MakeBigwigs_NormalizedToE
 
 rule GatherBigwigs:
     input:
-        expand("bigwigs/unstranded/{sample}.bw", sample=AllSamples),
+        expand("bigwigs/unstranded/{sample}.bw", sample=AllSamples_202310),
         expand("bigwigs/stranded/{sample}.minus.bw", sample=AllNEBNextSamples),
         expand("bigwigs/stranded/{sample}.plus.bw", sample=AllNEBNextSamples)

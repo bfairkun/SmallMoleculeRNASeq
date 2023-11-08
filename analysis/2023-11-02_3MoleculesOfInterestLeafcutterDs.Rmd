@@ -23,6 +23,8 @@ library(RColorBrewer)
 library(data.table)
 library(gplots)
 library(ggrepel)
+library(GGally)
+library(edgeR)
 
 # define some useful funcs
 sample_n_of <- function(data, size, ...) {
@@ -173,5 +175,436 @@ effect_sizes %>%
   labs(caption="All leafcutter-tested GA|GU")
 ```
 
-So first recall this plot I have made in the past, where the x-axis is the spearman dose:PSI correlation coefficient, sort of a proxy for effects on different NN sub-categories of NNGA|GU introns. branaplam has stronger effects on GA, CA, and TA... but AA looks more or less the same between risdiplam/branaplam... AT maybe looks a bit risdiplam specific... This btw is the same sequence in that risdiplam-specific sequence in HSD17B4 which has two poison exons.
+So first recall a similar plot I have made in the past (in this notebook: [https://bfairkun.github.io/SmallMoleculeRNASeq/20220923_ExploreSpecificityEstimates.html](https://bfairkun.github.io/SmallMoleculeRNASeq/20220923_ExploreSpecificityEstimates.html)), where the x-axis is the spearman dose:PSI correlation coefficient, sort of a proxy for effects on different NN sub-categories of NNGA|GU introns. branaplam has stronger effects on GA, CA, and TA... but AA looks more or less the same between risdiplam/branaplam... AT maybe looks a bit risdiplam specific... This btw is the same sequence in that risdiplam-specific sequence in HSD17B4 which has two poison exons.
 In any case, now look at the second plot, where the x-axis is the logef (from leafcutter) for introns with these different groups... I also included some data from the fibroblast experiment: SM2 (colored green, because it is a branaplam scaffold) and C2 (colored blue because it is a risdiplam scaffold). Again just looking at SM2 and C2, the relative effects between classes are mostly consistent with the dose titration experiment with risdiplam and branaplam... Anyway, now looking at SMSM27 and SMSM32 (the red and orange), the effects look stronger than C2 for the GA and CA facets... Again, its tricky to compare, because the effective genome-wide dose isn't exactly the same between experiments, and the cell type is different... But I figure that by looking across different facets you can sort of control for those things. So from that, I do feel in some ways these molecules do have some slight branaplam-like-character moreso than risdiplam.
+
+## Differential expression
+
+I used edge to make contrasts for each treatment:dose vs DMSO... I will look at the results, with a particular focus on identifying any totally novel genes for now, that don't have any apparent effect in risdiplam/branaplam...
+
+```{r}
+DE.results <- 
+  bind_rows(
+    fread("../code/DE_testing/ExpOf3_Results.txt.gz") %>%
+      mutate(CellType = "LCL") %>%
+      mutate(treatment = str_replace(treatment, "^group", "")),
+    fread("../code/DE_testing/Results.txt.gz") %>%
+      mutate(CellType = "Fibroblast")
+  )
+
+DE.results %>%
+  ggplot(aes(x=logFC, y=-log10(FDR), color=FDR<0.01)) +
+  geom_point(alpha=0.01) +
+  facet_wrap(~treatment)
+
+DE.results %>%
+  dplyr::select(treatment, logCPM, Geneid) %>%
+  pivot_wider(names_from="treatment", values_from="logCPM") %>%
+  column_to_rownames("Geneid") %>%
+  drop_na() %>%
+  cor(method='s')
+```
+
+Ok, so it is clear that the logCPM column probably refers to the DMSO expression, or maybe the mean expession, and as it is the same value for amongst each contrast in the group of contrasts... I am anticipating looking for things that are significant and strong effect size in LCL, and further filtering out the genes for which that may be the case because there is lower expression and therefore likely less power in LCLs.
+
+```{r}
+
+GenesHigherExpressedInLCLs <- DE.results %>%
+  distinct(CellType, Geneid, logCPM) %>%
+  pivot_wider(names_from="CellType", values_from="logCPM") %>%
+  filter(LCL > Fibroblast) %>%
+  pull(Geneid)
+
+diag_limitrange <- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_density(...) + 
+    # coord_cartesian(xlim = c(1, 1E7)) +
+    theme_bw()
+}
+
+upper_point <- function(data, mapping, ...) { 
+  ggplot(data = data, mapping = mapping, ...) + 
+    geom_hex(...) + 
+    geom_abline() +
+    theme_bw()
+}
+
+my_fn <- function(data, mapping, method="s", use="everything", ...){
+              # grab data
+              x <- eval_data_col(data, mapping$x)
+              y <- eval_data_col(data, mapping$y)
+              # calculate correlation
+              corr <- cor(x, y, method=method, use=use)
+              # calculate colour based on correlation value
+              # Here I have set a correlation of minus one to blue, 
+              # zero to white, and one to red 
+              # Change this to suit: possibly extend to add as an argument of `my_fn`
+              colFn <- colorRampPalette(c("blue", "white", "red"), interpolate ='spline')
+              fill <- colFn(100)[findInterval(corr, seq(-1, 1, length=100))]
+              ggally_cor(data = data, mapping = mapping, ...) + 
+                theme_void() +
+                theme(panel.background = element_rect(fill=fill) + theme_classic())
+}
+
+DE.results %>%
+  dplyr::select(treatment, logFC, Geneid) %>%
+  # filter(Geneid %in% GenesHigherExpressedInLCLs) %>%
+  pivot_wider(names_from="treatment", values_from="logFC") %>%
+  dplyr::select(-Geneid) %>%
+  drop_na() %>%
+  ggpairs(
+    title="log2FC across contrasts",
+    # upper=list(continuous = my_fn),
+    upper=list(continuous = wrap("cor", method = "spearman", hjust=0.7)),
+    lower=list(continuous = upper_point),
+    diag=list(continuous = diag_limitrange)) +
+  theme_classic()
+
+
+DE.results %>%
+  dplyr::select(treatment, logFC, Geneid) %>%
+  # filter(Geneid %in% GenesHigherExpressedInLCLs) %>%
+  pivot_wider(names_from="treatment", values_from="logFC") %>%
+  drop_na() %>%
+  column_to_rownames("Geneid") %>%
+  cor(method='s') %>%
+  heatmap.2(trace='none')
+```
+
+Let's find some genes that are DE in SMSM27 or SMSM32, but not in SM2 or C2, and then check for their dose response curve in branaplam/risdiplam...
+
+```{r}
+GenesSignificantInFibroblast <- DE.results %>%
+  filter(CellType == "Fibroblast") %>%
+  filter(FDR < 0.01 & abs(logFC) > 0.5) %>%
+  filter(treatment %in% c("C2", "SM2")) %>%
+  distinct(Geneid) %>% pull(Geneid)
+
+DE.results %>%
+  filter(CellType == "LCL") %>%
+  filter(FDR < 0.01 & abs(logFC) > 1) %>%
+  filter(!Geneid %in% GenesSignificantInFibroblast) %>%
+  filter(!Geneid %in% GenesHigherExpressedInLCLs) %>%
+  ggplot(aes(x=logFC, y=-log10(FDR))) +
+  geom_point(alpha=0.1) +
+  facet_wrap(~treatment)
+
+
+DE.results %>%
+  filter(CellType == "LCL") %>%
+  filter(FDR < 0.01 & abs(logFC) > 1) %>%
+  filter(!Geneid %in% GenesSignificantInFibroblast) %>%
+  filter(!Geneid %in% GenesHigherExpressedInLCLs) 
+
+```
+
+So I have a list of genes that are pretty meaningfully DE in SMSM27 or SMSM32 and not in SM2 or C2... Let's check their dose response curve in branaplam/risdiplam...
+
+```{r, fig.height=10, fig.width=12}
+
+
+FullMetadata <- read_tsv('../data/202310_FullMetadata.tsv.gz')
+
+doseResponse.ColorKey <- FullMetadata %>%
+  group_by(treatment) %>%
+  filter(dose.nM == max(dose.nM)) %>%
+  ungroup() %>%
+  filter(treatment %in% c("Risdiplam", "Branaplam", "C2C5", "SMSM6", "SMSM32", "SMSM27")) %>%
+  distinct(treatment, color) %>%
+  add_row(treatment = "Old.DMSO", color = "#cccccc") %>%
+  add_row(treatment = "New.DMSO", color = "#252525")
+
+
+gene.counts <- read_tsv("../code/featureCounts/AllSamples_Counts.txt", comment = "#") %>%
+  rename_with(~ str_replace(.x, "Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam", "\\1"), contains("Alignments")) %>%
+  dplyr::select(-c(2:6)) %>%
+  column_to_rownames("Geneid") %>%
+  DGEList() %>%
+  calcNormFactors()
+
+CPM.mat <- cpm(gene.counts, prior.count = 0.1, log = T)
+
+symbols <- read_tsv("../data/Genes.list.txt")
+
+PotentialNewMoleculeSpecificDEGenes <- DE.results %>%
+  filter(CellType == "LCL") %>%
+  filter(FDR < 0.01 & abs(logFC) > 2) %>%
+  filter(!Geneid %in% GenesSignificantInFibroblast) %>%
+  filter(!Geneid %in% GenesHigherExpressedInLCLs) %>%
+  separate(Geneid, into=c("ensembl_id", "hgnc_symbol"), sep="_")
+
+set.seed(0)
+CPM.mat %>%
+  as.data.frame() %>%
+  rownames_to_column() %>%
+  mutate(ensembl_gene_id = str_replace_all(rowname, "\\..+$", "")) %>%
+  as_tibble() %>%
+  left_join(symbols) %>%
+  filter(hgnc_symbol %in% PotentialNewMoleculeSpecificDEGenes$hgnc_symbol) %>%
+  sample_n_of(size = 25, hgnc_symbol) %>%
+  dplyr::select(-rowname) %>%
+  pivot_longer(names_to = "old.sample.name", values_to = "log2CPM", -c("hgnc_symbol", "ensembl_gene_id")) %>%
+  left_join(FullMetadata) %>%
+  filter(Experiment %in% c("Dose response titration", "Exp090823")) %>%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == "Risdiplam" ~ dose.nM,
+    treatment == "C2C5" ~ dose.nM * 10,
+    treatment == "Branaplam" ~ dose.nM * sqrt(10),
+    treatment == "DMSO" ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %>%
+  mutate(treatment = case_when(
+    treatment == "DMSO" & Experiment == "Dose response titration" ~ "Old.DMSO",
+    treatment == "DMSO" & Experiment == "Exp090823" ~ "New.DMSO",
+    TRUE ~ treatment
+  )) %>%
+  ggplot(aes(x=doseInApproxRisdiscale, y=log2CPM, group=interaction(rep, treatment), color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~hgnc_symbol, scales="free") +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
+  Rotate_x_labels +
+  labs(x="nanomolar of risdiplam (or approx equivalent)") +
+  theme(legend.position='bottom')
+
+```
+
+Most don't seem all that unique. Here is a few cherry picked example that does look unique... It'd be nice to find the unproductive splice site for this.
+
+```{r}
+CPM.mat %>%
+  as.data.frame() %>%
+  rownames_to_column() %>%
+  mutate(ensembl_gene_id = str_replace_all(rowname, "\\..+$", "")) %>%
+  as_tibble() %>%
+  left_join(symbols) %>%
+  filter(hgnc_symbol %in% c("ACTL8", "TERT", "ADAMTSL2", "IL2B", "DECR2")) %>%
+  dplyr::select(-rowname) %>%
+  pivot_longer(names_to = "old.sample.name", values_to = "log2CPM", -c("hgnc_symbol", "ensembl_gene_id")) %>%
+  left_join(FullMetadata) %>%
+  filter(Experiment %in% c("Dose response titration", "Exp090823")) %>%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == "Risdiplam" ~ dose.nM,
+    treatment == "C2C5" ~ dose.nM * 10,
+    treatment == "Branaplam" ~ dose.nM * sqrt(10),
+    treatment == "DMSO" ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %>%
+  mutate(treatment = case_when(
+    treatment == "DMSO" & Experiment == "Dose response titration" ~ "Old.DMSO",
+    treatment == "DMSO" & Experiment == "Exp090823" ~ "New.DMSO",
+    TRUE ~ treatment
+  )) %>%
+  ggplot(aes(x=doseInApproxRisdiscale, y=log2CPM, group=interaction(rep, treatment), color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~hgnc_symbol, scales="free") +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
+  Rotate_x_labels +
+  labs(x="nanomolar of risdiplam (or approx equivalent)") +
+  theme(legend.position='bottom')
+```
+
+Let's go about this a different way: Look for DE genes in this LCL experiment that have a low dose:response spearman correlation coefficient in the titration series experiment.
+
+```{r}
+doseResponseExperimentDat <- fread("../code/DoseResponseData/LCL/TidyExpressionDoseData_logFCTransformedAndAllDMSORepsInEachSeries.txt.gz")
+
+DE.results$treatment %>% unique()
+
+DE.results %>%
+  filter(CellType == "LCL") %>%
+  filter(treatment %in% c("C2", "SM2", "SMSM6_50000", "SMSM27_3000", "SMSM32_3000")) %>%
+  group_by(Geneid) %>%
+  filter(any(FDR < 0.01 & abs(logFC) > 2)) %>%
+  ungroup() %>%
+  separate(Geneid, into=c("Geneid", "hgnc_symbol"), sep="_") %>%
+  inner_join(
+    doseResponseExperimentDat %>%
+    distinct(treatment, Geneid, spearman, .keep_all=T),
+    by=c("Geneid", "hgnc_symbol")
+  ) %>%
+  mutate(label = case_when(
+    hgnc_symbol %in% c("HTT", "MYB", "STAT1", "HSD17B4", "CRYL1", "ATG5", "BTG2") ~ hgnc_symbol,
+    log2FC < -1.5 & spearman > -0.3 ~ hgnc_symbol,
+    TRUE ~ NA_character_
+  )) %>%
+  ggplot(aes(x=spearman, y=log2FC)) +
+  geom_point(alpha=0.1) +
+  geom_point(
+    data = . %>% filter(!is.na(label)),
+    color='red') +
+  geom_text_repel(aes(label=label), max.overlaps=Inf) +
+  facet_grid(treatment.x~treatment.y) +
+  labs(title="High correlation between spearman and high dose log2FC")
+```
+
+Okay let's manually inspect some of those genes in dose respnse curves...
+
+```{r, fig.height=8, fig.height=8}
+CPM.mat %>%
+  as.data.frame() %>%
+  rownames_to_column() %>%
+  mutate(ensembl_gene_id = str_replace_all(rowname, "\\..+$", "")) %>%
+  as_tibble() %>%
+  left_join(symbols) %>%
+  filter(hgnc_symbol %in% c("ASIC1", "LEXM", "CCR4", "ORG6", "GNS", "PAX9", "GPR25", "HDAC5", "CSF3", "FBXO9", "CDC40", "PHEX", "MBOAT2", "PPP3CA", "MYEOV", "TERT", "ADAMTSL2", "ACTL8")) %>%
+  dplyr::select(-rowname) %>%
+  pivot_longer(names_to = "old.sample.name", values_to = "log2CPM", -c("hgnc_symbol", "ensembl_gene_id")) %>%
+  left_join(FullMetadata) %>%
+  filter(Experiment %in% c("Dose response titration", "Exp090823")) %>%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == "Risdiplam" ~ dose.nM,
+    treatment == "C2C5" ~ dose.nM * 10,
+    treatment == "Branaplam" ~ dose.nM * sqrt(10),
+    treatment == "DMSO" ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %>%
+  mutate(treatment = case_when(
+    treatment == "DMSO" & Experiment == "Dose response titration" ~ "Old.DMSO",
+    treatment == "DMSO" & Experiment == "Exp090823" ~ "New.DMSO",
+    TRUE ~ treatment
+  )) %>%
+  ggplot(aes(x=doseInApproxRisdiscale, y=log2CPM, group=interaction(rep, treatment), color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~hgnc_symbol, scales="free") +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
+  Rotate_x_labels +
+  labs(x="nanomolar of risdiplam (or approx equivalent)") +
+  theme(legend.position='bottom')
+```
+
+All of these are very very lowly expressed (eg ASIC1, PAX9, MYEOV), which I don't think I trust these to reproduce, or they do have clear effects in one treatment but maybe the spearman coef is smaller in another (eg FBXO9, HDAC5 has obvious effect in branaplam, and maybe less so in risdi)... None of these have a convincing effect that wouldn't be found in high dose of risdiplam/branaplam experiment.
+
+Nonetheless, I think to help me to better understand this experiment by manually browse coverage plots, I ought to make an IGV session with the help of my script that requires a metadata table.
+
+### Make IGV session
+
+Rewrites files that are read in this block. be careful not to rerun without thinking
+
+```{r, eval=F}
+MetadataForHelperScript <- read_tsv("../code/bigwigs/BigwigList.tsv", col_names=c("SampleName", "filepath", "Group", "Strand"))
+
+MetadataForHelperScript %>%
+  filter(Strand == ".")
+
+Exp090823.Metadata <- FullMetadata %>%
+  filter(Experiment == "Exp090823") %>%
+  mutate(Group = case_when(
+    treatment == "DMSO" ~ paste(Experiment, treatment, dose.nM, cell.type, libType, rep, "u", sep="_"),
+    TRUE ~ paste(Experiment, treatment, dose.nM, cell.type, libType, "u", sep="_"))
+    ) %>%
+  mutate(filepath = paste0("/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/" ,old.sample.name, ".bw")) %>%
+  mutate(Strand = ".") %>%
+  mutate(Supergroup = case_when(
+    old.sample.name %in% c("Exp090823_DMSO_NA_1", "Exp090823_DMSO_NA_2") ~ "SMSM27_titration_u",
+    old.sample.name %in% c("Exp090823_DMSO_NA_3", "Exp090823_DMSO_NA_4") ~ "SMSM32_titration_u",
+    old.sample.name %in% c("Exp090823_DMSO_NA_5") ~ "SMSM6_titration_u" ,
+    TRUE ~ paste(treatment, "titration_u", sep="_")
+  )) %>%
+  mutate(Color = case_when(
+    str_detect(old.sample.name, "SMSM27_120") ~ "#fee0d2",
+    str_detect(old.sample.name, "SMSM27_600") ~ "#fc9272",
+    str_detect(old.sample.name, "SMSM27_3000") ~ "#de2d26",
+
+    str_detect(old.sample.name, "SMSM32_120") ~ "#fee6ce",
+    str_detect(old.sample.name, "SMSM32_600") ~ "#fdae6b",
+    str_detect(old.sample.name, "SMSM32_3000") ~ "#e6550d",
+
+    str_detect(old.sample.name, "SMSM6") ~ "#b15928",
+    str_detect(old.sample.name, "DMSO") ~ "#969696",
+    TRUE ~ "color"
+  ))
+
+ColorsForTitration <- 
+    FullMetadata %>%
+      filter(treatment %in% c("C2C5", "Risdiplam", "Branaplam")) %>%
+      distinct(dose.nM, treatment) %>%
+      arrange(treatment, dose.nM) %>%
+      mutate(TitrationColor = c(brewer.pal(8, "Greens"), brewer.pal(8, "Purples"), brewer.pal(8, "Blues")))
+
+ColorsForTitration %>%
+  filter(treatment %in% c("C2C5", "Risdiplam", "Branaplam")) %>%
+  group_by(treatment) %>%
+  mutate(doseRank = dense_rank(dose.nM)) %>%
+  ungroup() %>%
+  ggplot(aes(x=doseRank, y=treatment, fill=TitrationColor)) +
+  geom_raster() +
+  scale_fill_identity()
+
+Exp090823.Metadata$Supergroup %>% unique()
+
+FullBwList <- Exp090823.Metadata %>%
+  dplyr::select(SampleName = old.sample.name, filepath, Group, Strand, Supergroup, color=Color) %>%
+  bind_rows(
+    FullMetadata %>%
+      filter(!is.na(bigwig)) %>%
+      filter(!str_detect(old.sample.name, "Exp090823")) %>%
+      mutate(Strand = ".") %>%
+      dplyr::select(SampleName, filepath=bigwig, Group=group, Strand, Supergroup=supergroup, color)
+    ) %>%
+  distinct()
+
+FullBwList %>%
+  dplyr::select(-Supergroup, -color) %>%
+  write_tsv("../code/bigwigs/BigwigList.tsv")
+
+FullBwList %>%
+  mutate(bed = "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz") %>%
+  dplyr::select(Group, color, bed, Supergroup) %>%
+  distinct() %>%
+  write_tsv("../code/bigwigs/BigwigList.groups.tsv")
+  
+# GroupsFile <- read_tsv("../code/bigwigs/BigwigList.groups.tsv")
+
+# FullMetadata %>%
+#   filter(!is.na(bigwig)) %>%
+#   filter(!str_detect(old.sample.name, "Exp090823")) %>%
+#   mutate(Strand = ".") %>%
+#   dplyr::select(SampleName, filepath=bigwig, Group=group)
+# 
+# Exp090823.Metadata %>%
+#   # dplyr::select(SampleName = old.sample.name, filepath, Group, Strand) %>%
+#   bind_rows(MetadataForHelperScript) %>%
+#   distinct(Group, color, Supergroup, .keep_all=T) %>%
+#   group_by()
+#   # mutate color, supergroup
+#   mutate(bed = "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz") %>%
+#   dplyr::select(name = SampleName, color)
+# 
+# # bind_rows(
+# #   GroupsFile,
+# #   Exp090823.Metadata %>%
+# #     distinct(Group, Color, Supergroup) %>%
+# #     mutate(PSI = "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz")) %>%
+# #   filter(!Group=="Exp090823_DMSO_NA_LCL_polyA_u") %>%
+# #   drop_na() %>%
+# #   distinct(Group, Color, Supergroup) %>%
+# #   write_tsv("../code/bigwigs/BigwigList.groups.tsv")
+
+
+
+read_tsv("../code/bigwigs/BigwigList.tsv") %>%
+  mutate(filepath = str_replace_all(filepath, "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/", "")) %>%
+  write_tsv("../code/bigwigs/BigwigList.relativepaths.tsv")
+```
+
+
+Now create the session
+
+```{bash, eval=F}
+cd /project2/yangili1/bjf79/20211209_JingxinRNAseq/code
+conda activate GenometracksByGenotype
+python scripts/GenometracksByGenotype/AggregateBigwigsForPlotting.py --GroupSettingsFile <(awk '$1 ~ /_u$/'
+bigwigs/BigwigList.groups.tsv | grep 'LCL' | grep -e 'SMSM32' -e 'SMSM27' -e 'SMSM6' -e 'Risdiplam' -e 'Branaplam' -e 'DMSO' | awk -v OFS='\t' 'BEGIN {print "name", "color", "bed", "supergroup"} {print}') --BigwigList bigwigs/BigwigList.relativepaths.tsv --Normalization WholeGenome --Region chr2:190968033-191021960 --BigwigListType KeyFile --OutputPrefix scratch/Exp202310_  --TracksTemplate scripts/GenometracksByGenotype/tracks_templates/GeneralPurposeColoredByGenotypeWithSupergroups.ini --Bed12GenesToIni scripts/GenometracksByGenotype/PremadeTracks/gencode.v26.FromGTEx.genes.bed12.gz  --NoSashimi --IGVSessionOutput --IGVSessionTemplate scripts/GenometracksByGenotype/tracks_templates/PlotAllOriginalBigwigs.xml
+
+mv scratch/Exp202310_tracks.xml ./
+
+```
+
+Then open the xml session file in IGV
+

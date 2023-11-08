@@ -54,48 +54,8 @@ Rotate_x_labels <- theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust
 ## Read in data
 
 ```{r}
-Metadata.ExpOf52 <- read_tsv("../code/config/samples.52MoleculeExperiment.tsv") %>%
-  mutate(cell.type = "LCL", libType="polyA", rep=BioRep, old.sample.name=SampleID, dose.nM=NA) %>%
-  mutate(treatment = if_else(Treatment=="DMSO", "DMSO", paste0("W", Treatment))) %>%
-  dplyr::select(treatment, cell.type, dose.nM, libType, rep, old.sample.name) %>%
-  mutate(SampleName = paste(treatment, dose.nM, cell.type, libType, rep, sep = "_"))
+FullMetadata <- read_tsv("../data/202310_FullMetadata.tsv.gz")
 
-Metadata.PreviousExperiments <- read_tsv("../code/bigwigs/BigwigList.tsv",col_names = c("SampleName", "bigwig", "group", "strand")) %>%
-  filter(strand==".") %>%
-  dplyr::select(-strand) %>%
-  mutate(old.sample.name = str_replace(bigwig, "/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw", "\\1")) %>%
-  separate(SampleName, into=c("treatment", "dose.nM", "cell.type", "libType", "rep"), convert=T, remove=F, sep="_") %>%
-  left_join(
-    read_tsv("../code/bigwigs/BigwigList.groups.tsv", col_names = c("group", "color", "bed", "supergroup")),
-    by="group"
-  )
-
-Metadata.ExpOf3 <- read_tsv("../code/config/samples.3MoleculesOfInterestExperiment.tsv") %>%
-  dplyr::select(old.sample.name=SampleName) %>%
-  distinct() %>%
-  separate(old.sample.name, into=c("Experiment", "treatment","dose.nM", "rep"), convert=T, remove=F, sep="_") %>%
-  mutate(cell.type="LCL", libType="polyA") %>%
-  arrange(treatment, dose.nM)
-
-FullMetadata <- bind_rows(Metadata.ExpOf52, Metadata.PreviousExperiments) %>%
-  mutate(Experiment = case_when(
-    cell.type == "Fibroblast" ~ "Single high dose fibroblast",
-    startsWith(old.sample.name, "TitrationExp") ~ "Dose response titration",
-    startsWith(old.sample.name, "chRNA") ~ "nascent RNA profiling",
-    startsWith(old.sample.name, "NewMolecule") ~ "Single high dose LCL"
-  )) %>%
-  bind_rows(Metadata.ExpOf3) %>%
-  mutate(color = case_when(
-    treatment == "DMSO" ~ "#969696",
-    Experiment == "Single high dose LCL" ~ "#252525",
-    treatment == "SMSM6" ~ "#a65628",
-    treatment == "SMSM32" ~ "#ff7f00",
-    treatment == "SMSM27" ~ "#e41a1c",
-    TRUE ~ color
-  )) %>%
-  mutate(leafcutter.name = str_replace_all(old.sample.name, "-", "."))
-
-Metadata.ExpOf3 %>% distinct(treatment)
 
 PSI <- fread("../code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz", sep = '\t' ) %>%
   dplyr::select(-"NewMolecule.C04.2")
@@ -104,6 +64,16 @@ PreviouslyModeledJuncs <- read_tsv("../output/EC50Estimtes.FromPSI.txt.gz")
 Modelled.introns <- PreviouslyModeledJuncs %>%
   filter(!is.na(Steepness)) %>%
   dplyr::select(`#Chrom`, start, end, strand=strand.y)
+
+
+doseResponse.ColorKey <- FullMetadata %>%
+  group_by(treatment) %>%
+  filter(dose.nM == max(dose.nM)) %>%
+  ungroup() %>%
+  filter(treatment %in% c("Risdiplam", "Branaplam", "C2C5", "SMSM6", "SMSM32", "SMSM27")) %>%
+  distinct(treatment, color) %>%
+  add_row(treatment = "Old.DMSO", color = "#cccccc") %>%
+  add_row(treatment = "New.DMSO", color = "#252525")
 ```
 
 
@@ -186,7 +156,7 @@ ggplot(aes(x=PC1, y=PC2, color=color, shape=Experiment)) +
 
 ### Gene expression data
 
-```{r, fig.height=9, fig.width=12}
+```{r}
 gene.counts <- read_tsv("../code/featureCounts/AllSamples_Counts.txt", comment = "#") %>%
   rename_with(~ str_replace(.x, "Alignments/STAR_Align/(.+?)/Aligned.sortedByCoord.out.bam", "\\1"), contains("Alignments")) %>%
   dplyr::select(-c(2:6)) %>%
@@ -219,6 +189,11 @@ ReadsPerDataset <- ggplot(counts.plot.dat, aes(x=old.sample.name, y=lib.size/2E6
   facet_grid(~Experiment, scales = "free_x", space = "free_x", labeller = label_wrap_gen(15)) +
   labs(title="RNA-seq datasets", y="Read count (M)")
 ReadsPerDataset
+```
+
+dose response curves
+
+```{r, fig.height=9, fig.width=12}
 
 CPM.mat <- cpm(gene.counts, prior.count = 0.1, log = T)
 
@@ -283,7 +258,7 @@ CPM.mat %>%
   geom_line() +
   scale_x_continuous(trans='log10') +
   facet_wrap(~hgnc_symbol, scales="free") +
-  # scale_color_manual(values=FullMetadata) +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
   Rotate_x_labels +
   labs(x="nanomolar of risdiplam (or approx equivalent)") +
   theme(legend.position='bottom')
@@ -322,7 +297,7 @@ PSI.GAGT.Only %>%
   geom_line() +
   scale_x_continuous(trans='log10') +
   facet_wrap(~facetName, scales="free") +
-  # scale_color_manual(values=FullMetadata) +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
   Rotate_x_labels +
   labs(x="nanomolar of risdiplam (or approx equivalent)",  caption="FacetTitle:\nNN in NNGA|GT, gene\njunc coords") +
   theme(legend.position='bottom')
@@ -357,7 +332,7 @@ PSI.GAGT.Only %>%
   geom_line() +
   scale_x_continuous(trans='log10') +
   facet_wrap(~facetName, scales="free") +
-  # scale_color_manual(values=FullMetadata) +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
   Rotate_x_labels +
   labs(x="nanomolar of risdiplam (or approx equivalent)",  caption="FacetTitle:\nNN in NNGA|GT, gene\njunc coords") +
   theme(legend.position='bottom')

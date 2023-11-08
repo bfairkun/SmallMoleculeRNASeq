@@ -11,8 +11,8 @@ rule CopyAndMergeFastq:
         R1 = lambda wildcards: titration_series_samples.loc[wildcards.sample]['R1'],
         R2 = lambda wildcards: titration_series_samples.loc[wildcards.sample]['R2'],
     output:
-        R1 = "Fastq/{sample}.R1.fastq.gz",
-        R2 = "Fastq/{sample}.R2.fastq.gz",
+        R1 = temp("Fastq/{sample}.R1.fastq.gz"),
+        R2 = temp("Fastq/{sample}.R2.fastq.gz"),
     wildcard_constraints:
         sample = "|".join(titration_series_samples.index)
     shell:

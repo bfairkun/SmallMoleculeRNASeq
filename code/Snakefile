@@ -40,7 +40,7 @@ rule all:
     input:
         # expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam.bai", sample= samples.index),
         # "SplicingAnalysis/leafcutter/clustering/autosomes/leafcutter_perind.counts.gz",
-        multiext("SplicingAnalysis/SpliceQ/MergedTable.", "SE.txt.gz", "IER.txt.gz", "exon5_cov.txt.gz", "sj5_cov_split.txt.gz", "sj5_cov_nonsplit.txt.gz", "intron_cov.txt.gz", "sj3_cov_split.txt.gz", "sj3_cov_nonsplit.txt.gz", "exon3_cov.txt.gz"),
+        # multiext("SplicingAnalysis/SpliceQ/MergedTable.", "SE.txt.gz", "IER.txt.gz", "exon5_cov.txt.gz", "sj5_cov_split.txt.gz", "sj5_cov_nonsplit.txt.gz", "intron_cov.txt.gz", "sj3_cov_split.txt.gz", "sj3_cov_nonsplit.txt.gz", "exon3_cov.txt.gz"),
         "DoseResponseData/LCL/TidySplicingDoseData.txt.gz",
         expand("SplicingAnalysis/leafcutter/differential_splicing/{treatment}_effect_sizes.txt", treatment = NonControlTreatments),
         "featureCounts/Counts.txt",
@@ -53,7 +53,8 @@ rule all:
         "SplicingAnalysis/FullSpliceSiteAnnotations/JuncfilesMerged.annotated.basic.bed.5ss.tab.gz",
         "../output/ClinVar.PangolinResults.tsv.gz",
         rules.GatherChRNAResults.input,
-        rules.GatherExpMoleculesOfInterest.input
+        rules.GatherExpMoleculesOfInterest.input,
+        rules.GatherBigwigs.input
 
         # expand("Alignments/STAR_Align/{sample}/Aligned.sortedByCoord.out.bam",sample=AllSamples),
         # 'RE_Results/EditLevel/GatheredEditingLevels.bed'

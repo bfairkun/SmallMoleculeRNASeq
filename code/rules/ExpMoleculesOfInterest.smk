@@ -13,8 +13,8 @@ rule CopyAndMergeFastq_Exp_3MoleculesOfInterest:
         R1 = lambda wildcards: Exp_202310_3MoleculesOfInterest_samples.loc[wildcards.sample]['R1'],
         R2 = lambda wildcards: Exp_202310_3MoleculesOfInterest_samples.loc[wildcards.sample]['R2'],
     output:
-        R1 = "Fastq/{sample}.R1.fastq.gz",
-        R2 = "Fastq/{sample}.R2.fastq.gz",
+        R1 = temp("Fastq/{sample}.R1.fastq.gz"),
+        R2 = temp("Fastq/{sample}.R2.fastq.gz"),
     wildcard_constraints:
         sample = "|".join(Exp_202310_3MoleculesOfInterest_samples.index)
     shell:
@@ -78,5 +78,16 @@ use rule leafcutter_ds as leafcutter_ds_ExpOf3 with:
     log:
         "logs/leafcutter_ds_ExpOf3/{treatment}.log"
 
-# rule TidyDoseResponseData_ExpOf3:
-#     input:
+
+rule DE_testing_ExpOf3:
+    input:
+        "featureCounts/AllSamples_Counts.txt"
+    output:
+        results = "DE_testing/ExpOf3_Results.txt.gz",
+        counts = "DE_testing/ExpOf3_Counts.mat.txt.gz"
+    log:
+        "logs/DE_testing_ExpOf3.log"
+    shell:
+        """
+        /software/R-3.4.3-el7-x86_64/bin/Rscript scripts/DE_edgeR_ExpOf3.R {input} {output.results} {output.counts} &> {log}
+        """

@@ -322,13 +322,13 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-11-02
+<strong>Last updated:</strong> 2023-11-08
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 2
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong>
@@ -442,56 +442,30 @@ run.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute">
-<span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
 </p>
 </div>
-<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
 <div class="panel-body">
-<p>
-Using absolute paths to the files within your workflowr project makes it
-difficult for you and others to run your code on a different machine.
-Change the absolute path(s) below to the suggested relative path(s) to
-make your code more reproducible.
-</p>
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th style="text-align:left;">
-absolute
-</th>
-<th style="text-align:left;">
-relative
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw
-</td>
-<td style="text-align:left;">
-../code/bigwigs/unstranded/(.+?).bw
-</td>
-</tr>
-</tbody>
-</table>
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree3c2aa401dcb108044b2382821578f792b0b42897targetblank3c2aa40a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree5dce412b8afc794d5b52530bc8ce46ccb0ad85c2targetblank5dce412a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/3c2aa401dcb108044b2382821578f792b0b42897" target="_blank">3c2aa40</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2" target="_blank">5dce412</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree3c2aa401dcb108044b2382821578f792b0b42897targetblank3c2aa40a"
+id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree5dce412b8afc794d5b52530bc8ce46ccb0ad85c2targetblank5dce412a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -501,7 +475,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/3c2aa401dcb108044b2382821578f792b0b42897" target="_blank">3c2aa40</a>.
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2" target="_blank">5dce412</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -545,6 +519,9 @@ Ignored files:
     Ignored:    code/DataNotToCommit/
     Ignored:    code/DonorMotifSearches/
     Ignored:    code/DoseResponseData/
+    Ignored:    code/Exp202310_tracks.xml
+    Ignored:    code/Exp202310_tracks_e.xml
+    Ignored:    code/Exp202310_tracks_overlaid.xml
     Ignored:    code/Fastq/
     Ignored:    code/FastqFastp/
     Ignored:    code/FivePrimeSpliceSites.txt
@@ -573,7 +550,6 @@ Ignored files:
     Ignored:    code/log
     Ignored:    code/logs/
     Ignored:    code/rstudio-server.job
-    Ignored:    code/rules/.ExpMoleculesOfInterest.smk.swp
     Ignored:    code/scratch/
     Ignored:    code/temp/
     Ignored:    code/test.txt.gz
@@ -588,14 +564,17 @@ Ignored files:
     Ignored:    data/~$52CompoundsTempPlateLayoutForPipettingConvenience.xlsx
 
 Untracked files:
-    Untracked:  analysis/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd
-    Untracked:  code/config/samples.3MoleculesOfInterestExperiment.Contrasts.tsv
-    Untracked:  code/scripts/Exp202310_MakeLeafcutterContrasts.R
+    Untracked:  code/scripts/DE_edgeR_ExpOf3.R
+    Untracked:  data/202310_FullMetadata.tsv.gz
 
 Unstaged changes:
     Modified:   analysis/2023-10-31_Explore3MoleculesOfInterest.Rmd
+    Modified:   analysis/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd
+    Modified:   code/Snakefile
     Modified:   code/rules/ExpMoleculesOfInterest.smk
-    Modified:   code/rules/common.smk
+    Modified:   code/rules/ProcessTitrationSeries.smk
+    Modified:   code/rules/Process_chRNA.smk
+    Modified:   code/rules/RNASeqProcessing.smk
     Modified:   code/scripts/GenometracksByGenotype
 
 </code></pre>
@@ -643,6 +622,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2/analysis/2023-10-31_Explore3MoleculesOfInterest.Rmd" target="_blank">5dce412</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-02
+</td>
+<td>
+updated nb
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2/docs/2023-10-31_Explore3MoleculesOfInterest.html" target="_blank">5dce412</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-02
+</td>
+<td>
+updated nb
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -725,62 +738,26 @@ Rotate_x_labels &lt;- theme(axis.text.x = element_text(angle = 45, vjust = 1, hj
 </div>
 <div id="read-in-data" class="section level2">
 <h2>Read in data</h2>
-<pre class="r"><code>Metadata.ExpOf52 &lt;- read_tsv(&quot;../code/config/samples.52MoleculeExperiment.tsv&quot;) %&gt;%
-  mutate(cell.type = &quot;LCL&quot;, libType=&quot;polyA&quot;, rep=BioRep, old.sample.name=SampleID, dose.nM=NA) %&gt;%
-  mutate(treatment = if_else(Treatment==&quot;DMSO&quot;, &quot;DMSO&quot;, paste0(&quot;W&quot;, Treatment))) %&gt;%
-  dplyr::select(treatment, cell.type, dose.nM, libType, rep, old.sample.name) %&gt;%
-  mutate(SampleName = paste(treatment, dose.nM, cell.type, libType, rep, sep = &quot;_&quot;))
+<pre class="r"><code>FullMetadata &lt;- read_tsv(&quot;../data/202310_FullMetadata.tsv.gz&quot;)
 
-Metadata.PreviousExperiments &lt;- read_tsv(&quot;../code/bigwigs/BigwigList.tsv&quot;,col_names = c(&quot;SampleName&quot;, &quot;bigwig&quot;, &quot;group&quot;, &quot;strand&quot;)) %&gt;%
-  filter(strand==&quot;.&quot;) %&gt;%
-  dplyr::select(-strand) %&gt;%
-  mutate(old.sample.name = str_replace(bigwig, &quot;/project2/yangili1/bjf79/20211209_JingxinRNAseq/code/bigwigs/unstranded/(.+?).bw&quot;, &quot;\\1&quot;)) %&gt;%
-  separate(SampleName, into=c(&quot;treatment&quot;, &quot;dose.nM&quot;, &quot;cell.type&quot;, &quot;libType&quot;, &quot;rep&quot;), convert=T, remove=F, sep=&quot;_&quot;) %&gt;%
-  left_join(
-    read_tsv(&quot;../code/bigwigs/BigwigList.groups.tsv&quot;, col_names = c(&quot;group&quot;, &quot;color&quot;, &quot;bed&quot;, &quot;supergroup&quot;)),
-    by=&quot;group&quot;
-  )
 
-Metadata.ExpOf3 &lt;- read_tsv(&quot;../code/config/samples.3MoleculesOfInterestExperiment.tsv&quot;) %&gt;%
-  dplyr::select(old.sample.name=SampleName) %&gt;%
-  distinct() %&gt;%
-  separate(old.sample.name, into=c(&quot;Experiment&quot;, &quot;treatment&quot;,&quot;dose.nM&quot;, &quot;rep&quot;), convert=T, remove=F, sep=&quot;_&quot;) %&gt;%
-  mutate(cell.type=&quot;LCL&quot;, libType=&quot;polyA&quot;) %&gt;%
-  arrange(treatment, dose.nM)
-
-FullMetadata &lt;- bind_rows(Metadata.ExpOf52, Metadata.PreviousExperiments) %&gt;%
-  mutate(Experiment = case_when(
-    cell.type == &quot;Fibroblast&quot; ~ &quot;Single high dose fibroblast&quot;,
-    startsWith(old.sample.name, &quot;TitrationExp&quot;) ~ &quot;Dose response titration&quot;,
-    startsWith(old.sample.name, &quot;chRNA&quot;) ~ &quot;nascent RNA profiling&quot;,
-    startsWith(old.sample.name, &quot;NewMolecule&quot;) ~ &quot;Single high dose LCL&quot;
-  )) %&gt;%
-  bind_rows(Metadata.ExpOf3) %&gt;%
-  mutate(color = case_when(
-    treatment == &quot;DMSO&quot; ~ &quot;#969696&quot;,
-    Experiment == &quot;Single high dose LCL&quot; ~ &quot;#252525&quot;,
-    treatment == &quot;SMSM6&quot; ~ &quot;#a65628&quot;,
-    treatment == &quot;SMSM32&quot; ~ &quot;#ff7f00&quot;,
-    treatment == &quot;SMSM27&quot; ~ &quot;#e41a1c&quot;,
-    TRUE ~ color
-  )) %&gt;%
-  mutate(leafcutter.name = str_replace_all(old.sample.name, &quot;-&quot;, &quot;.&quot;))
-
-Metadata.ExpOf3 %&gt;% distinct(treatment)</code></pre>
-<pre><code># A tibble: 4 × 1
-  treatment
-  &lt;chr&gt;    
-1 DMSO     
-2 SMSM27   
-3 SMSM32   
-4 SMSM6    </code></pre>
-<pre class="r"><code>PSI &lt;- fread(&quot;../code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz&quot;, sep = &#39;\t&#39; ) %&gt;%
+PSI &lt;- fread(&quot;../code/SplicingAnalysis/leafcutter_all_samples_202310/leafcutter_perind_numers.bed.gz&quot;, sep = &#39;\t&#39; ) %&gt;%
   dplyr::select(-&quot;NewMolecule.C04.2&quot;)
 
 PreviouslyModeledJuncs &lt;- read_tsv(&quot;../output/EC50Estimtes.FromPSI.txt.gz&quot;)
 Modelled.introns &lt;- PreviouslyModeledJuncs %&gt;%
   filter(!is.na(Steepness)) %&gt;%
-  dplyr::select(`#Chrom`, start, end, strand=strand.y)</code></pre>
+  dplyr::select(`#Chrom`, start, end, strand=strand.y)
+
+
+doseResponse.ColorKey &lt;- FullMetadata %&gt;%
+  group_by(treatment) %&gt;%
+  filter(dose.nM == max(dose.nM)) %&gt;%
+  ungroup() %&gt;%
+  filter(treatment %in% c(&quot;Risdiplam&quot;, &quot;Branaplam&quot;, &quot;C2C5&quot;, &quot;SMSM6&quot;, &quot;SMSM32&quot;, &quot;SMSM27&quot;)) %&gt;%
+  distinct(treatment, color) %&gt;%
+  add_row(treatment = &quot;Old.DMSO&quot;, color = &quot;#cccccc&quot;) %&gt;%
+  add_row(treatment = &quot;New.DMSO&quot;, color = &quot;#252525&quot;)</code></pre>
 <p>make heatmap of juncs</p>
 <pre class="r"><code>PSI.GAGT.Only &lt;- PSI %&gt;%
   inner_join(Modelled.introns) %&gt;%
@@ -1119,7 +1096,7 @@ ReadsPerDataset &lt;- ggplot(counts.plot.dat, aes(x=old.sample.name, y=lib.size/
   facet_grid(~Experiment, scales = &quot;free_x&quot;, space = &quot;free_x&quot;, labeller = label_wrap_gen(15)) +
   labs(title=&quot;RNA-seq datasets&quot;, y=&quot;Read count (M)&quot;)
 ReadsPerDataset</code></pre>
-<p><img src="figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-5-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
 Past versions of unnamed-chunk-5-1.png
@@ -1157,6 +1134,7 @@ Benjmain Fair
 </table>
 </div>
 </div>
+<p>dose response curves</p>
 <pre class="r"><code>CPM.mat &lt;- cpm(gene.counts, prior.count = 0.1, log = T)
 
 symbols &lt;- read_tsv(&quot;../data/Genes.list.txt&quot;)
@@ -1213,13 +1191,13 @@ FullMetadata</code></pre>
   geom_point() +
   scale_x_continuous(trans=&#39;log10&#39;) +
   facet_grid(treatment~hgnc_symbol, scales=&quot;free&quot;)</code></pre>
-<p><img src="figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-5-2.png" width="1152" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-6-1.png" width="1152" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-2">
-Past versions of unnamed-chunk-5-2.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-5-2" class="collapse">
+<div id="fig-unnamed-chunk-6-1" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1238,7 +1216,7 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/3c2aa401dcb108044b2382821578f792b0b42897/docs/figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-5-2.png" target="_blank">3c2aa40</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/3c2aa401dcb108044b2382821578f792b0b42897/docs/figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-6-1.png" target="_blank">3c2aa40</a>
 </td>
 <td>
 Benjmain Fair
@@ -1285,17 +1263,17 @@ CPM.mat %&gt;%
   geom_line() +
   scale_x_continuous(trans=&#39;log10&#39;) +
   facet_wrap(~hgnc_symbol, scales=&quot;free&quot;) +
-  # scale_color_manual(values=FullMetadata) +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
   Rotate_x_labels +
   labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;) +
   theme(legend.position=&#39;bottom&#39;)</code></pre>
-<p><img src="figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-5-3.png" width="1152" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-6-2.png" width="1152" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-3">
-Past versions of unnamed-chunk-5-3.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-2">
+Past versions of unnamed-chunk-6-2.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-5-3" class="collapse">
+<div id="fig-unnamed-chunk-6-2" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -1314,7 +1292,7 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/3c2aa401dcb108044b2382821578f792b0b42897/docs/figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-5-3.png" target="_blank">3c2aa40</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/3c2aa401dcb108044b2382821578f792b0b42897/docs/figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-6-2.png" target="_blank">3c2aa40</a>
 </td>
 <td>
 Benjmain Fair
@@ -1360,48 +1338,11 @@ Benjmain Fair
   geom_line() +
   scale_x_continuous(trans=&#39;log10&#39;) +
   facet_wrap(~facetName, scales=&quot;free&quot;) +
-  # scale_color_manual(values=FullMetadata) +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
   Rotate_x_labels +
   labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;,  caption=&quot;FacetTitle:\nNN in NNGA|GT, gene\njunc coords&quot;) +
   theme(legend.position=&#39;bottom&#39;)</code></pre>
-<p><img src="figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-6-1.png" width="1152" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
-Past versions of unnamed-chunk-6-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-6-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/3c2aa401dcb108044b2382821578f792b0b42897/docs/figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-6-1.png" target="_blank">3c2aa40</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2023-11-01
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-7-1.png" width="1152" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>PSI.GAGT.Only %&gt;%
   pivot_longer(names_to = &quot;leafcutter.name&quot;, values_to = &quot;LeafcutterPSI&quot;, -c(&quot;junc&quot;)) %&gt;%
   left_join(FullMetadata) %&gt;%
@@ -1432,48 +1373,11 @@ Benjmain Fair
   geom_line() +
   scale_x_continuous(trans=&#39;log10&#39;) +
   facet_wrap(~facetName, scales=&quot;free&quot;) +
-  # scale_color_manual(values=FullMetadata) +
+  scale_color_manual(values=deframe(doseResponse.ColorKey)) +
   Rotate_x_labels +
   labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;,  caption=&quot;FacetTitle:\nNN in NNGA|GT, gene\njunc coords&quot;) +
   theme(legend.position=&#39;bottom&#39;)</code></pre>
-<p><img src="figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-6-2.png" width="1152" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-2">
-Past versions of unnamed-chunk-6-2.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-6-2" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/3c2aa401dcb108044b2382821578f792b0b42897/docs/figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-6-2.png" target="_blank">3c2aa40</a>
-</td>
-<td>
-Benjmain Fair
-</td>
-<td>
-2023-11-01
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p><img src="figure/2023-10-31_Explore3MoleculesOfInterest.Rmd/unnamed-chunk-7-2.png" width="1152" style="display: block; margin: auto;" /></p>
 <p>I think to further process this data, one useful approach will be to
 fit a loglogistic model, with the upper limit, lower limit, and slope
 fixed, and then only EC50 may change… This is how I processed some of
@@ -1525,7 +1429,7 @@ loaded via a namespace (and not attached):
 [25] caTools_1.18.2     scales_1.2.0       digest_0.6.29      rmarkdown_2.14    
 [29] R.utils_2.11.0     pkgconfig_2.0.3    htmltools_0.5.2    dbplyr_2.1.1      
 [33] fastmap_1.1.0      highr_0.9          rlang_1.0.2        readxl_1.4.0      
-[37] rstudioapi_0.13    farver_2.1.0       jquerylib_0.1.4    generics_0.1.2    
+[37] rstudioapi_0.13    jquerylib_0.1.4    generics_0.1.2     farver_2.1.0      
 [41] jsonlite_1.8.0     gtools_3.9.2       vroom_1.5.7        R.oo_1.24.0       
 [45] magrittr_2.0.3     Rcpp_1.0.8.3       munsell_0.5.0      fansi_1.0.3       
 [49] lifecycle_1.0.1    R.methodsS3_1.8.1  stringi_1.7.6      whisker_0.4       
