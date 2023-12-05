@@ -178,6 +178,188 @@ effect_sizes %>%
 So first recall a similar plot I have made in the past (in this notebook: [https://bfairkun.github.io/SmallMoleculeRNASeq/20220923_ExploreSpecificityEstimates.html](https://bfairkun.github.io/SmallMoleculeRNASeq/20220923_ExploreSpecificityEstimates.html)), where the x-axis is the spearman dose:PSI correlation coefficient, sort of a proxy for effects on different NN sub-categories of NNGA|GU introns. branaplam has stronger effects on GA, CA, and TA... but AA looks more or less the same between risdiplam/branaplam... AT maybe looks a bit risdiplam specific... This btw is the same sequence in that risdiplam-specific sequence in HSD17B4 which has two poison exons.
 In any case, now look at the second plot, where the x-axis is the logef (from leafcutter) for introns with these different groups... I also included some data from the fibroblast experiment: SM2 (colored green, because it is a branaplam scaffold) and C2 (colored blue because it is a risdiplam scaffold). Again just looking at SM2 and C2, the relative effects between classes are mostly consistent with the dose titration experiment with risdiplam and branaplam... Anyway, now looking at SMSM27 and SMSM32 (the red and orange), the effects look stronger than C2 for the GA and CA facets... Again, its tricky to compare, because the effective genome-wide dose isn't exactly the same between experiments, and the cell type is different... But I figure that by looking across different facets you can sort of control for those things. So from that, I do feel in some ways these molecules do have some slight branaplam-like-character moreso than risdiplam.
 
+
+Let's also look at +3 +4 positions which Ishigami et al suggests influences these molecules...
+
+```{r}
+effect_sizes %>%
+  mutate(GUNN = substr(seq, 7,8)) %>%
+  # filter(p.adjust < 0.01) %>%
+  filter(Contrast %in% names(Colors.Subset)) %>%
+  filter(NNGU=="GA") %>%
+  group_by(GUNN) %>%
+  mutate(Unique_Elements = n_distinct(intron)) %>%   # Now summarise with unique elements per group
+  ungroup() %>%
+  mutate(FacetGroup = str_glue("{GUNN}; n={Unique_Elements}")) %>%
+  ggplot(aes(x=logef, color=Contrast)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype="dashed") +
+  geom_vline(
+    data = . %>%
+      group_by(FacetGroup, Contrast) %>%
+      summarise(med=median(logef, na.rm=T)),
+    aes(xintercept=med, color=Contrast),
+    linetype='dashed'
+  ) +
+  scale_color_manual(values=Colors.Subset, drop=T) +
+  coord_cartesian(xlim=c(-0.1, 0.1)) +
+  ylab("CumulativeFraction") +
+  facet_wrap(~FacetGroup) +
+  theme_light() +
+  ggtitle("Effect sizes for GA|GTNN introns, grouped by NN") +
+  labs(caption="All leafcutter-tested GA|GU")
+```
+
+### risdiplam at non GU-AG introns
+
+this got me thinking if risdiplam bulge repair can work on the small subset of introns that may be GA|GC or GA|AU.. Check out [this reference](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6280755/)
+
+```{r}
+effect_sizes %>%
+  filter(Contrast %in% names(Colors.Subset)) %>%
+  mutate(Minus2Minus1 = case_when(
+    str_detect(seq, "^\\w{2}GA") ~ "GA",
+    str_detect(seq, "^\\w{2}AG") ~ "AG",
+    TRUE ~ "Other"
+  )) %>%
+  mutate(Plus1Plus2 = case_when(
+    splice_site == "GT-AG" ~ "GU",
+    splice_site == "GC-AG" ~ "GC",
+    splice_site == "AT-AC" ~ "AU",
+    TRUE ~ "Other"
+  )) %>%
+  mutate(IntronGroup = paste(Minus2Minus1, Plus1Plus2)) %>%
+  group_by(IntronGroup) %>%
+  mutate(Unique_Elements = n_distinct(intron)) %>%   # Now summarise with unique elements per group
+  ungroup() %>%
+  mutate(FacetGroup = str_glue("{IntronGroup}; n={Unique_Elements}")) %>%
+  ggplot(aes(x=logef, color=Contrast)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype="dashed") +
+  geom_vline(
+    data = . %>%
+      group_by(FacetGroup, Contrast) %>%
+      summarise(med=median(logef, na.rm=T)),
+    aes(xintercept=med, color=Contrast),
+    linetype='dashed'
+  ) +
+  scale_color_manual(values=Colors.Subset, drop=T) +
+  coord_cartesian(xlim=c(-0.1, 0.1)) +
+  ylab("CumulativeFraction") +
+  facet_wrap(~FacetGroup) +
+  theme_light() +
+  ggtitle("Effect sizes for GA|GTNN introns, grouped by NN") +
+  labs(caption="All leafcutter-tested GA|GU")
+```
+
+So maybe GA|GC introns are affected, but the sample size is so low its really hard to tell.. Let's look at all the dose response curevs for the GA|GC and GA|TT introns, to check that they are believable...
+
+```{r}
+dose_response_splicing_dat <- fread("../code/DoseResponseData/LCL/TidySplicingDoseData_PSITransformedAndAllDMSORepsInEachSeries.txt.gz")
+
+dose_response_splicing_dat %>%
+  filter(str_detect(seq, "^\\w{2}GAGC")) %>%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == "Risdiplam" ~ dose.nM,
+    treatment == "C2C5" ~ dose.nM * 10,
+    treatment == "Branaplam" ~ dose.nM * sqrt(10),
+    treatment == "DMSO" ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %>%
+  mutate(facetGroup = str_glue("{gene_names}\n{junc}")) %>%
+  ggplot(aes(x=doseInApproxRisdiscale, y=PSI_transformed, color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~facetGroup, scales="free") +
+  Rotate_x_labels +
+  labs(x="nanomolar of risdiplam (or approx equivalent)", title="GA|GC introns") +
+  theme(legend.position='bottom')
+
+dose_response_splicing_dat %>%
+  filter(str_detect(seq, "^\\w{2}GATT")) %>%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == "Risdiplam" ~ dose.nM,
+    treatment == "C2C5" ~ dose.nM * 10,
+    treatment == "Branaplam" ~ dose.nM * sqrt(10),
+    treatment == "DMSO" ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %>%
+  mutate(facetGroup = str_glue("{gene_names}\n{junc}")) %>%
+  ggplot(aes(x=doseInApproxRisdiscale, y=PSI_transformed, color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~facetGroup, scales="free") +
+  Rotate_x_labels +
+  labs(x="nanomolar of risdiplam (or approx equivalent)", title="GA|TT introns") +
+  theme(legend.position='bottom')
+```
+
+Ok, that FBXW5 (chr9:136941684:136942100:clu_18609_-) example looks good, as does the CCNBP1IP1. Let's check those on the genome browser
+
+... They both looks believable on genome broswer... Though the branaplam induced GA|GC and the branaplam induced GA|TT event is an annotated frame-preserving event, so it doesn't really affect host gene expression. Nonetheless, still sort of interesting that this may work from a splicing perspective. And in the GA|TT case, the sequence is AGA|TT, which may explain why there is specificity for branaplam. So maybe those same rules about the -4A and -3A still apply for these weirder splice sites.
+
+Let's similarly check all the GA|AU events in dose response
+
+```{r}
+dose_response_splicing_dat %>%
+  filter(str_detect(seq, "^\\w{2}GAAT")) %>%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == "Risdiplam" ~ dose.nM,
+    treatment == "C2C5" ~ dose.nM * 10,
+    treatment == "Branaplam" ~ dose.nM * sqrt(10),
+    treatment == "DMSO" ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %>%
+  mutate(facetGroup = str_glue("{gene_names}\n{junc}")) %>%
+  ggplot(aes(x=doseInApproxRisdiscale, y=PSI_transformed, color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans='log10') +
+  facet_wrap(~facetGroup, scales="free") +
+  Rotate_x_labels +
+  labs(x="nanomolar of risdiplam (or approx equivalent)", title="GA|AT introns") +
+  theme(legend.position='bottom')
+```
+
+none of those seem promising enough to look intro any further.
+
+Just to summarise the prevalnce of these very non canonical splice sites, let's make some plots..
+
+```{r}
+# how common is GU vs non GU at +1 and +2
+dose_response_splicing_dat %>%
+  distinct(junc, .keep_all = T) %>%
+  filter(IntronType == "Annotated") %>%
+  mutate(Plus1Plus2 = substr(seq, 5,6)) %>%
+  count(Plus1Plus2) %>%
+  mutate(Percent = n/sum(n)*100) %>%
+  knitr::kable()
+
+# filter for NN|GU, how common is NN?
+dose_response_splicing_dat %>%
+  distinct(junc, .keep_all = T) %>%
+  filter(str_detect(seq, "^\\w{4}GT")) %>%
+  filter(IntronType == "Annotated") %>%
+  mutate(Minus2Minus1 = substr(seq, 3,4)) %>%
+  count(Minus2Minus1) %>%
+  mutate(Percent = n/sum(n)*100) %>%
+  knitr::kable()
+
+# filter for AGN|GU, how common is N?
+dose_response_splicing_dat %>%
+  distinct(junc, .keep_all = T) %>%
+  filter(IntronType == "Annotated") %>%
+  filter(str_detect(seq, "^\\wAG\\wGT")) %>%
+  mutate(N.Minus1Bulge = substr(seq, 4,4)) %>%
+  count(N.Minus1Bulge) %>%
+  mutate(Percent = n/sum(n)*100) %>%
+  knitr::kable()
+
+```
+
+
 ## Differential expression
 
 I used edge to make contrasts for each treatment:dose vs DMSO... I will look at the results, with a particular focus on identifying any totally novel genes for now, that don't have any apparent effect in risdiplam/branaplam...
@@ -607,4 +789,14 @@ mv scratch/Exp202310_tracks.xml ./
 ```
 
 Then open the xml session file in IGV
+
+### thinking about two sites
+
+```{r}
+slope <- 0.5
+dose <- 0.5
+doseChange <- 2
+NumSites <- 2
+E <- NumSites * doseChange *dose * slope
+```
 

@@ -1,0 +1,127 @@
+---
+title: "2023-11-14_MakeFimoSearchMotifs"
+output: html_document
+date: '2023-11-14'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message=F)
+```
+
+
+## Intro
+
+I anticipate performing an analysis about U1 affects from a distance... I hypothesize there are many sites where U1 binds to recruit the spliceosome (or perhaps have other functions, including inhibiting PCPA, or inhibiting ESEs), but are not catalytically active 5'ss. See the following relevant publications:
+
+- U1 can inhibit PCPA; "telescripting" [https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8583093/](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8583093/)
+- U1 may function from a distance to recruit spliceosome, like exon definition, but without activating 5'ss [https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6557577/](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6557577/)
+- U1 may sterically inhibit elements [https://www.embopress.org/doi/full/10.1038/emboj.2009.397](https://www.embopress.org/doi/full/10.1038/emboj.2009.397)
+
+In anticipation of this analysis, I want to identify U1 binding motifs across the genome with fimo... I will do this with various versions of the motif:
+
+A general motif, based on PWM from all annotated 5'ss.
+a C2C5, risdiplam, or branaplam-based GA|GU motif, based on SM-activated GA|GU 5'ss.
+
+Here I will create those motif files for later use with fimo.
+
+## Analysis
+
+load libs
+
+```{r}
+library(data.table)
+library(tidyverse)
+library(ggseqlogo)
+
+PullSeq <- function(df){
+  df %>%
+    pull(seq) %>%
+    return()
+}
+
+
+```
+
+read in data... 
+
+group juncs by if the dose response is > 0.8 and they are GA|GU introns
+
+```{r}
+dat <- read_tsv("../code/DoseResponseData/LCL/TidySplicingDoseData_PSITransformedAndAllDMSORepsInEachSeries.txt.gz")
+
+Juncs.tidy <- bind_rows(
+  dat %>%
+    distinct(junc, treatment, .keep_all=T) %>%
+    filter(str_detect(seq, "^[ACGT]{2}GAGT")) %>%
+    filter(!is.na(spearman)) %>%
+    filter(spearman > 0.8),
+  dat %>%
+    distinct(junc, .keep_all=T) %>%
+    filter(!is.na(spearman)) %>%
+    mutate(treatment = "All_introns")
+) %>%
+  add_count(treatment) %>%
+  mutate(Motif = str_glue("{treatment}; n={n}"))
+
+Juncs.tidy %>%
+  group_by(Motif) %>%
+  split(f = as.factor(.$Motif)) %>%
+  lapply(PullSeq) %>%
+  ggseqlogo()
+
+```
+
+Write out to file, to use with MEME suite tools.
+
+```{r, eval=F}
+
+dir.create("../data/DonorMotifs")
+
+Juncs.tidy %>%
+  dplyr::select(treatment, seq) %>%
+  group_by(treatment) %>%
+  group_walk(~ write_csv(.x, paste0("../data/DonorMotifs/",.y$treatment, ".txt"), col_names = F))
+```
+
+I anticipate also in the future being interesting in good U1 sites that are definitely not catalystically activate, and maybe not even have a GU... I think I will also make some motifs that match the consensus but are [ACU] and [ACG] at the +1 and +2 respectively. I hypothesize there may be U1 binding sites across the genome that are catalytically dead because of no GU, but are nonetheless decent U1 binding sites that influence splice site choice.
+
+
+For example, based on [Erkelenz et al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6280755/) I may want to also explore AG|GCAAGU motifs, and AG|TTAAGU
+
+```{r}
+Juncs.tidy <- bind_rows(
+  dat %>%
+    distinct(junc, treatment, .keep_all=T) %>%
+    filter(str_detect(seq, "^[ACGT]{2}GAGT")) %>%
+    filter(!is.na(spearman)) %>%
+    filter(spearman > 0.8),
+  dat %>%
+    distinct(junc, .keep_all=T) %>%
+    filter(!is.na(spearman)) %>%
+    mutate(treatment = "All_introns"),
+  dat %>%
+    distinct(junc, .keep_all=T) %>%
+    filter(str_detect(seq, "^[ACGT]{4}GC")) %>%
+    filter(!is.na(spearman)) %>%
+    mutate(treatment = "GC_introns"),
+  dat %>%
+    distinct(junc, .keep_all=T) %>%
+    filter(str_detect(seq, "^[ACGT]{4}AT")) %>%
+    filter(!is.na(spearman)) %>%
+    mutate(treatment = "AU_introns"),
+  dat %>%
+    distinct(junc, .keep_all=T) %>%
+    filter(str_detect(seq, "^[ACGT]{4}TT")) %>%
+    filter(!is.na(spearman)) %>%
+    mutate(treatment = "UU_introns")
+) %>%
+  add_count(treatment) %>%
+  mutate(Motif = str_glue("{treatment}; n={n}"))
+
+Juncs.tidy %>%
+  group_by(Motif) %>%
+  split(f = as.factor(.$Motif)) %>%
+  lapply(PullSeq) %>%
+  ggseqlogo()
+```
+

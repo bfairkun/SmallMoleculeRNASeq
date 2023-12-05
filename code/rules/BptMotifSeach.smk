@@ -44,28 +44,26 @@ rule MakeSitesFilesFor5ss:
     input:
         "../output/EC50Estimtes.FromPSI.txt.gz"
     output:
-        B = "DonorMotifSearches/Sites/BranaplamSpecific.txt",
-        R = "DonorMotifSearches/Sites/RisdiplamSpecific.txt"
+        directory("DonorMotifSearches/Sites")
     log:
         "logs/MakeSitesFilesFor5ss.log"
     conda:
         "../envs/r_essentials.yml"
     shell:
         """
-        Rscript scripts/MakeDonorSitesForMeme.R {input} DonorMotifSearches/Sites/ &> {log}
+        Rscript scripts/MakeDonorSitesForMeme.R {input} {output}/ &> {log}
         """
 
 rule Sites2memeForDonorSites:
     input:
-        B = "DonorMotifSearches/Sites/BranaplamSpecific.txt",
-        R = "DonorMotifSearches/Sites/RisdiplamSpecific.txt"
+        "DonorMotifSearches/Sites"
     output:
         "DonorMotifSearches/Motifs.meme"
     conda:
         "../envs/meme.yaml"
     shell:
         """
-        sites2meme DonorMotifSearches/Sites > {output}
+        sites2meme {input} > {output}
         """
 
 rule fimo_DonorSites:
@@ -79,8 +77,30 @@ rule fimo_DonorSites:
         "logs/fimo_DonorSites.log"
     conda:
         "../envs/meme.yaml"
+    params:
     shell:
         """
-        (fimo --text {input.motifs} {input.fa} | awk -v OFS='\\t' 'NR>1 {{print $2, $3, $4, $1"_"$8, $6, $5}}' | bedtools sort -i - | bgzip /dev/stdin -c > {output.bed}) &>> {log}
+        (fimo {params} --text {input.motifs} {input.fa} | awk -v OFS='\\t' 'NR>1 {{print $2, $3, $4, $1"_"$8, $6, $5}}' | bedtools sort -i - | bgzip /dev/stdin -c > {output.bed}) &>> {log}
         (tabix -p bed {output.bed}) &>> {log}
         """
+
+use rule Sites2memeForDonorSites as Sites2memeForDonorSites_2 with:
+    input:
+        "../data/DonorMotifs"
+    output:
+        "DonorMotifSearches/Motifs2.meme"
+
+
+use rule fimo_DonorSites as fimo_DonorSites_2 with:
+    input:
+        fa = "/project2/yangili1/bjf79/ChromatinSplicingQTLs/code/ReferenceGenome/Fasta/GRCh38.primary_assembly.genome.fa",
+        motifs = "DonorMotifSearches/Motifs2.meme"
+    output:
+        bed = "DonorMotifSearches/DonorHitsMoreGeneral.fimo.bed.gz",
+        tbi = "DonorMotifSearches/DonorHitsMoreGeneral.fimo.bed.gz.tbi"
+    params:
+        "--thresh 1e-3"
+    log:
+        "logs/fimo_DonorSites2.log"
+    resources:
+        mem_mb = 48000

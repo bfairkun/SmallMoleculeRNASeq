@@ -285,12 +285,19 @@ $(document).ready(function () {
 <div id="TOC">
 <ul>
 <li><a href="#intro" id="toc-intro">Intro</a></li>
-<li><a href="#analysis" id="toc-analysis">Analysis</a></li>
+<li><a href="#analysis" id="toc-analysis">Analysis</a>
+<ul>
+<li><a href="#risdiplam-at-non-gu-ag-introns"
+id="toc-risdiplam-at-non-gu-ag-introns">risdiplam at non GU-AG
+introns</a></li>
+</ul></li>
 <li><a href="#differential-expression"
 id="toc-differential-expression">Differential expression</a>
 <ul>
 <li><a href="#make-igv-session" id="toc-make-igv-session">Make IGV
 session</a></li>
+<li><a href="#thinking-about-two-sites"
+id="toc-thinking-about-two-sites">thinking about two sites</a></li>
 </ul></li>
 </ul>
 </div>
@@ -319,7 +326,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-11-08
+<strong>Last updated:</strong> 2023-12-05
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -496,15 +503,15 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree5dce412b8afc794d5b52530bc8ce46ccb0ad85c2targetblank5dce412a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreee3d0faa0f8fe687727b57d7e4ced814fba8ec378targetblanke3d0faaa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2" target="_blank">5dce412</a>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/e3d0faa0f8fe687727b57d7e4ced814fba8ec378" target="_blank">e3d0faa</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtree5dce412b8afc794d5b52530bc8ce46ccb0ad85c2targetblank5dce412a"
+id="strongRepositoryversionstrongahrefhttpsgithubcombfairkunSmallMoleculeRNASeqtreee3d0faa0f8fe687727b57d7e4ced814fba8ec378targetblanke3d0faaa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -514,7 +521,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/5dce412b8afc794d5b52530bc8ce46ccb0ad85c2" target="_blank">5dce412</a>.
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/tree/e3d0faa0f8fe687727b57d7e4ced814fba8ec378" target="_blank">e3d0faa</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -535,7 +542,6 @@ Ignored files:
     Ignored:    analysis/.RData
     Ignored:    analysis/.Rhistory
     Ignored:    analysis/20220707_TitrationSeries_DE_testing.nb.html
-    Ignored:    analysis/figure/
     Ignored:    code/.DS_Store
     Ignored:    code/._DOCK7.pdf
     Ignored:    code/._DOCK7_DMSO1.pdf
@@ -604,16 +610,12 @@ Ignored files:
     Ignored:    data/~$52CompoundsTempPlateLayoutForPipettingConvenience.xlsx
 
 Untracked files:
-    Untracked:  code/scripts/DE_edgeR_ExpOf3.R
-    Untracked:  data/202310_FullMetadata.tsv.gz
+    Untracked:  analysis/2023-11-14_MakeFimoSearchMotifs.Rmd
+    Untracked:  data/DonorMotifs/
 
 Unstaged changes:
     Modified:   analysis/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd
-    Modified:   code/Snakefile
-    Modified:   code/rules/ExpMoleculesOfInterest.smk
-    Modified:   code/rules/ProcessTitrationSeries.smk
-    Modified:   code/rules/Process_chRNA.smk
-    Modified:   code/rules/RNASeqProcessing.smk
+    Modified:   code/rules/BptMotifSeach.smk
     Modified:   code/scripts/GenometracksByGenotype
 
 </code></pre>
@@ -662,6 +664,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e3d0faa0f8fe687727b57d7e4ced814fba8ec378/analysis/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd" target="_blank">e3d0faa</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-08
+</td>
+<td>
+add nb
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/bfairkun/SmallMoleculeRNASeq/e3d0faa0f8fe687727b57d7e4ced814fba8ec378/docs/2023-11-02_3MoleculesOfInterestLeafcutterDs.html" target="_blank">e3d0faa</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-08
+</td>
+<td>
+add nb
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -992,6 +1028,496 @@ and the cell type is different… But I figure that by looking across
 different facets you can sort of control for those things. So from that,
 I do feel in some ways these molecules do have some slight
 branaplam-like-character moreso than risdiplam.</p>
+<p>Let’s also look at +3 +4 positions which Ishigami et al suggests
+influences these molecules…</p>
+<pre class="r"><code>effect_sizes %&gt;%
+  mutate(GUNN = substr(seq, 7,8)) %&gt;%
+  # filter(p.adjust &lt; 0.01) %&gt;%
+  filter(Contrast %in% names(Colors.Subset)) %&gt;%
+  filter(NNGU==&quot;GA&quot;) %&gt;%
+  group_by(GUNN) %&gt;%
+  mutate(Unique_Elements = n_distinct(intron)) %&gt;%   # Now summarise with unique elements per group
+  ungroup() %&gt;%
+  mutate(FacetGroup = str_glue(&quot;{GUNN}; n={Unique_Elements}&quot;)) %&gt;%
+  ggplot(aes(x=logef, color=Contrast)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  geom_vline(
+    data = . %&gt;%
+      group_by(FacetGroup, Contrast) %&gt;%
+      summarise(med=median(logef, na.rm=T)),
+    aes(xintercept=med, color=Contrast),
+    linetype=&#39;dashed&#39;
+  ) +
+  scale_color_manual(values=Colors.Subset, drop=T) +
+  coord_cartesian(xlim=c(-0.1, 0.1)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~FacetGroup) +
+  theme_light() +
+  ggtitle(&quot;Effect sizes for GA|GTNN introns, grouped by NN&quot;) +
+  labs(caption=&quot;All leafcutter-tested GA|GU&quot;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e3d0faa0f8fe687727b57d7e4ced814fba8ec378/docs/figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-5-1.png" target="_blank">e3d0faa</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="risdiplam-at-non-gu-ag-introns" class="section level3">
+<h3>risdiplam at non GU-AG introns</h3>
+<p>this got me thinking if risdiplam bulge repair can work on the small
+subset of introns that may be GA|GC or GA|AU.. Check out <a
+href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6280755/">this
+reference</a></p>
+<pre class="r"><code>effect_sizes %&gt;%
+  filter(Contrast %in% names(Colors.Subset)) %&gt;%
+  mutate(Minus2Minus1 = case_when(
+    str_detect(seq, &quot;^\\w{2}GA&quot;) ~ &quot;GA&quot;,
+    str_detect(seq, &quot;^\\w{2}AG&quot;) ~ &quot;AG&quot;,
+    TRUE ~ &quot;Other&quot;
+  )) %&gt;%
+  mutate(Plus1Plus2 = case_when(
+    splice_site == &quot;GT-AG&quot; ~ &quot;GU&quot;,
+    splice_site == &quot;GC-AG&quot; ~ &quot;GC&quot;,
+    splice_site == &quot;AT-AC&quot; ~ &quot;AU&quot;,
+    TRUE ~ &quot;Other&quot;
+  )) %&gt;%
+  mutate(IntronGroup = paste(Minus2Minus1, Plus1Plus2)) %&gt;%
+  group_by(IntronGroup) %&gt;%
+  mutate(Unique_Elements = n_distinct(intron)) %&gt;%   # Now summarise with unique elements per group
+  ungroup() %&gt;%
+  mutate(FacetGroup = str_glue(&quot;{IntronGroup}; n={Unique_Elements}&quot;)) %&gt;%
+  ggplot(aes(x=logef, color=Contrast)) +
+  stat_ecdf() +
+  geom_vline(xintercept = 0, linetype=&quot;dashed&quot;) +
+  geom_vline(
+    data = . %&gt;%
+      group_by(FacetGroup, Contrast) %&gt;%
+      summarise(med=median(logef, na.rm=T)),
+    aes(xintercept=med, color=Contrast),
+    linetype=&#39;dashed&#39;
+  ) +
+  scale_color_manual(values=Colors.Subset, drop=T) +
+  coord_cartesian(xlim=c(-0.1, 0.1)) +
+  ylab(&quot;CumulativeFraction&quot;) +
+  facet_wrap(~FacetGroup) +
+  theme_light() +
+  ggtitle(&quot;Effect sizes for GA|GTNN introns, grouped by NN&quot;) +
+  labs(caption=&quot;All leafcutter-tested GA|GU&quot;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e3d0faa0f8fe687727b57d7e4ced814fba8ec378/docs/figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-6-1.png" target="_blank">e3d0faa</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>So maybe GA|GC introns are affected, but the sample size is so low
+its really hard to tell.. Let’s look at all the dose response curevs for
+the GA|GC and GA|TT introns, to check that they are believable…</p>
+<pre class="r"><code>dose_response_splicing_dat &lt;- fread(&quot;../code/DoseResponseData/LCL/TidySplicingDoseData_PSITransformedAndAllDMSORepsInEachSeries.txt.gz&quot;)
+
+dose_response_splicing_dat %&gt;%
+  filter(str_detect(seq, &quot;^\\w{2}GAGC&quot;)) %&gt;%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == &quot;Risdiplam&quot; ~ dose.nM,
+    treatment == &quot;C2C5&quot; ~ dose.nM * 10,
+    treatment == &quot;Branaplam&quot; ~ dose.nM * sqrt(10),
+    treatment == &quot;DMSO&quot; ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %&gt;%
+  mutate(facetGroup = str_glue(&quot;{gene_names}\n{junc}&quot;)) %&gt;%
+  ggplot(aes(x=doseInApproxRisdiscale, y=PSI_transformed, color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~facetGroup, scales=&quot;free&quot;) +
+  Rotate_x_labels +
+  labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;, title=&quot;GA|GC introns&quot;) +
+  theme(legend.position=&#39;bottom&#39;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e3d0faa0f8fe687727b57d7e4ced814fba8ec378/docs/figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-7-1.png" target="_blank">e3d0faa</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>dose_response_splicing_dat %&gt;%
+  filter(str_detect(seq, &quot;^\\w{2}GATT&quot;)) %&gt;%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == &quot;Risdiplam&quot; ~ dose.nM,
+    treatment == &quot;C2C5&quot; ~ dose.nM * 10,
+    treatment == &quot;Branaplam&quot; ~ dose.nM * sqrt(10),
+    treatment == &quot;DMSO&quot; ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %&gt;%
+  mutate(facetGroup = str_glue(&quot;{gene_names}\n{junc}&quot;)) %&gt;%
+  ggplot(aes(x=doseInApproxRisdiscale, y=PSI_transformed, color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~facetGroup, scales=&quot;free&quot;) +
+  Rotate_x_labels +
+  labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;, title=&quot;GA|TT introns&quot;) +
+  theme(legend.position=&#39;bottom&#39;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Ok, that FBXW5 (chr9:136941684:136942100:clu_18609_-) example looks
+good, as does the CCNBP1IP1. Let’s check those on the genome browser</p>
+<p>… They both looks believable on genome broswer… Though the branaplam
+induced GA|GC and the branaplam induced GA|TT event is an annotated
+frame-preserving event, so it doesn’t really affect host gene
+expression. Nonetheless, still sort of interesting that this may work
+from a splicing perspective. And in the GA|TT case, the sequence is
+AGA|TT, which may explain why there is specificity for branaplam. So
+maybe those same rules about the -4A and -3A still apply for these
+weirder splice sites.</p>
+<p>Let’s similarly check all the GA|AU events in dose response</p>
+<pre class="r"><code>dose_response_splicing_dat %&gt;%
+  filter(str_detect(seq, &quot;^\\w{2}GAAT&quot;)) %&gt;%
+  mutate(doseInApproxRisdiscale = case_when(
+    treatment == &quot;Risdiplam&quot; ~ dose.nM,
+    treatment == &quot;C2C5&quot; ~ dose.nM * 10,
+    treatment == &quot;Branaplam&quot; ~ dose.nM * sqrt(10),
+    treatment == &quot;DMSO&quot; ~ 0.316,
+    TRUE ~ dose.nM * sqrt(10),
+  )) %&gt;%
+  mutate(facetGroup = str_glue(&quot;{gene_names}\n{junc}&quot;)) %&gt;%
+  ggplot(aes(x=doseInApproxRisdiscale, y=PSI_transformed, color=treatment)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(trans=&#39;log10&#39;) +
+  facet_wrap(~facetGroup, scales=&quot;free&quot;) +
+  Rotate_x_labels +
+  labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;, title=&quot;GA|AT introns&quot;) +
+  theme(legend.position=&#39;bottom&#39;)</code></pre>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e3d0faa0f8fe687727b57d7e4ced814fba8ec378/docs/figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-8-1.png" target="_blank">e3d0faa</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>none of those seem promising enough to look intro any further.</p>
+<p>Just to summarise the prevalnce of these very non canonical splice
+sites, let’s make some plots..</p>
+<pre class="r"><code># how common is GU vs non GU at +1 and +2
+dose_response_splicing_dat %&gt;%
+  distinct(junc, .keep_all = T) %&gt;%
+  filter(IntronType == &quot;Annotated&quot;) %&gt;%
+  mutate(Plus1Plus2 = substr(seq, 5,6)) %&gt;%
+  count(Plus1Plus2) %&gt;%
+  mutate(Percent = n/sum(n)*100) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Plus1Plus2</th>
+<th align="right">n</th>
+<th align="right">Percent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AT</td>
+<td align="right">28</td>
+<td align="right">0.0432747</td>
+</tr>
+<tr class="even">
+<td align="left">CT</td>
+<td align="right">1</td>
+<td align="right">0.0015455</td>
+</tr>
+<tr class="odd">
+<td align="left">GA</td>
+<td align="right">5</td>
+<td align="right">0.0077276</td>
+</tr>
+<tr class="even">
+<td align="left">GC</td>
+<td align="right">548</td>
+<td align="right">0.8469468</td>
+</tr>
+<tr class="odd">
+<td align="left">GG</td>
+<td align="right">7</td>
+<td align="right">0.0108187</td>
+</tr>
+<tr class="even">
+<td align="left">GT</td>
+<td align="right">64108</td>
+<td align="right">99.0804136</td>
+</tr>
+<tr class="odd">
+<td align="left">TT</td>
+<td align="right">6</td>
+<td align="right">0.0092731</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># filter for NN|GU, how common is NN?
+dose_response_splicing_dat %&gt;%
+  distinct(junc, .keep_all = T) %&gt;%
+  filter(str_detect(seq, &quot;^\\w{4}GT&quot;)) %&gt;%
+  filter(IntronType == &quot;Annotated&quot;) %&gt;%
+  mutate(Minus2Minus1 = substr(seq, 3,4)) %&gt;%
+  count(Minus2Minus1) %&gt;%
+  mutate(Percent = n/sum(n)*100) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Minus2Minus1</th>
+<th align="right">n</th>
+<th align="right">Percent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="right">2875</td>
+<td align="right">4.4846197</td>
+</tr>
+<tr class="even">
+<td align="left">AC</td>
+<td align="right">635</td>
+<td align="right">0.9905160</td>
+</tr>
+<tr class="odd">
+<td align="left">AG</td>
+<td align="right">35883</td>
+<td align="right">55.9727335</td>
+</tr>
+<tr class="even">
+<td align="left">AT</td>
+<td align="right">1353</td>
+<td align="right">2.1105010</td>
+</tr>
+<tr class="odd">
+<td align="left">CA</td>
+<td align="right">1497</td>
+<td align="right">2.3351220</td>
+</tr>
+<tr class="even">
+<td align="left">CC</td>
+<td align="right">408</td>
+<td align="right">0.6364260</td>
+</tr>
+<tr class="odd">
+<td align="left">CG</td>
+<td align="right">3911</td>
+<td align="right">6.1006427</td>
+</tr>
+<tr class="even">
+<td align="left">CT</td>
+<td align="right">1163</td>
+<td align="right">1.8141262</td>
+</tr>
+<tr class="odd">
+<td align="left">GA</td>
+<td align="right">935</td>
+<td align="right">1.4584763</td>
+</tr>
+<tr class="even">
+<td align="left">GC</td>
+<td align="right">322</td>
+<td align="right">0.5022774</td>
+</tr>
+<tr class="odd">
+<td align="left">GG</td>
+<td align="right">5789</td>
+<td align="right">9.0300742</td>
+</tr>
+<tr class="even">
+<td align="left">GT</td>
+<td align="right">600</td>
+<td align="right">0.9359206</td>
+</tr>
+<tr class="odd">
+<td align="left">TA</td>
+<td align="right">386</td>
+<td align="right">0.6021089</td>
+</tr>
+<tr class="even">
+<td align="left">TC</td>
+<td align="right">253</td>
+<td align="right">0.3946465</td>
+</tr>
+<tr class="odd">
+<td align="left">TG</td>
+<td align="right">7496</td>
+<td align="right">11.6927685</td>
+</tr>
+<tr class="even">
+<td align="left">TT</td>
+<td align="right">602</td>
+<td align="right">0.9390404</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># filter for AGN|GU, how common is N?
+dose_response_splicing_dat %&gt;%
+  distinct(junc, .keep_all = T) %&gt;%
+  filter(IntronType == &quot;Annotated&quot;) %&gt;%
+  filter(str_detect(seq, &quot;^\\wAG\\wGT&quot;)) %&gt;%
+  mutate(N.Minus1Bulge = substr(seq, 4,4)) %&gt;%
+  count(N.Minus1Bulge) %&gt;%
+  mutate(Percent = n/sum(n)*100) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">N.Minus1Bulge</th>
+<th align="right">n</th>
+<th align="right">Percent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">411</td>
+<td align="right">17.046868</td>
+</tr>
+<tr class="even">
+<td align="left">C</td>
+<td align="right">115</td>
+<td align="right">4.769805</td>
+</tr>
+<tr class="odd">
+<td align="left">G</td>
+<td align="right">1638</td>
+<td align="right">67.938615</td>
+</tr>
+<tr class="even">
+<td align="left">T</td>
+<td align="right">247</td>
+<td align="right">10.244712</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="differential-expression" class="section level2">
 <h2>Differential expression</h2>
@@ -1012,7 +1538,44 @@ DE.results %&gt;%
   ggplot(aes(x=logFC, y=-log10(FDR), color=FDR&lt;0.01)) +
   geom_point(alpha=0.01) +
   facet_wrap(~treatment)</code></pre>
-<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e3d0faa0f8fe687727b57d7e4ced814fba8ec378/docs/figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-10-1.png" target="_blank">e3d0faa</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>DE.results %&gt;%
   dplyr::select(treatment, logCPM, Geneid) %&gt;%
   pivot_wider(names_from=&quot;treatment&quot;, values_from=&quot;logCPM&quot;) %&gt;%
@@ -1118,7 +1681,44 @@ DE.results %&gt;%
     lower=list(continuous = upper_point),
     diag=list(continuous = diag_limitrange)) +
   theme_classic()</code></pre>
-<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/bfairkun/SmallMoleculeRNASeq/blob/e3d0faa0f8fe687727b57d7e4ced814fba8ec378/docs/figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-11-1.png" target="_blank">e3d0faa</a>
+</td>
+<td>
+Benjmain Fair
+</td>
+<td>
+2023-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>DE.results %&gt;%
   dplyr::select(treatment, logFC, Geneid) %&gt;%
   # filter(Geneid %in% GenesHigherExpressedInLCLs) %&gt;%
@@ -1127,7 +1727,7 @@ DE.results %&gt;%
   column_to_rownames(&quot;Geneid&quot;) %&gt;%
   cor(method=&#39;s&#39;) %&gt;%
   heatmap.2(trace=&#39;none&#39;)</code></pre>
-<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Let’s find some genes that are DE in SMSM27 or SMSM32, but not in SM2
 or C2, and then check for their dose response curve in
 branaplam/risdiplam…</p>
@@ -1145,7 +1745,7 @@ DE.results %&gt;%
   ggplot(aes(x=logFC, y=-log10(FDR))) +
   geom_point(alpha=0.1) +
   facet_wrap(~treatment)</code></pre>
-<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>DE.results %&gt;%
   filter(CellType == &quot;LCL&quot;) %&gt;%
   filter(FDR &lt; 0.01 &amp; abs(logFC) &gt; 1) %&gt;%
@@ -1242,7 +1842,7 @@ CPM.mat %&gt;%
   Rotate_x_labels +
   labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;) +
   theme(legend.position=&#39;bottom&#39;)</code></pre>
-<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-8-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-13-1.png" width="1152" style="display: block; margin: auto;" /></p>
 <p>Most don’t seem all that unique. Here is a few cherry picked example
 that does look unique… It’d be nice to find the unproductive splice site
 for this.</p>
@@ -1278,7 +1878,7 @@ for this.</p>
   Rotate_x_labels +
   labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;) +
   theme(legend.position=&#39;bottom&#39;)</code></pre>
-<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Let’s go about this a different way: Look for DE genes in this LCL
 experiment that have a low dose:response spearman correlation
 coefficient in the titration series experiment.</p>
@@ -1313,7 +1913,7 @@ DE.results$treatment %&gt;% unique()</code></pre>
   geom_text_repel(aes(label=label), max.overlaps=Inf) +
   facet_grid(treatment.x~treatment.y) +
   labs(title=&quot;High correlation between spearman and high dose log2FC&quot;)</code></pre>
-<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Okay let’s manually inspect some of those genes in dose respnse
 curves…</p>
 <pre class="r"><code>CPM.mat %&gt;%
@@ -1348,7 +1948,7 @@ curves…</p>
   Rotate_x_labels +
   labs(x=&quot;nanomolar of risdiplam (or approx equivalent)&quot;) +
   theme(legend.position=&#39;bottom&#39;)</code></pre>
-<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/2023-11-02_3MoleculesOfInterestLeafcutterDs.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>All of these are very very lowly expressed (eg ASIC1, PAX9, MYEOV),
 which I don’t think I trust these to reproduce, or they do have clear
 effects in one treatment but maybe the spearman coef is smaller in
@@ -1475,6 +2075,14 @@ bigwigs/BigwigList.groups.tsv | grep &#39;LCL&#39; | grep -e &#39;SMSM32&#39; -e
 mv scratch/Exp202310_tracks.xml ./
 </code></pre>
 <p>Then open the xml session file in IGV</p>
+</div>
+<div id="thinking-about-two-sites" class="section level3">
+<h3>thinking about two sites</h3>
+<pre class="r"><code>slope &lt;- 0.5
+dose &lt;- 0.5
+doseChange &lt;- 2
+NumSites &lt;- 2
+E &lt;- NumSites * doseChange *dose * slope</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
